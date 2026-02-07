@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <title>Contacto</title>
+  </head>
+
+  <body>
+    <main>
+      <section class="contact-container">
+        <h2>Contacto</h2>
+        <p class="contact-intro">
+          Si tienes alguna pregunta o sugerencia, no dudes en contactarnos.
+        </p>
+        <p class="contact-subintro">
+          Para colaborar con fotos de montañas rusas, rellena también el
+          formulario o escríbeme al correo o por mis redes sociales.
+        </p>
+
+        <form
+          action="server/api/submit_contact.php"
+          method="POST"
+          class="contact-form"
+          id="contactForm"
+        >
+          <div class="form-group">
+            <label for="name">Nombre</label>
+            <input
+              type="text"
+              name="name"
+              id="name"
+              placeholder="Tu nombre"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              placeholder="Tu email"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="reason">Motivo</label>
+            <select name="reason" id="reason" required>
+              <option value="">Selecciona una opción</option>
+              <option value="bug">Reportar un error</option>
+              <option value="idea">Sugerir una idea</option>
+              <option value="fotos">Colaborar con fotos</option>
+              <option value="otros">Otros</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="subject">Asunto</label>
+            <input
+              type="text"
+              name="subject"
+              id="subject"
+              placeholder="Asunto"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="message">Mensaje</label>
+            <textarea
+              name="message"
+              id="message"
+              placeholder="Escribe tu mensaje aquí..."
+              required
+              rows="5"
+            ></textarea>
+          </div>
+
+          <button type="submit" class="btn-primary">Enviar Mensaje</button>
+        </form>
+      </section>
+    </main>
+
+    <script>
+      document
+        .getElementById("contactForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const form = this;
+          const btn = form.querySelector('button[type="submit"]');
+          const originalText = btn.textContent;
+
+          // Disable button
+          btn.disabled = true;
+          btn.textContent = "Enviando...";
+
+          try {
+            const formData = {
+              name: form.name.value,
+              email: form.email.value,
+              reason: form.reason.value,
+              subject: form.subject.value,
+              message: form.message.value,
+            };
+
+            const response = await fetch("server/api/submit_contact.php", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(formData),
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+              alert(
+                "¡Mensaje enviado correctamente! Gracias por contactarnos.",
+              );
+              form.reset();
+            } else {
+              alert(
+                "Error: " + (result.error || "Ocurrió un error desconocido."),
+              );
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            alert("Error de conexión al enviar el mensaje.");
+          } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
+          }
+        });
+    </script>
+  </body>
+</html>
