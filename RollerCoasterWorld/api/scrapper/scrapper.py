@@ -200,6 +200,21 @@ class RCDBScraper:
                 'rcdb_url': url
             }
             
+            # Imagen principal (si existe)
+            # RCDB suele poner la imagen en un div con id="demo-pic" o similar, o en un meta tag
+            # Buscamos el elemento <a href="/pictures/..."> que contiene la imagen principal
+            picture_div = soup.find('div', id='demo-pic')
+            if picture_div:
+                img_tag = picture_div.find('img')
+                if img_tag and img_tag.get('src'):
+                    coaster['main_image_url'] = f"{self.base_url}{img_tag.get('src')}"
+            
+            # Si no encuentra en demo-pic, intentar buscar en meta og:image
+            if 'main_image_url' not in coaster:
+                meta_img = soup.find('meta', property='og:image')
+                if meta_img and meta_img.get('content'):
+                    coaster['main_image_url'] = meta_img.get('content')
+            
             # Nombre (h1)
             h1 = soup.find('h1')
             if h1:
