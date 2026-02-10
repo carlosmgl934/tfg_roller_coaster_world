@@ -2,10 +2,13 @@ CREATE TABLE IF NOT EXISTS coasters(
 
     -- Datos de la coaster NO estadísticos --
     id INT AUTO_INCREMENT PRIMARY KEY,
+    rcdb_id INT DEFAULT NULL,
+    rcdb_url VARCHAR(255) DEFAULT NULL,
     coaster_name VARCHAR(255) NOT NULL,
     park_id INT NOT NULL,
     coaster_manufacter VARCHAR(255) DEFAULT NULL,
     coaster_model VARCHAR(255) DEFAULT NULL, 
+    coaster_status VARCHAR(50) DEFAULT NULL,
     imagen_url VARCHAR(255) DEFAULT NULL,
 
     -- Estadísticas --
