@@ -200,16 +200,12 @@ class RCDBScraper:
                 'rcdb_url': url
             }
             
-            # Imagen principal (si existe)
-            # RCDB suele poner la imagen en un div con id="demo-pic" o similar, o en un meta tag
-            # Buscamos el elemento <a href="/pictures/..."> que contiene la imagen principal
-            picture_div = soup.find('div', id='demo-pic')
-            if picture_div:
-                img_tag = picture_div.find('img')
-                if img_tag and img_tag.get('src'):
-                    coaster['main_image_url'] = f"{self.base_url}{img_tag.get('src')}"
+            # Imagen principal - usar a#opfAnchor con data-url
+            opf_anchor = soup.find('a', id='opfAnchor')
+            if opf_anchor and opf_anchor.get('data-url'):
+                coaster['main_image_url'] = f"{self.base_url}{opf_anchor.get('data-url')}"
             
-            # Si no encuentra en demo-pic, intentar buscar en meta og:image
+            # Fallback: meta og:image
             if 'main_image_url' not in coaster:
                 meta_img = soup.find('meta', property='og:image')
                 if meta_img and meta_img.get('content'):
@@ -245,19 +241,41 @@ class RCDBScraper:
                         # Si solo hay uno, es el país
                         coaster['country'] = locations[-1]
             
-            # Estado (Operating, Closed, etc.) - está en un link con /g.htm?id=93 o similar
-            status_link = soup.find('a', href=re.compile(r'/g\.htm\?id=9[0-9]'))
-            if status_link:
-                coaster['status'] = status_link.text.strip()
+            # Estado y Año de apertura - extraer de div#feature > p
+            feature_div = soup.find('div', id='feature')
+            if feature_div:
+                status_p = feature_div.find('p')
+                if status_p:
+                    status_text = status_p.get_text()
+                    # Status por keywords
+                    if 'Operating' in status_text:
+                        coaster['status'] = 'Operating'
+                    elif 'Removed' in status_text:
+                        coaster['status'] = 'Closed'
+                    elif 'In Storage' in status_text:
+                        coaster['status'] = 'In Storage'
+                    elif 'Under Construction' in status_text:
+                        coaster['status'] = 'Construction'
+                    elif 'SBNO' in status_text or 'Standing But Not Operating' in status_text:
+                        coaster['status'] = 'SBNO'
+                    elif 'Relocated' in status_text:
+                        coaster['status'] = 'Relocated'
+                    else:
+                        sl = status_p.find('a', href=re.compile(r'/g\.htm\?id=\d+'))
+                        if sl:
+                            coaster['status'] = sl.text.strip()
+                    
+                    # Año de apertura desde <time datetime="...">
+                    time_tag = status_p.find('time')
+                    if time_tag and time_tag.get('datetime'):
+                        dt = time_tag.get('datetime')
+                        coaster['opened'] = dt
+                        ym = re.search(r'^(\d{4})', dt)
+                        if ym:
+                            coaster['year'] = int(ym.group(1))
             
-            # Fecha de apertura - texto "Operating since" seguido de fecha
+            # text_content se usa más abajo para tipo, diseño, make, model
             text_content = soup.get_text()
-            since_match = re.search(r'Operating since\s+(\d{1,2}/\d{1,2}/\d{4})', text_content)
-            if since_match:
-                coaster['opened'] = since_match.group(1)
-                year_match = re.search(r'/(\d{4})$', since_match.group(1))
-                if year_match:
-                    coaster['year'] = int(year_match.group(1))
             
             # Tipo y diseño - están en el texto después del h1
             # Steel, Wood, etc.

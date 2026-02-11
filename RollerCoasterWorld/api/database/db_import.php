@@ -34,6 +34,7 @@ $db = new DBConexion();
 $conn = $db->getConexion();
 
 $inserted = 0;
+$updated = 0;
 $skipped = 0;
 $parks_created = 0;
 
@@ -86,11 +87,16 @@ foreach ($coasters as $c) {
     }
 
     // ---- INSERTAR COASTER ----
+    // ---- INSERTAR O ACTUALIZAR COASTER ----
     $stmt = $conn->prepare("
         INSERT INTO coasters (rcdb_id, rcdb_url, coaster_name, park_id,
             coaster_manufacter, coaster_model, coaster_status, imagen_url,
             height, speed, coaster_length, inversions, opening_year)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+            coaster_status = VALUES(coaster_status),
+            opening_year = VALUES(opening_year),
+            imagen_url = VALUES(imagen_url)
     ");
 
     $stmt->execute([
@@ -109,16 +115,25 @@ foreach ($coasters as $c) {
         $c['year'] ?? null,
     ]);
 
-    $inserted++;
+    // Verificar si se actualizó o insertó
+    if ($stmt->rowCount() == 1) {
+        $inserted++;
+    } elseif ($stmt->rowCount() == 2) {
+        // Se actualizó una fila existente (UPDATE incrementa rowCount en 2)
+        $updated++;
+    } else {
+        $skipped++;
+    }
 
-    if ($inserted % 500 == 0) {
-        echo " $inserted insertadas...\n";
+    $total_processed = $inserted + $updated + $skipped;
+    if ($total_processed % 500 == 0) {
+        echo " $total_processed procesadas ($inserted nuevas, $updated actualizadas)...\n";
     }
 }
 
 echo "\n Importación completada:\n";
 echo " Coasters insertadas: $inserted\n";
-echo " Coasters saltadas (duplicadas): $skipped\n";
+echo " Coasters actualizadas: $updated\n";
+echo " Coasters saltadas (sin cambios): $skipped\n";
 echo " Parques nuevos creados: $parks_created\n";
-
 ?>

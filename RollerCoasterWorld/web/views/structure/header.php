@@ -13,13 +13,13 @@
       <ul>
         <li><a href="index.php">Inicio</a></li>
         <li><a href="profile.php">Mi perfil</a></li>
-        <li><a href="rollercoasters.php">Montañas Rusas</a></li>
+        <li><a href="coasters.php">Montañas Rusas</a></li>
         <li><a href="parks.php">Parques</a></li>
         <li><a href="forums.php">Foros</a></li>
       </ul>
     </nav>
     <div class="user-actions">
-      <a href="login.php">Iniciar sesión</a>
-      <a href="register.php">Registrarse</a>
+      <a href="../firebase/auth/login.php">Iniciar sesión</a>
+      <a href="../firebase/auth/register.php">Registrarse</a>
     </div>
   </header>
