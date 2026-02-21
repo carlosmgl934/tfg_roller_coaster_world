@@ -1,19 +1,10 @@
-CREATE TABLE IF NOT EXISTS friendship(
-
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    estado_solicitud ENUM('PENDIENTE', 'ACEPTADA') DEFAULT 'PENDIENTE',
-
-    -- Persona solicitante --
+CREATE TABLE IF NOT EXISTS friendship (
+    id SERIAL PRIMARY KEY,
+    estado_solicitud VARCHAR(20) CHECK (estado_solicitud IN ('PENDIENTE', 'ACEPTADA')) DEFAULT 'PENDIENTE',
     solicitante_id INT NOT NULL,
-    
-    -- Persona solicitada --
     solicitada_id INT NOT NULL,
-
-    -- Antiguedad amistad --
-    accepted_at TIMESTAMP NULL DEFAULT NULL,
-   
+    accepted_at TIMESTAMP DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-     
     FOREIGN KEY (solicitante_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (solicitada_id) REFERENCES users(id) ON DELETE CASCADE
 );

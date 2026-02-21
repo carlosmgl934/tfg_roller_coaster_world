@@ -1,9 +1,0 @@
-GUION_TFG_RollerCoasterWorld.html
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
-node_modules/
-vendor/
-*.log
-.env
