@@ -1,65 +1,87 @@
 <?php
 
-class DBConexion
+/**
+ * Carga variables de entorno desde .env (ruta ajustada para tu estructura)
+ * .env está en RollerCoasterWorld/.env
+ */
+function loadEnv()
 {
+    // Desde /api/database/ → subimos 2 niveles hasta RollerCoasterWorld
+    $envPath = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . '.env';
 
-    private PDO $conn;
-    public function __construct()
-    {
-
-        $env = parse_ini_file(__DIR__ . '/../../.env');
-
-        $host = $env['DB_HOST'];
-        $user = $env['DB_USER'];
-        $password = $env['DB_PASS'];
-        $dbname = $env['DB_NAME'];
-        $destino = "mysql:host=$host;port={$env['DB_PORT']};dbname=$dbname;charset=utf8mb4";
-
-
-
-        try {
-            //Crear conexión PDO
-            $this->conn = new PDO($destino, $user, $password);
-            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            echo "Error al conectar a la base de datos: " . $e->getMessage();
-        }
+    if (!file_exists($envPath)) {
+        die("Archivo .env no encontrado en: " . $envPath . "<br>" .
+            "Ruta esperada: C:\\xampp\\htdocs\\tfg\\tfg_roller_coaster_world\\RollerCoasterWorld\\.env");
     }
 
-    public function getConexion(): PDO
-    {
-        return $this->conn;
-    }
+    $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if (empty($line) || str_starts_with($line, '#')) continue;
+        if (!str_contains($line, '=')) continue;
 
-    public function query($sql)
-    {
-        try {
-            $result = $this->conn->query($sql);
-            return $result;
-        } catch (PDOException $e) {
-            echo "Error al ejecutar la consulta: " . $e->getMessage();
-        }
-    }
+        list($key, $value) = explode('=', $line, 2);
+        $key   = trim($key);
+        $value = trim($value);
 
-    public function prepare($sql)
-    {
-        try {
-            $stmt = $this->conn->prepare($sql);
-            return $stmt;
-        } catch (PDOException $e) {
-            echo "Error al preparar la consulta: " . $e->getMessage();
-        }
-    }
+        // Quitar comillas si existen
+        $value = trim($value, '"\'');
 
-    public function execute($stmt, $params = [])
-    {
-        try {
-            $stmt->execute($params);
-            return $stmt;
-        } catch (PDOException $e) {
-            echo "Error al ejecutar la consulta: " . $e->getMessage();
-        }
+        putenv("$key=$value");
+        $_ENV[$key]    = $value;
+        $_SERVER[$key] = $value;
     }
 }
 
-?>
+// Cargar solo una vez
+if (!isset($_ENV['DB_HOST'])) {
+    loadEnv();
+}
+
+class DBConexion
+{
+    private PDO $conn;
+
+    public function __construct()
+    {
+        $host     = $_ENV['DB_HOST']     ?? die('Falta DB_HOST en .env');
+        $port     = $_ENV['DB_PORT']     ?? '5432';
+        $dbname   = $_ENV['DB_NAME']     ?? 'postgres';
+        $user     = $_ENV['DB_USER']     ?? 'postgres';
+        $password = $_ENV['DB_PASS']     ?? die('Falta DB_PASS en .env');
+
+        $dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
+
+        try {
+            $this->conn = new PDO($dsn, $user, $password);
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->conn->exec("SET NAMES 'utf8'");
+            $this->conn->exec("SET TIME ZONE 'Europe/Madrid'");
+        } catch (PDOException $e) {
+            die("Error al conectar a Supabase (PostgreSQL): " . $e->getMessage());
+        }
+    }
+
+    public function query($sql) {
+        try { return $this->conn->query($sql); }
+        catch (PDOException $e) { die("Error en query: " . $e->getMessage()); }
+    }
+
+    public function prepare($sql) {
+        try { return $this->conn->prepare($sql); }
+        catch (PDOException $e) { die("Error al preparar: " . $e->getMessage()); }
+    }
+
+    public function execute($stmt, $params = []) {
+        try { $stmt->execute($params); return $stmt; }
+        catch (PDOException $e) { die("Error al ejecutar: " . $e->getMessage()); }
+    }
+
+    public function lastInsertId() {
+        return $this->conn->lastInsertId();
+    }
+
+    public function close() {
+        $this->conn = null;
+    }
+}

@@ -1,0 +1,7 @@
+2026-02-22 17:02:16 - POST recibido: 
+2026-02-22 17:02:16 - Datos inválidos o no recibidos
+2026-02-22 17:03:48 - POST recibido: {"firebase_uid":"HBu22wEw9leYm9S1L7L8vx81BDB2","email":"ajimenezpazos@gmail.com","username":"ajimenezpazos"}
+2026-02-22 17:03:48 - Datos: uid=HBu22wEw9leYm9S1L7L8vx81BDB2, email=ajimenezpazos@gmail.com, username=ajimenezpazos
+2026-02-22 17:03:49 - Conexión creada
+2026-02-22 17:03:49 - Execute: OK
+2026-02-22 17:03:49 - Insertado ID: 1
