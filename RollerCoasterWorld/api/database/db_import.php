@@ -2,8 +2,14 @@
 
 /**
  * Importar datos de RCDB (JSON) a Supabase (PostgreSQL)
- * Versión final adaptada: accede a $data['coasters'], valida campos obligatorios,
- * salta entradas inválidas y usa ON CONFLICT para evitar duplicados.
+ *
+ * Uso:  php db_import.php ../scrapper/rcdb_complete.json
+ *
+ * Cambios respecto a versión anterior:
+ *  - city vacío ya NO descarta el coaster (se usa 'Desconocido' como fallback)
+ *  - park_id se obtiene con SELECT cuando ON CONFLICT no hace INSERT
+ *  - Conversión ft→m y mph→kmh si las unidades métricas faltan
+ *  - Progress cada 1000 registros para no saturar consola
  */
 
 require_once __DIR__ . '/db_conexion.php';
@@ -20,7 +26,7 @@ if (!file_exists($json_path)) {
     exit(1);
 }
 
-// Leer y parsear JSON
+echo "Leyendo JSON...\n";
 $json_content = file_get_contents($json_path);
 $data = json_decode($json_content, true);
 
@@ -29,50 +35,45 @@ if ($data === null) {
     exit(1);
 }
 
-// Acceder al array real de coasters (está dentro de la clave "coasters")
-$coasters = $data['coasters'] ?? [];
+// Soporte para JSON con clave 'coasters' o array directo
+$coasters = $data['coasters'] ?? (is_array($data) ? $data : []);
 
-if (empty($coasters) || !is_array($coasters)) {
-    echo "No se encontró un array válido en 'coasters' dentro del JSON\n";
+if (empty($coasters)) {
+    echo "No se encontraron coasters en el JSON\n";
     exit(1);
 }
+
+$total = count($coasters);
+echo "Total de coasters en el JSON: $total\n\n";
 
 $db = new DBConexion();
 
 $inserted = 0;
 $updated = 0;
 $skipped = 0;
-$parks_processed = 0;
+$parks_created = 0;
 
-$total = count($coasters);
-echo "Procesando $total coasters...\n";
+// ── Prepared statements ────────────────────────────────────────────────────
 
-// Preparar statements
-$park_stmt = $db->prepare("
+// Buscar parque por nombre
+$park_find = $db->prepare("SELECT id FROM parks WHERE park_name = :park_name LIMIT 1");
+
+// Insertar parque. ON CONFLICT devuelve id SOLO si hace INSERT;
+// si ya existe, RETURNING no devuelve nada → usaremos SELECT de fallback.
+$park_insert = $db->prepare("
     INSERT INTO parks (
-        park_name, park_location, park_country, imagen_url,
-        num_coasters, operating_coasters, opening_year,
-        precio_entrada, stars, latitude, longitude
+        park_name, park_location, park_country,
+        num_coasters, operating_coasters, stars
     ) VALUES (
-        :park_name, :park_location, :park_country, :imagen_url,
-        :num_coasters, :operating_coasters, :opening_year,
-        :precio_entrada, :stars, :latitude, :longitude
+        :park_name, :park_location, :park_country,
+        0, 0, 0
     )
-    ON CONFLICT (park_name) DO UPDATE SET
-        park_location = EXCLUDED.park_location,
-        park_country = EXCLUDED.park_country,
-        imagen_url = EXCLUDED.imagen_url,
-        num_coasters = EXCLUDED.num_coasters,
-        operating_coasters = EXCLUDED.operating_coasters,
-        opening_year = EXCLUDED.opening_year,
-        precio_entrada = EXCLUDED.precio_entrada,
-        stars = EXCLUDED.stars,
-        latitude = EXCLUDED.latitude,
-        longitude = EXCLUDED.longitude
+    ON CONFLICT (park_name) DO NOTHING
     RETURNING id
 ");
 
-$coaster_stmt = $db->prepare("
+// Insertar / actualizar coaster con ON CONFLICT (rcdb_id)
+$coaster_upsert = $db->prepare("
     INSERT INTO coasters (
         rcdb_id, rcdb_url, coaster_name, park_id,
         coaster_manufacter, coaster_model, coaster_status,
@@ -80,95 +81,134 @@ $coaster_stmt = $db->prepare("
         inversions, opening_year, stars
     ) VALUES (
         :rcdb_id, :rcdb_url, :coaster_name, :park_id,
-        :coaster_manufacter, :coaster_model, :coaster_status,
-        :imagen_url, :height, :speed, :coaster_length,
-        :inversions, :opening_year, :stars
+        :manufacter, :model, :status,
+        :imagen_url, :height, :speed, :length,
+        :inversions, :year, 0
     )
     ON CONFLICT (rcdb_id) DO UPDATE SET
-        rcdb_url = EXCLUDED.rcdb_url,
-        coaster_name = EXCLUDED.coaster_name,
-        park_id = EXCLUDED.park_id,
+        rcdb_url           = EXCLUDED.rcdb_url,
+        coaster_name       = EXCLUDED.coaster_name,
+        park_id            = EXCLUDED.park_id,
         coaster_manufacter = EXCLUDED.coaster_manufacter,
-        coaster_model = EXCLUDED.coaster_model,
-        coaster_status = EXCLUDED.coaster_status,
-        imagen_url = EXCLUDED.imagen_url,
-        height = EXCLUDED.height,
-        speed = EXCLUDED.speed,
-        coaster_length = EXCLUDED.coaster_length,
-        inversions = EXCLUDED.inversions,
-        opening_year = EXCLUDED.opening_year,
-        stars = EXCLUDED.stars
+        coaster_model      = EXCLUDED.coaster_model,
+        coaster_status     = EXCLUDED.coaster_status,
+        imagen_url         = EXCLUDED.imagen_url,
+        height             = EXCLUDED.height,
+        speed              = EXCLUDED.speed,
+        coaster_length     = EXCLUDED.coaster_length,
+        inversions         = EXCLUDED.inversions,
+        opening_year       = EXCLUDED.opening_year
 ");
 
-foreach ($coasters as $index => $item) {
-    // Normalizar y validar campos obligatorios
-    $park_name     = trim($item['park'] ?? '');
-    $park_location = trim($item['city'] ?? '');   // 'city' en tu JSON
+// ── Helper: obtener o crear park_id ───────────────────────────────────────
+function getOrCreatePark($park_find, $park_insert, &$parks_created, $name, $location, $country): int|false
+{
+    // 1. Intentar insertar (ON CONFLICT DO NOTHING)
+    $park_insert->execute([
+        ':park_name' => $name,
+        ':park_location' => $location,
+        ':park_country' => $country,
+    ]);
+    $id = $park_insert->fetchColumn();
 
-    if (empty($park_name) || empty($park_location)) {
-        $msg = "Saltando entrada inválida (índice $index) → ";
-        $msg .= empty($park_name) ? "park vacío " : "";
-        $msg .= empty($park_location) ? "city/park_location vacío " : "";
-        $msg .= "(rcdb_id: " . ($item['id'] ?? 'sin id') . ")\n";
-        echo $msg;
+    if ($id !== false) {
+        $parks_created++;
+        return (int) $id;
+    }
+
+    // 2. Fallback: ya existía → buscarlo por nombre
+    $park_find->execute([':park_name' => $name]);
+    $row = $park_find->fetch(PDO::FETCH_ASSOC);
+    return $row ? (int) $row['id'] : false;
+}
+
+// ── Conversión de unidades ─────────────────────────────────────────────────
+function toMetric(array $item): array
+{
+    // Altura
+    $height = $item['height_m'] ?? null;
+    if ($height === null && isset($item['height_ft'])) {
+        $height = round($item['height_ft'] * 0.3048, 1);
+    }
+
+    // Velocidad
+    $speed = $item['speed_kmh'] ?? null;
+    if ($speed === null && isset($item['speed_mph'])) {
+        $speed = round($item['speed_mph'] * 1.60934, 1);
+    }
+
+    // Longitud
+    $length = $item['length_m'] ?? null;
+    if ($length === null && isset($item['length_ft'])) {
+        $length = round($item['length_ft'] * 0.3048, 1);
+    }
+
+    return [$height, $speed, $length];
+}
+
+// ── Loop principal ─────────────────────────────────────────────────────────
+foreach ($coasters as $index => $item) {
+
+    $rcdb_id = $item['id'] ?? $item['rcdb_id'] ?? null;
+
+    // Sin rcdb_id no podemos hacer ON CONFLICT, saltamos
+    if (!$rcdb_id) {
         $skipped++;
         continue;
     }
 
-    // Insertar / actualizar parque
-    $park_stmt->execute([
-        ':park_name'          => $park_name,
-        ':park_location'      => $park_location,
-        ':park_country'       => $item['country'] ?? null,
-        ':imagen_url'         => $item['main_image_url'] ?? null,
-        ':num_coasters'       => 0,  // no lo tienes en JSON, ponemos 0 por defecto
-        ':operating_coasters' => 0,
-        ':opening_year'       => $item['year'] ?? null,
-        ':precio_entrada'     => null,
-        ':stars'              => 0,
-        ':latitude'           => null,
-        ':longitude'          => null,
-    ]);
+    // Datos del parque — city vacío ya no descarta el coaster
+    $park_name = trim($item['park'] ?? 'Desconocido');
+    $park_location = trim($item['city'] ?? '') ?: 'Desconocido';
+    $park_country = $item['country'] ?? null;
 
-    $park_id = $park_stmt->fetchColumn();
-    if ($park_id) {
-        $parks_processed++;
+    $park_id = getOrCreatePark($park_find, $park_insert, $parks_created, $park_name, $park_location, $park_country);
+
+    if ($park_id === false) {
+        // Rarísimo, pero si ocurre no podemos insertar el coaster
+        $skipped++;
+        continue;
     }
 
-    // Insertar / actualizar coaster
-    $coaster_stmt->execute([
-        ':rcdb_id'             => $item['id'] ?? null,
-        ':rcdb_url'            => $item['rcdb_url'] ?? null,
-        ':coaster_name'        => $item['name'] ?? null,
-        ':park_id'             => $park_id,
-        ':coaster_manufacter'  => $item['make'] ?? null,
-        ':coaster_model'       => $item['model'] ?? null,
-        ':coaster_status'      => $item['status'] ?? null,
-        ':imagen_url'          => $item['main_image_url'] ?? null,
-        ':height'              => $item['height_m'] ?? null,
-        ':speed'               => $item['speed_kmh'] ?? null,
-        ':coaster_length'      => $item['length_m'] ?? null,
-        ':inversions'          => $item['inversions'] ?? 0,
-        ':opening_year'        => $item['year'] ?? null,
-        ':stars'               => 0,
+    [$height, $speed, $length] = toMetric($item);
+
+    $coaster_upsert->execute([
+        ':rcdb_id' => $rcdb_id,
+        ':rcdb_url' => $item['rcdb_url'] ?? "https://rcdb.com/{$rcdb_id}.htm",
+        ':coaster_name' => $item['name'] ?? 'Sin nombre',
+        ':park_id' => $park_id,
+        ':manufacter' => $item['make'] ?? null,
+        ':model' => $item['model'] ?? null,
+        ':status' => $item['status'] ?? null,
+        ':imagen_url' => $item['main_image_url'] ?? null,
+        ':height' => $height,
+        ':speed' => $speed,
+        ':length' => $length,
+        ':inversions' => $item['inversions'] ?? 0,
+        ':year' => $item['year'] ?? null,
     ]);
 
-    $rowCount = $coaster_stmt->rowCount();
-    if ($rowCount > 0) {
+    $rows = $coaster_upsert->rowCount();
+    if ($rows == 1) {
         $inserted++;
+    } elseif ($rows == 2) {
+        $updated++;   // PostgreSQL rowCount = 2 cuando hace UPDATE
     } else {
         $skipped++;
     }
 
-    $total_processed = $inserted + $skipped;
-    if ($total_processed % 500 == 0) {
-        echo " $total_processed procesadas ($inserted insertadas/actualizadas, $skipped saltadas)...\n";
+    $done = $inserted + $updated + $skipped;
+    if ($done % 1000 === 0) {
+        echo " [{$done}/{$total}] insertadas: $inserted | actualizadas: $updated | saltadas: $skipped\n";
     }
 }
 
-echo "\nImportación completada:\n";
-echo " - Coasters procesadas exitosamente: $inserted\n";
-echo " - Entradas saltadas (inválidas): $skipped\n";
-echo " - Parques procesados (insertados/actualizados): $parks_processed\n";
-echo "¡Proceso finalizado!\n";
+echo "\n===============================\n";
+echo " Importación completada\n";
+echo "===============================\n";
+echo " Coasters insertadas:   $inserted\n";
+echo " Coasters actualizadas: $updated\n";
+echo " Coasters saltadas:     $skipped\n";
+echo " Parques nuevos:        $parks_created\n";
+echo "===============================\n";
 ?>

@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS forum_messages (
     id SERIAL PRIMARY KEY,
+    -- Datos del mensaje --
     forum_id INT NOT NULL,
     user_id INT NOT NULL,
     content TEXT NOT NULL,
