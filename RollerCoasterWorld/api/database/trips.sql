@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS trips(
     start_date DATE NOT NULL,      --fecha de inicio
     end_date DATE NOT NULL,        --fecha de final
 
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     parks_visited VARCHAR(255) DEFAULT NULL,  --nuevos parques que visita
     new_credits INT(100) NOT NULL,  --nuevas montañas rusas que prueba
