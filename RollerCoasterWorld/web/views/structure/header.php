@@ -23,6 +23,7 @@ $is_logged = isset($_SESSION['firebase_uid']);
   <script src="/tfg/tfg_roller_coaster_world/RollerCoasterWorld/web/js/auth.js"></script>
 
   <!-- Otros CSS/JS que tengas -->
+   <script src="/tfg/tfg_roller_coaster_world/RollerCoasterWorld/web/js/auth-check.js"></script>
 </head>
 
 <body>

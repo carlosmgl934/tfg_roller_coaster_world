@@ -5,3 +5,38 @@
 2026-02-22 17:03:49 - Conexión creada
 2026-02-22 17:03:49 - Execute: OK
 2026-02-22 17:03:49 - Insertado ID: 1
+2026-03-01 17:39:57 - POST recibido: {"firebase_uid":"CCn0NDjsEIbW4DaJXz2trhMsp8D2","email":"vicenteexpositotierno12@gmail.com","username":"vicenteexpositotierno12"}
+2026-03-01 17:39:57 - Datos: uid=CCn0NDjsEIbW4DaJXz2trhMsp8D2, email=vicenteexpositotierno12@gmail.com, username=vicenteexpositotierno12
+2026-03-01 17:39:58 - Conexión creada
+2026-03-01 17:39:58 - Execute: OK
+2026-03-01 17:39:58 - Insertado ID: 1
+2026-03-01 17:50:25 - POST recibido: {"firebase_uid":"CCn0NDjsEIbW4DaJXz2trhMsp8D2","email":"vicenteexpositotierno12@gmail.com","username":"vicenteexpositotierno12"}
+2026-03-01 17:50:25 - Datos: uid=CCn0NDjsEIbW4DaJXz2trhMsp8D2, email=vicenteexpositotierno12@gmail.com, username=vicenteexpositotierno12
+2026-03-01 17:50:25 - Conexión creada
+2026-03-01 17:50:25 - Execute: OK
+2026-03-01 17:50:25 - No insertado (ya existe o error)
+2026-03-01 18:02:46 - POST recibido: {"firebase_uid":"CCn0NDjsEIbW4DaJXz2trhMsp8D2","email":"vicenteexpositotierno12@gmail.com","username":"vicenteexpositotierno12"}
+2026-03-01 18:02:46 - Datos: uid=CCn0NDjsEIbW4DaJXz2trhMsp8D2, email=vicenteexpositotierno12@gmail.com, username=vicenteexpositotierno12
+2026-03-01 18:02:46 - Conexión creada
+2026-03-01 18:02:46 - Execute: OK
+2026-03-01 18:02:46 - No insertado (ya existe o error)
+2026-03-01 18:05:46 - POST recibido: {"firebase_uid":"CCn0NDjsEIbW4DaJXz2trhMsp8D2","email":"vicenteexpositotierno12@gmail.com","username":"vicenteexpositotierno12"}
+2026-03-01 18:05:46 - Datos: uid=CCn0NDjsEIbW4DaJXz2trhMsp8D2, email=vicenteexpositotierno12@gmail.com, username=vicenteexpositotierno12
+2026-03-01 18:05:46 - Conexión creada
+2026-03-01 18:05:46 - Execute: OK
+2026-03-01 18:05:46 - No insertado (ya existe o error)
+2026-03-01 18:09:27 - POST recibido: {"firebase_uid":"CCn0NDjsEIbW4DaJXz2trhMsp8D2","email":"vicenteexpositotierno12@gmail.com","username":"vicenteexpositotierno12"}
+2026-03-01 18:09:27 - Datos: uid=CCn0NDjsEIbW4DaJXz2trhMsp8D2, email=vicenteexpositotierno12@gmail.com, username=vicenteexpositotierno12
+2026-03-01 18:09:28 - Conexión creada
+2026-03-01 18:09:28 - Execute: OK
+2026-03-01 18:09:28 - No insertado (ya existe o error)
+2026-03-01 18:16:11 - POST recibido: {"firebase_uid":"CCn0NDjsEIbW4DaJXz2trhMsp8D2","email":"vicenteexpositotierno12@gmail.com","username":"vicenteexpositotierno12"}
+2026-03-01 18:16:11 - Datos: uid=CCn0NDjsEIbW4DaJXz2trhMsp8D2, email=vicenteexpositotierno12@gmail.com, username=vicenteexpositotierno12
+2026-03-01 18:16:11 - Conexión creada
+2026-03-01 18:16:11 - Execute: OK
+2026-03-01 18:16:11 - No insertado (ya existe o error)
+2026-03-01 18:24:31 - POST recibido: {"firebase_uid":"CCn0NDjsEIbW4DaJXz2trhMsp8D2","email":"vicenteexpositotierno12@gmail.com","username":"vicenteexpositotierno12"}
+2026-03-01 18:24:31 - Datos: uid=CCn0NDjsEIbW4DaJXz2trhMsp8D2, email=vicenteexpositotierno12@gmail.com, username=vicenteexpositotierno12
+2026-03-01 18:24:31 - Conexión creada
+2026-03-01 18:24:31 - Execute: OK
+2026-03-01 18:24:31 - No insertado (ya existe o error)
