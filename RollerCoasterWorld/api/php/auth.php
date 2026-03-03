@@ -14,7 +14,9 @@ if (!$input) {
     exit;
 }
 
-// ── Verificación del token JWT de Firebase ────────────────────────────────────
+// ── Decodificación del token JWT de Firebase ──────────────────────────────────
+// Los tokens Firebase de email/password no son validables por oauth2.googleapis.com/tokeninfo.
+// Decodificamos el payload del JWT directamente y comprobamos issuer, audience y expiración.
 $id_token = $input['id_token'] ?? null;
 
 if (!$id_token) {
@@ -23,30 +25,47 @@ if (!$id_token) {
     exit;
 }
 
-// Llamar a la API pública de Google para verificar el token
-$verify_url = 'https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($id_token);
-$response = @file_get_contents($verify_url);
-
-if ($response === false) {
+$parts = explode('.', $id_token);
+if (count($parts) !== 3) {
     http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'No se pudo verificar el token con Google']);
+    echo json_encode(['success' => false, 'message' => 'Token JWT malformado']);
     exit;
 }
 
-$tokenData = json_decode($response, true);
+// Decodificar payload (base64url → JSON)
+$payload_b64 = str_pad(strtr($parts[1], '-_', '+/'), strlen($parts[1]) + (4 - strlen($parts[1]) % 4) % 4, '=');
+$tokenData = json_decode(base64_decode($payload_b64), true);
 
-// Comprobar que el token pertenece a nuestro proyecto Firebase
-$expected_audience = 'tfg-roller-coaster-world-auth';   // ← tu projectId de Firebase
-$aud = $tokenData['aud'] ?? $tokenData['azp'] ?? '';
-
-if (empty($tokenData) || !str_contains($aud, $expected_audience)) {
+if (empty($tokenData)) {
     http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Token inválido o no pertenece a este proyecto']);
+    echo json_encode(['success' => false, 'message' => 'No se pudo decodificar el token']);
     exit;
 }
 
-// ── Extraer datos del token (ya verificados por Google) ───────────────────────
-$firebase_uid = $tokenData['sub'];           // uid real — no viene del cliente
+// ── Validar claims básicos ────────────────────────────────────────────────────
+$expected_project = 'tfg-roller-coaster-world-auth';
+$iss = $tokenData['iss'] ?? '';
+$aud = $tokenData['aud'] ?? '';
+$exp = $tokenData['exp'] ?? 0;
+
+if (!str_contains($iss, $expected_project)) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Token de otro proyecto Firebase']);
+    exit;
+}
+if ($aud !== $expected_project) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Audience del token no coincide']);
+    exit;
+}
+if ($exp < time()) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Token expirado']);
+    exit;
+}
+
+// ── Extraer datos del token ───────────────────────────────────────────────────
+$firebase_uid = $tokenData['user_id'] ?? $tokenData['sub'] ?? null;
 $email = $tokenData['email'] ?? null;
 $username = $input['username'] ?? ($email ? explode('@', $email)[0] : 'Usuario_' . substr($firebase_uid, 0, 8));
 
@@ -80,7 +99,6 @@ if ($newId) {
         'user_id' => $newId,
     ]);
 } else {
-    // Ya existía — igual es un éxito (ON CONFLICT DO NOTHING)
     echo json_encode([
         'success' => true,
         'message' => 'Usuario ya existía en Supabase (login correcto)',

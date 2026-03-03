@@ -86,6 +86,24 @@ function signInWithEmail(email, password) {
       const user = userCredential.user;
       console.log("Login exitoso! UID:", user.uid);
 
+      // ── Si hay un borrado pendiente por requires-recent-login, ejecutarlo ahora ──
+      if (sessionStorage.getItem("pending_delete") === "1") {
+        sessionStorage.removeItem("pending_delete");
+        user
+          .delete()
+          .then(() => {
+            fetch(BASE + "/api/php/delete_user.php", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ firebase_uid: user.uid }),
+            }).catch((e) => console.error("Error borrando de Supabase:", e));
+            alert("Cuenta eliminada correctamente.");
+            window.location.href = BASE + "/web/firebase/auth/login.php";
+          })
+          .catch((err) => alert("Error al eliminar la cuenta: " + err.message));
+        return; // No continuar con el flujo de login normal
+      }
+
       user.getIdToken().then((idToken) => {
         fetch(BASE + "/api/php/save_session.php", {
           method: "POST",
@@ -129,6 +147,24 @@ function signInWithGoogle() {
     .then((result) => {
       const user = result.user;
       console.log("Login Google OK:", user.uid);
+
+      // ── Si hay un borrado pendiente por requires-recent-login, ejecutarlo ahora ──
+      if (sessionStorage.getItem("pending_delete") === "1") {
+        sessionStorage.removeItem("pending_delete");
+        user
+          .delete()
+          .then(() => {
+            fetch(BASE + "/api/php/delete_user.php", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ firebase_uid: user.uid }),
+            }).catch((e) => console.error("Error borrando de Supabase:", e));
+            alert("Cuenta eliminada correctamente.");
+            window.location.href = BASE + "/web/firebase/auth/login.php";
+          })
+          .catch((err) => alert("Error al eliminar la cuenta: " + err.message));
+        return;
+      }
 
       user.getIdToken().then((idToken) => {
         fetch(BASE + "/api/php/save_session.php", {
@@ -301,7 +337,6 @@ function borrarCuenta() {
         body: JSON.stringify({ firebase_uid: user.uid }),
       })
         .then((r) => r.json())
-        .then((d) => alert("Usuario eliminado de Supabase:" + d))
         .catch((err) =>
           console.error("Error al eliminar usuario de Supabase:", err),
         );
@@ -310,6 +345,20 @@ function borrarCuenta() {
       window.location.href = BASE + "/web/firebase/auth/login.php";
     })
     .catch((error) => {
-      alert("Error al eliminar la cuenta: " + error.message);
+      if (error.code === "auth/requires-recent-login") {
+        // Guardar marca para reintentar el borrado automáticamente tras el login
+        sessionStorage.setItem("pending_delete", "1");
+        alert(
+          "Por seguridad, necesitas volver a iniciar sesión antes de eliminar tu cuenta.\n\nInicia sesión y la cuenta se eliminará automáticamente.",
+        );
+        // Cerrar sesión PHP + Firebase y redirigir al login
+        fetch(BASE + "/api/php/logout.php", { method: "POST" }).finally(() => {
+          auth.signOut().then(() => {
+            window.location.href = BASE + "/web/firebase/auth/login.php";
+          });
+        });
+      } else {
+        alert("Error al eliminar la cuenta: " + error.message);
+      }
     });
 }
