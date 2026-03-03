@@ -1,0 +1,2549 @@
+{
+  "saved_at": "2026-03-03T16:34:19.116973",
+  "scanned": 23845,
+  "not_found": 10,
+  "new_coasters": [
+    {
+      "rcdb_id": 23775,
+      "rcdb_url": "https://rcdb.com/23775.htm",
+      "name": "Chaoxiangwan Park / 超享玩游乐园",
+      "city": "Meilan",
+      "country": "China",
+      "status": "Operating",
+      "year": 2024
+    },
+    {
+      "rcdb_id": 23776,
+      "rcdb_url": "https://rcdb.com/23776.htm",
+      "main_image_url": "https://rcdb.com/aaivdtc",
+      "name": "Chicken Coop / 小鸡快跑",
+      "park": "Chaoxiangwan Park",
+      "city": "Meilan",
+      "country": "China",
+      "status": "Operating",
+      "year": 2024,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23777,
+      "rcdb_url": "https://rcdb.com/23777.htm",
+      "name": "unknown",
+      "park": "Juegos del Parque Rodó",
+      "city": "Montevideo",
+      "country": "Uruguay",
+      "status": "Construction",
+      "year": 2026,
+      "inversions": 2
+    },
+    {
+      "rcdb_id": 23778,
+      "rcdb_url": "https://rcdb.com/23778.htm",
+      "main_image_url": "https://rcdb.com/aaivsic",
+      "name": "Wriggler",
+      "park": "Gulliver's Land Resort",
+      "city": "Milton Keynes",
+      "country": "United Kingdom",
+      "status": "Operating",
+      "year": 2026,
+      "make": "SBF Visa Group",
+      "model": "Family Coaster / MX48",
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23779,
+      "rcdb_url": "https://rcdb.com/23779.htm",
+      "name": "Elefantenreservat und Erlebnispark Starkenberg",
+      "city": "Starkenberg",
+      "country": "Germany",
+      "status": "Operating",
+      "year": 2020
+    },
+    {
+      "rcdb_id": 23780,
+      "rcdb_url": "https://rcdb.com/23780.htm",
+      "name": "unknown",
+      "park": "Elefantenreservat und Erlebnispark Starkenberg",
+      "city": "Starkenberg",
+      "country": "Germany",
+      "status": "Construction",
+      "year": 2026,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23781,
+      "rcdb_url": "https://rcdb.com/23781.htm",
+      "name": "unknown",
+      "park": "Longshouyang Water Park",
+      "city": "Qionghai",
+      "country": "China",
+      "status": "Closed",
+      "year": 2026,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23782,
+      "rcdb_url": "https://rcdb.com/23782.htm",
+      "name": "Little Dipper",
+      "park": "Ocean Beach Park",
+      "city": "New London",
+      "country": "United States",
+      "status": "Closed",
+      "year": 1951,
+      "make": "Allan Herschell Company",
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23783,
+      "rcdb_url": "https://rcdb.com/23783.htm",
+      "name": "unknown",
+      "park": "Lakewood Park",
+      "city": "Waterbury",
+      "country": "United States",
+      "status": "Closed",
+      "year": 1921,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23784,
+      "rcdb_url": "https://rcdb.com/23784.htm",
+      "name": "Todd Shaulis"
+    },
+    {
+      "rcdb_id": 23785,
+      "rcdb_url": "https://rcdb.com/23785.htm",
+      "main_image_url": "https://rcdb.com/aaivejc",
+      "name": "Gliding Dragon / 滑行龙",
+      "park": "Zheshan Park",
+      "city": "Wuhu",
+      "country": "China",
+      "status": "Operating",
+      "year": 2024,
+      "make": "Baoding Hengrui Youle Juxie Co., Ltd",
+      "model": "Gliding Dragon",
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23786,
+      "rcdb_url": "https://rcdb.com/23786.htm",
+      "main_image_url": "https://rcdb.com/aaivgkc",
+      "name": "Wanda Plaza / 万达广场",
+      "city": "Yijiang",
+      "country": "China",
+      "status": "Operating",
+      "year": 2014
+    },
+    {
+      "rcdb_id": 23787,
+      "rcdb_url": "https://rcdb.com/23787.htm",
+      "main_image_url": "https://rcdb.com/aaivgic",
+      "name": "Undersea Adventure / 海底大冒险",
+      "park": "Wanda Plaza",
+      "city": "Yijiang",
+      "country": "China",
+      "status": "Operating",
+      "year": 2026,
+      "make": "Risheng Amusement Rides",
+      "model": "Undersea Adventure",
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23788,
+      "rcdb_url": "https://rcdb.com/23788.htm",
+      "name": "unknown",
+      "park": "Clyffside Park",
+      "city": "Ashland",
+      "country": "United States",
+      "status": "Closed",
+      "year": 1914,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23789,
+      "rcdb_url": "https://rcdb.com/23789.htm",
+      "name": "Rosedale Park",
+      "city": "Covington",
+      "country": "United States",
+      "status": "Operated",
+      "year": 1927
+    },
+    {
+      "rcdb_id": 23790,
+      "rcdb_url": "https://rcdb.com/23790.htm",
+      "name": "unknown",
+      "park": "Rosedale Park",
+      "city": "Covington",
+      "country": "United States",
+      "status": "Closed",
+      "year": 1927,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23791,
+      "rcdb_url": "https://rcdb.com/23791.htm",
+      "name": "Little Dipper",
+      "park": "Rosedale Park",
+      "city": "Covington",
+      "country": "United States",
+      "status": "Closed",
+      "year": 1951,
+      "make": "Allan Herschell Company",
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23792,
+      "rcdb_url": "https://rcdb.com/23792.htm",
+      "name": "Wanda Plaza / 万达广场",
+      "city": "Jinghu",
+      "country": "China",
+      "status": "Operating",
+      "year": 2026
+    },
+    {
+      "rcdb_id": 23793,
+      "rcdb_url": "https://rcdb.com/23793.htm",
+      "main_image_url": "https://rcdb.com/aaivgzc",
+      "name": "Undersea Adventure / 海底大冒险",
+      "park": "Wanda Plaza",
+      "city": "Jinghu",
+      "country": "China",
+      "status": "Operating",
+      "year": 2026,
+      "make": "Risheng Amusement Rides",
+      "model": "Undersea Adventure",
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23794,
+      "rcdb_url": "https://rcdb.com/23794.htm",
+      "name": "Clear Water Bay Dongrong Amusement Park / 清水湾东榕游乐场",
+      "city": "Lingshui",
+      "country": "China",
+      "status": "Operating",
+      "year": 2019
+    },
+    {
+      "rcdb_id": 23795,
+      "rcdb_url": "https://rcdb.com/23795.htm",
+      "main_image_url": "https://rcdb.com/aaivemc",
+      "name": "High Speed Rail Park / 高铁乐园",
+      "park": "Clear Water Bay Dongrong Amusement Park",
+      "city": "Lingshui",
+      "country": "China",
+      "status": "Operating",
+      "year": 2021,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23796,
+      "rcdb_url": "https://rcdb.com/23796.htm",
+      "main_image_url": "https://rcdb.com/aaivepc",
+      "name": "Fruitworm Pulley / 果虫滑车",
+      "park": "Clear Water Bay Dongrong Amusement Park",
+      "city": "Lingshui",
+      "country": "China",
+      "status": "Operating",
+      "year": 2021,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23797,
+      "rcdb_url": "https://rcdb.com/23797.htm",
+      "name": "unknown",
+      "park": "Moku Sphere",
+      "city": "Yubei",
+      "country": "China",
+      "status": "Construction",
+      "year": 2026,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23798,
+      "rcdb_url": "https://rcdb.com/23798.htm",
+      "name": "Dizzy Land",
+      "city": "Cambridge",
+      "country": "United States",
+      "status": "Operated",
+      "year": 1957
+    },
+    {
+      "rcdb_id": 23799,
+      "rcdb_url": "https://rcdb.com/23799.htm",
+      "name": "unknown",
+      "park": "Dizzy Land",
+      "city": "Cambridge",
+      "country": "United States",
+      "status": "Closed",
+      "year": 1957,
+      "make": "Allan Herschell Company",
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23800,
+      "rcdb_url": "https://rcdb.com/23800.htm",
+      "name": "Rudolf (Ruud) Bos"
+    },
+    {
+      "rcdb_id": 23801,
+      "rcdb_url": "https://rcdb.com/23801.htm",
+      "name": "René Merkelbach"
+    },
+    {
+      "rcdb_id": 23802,
+      "rcdb_url": "https://rcdb.com/23802.htm",
+      "name": "Electric-Driven Coaster / 产品名称_电力驱动滑行车",
+      "park": "Nanfang Amusement Rides Co.",
+      "city": "Wenzhou",
+      "country": "China",
+      "status": "In Production"
+    },
+    {
+      "rcdb_id": 23803,
+      "rcdb_url": "https://rcdb.com/23803.htm",
+      "name": "T2-H24V9.5G14.2",
+      "park": "Electric-Driven Coaster",
+      "city": "Wenzhou",
+      "country": "China",
+      "status": "In Production"
+    },
+    {
+      "rcdb_id": 23804,
+      "rcdb_url": "https://rcdb.com/23804.htm",
+      "name": "Caterpillar",
+      "park": "Barry Island Pleasure Park",
+      "city": "Barry Island",
+      "country": "United Kingdom",
+      "status": "Construction",
+      "year": 2026,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23805,
+      "rcdb_url": "https://rcdb.com/23805.htm",
+      "main_image_url": "https://rcdb.com/aaivfec",
+      "name": "Haidongfang Beach Park / 海东方沙滩公园",
+      "city": "Dongfang",
+      "country": "China",
+      "status": "Operating",
+      "year": 2019
+    },
+    {
+      "rcdb_id": 23806,
+      "rcdb_url": "https://rcdb.com/23806.htm",
+      "main_image_url": "https://rcdb.com/aaivfcc",
+      "name": "unknown",
+      "park": "Haidongfang Beach Park",
+      "city": "Dongfang",
+      "country": "China",
+      "status": "Operating",
+      "year": 2019,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23807,
+      "rcdb_url": "https://rcdb.com/23807.htm",
+      "main_image_url": "https://rcdb.com/aaivgec",
+      "name": "Aihe Town / 爱和小镇",
+      "city": "Nanchang",
+      "country": "China",
+      "status": "Operating",
+      "year": 2026
+    },
+    {
+      "rcdb_id": 23808,
+      "rcdb_url": "https://rcdb.com/23808.htm",
+      "main_image_url": "https://rcdb.com/aaivgcc",
+      "name": "unknown",
+      "park": "Aihe Town",
+      "city": "Nanchang",
+      "country": "China",
+      "status": "Operating",
+      "year": 2025,
+      "make": "Risheng Amusement Rides",
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23809,
+      "rcdb_url": "https://rcdb.com/23809.htm",
+      "main_image_url": "https://rcdb.com/aaivgbc",
+      "name": "unknown",
+      "park": "Lotus World",
+      "city": "Sanshui",
+      "country": "China",
+      "status": "Operating",
+      "year": 2026,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23810,
+      "rcdb_url": "https://rcdb.com/23810.htm",
+      "name": "Avon Park",
+      "city": "Girard",
+      "country": "United States",
+      "status": "Operated",
+      "year": 1897
+    },
+    {
+      "rcdb_id": 23811,
+      "rcdb_url": "https://rcdb.com/23811.htm",
+      "name": "unknown",
+      "park": "Avon Park",
+      "city": "Girard",
+      "country": "United States",
+      "status": "Closed",
+      "year": 1904,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23812,
+      "rcdb_url": "https://rcdb.com/23812.htm",
+      "main_image_url": "https://rcdb.com/aaivgfc",
+      "name": "High Speed Rail Park / 高铁乐园",
+      "park": "Ying Xiang Ecological Park",
+      "city": "Gaoming",
+      "country": "China",
+      "status": "Operating",
+      "year": 2024,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23813,
+      "rcdb_url": "https://rcdb.com/23813.htm",
+      "main_image_url": "https://rcdb.com/aaivgqc",
+      "name": "Jungle Flying Squirrel / 丛林飞鼠",
+      "park": "Jiaying Shiguang",
+      "city": "Meijiang",
+      "country": "China",
+      "status": "Operating",
+      "year": 2021,
+      "make": "Guohui Machinery",
+      "model": "HXC9A (Scooter)",
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23814,
+      "rcdb_url": "https://rcdb.com/23814.htm",
+      "main_image_url": "https://rcdb.com/aaivgpc",
+      "name": "Wuyue Plaza / 吾悦广场",
+      "city": "Qindu",
+      "country": "China",
+      "status": "Operating",
+      "year": 2021
+    },
+    {
+      "rcdb_id": 23815,
+      "rcdb_url": "https://rcdb.com/23815.htm",
+      "main_image_url": "https://rcdb.com/aaivgmc",
+      "name": "Chicken Coop / 小鸡快跑",
+      "park": "Wuyue Plaza",
+      "city": "Qindu",
+      "country": "China",
+      "status": "Operating",
+      "year": 2022,
+      "make": "Risheng Amusement Rides",
+      "model": "Chicken Coop",
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23816,
+      "rcdb_url": "https://rcdb.com/23816.htm",
+      "name": "Sakura Circus / さくらサーカス",
+      "city": "Nara",
+      "country": "Japan",
+      "status": "Operating",
+      "year": 2025
+    },
+    {
+      "rcdb_id": 23817,
+      "rcdb_url": "https://rcdb.com/23817.htm",
+      "name": "Dragon Coaster / ドラゴンコースター",
+      "park": "Sakura Circus",
+      "city": "Nara",
+      "country": "Japan",
+      "status": "Operating",
+      "year": 2025,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23818,
+      "rcdb_url": "https://rcdb.com/23818.htm",
+      "name": "Arthurs Seat Eagle",
+      "city": "Dromana",
+      "country": "Australia",
+      "status": "Operating",
+      "year": 2016
+    },
+    {
+      "rcdb_id": 23819,
+      "rcdb_url": "https://rcdb.com/23819.htm",
+      "name": "unknown",
+      "park": "Arthurs Seat Eagle",
+      "city": "Dromana",
+      "country": "Australia",
+      "status": "Construction",
+      "year": 2028,
+      "length_m": 1440.0,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23820,
+      "rcdb_url": "https://rcdb.com/23820.htm",
+      "main_image_url": "https://rcdb.com/aaivhcc",
+      "name": "B.Duck City Funs",
+      "city": "Chancheng",
+      "country": "China",
+      "status": "Operating",
+      "year": 2026
+    },
+    {
+      "rcdb_id": 23821,
+      "rcdb_url": "https://rcdb.com/23821.htm",
+      "main_image_url": "https://rcdb.com/aaivhec",
+      "name": "unknown",
+      "park": "B.Duck City Funs",
+      "city": "Chancheng",
+      "country": "China",
+      "status": "Operating",
+      "year": 2026,
+      "make": "Risheng Amusement Rides",
+      "model": "Travel Duck",
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23822,
+      "rcdb_url": "https://rcdb.com/23822.htm",
+      "name": "Grinn Corporation",
+      "city": "Kursk",
+      "country": "Russia",
+      "status": "In Business",
+      "year": 1992
+    },
+    {
+      "rcdb_id": 23823,
+      "rcdb_url": "https://rcdb.com/23823.htm",
+      "name": "Air Games / ألعاب هوائية",
+      "city": "Ta'if",
+      "country": "Saudi Arabia",
+      "status": "Operating",
+      "year": 2024
+    },
+    {
+      "rcdb_id": 23824,
+      "rcdb_url": "https://rcdb.com/23824.htm",
+      "main_image_url": "https://rcdb.com/aaivlic",
+      "name": "unknown",
+      "park": "Air Games",
+      "city": "Ta'if",
+      "country": "Saudi Arabia",
+      "status": "Operating",
+      "year": 2024,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23825,
+      "rcdb_url": "https://rcdb.com/23825.htm",
+      "name": "Funtura Lucknow / फंटूरा लखनऊ",
+      "city": "Lucknow",
+      "country": "India",
+      "status": "Operating",
+      "year": 2021
+    },
+    {
+      "rcdb_id": 23826,
+      "rcdb_url": "https://rcdb.com/23826.htm",
+      "name": "Mini Roller Coaster",
+      "park": "Funtura Lucknow",
+      "city": "Lucknow",
+      "country": "India",
+      "status": "Operating",
+      "year": 2021,
+      "make": "Preston & Barbieri",
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23827,
+      "rcdb_url": "https://rcdb.com/23827.htm",
+      "name": "G-Cat Kiddie Park / 怪猫儿童乐园",
+      "city": "Xiuying",
+      "country": "China",
+      "status": "Operating",
+      "year": 2022
+    },
+    {
+      "rcdb_id": 23828,
+      "rcdb_url": "https://rcdb.com/23828.htm",
+      "main_image_url": "https://rcdb.com/aaivlnc",
+      "name": "Chicken Coop / 小鸡快跑",
+      "park": "G-Cat Kiddie Park",
+      "city": "Xiuying",
+      "country": "China",
+      "status": "Operating",
+      "year": 2022,
+      "make": "Risheng Amusement Rides",
+      "model": "Chicken Coop",
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23829,
+      "rcdb_url": "https://rcdb.com/23829.htm",
+      "name": "Sould Park",
+      "city": "Spain",
+      "country": "Spain",
+      "status": "In Business",
+      "year": 2026
+    },
+    {
+      "rcdb_id": 23830,
+      "rcdb_url": "https://rcdb.com/23830.htm",
+      "name": "Sould Park Málaga",
+      "city": "Málaga",
+      "country": "Spain",
+      "status": "Construction",
+      "year": 2026
+    },
+    {
+      "rcdb_id": 23831,
+      "rcdb_url": "https://rcdb.com/23831.htm",
+      "name": "unknown",
+      "park": "Sould Park Málaga",
+      "city": "Málaga",
+      "country": "Spain",
+      "status": "Construction",
+      "year": 2026,
+      "make": "Gosetto",
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23832,
+      "rcdb_url": "https://rcdb.com/23832.htm",
+      "name": "unknown",
+      "park": "Sould Park Málaga",
+      "city": "Málaga",
+      "country": "Spain",
+      "status": "Construction",
+      "year": 2026,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23833,
+      "rcdb_url": "https://rcdb.com/23833.htm",
+      "main_image_url": "https://rcdb.com/aaivqic",
+      "name": "unknown",
+      "park": "People's Park",
+      "city": "Yinzhou",
+      "country": "China",
+      "status": "SBNO",
+      "year": 2026,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23834,
+      "rcdb_url": "https://rcdb.com/23834.htm",
+      "name": "Jester FEC",
+      "city": "Lexington",
+      "country": "United States",
+      "status": "In Business",
+      "year": 2026
+    },
+    {
+      "rcdb_id": 23835,
+      "rcdb_url": "https://rcdb.com/23835.htm",
+      "name": "unknown",
+      "park": "Wanquan Park",
+      "city": "Dadong",
+      "country": "China",
+      "status": "Operating",
+      "year": 2021,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23836,
+      "rcdb_url": "https://rcdb.com/23836.htm",
+      "name": "unknown",
+      "park": "Fun World",
+      "city": "Bangalore",
+      "country": "India",
+      "status": "Operating",
+      "year": 2024,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23837,
+      "rcdb_url": "https://rcdb.com/23837.htm",
+      "name": "Monticello Amusement Park",
+      "city": "Monticello",
+      "country": "United States",
+      "status": "Operated",
+      "year": 1923
+    },
+    {
+      "rcdb_id": 23838,
+      "rcdb_url": "https://rcdb.com/23838.htm",
+      "name": "Pippin",
+      "park": "Monticello Amusement Park",
+      "city": "Monticello",
+      "country": "United States",
+      "status": "Closed",
+      "year": 1923,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23839,
+      "rcdb_url": "https://rcdb.com/23839.htm",
+      "name": "Fantasy Rides Industry",
+      "city": "Villafranca Padovana",
+      "country": "Italy",
+      "status": "In Business",
+      "year": 2006
+    },
+    {
+      "rcdb_id": 23840,
+      "rcdb_url": "https://rcdb.com/23840.htm",
+      "main_image_url": "https://rcdb.com/aaivqnc",
+      "name": "EuroMir",
+      "park": "Cracow Eye",
+      "city": "Kraków",
+      "country": "Poland",
+      "status": "Operating",
+      "year": 2023,
+      "make": "Yamasakutalab",
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23841,
+      "rcdb_url": "https://rcdb.com/23841.htm",
+      "name": "Kim Rahagers"
+    },
+    {
+      "rcdb_id": 23842,
+      "rcdb_url": "https://rcdb.com/23842.htm",
+      "name": "Nautilus",
+      "park": "Zoomarine",
+      "city": "Albufeira",
+      "country": "Portugal",
+      "status": "Construction",
+      "year": 2026,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23843,
+      "rcdb_url": "https://rcdb.com/23843.htm",
+      "name": "Chicken Coop / 小鸡快跑",
+      "park": "Wuyue Plaza",
+      "city": "Weiyang",
+      "country": "China",
+      "status": "Operating",
+      "year": 2022,
+      "make": "Risheng Amusement Rides",
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23844,
+      "rcdb_url": "https://rcdb.com/23844.htm",
+      "name": "Pohjolan Express",
+      "park": "Tykkimäki",
+      "city": "Kouvola",
+      "country": "Finland",
+      "status": "Construction",
+      "year": 2026,
+      "make": "SBF Visa Group",
+      "length_m": 193.0,
+      "height_m": 9.0,
+      "speed_kmh": 45.1,
+      "inversions": 0
+    },
+    {
+      "rcdb_id": 23845,
+      "rcdb_url": "https://rcdb.com/23845.htm",
+      "name": "Comet Jr.",
+      "park": "Kiddie Playland",
+      "city": "North Randall",
+      "country": "United States",
+      "status": "Closed",
+      "year": 1952,
+      "make": "National Amusement Device Company",
+      "inversions": 0
+    }
+  ],
+  "changed_coasters": [
+    {
+      "rcdb_id": 295,
+      "name": "Chip & Dale's Gadget Coaster",
+      "changes": [
+        "Nombre: 'Chip & Dale’s Gadget Coaster' → \"Chip & Dale's Gadget Coaster\""
+      ],
+      "scraped": {
+        "rcdb_id": 295,
+        "rcdb_url": "https://rcdb.com/295.htm",
+        "main_image_url": "https://rcdb.com/aaaaooc",
+        "name": "Chip & Dale's Gadget Coaster",
+        "park": "Disneyland",
+        "city": "Anaheim",
+        "country": "United States",
+        "status": "Operating",
+        "year": 1993,
+        "make": "Vekoma",
+        "model": "Junior Coaster / 207m",
+        "length_m": 207.0,
+        "height_m": 8.5,
+        "speed_kmh": 34.9,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 502,
+      "name": "Medusa",
+      "changes": [
+        "Imagen URL: 'https://rcdb.com/aahzcxc' → 'https://rcdb.com/aaiviac'"
+      ],
+      "scraped": {
+        "rcdb_id": 502,
+        "rcdb_url": "https://rcdb.com/502.htm",
+        "main_image_url": "https://rcdb.com/aaiviac",
+        "name": "Medusa",
+        "park": "Six Flags Great Adventure",
+        "city": "Jackson",
+        "country": "United States",
+        "status": "Operating",
+        "year": 1999,
+        "make": "Bolliger & Mabillard",
+        "model": "Floorless Coaster / Medusa",
+        "length_m": 1214.6,
+        "height_m": 43.3,
+        "speed_kmh": 98.2,
+        "inversions": 7
+      }
+    },
+    {
+      "rcdb_id": 560,
+      "name": "Rock 'n' Roller Coaster",
+      "changes": [
+        "Estado: 'Operating' → 'SBNO'",
+        "Año apertura: 1999 → 2026"
+      ],
+      "scraped": {
+        "rcdb_id": 560,
+        "rcdb_url": "https://rcdb.com/560.htm",
+        "main_image_url": "https://rcdb.com/aaiiahc",
+        "name": "Rock 'n' Roller Coaster",
+        "park": "Walt Disney World - Disney's Hollywood Studios",
+        "city": "Lake Buena Vista",
+        "country": "United States",
+        "status": "SBNO",
+        "year": 2026,
+        "make": "Vekoma",
+        "model": "LSM Coaster / 1,037m (Disney)",
+        "length_m": 996.0,
+        "height_m": 24.4,
+        "speed_kmh": 91.7,
+        "inversions": 3
+      }
+    },
+    {
+      "rcdb_id": 563,
+      "name": "Trolls Trollercoaster",
+      "changes": [
+        "Imagen URL: 'https://rcdb.com/aaiaxzc' → 'https://rcdb.com/aaivegc'"
+      ],
+      "scraped": {
+        "rcdb_id": 563,
+        "rcdb_url": "https://rcdb.com/563.htm",
+        "main_image_url": "https://rcdb.com/aaivegc",
+        "name": "Trolls Trollercoaster",
+        "park": "Universal Studios Florida",
+        "city": "Orlando",
+        "country": "United States",
+        "status": "Operating",
+        "year": 1999,
+        "make": "Vekoma",
+        "model": "Junior Coaster / 207m",
+        "length_m": 207.0,
+        "height_m": 8.5,
+        "speed_kmh": 34.9,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 666,
+      "name": "Meteor",
+      "changes": [
+        "Nombre: 'Roller Coaster' → 'Meteor'"
+      ],
+      "scraped": {
+        "rcdb_id": 666,
+        "rcdb_url": "https://rcdb.com/666.htm",
+        "name": "Meteor",
+        "park": "Lakewood Park",
+        "city": "Waterbury",
+        "country": "United States",
+        "status": "Closed",
+        "year": 1930,
+        "length_m": 609.6,
+        "height_m": 19.4,
+        "speed_kmh": 56.3,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 675,
+      "name": "Runaway Ore Cart",
+      "changes": [
+        "Año apertura: 1999 → 1997"
+      ],
+      "scraped": {
+        "rcdb_id": 675,
+        "rcdb_url": "https://rcdb.com/675.htm",
+        "main_image_url": "https://rcdb.com/aaiclgc",
+        "name": "Runaway Ore Cart",
+        "park": "Silver Dollar City",
+        "city": "Branson",
+        "country": "United States",
+        "status": "Closed",
+        "year": 1997,
+        "make": "Molina & Son's",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 739,
+      "name": "Kōmbo",
+      "changes": [
+        "Nombre: 'Kombo' → 'Kōmbo'",
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 739,
+        "rcdb_url": "https://rcdb.com/739.htm",
+        "main_image_url": "https://rcdb.com/aabmqoc",
+        "name": "Kōmbo",
+        "park": "Indianapolis Zoo",
+        "city": "Indianapolis",
+        "country": "United States",
+        "status": "Closed",
+        "year": 2001,
+        "make": "Zierer",
+        "model": "Tivoli / Medium",
+        "length_m": 199.0,
+        "height_m": 6.0,
+        "speed_kmh": 32.0,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 852,
+      "name": "Cannonball Express",
+      "changes": [
+        "Estado: 'Operating' → 'SBNO'",
+        "Año apertura: 1985 → 2026"
+      ],
+      "scraped": {
+        "rcdb_id": 852,
+        "rcdb_url": "https://rcdb.com/852.htm",
+        "main_image_url": "https://rcdb.com/aaartlc",
+        "name": "Cannonball Express",
+        "park": "Pleasurewood Hills",
+        "city": "Lowestoft",
+        "country": "United Kingdom",
+        "status": "SBNO",
+        "year": 2026,
+        "make": "Schwarzkopf",
+        "model": "Jet Star / Jumbo V",
+        "length_m": 529.7,
+        "height_m": 16.0,
+        "speed_kmh": 54.7,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 1139,
+      "name": "Rail Chase The Ride",
+      "changes": [
+        "Año apertura: 2000 → 1997"
+      ],
+      "scraped": {
+        "rcdb_id": 1139,
+        "rcdb_url": "https://rcdb.com/1139.htm",
+        "name": "Rail Chase The Ride",
+        "park": "Sega World Sydney",
+        "city": "Darling Harbour",
+        "country": "Australia",
+        "status": "Closed",
+        "year": 1997,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 1270,
+      "name": "Skip Coaster / スキップコースター こわこわカー",
+      "changes": [
+        "Nombre: 'Skip Coaster' → 'Skip Coaster / スキップコースター こわこわカー'"
+      ],
+      "scraped": {
+        "rcdb_id": 1270,
+        "rcdb_url": "https://rcdb.com/1270.htm",
+        "main_image_url": "https://rcdb.com/aaazwgc",
+        "name": "Skip Coaster / スキップコースター こわこわカー",
+        "park": "Takarazuka Garden Fields",
+        "city": "Takarazuka",
+        "country": "Japan",
+        "status": "Closed",
+        "year": 1998,
+        "make": "Sansei Technologies",
+        "length_m": 236.0,
+        "height_m": 10.0,
+        "speed_kmh": 31.1,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 1427,
+      "name": "Batflyer / バットフライヤー",
+      "changes": [
+        "Estado: 'SBNO' → 'Operating'",
+        "Año apertura: 2025 → 2001"
+      ],
+      "scraped": {
+        "rcdb_id": 1427,
+        "rcdb_url": "https://rcdb.com/1427.htm",
+        "main_image_url": "https://rcdb.com/aaaqhsc",
+        "name": "Batflyer / バットフライヤー",
+        "park": "Nasu Highland Park",
+        "city": "Nasu",
+        "country": "Japan",
+        "status": "Operating",
+        "year": 2001,
+        "make": "Caripro",
+        "model": "Batflyer",
+        "length_m": 147.0,
+        "speed_kmh": 36.0,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 2412,
+      "name": "Bubbles The Coaster",
+      "changes": [
+        "Imagen URL: 'https://rcdb.com/aaajwdc' → 'https://rcdb.com/aaivjrc'"
+      ],
+      "scraped": {
+        "rcdb_id": 2412,
+        "rcdb_url": "https://rcdb.com/2412.htm",
+        "main_image_url": "https://rcdb.com/aaivjrc",
+        "name": "Bubbles The Coaster",
+        "park": "Storybook Land",
+        "city": "Egg Harbor Township",
+        "country": "United States",
+        "status": "Operating",
+        "year": 2000,
+        "make": "E&F Miler Industries",
+        "model": "Family Coaster / 16ft Oval w/helix on left",
+        "length_m": 126.8,
+        "height_m": 4.9,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 3055,
+      "name": "Reverser",
+      "changes": [
+        "Año apertura: 1925 → 1923"
+      ],
+      "scraped": {
+        "rcdb_id": 3055,
+        "rcdb_url": "https://rcdb.com/3055.htm",
+        "name": "Reverser",
+        "park": "Saltair",
+        "city": "Magna",
+        "country": "United States",
+        "status": "Closed",
+        "year": 1923,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 3185,
+      "name": "Abismo",
+      "changes": [
+        "Altura (m): 46.2 → 49.0",
+        "Longitud (m): 450.0 → 410.0"
+      ],
+      "scraped": {
+        "rcdb_id": 3185,
+        "rcdb_url": "https://rcdb.com/3185.htm",
+        "main_image_url": "https://rcdb.com/aaefsnc",
+        "name": "Abismo",
+        "park": "Parque de Atracciones de Madrid",
+        "city": "Madrid",
+        "country": "Spain",
+        "status": "Operating",
+        "year": 2006,
+        "make": "Maurer Rides GmbH",
+        "model": "SkyLoop / XT 450",
+        "length_m": 410.0,
+        "height_m": 49.0,
+        "speed_kmh": 104.9,
+        "inversions": 2
+      }
+    },
+    {
+      "rcdb_id": 4115,
+      "name": "Child Coaster / チャイルドコースター",
+      "changes": [
+        "Estado: 'SBNO' → 'Closed'",
+        "Año apertura: 2017 → 2007"
+      ],
+      "scraped": {
+        "rcdb_id": 4115,
+        "rcdb_url": "https://rcdb.com/4115.htm",
+        "main_image_url": "https://rcdb.com/aabgqdc",
+        "name": "Child Coaster / チャイルドコースター",
+        "park": "Greenpia Setouchi",
+        "city": "Kure",
+        "country": "Japan",
+        "status": "Closed",
+        "year": 2007,
+        "make": "Ikeda Works",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 4534,
+      "name": "Six Flags Great Adventure",
+      "changes": [
+        "Imagen URL: 'https://rcdb.com/aahyxsc' → 'https://rcdb.com/aaivhoc'"
+      ],
+      "scraped": {
+        "rcdb_id": 4534,
+        "rcdb_url": "https://rcdb.com/4534.htm",
+        "main_image_url": "https://rcdb.com/aaivhoc",
+        "name": "Six Flags Great Adventure",
+        "city": "Jackson",
+        "country": "United States",
+        "status": "Operating",
+        "year": 1974
+      }
+    },
+    {
+      "rcdb_id": 4579,
+      "name": "Silver Dollar City",
+      "changes": [
+        "Imagen URL: 'https://rcdb.com/aagznoc' → 'https://rcdb.com/aaivmnc'"
+      ],
+      "scraped": {
+        "rcdb_id": 4579,
+        "rcdb_url": "https://rcdb.com/4579.htm",
+        "main_image_url": "https://rcdb.com/aaivmnc",
+        "name": "Silver Dollar City",
+        "city": "Branson",
+        "country": "United States",
+        "status": "Operating",
+        "year": 1960
+      }
+    },
+    {
+      "rcdb_id": 4943,
+      "name": "Sega World Sydney",
+      "changes": [
+        "Año apertura: 2000 → 1997"
+      ],
+      "scraped": {
+        "rcdb_id": 4943,
+        "rcdb_url": "https://rcdb.com/4943.htm",
+        "name": "Sega World Sydney",
+        "city": "Darling Harbour",
+        "country": "Australia",
+        "status": "Operated",
+        "year": 1997
+      }
+    },
+    {
+      "rcdb_id": 5455,
+      "name": "Storybook Land",
+      "changes": [
+        "Imagen URL: 'https://rcdb.com/aagbsmc' → 'https://rcdb.com/aaivkec'"
+      ],
+      "scraped": {
+        "rcdb_id": 5455,
+        "rcdb_url": "https://rcdb.com/5455.htm",
+        "main_image_url": "https://rcdb.com/aaivkec",
+        "name": "Storybook Land",
+        "city": "Egg Harbor Township",
+        "country": "United States",
+        "status": "Operating",
+        "year": 1955
+      }
+    },
+    {
+      "rcdb_id": 5554,
+      "name": "Clyffside Park",
+      "changes": [
+        "Año apertura: 1913 → 1909"
+      ],
+      "scraped": {
+        "rcdb_id": 5554,
+        "rcdb_url": "https://rcdb.com/5554.htm",
+        "name": "Clyffside Park",
+        "city": "Ashland",
+        "country": "United States",
+        "status": "Operated",
+        "year": 1909
+      }
+    },
+    {
+      "rcdb_id": 5732,
+      "name": "Halmstad Äventyrsland",
+      "changes": [
+        "Estado: 'SBNO' → 'Operated'",
+        "Año apertura: 2022 → 2005"
+      ],
+      "scraped": {
+        "rcdb_id": 5732,
+        "rcdb_url": "https://rcdb.com/5732.htm",
+        "main_image_url": "https://rcdb.com/aadplhc",
+        "name": "Halmstad Äventyrsland",
+        "city": "Halmstad",
+        "country": "Sweden",
+        "status": "Operated",
+        "year": 2005
+      }
+    },
+    {
+      "rcdb_id": 6248,
+      "name": "Greenpia Setouchi / グリーンピアせとうち",
+      "changes": [
+        "Estado: 'Operating' → 'Operated'"
+      ],
+      "scraped": {
+        "rcdb_id": 6248,
+        "rcdb_url": "https://rcdb.com/6248.htm",
+        "name": "Greenpia Setouchi / グリーンピアせとうち",
+        "city": "Kure",
+        "country": "Japan",
+        "status": "Operated",
+        "year": 2005
+      }
+    },
+    {
+      "rcdb_id": 6276,
+      "name": "Fééryland",
+      "changes": [
+        "Año apertura: 2001 → 1965"
+      ],
+      "scraped": {
+        "rcdb_id": 6276,
+        "rcdb_url": "https://rcdb.com/6276.htm",
+        "main_image_url": "https://rcdb.com/aainqrc",
+        "name": "Fééryland",
+        "city": "Tournehem-sur-la-Hem",
+        "country": "France",
+        "status": "Operating",
+        "year": 1965
+      }
+    },
+    {
+      "rcdb_id": 7037,
+      "name": "Buffalo Coaster",
+      "changes": [
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 7037,
+        "rcdb_url": "https://rcdb.com/7037.htm",
+        "main_image_url": "https://rcdb.com/aadiscc",
+        "name": "Buffalo Coaster",
+        "park": "Zoomarine",
+        "city": "Albufeira",
+        "country": "Portugal",
+        "status": "Closed",
+        "year": 2013,
+        "make": "Zamperla",
+        "model": "Powered Coaster / Twin Helix",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 8594,
+      "name": "Gold Dragon Tackle / 金龙滑车 / Jīnlóng Huáchē",
+      "changes": [
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 8594,
+        "rcdb_url": "https://rcdb.com/8594.htm",
+        "main_image_url": "https://rcdb.com/aabtirc",
+        "name": "Gold Dragon Tackle / 金龙滑车 / Jīnlóng Huáchē",
+        "park": "Zheshan Park",
+        "city": "Wuhu",
+        "country": "China",
+        "status": "Closed",
+        "year": 2007,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 9321,
+      "name": "Aoyun Fuwa Paradise / 奥运福娃乐园",
+      "changes": [
+        "Estado: 'Operating' → 'Operated'"
+      ],
+      "scraped": {
+        "rcdb_id": 9321,
+        "rcdb_url": "https://rcdb.com/9321.htm",
+        "main_image_url": "https://rcdb.com/aabsnwc",
+        "name": "Aoyun Fuwa Paradise / 奥运福娃乐园",
+        "city": "Fengtai",
+        "country": "China",
+        "status": "Operated",
+        "year": 2008
+      }
+    },
+    {
+      "rcdb_id": 9548,
+      "name": "Etnaland",
+      "changes": [
+        "Estado: 'Operating' → 'SBNO'",
+        "Año apertura: 2001 → 2025"
+      ],
+      "scraped": {
+        "rcdb_id": 9548,
+        "rcdb_url": "https://rcdb.com/9548.htm",
+        "main_image_url": "https://rcdb.com/aacujxc",
+        "name": "Etnaland",
+        "city": "Belpasso",
+        "country": "Italy",
+        "status": "SBNO",
+        "year": 2025
+      }
+    },
+    {
+      "rcdb_id": 9549,
+      "name": "Storm",
+      "changes": [
+        "Estado: 'Operating' → 'SBNO'",
+        "Año apertura: 2013 → 2025"
+      ],
+      "scraped": {
+        "rcdb_id": 9549,
+        "rcdb_url": "https://rcdb.com/9549.htm",
+        "main_image_url": "https://rcdb.com/aachndc",
+        "name": "Storm",
+        "park": "Etnaland",
+        "city": "Belpasso",
+        "country": "Italy",
+        "status": "SBNO",
+        "year": 2025,
+        "make": "Mack Rides GmbH & Co KG",
+        "model": "Mega Coaster / Custom",
+        "length_m": 800.0,
+        "height_m": 32.0,
+        "inversions": 1
+      }
+    },
+    {
+      "rcdb_id": 10682,
+      "name": "Eldorado",
+      "changes": [
+        "Estado: 'Operating' → 'SBNO'",
+        "Año apertura: 2013 → 2025"
+      ],
+      "scraped": {
+        "rcdb_id": 10682,
+        "rcdb_url": "https://rcdb.com/10682.htm",
+        "main_image_url": "https://rcdb.com/aachzac",
+        "name": "Eldorado",
+        "park": "Etnaland",
+        "city": "Belpasso",
+        "country": "Italy",
+        "status": "SBNO",
+        "year": 2025,
+        "make": "S&S Worldwide",
+        "model": "Mine Train Coaster",
+        "length_m": 579.0,
+        "height_m": 21.0,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 10922,
+      "name": "Fun Oasis / واحة المرح",
+      "changes": [
+        "Estado: 'Operating' → 'SBNO'",
+        "Año apertura: 2006 → 2026"
+      ],
+      "scraped": {
+        "rcdb_id": 10922,
+        "rcdb_url": "https://rcdb.com/10922.htm",
+        "main_image_url": "https://rcdb.com/aahqxxc",
+        "name": "Fun Oasis / واحة المرح",
+        "city": "Riyadh",
+        "country": "Saudi Arabia",
+        "status": "SBNO",
+        "year": 2026
+      }
+    },
+    {
+      "rcdb_id": 10923,
+      "name": "Animal Race",
+      "changes": [
+        "Estado: 'Operating' → 'SBNO'",
+        "Año apertura: 2006 → 2026"
+      ],
+      "scraped": {
+        "rcdb_id": 10923,
+        "rcdb_url": "https://rcdb.com/10923.htm",
+        "main_image_url": "https://rcdb.com/aahqxlc",
+        "name": "Animal Race",
+        "park": "Fun Oasis",
+        "city": "Riyadh",
+        "country": "Saudi Arabia",
+        "status": "SBNO",
+        "year": 2026,
+        "make": "SBF Visa Group",
+        "model": "Other / Indoor Spinning Coaster (MX54)",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 11050,
+      "name": "Outer Space Flying Coaster",
+      "changes": [
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 11050,
+        "rcdb_url": "https://rcdb.com/11050.htm",
+        "main_image_url": "https://rcdb.com/aacptuc",
+        "name": "Outer Space Flying Coaster",
+        "park": "Jindouwan Resort Villas",
+        "city": "Tanzhou",
+        "country": "China",
+        "status": "Closed",
+        "year": 2013,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 11060,
+      "name": "Hip Hop Coaster",
+      "changes": [
+        "Estado: 'Operating' → 'SBNO'",
+        "Año apertura: 2013 → 2025"
+      ],
+      "scraped": {
+        "rcdb_id": 11060,
+        "rcdb_url": "https://rcdb.com/11060.htm",
+        "main_image_url": "https://rcdb.com/aackcmc",
+        "name": "Hip Hop Coaster",
+        "park": "Etnaland",
+        "city": "Belpasso",
+        "country": "Italy",
+        "status": "SBNO",
+        "year": 2025,
+        "make": "Zamperla",
+        "model": "Other / Speedy Coaster",
+        "length_m": 175.0,
+        "height_m": 9.0,
+        "speed_kmh": 29.9,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 11359,
+      "name": "Kålmasken",
+      "changes": [
+        "Estado: 'SBNO' → 'Closed'",
+        "Año apertura: 2022 → 2010"
+      ],
+      "scraped": {
+        "rcdb_id": 11359,
+        "rcdb_url": "https://rcdb.com/11359.htm",
+        "main_image_url": "https://rcdb.com/aadplpc",
+        "name": "Kålmasken",
+        "park": "Halmstad Äventyrsland",
+        "city": "Halmstad",
+        "country": "Sweden",
+        "status": "Closed",
+        "year": 2010,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 12001,
+      "name": "Family Park",
+      "changes": [
+        "Año apertura: 2007 → 2005"
+      ],
+      "scraped": {
+        "rcdb_id": 12001,
+        "rcdb_url": "https://rcdb.com/12001.htm",
+        "main_image_url": "https://rcdb.com/aaechoc",
+        "name": "Family Park",
+        "city": "Saint-Martin-le-Beau",
+        "country": "France",
+        "status": "Operated",
+        "year": 2005
+      }
+    },
+    {
+      "rcdb_id": 12432,
+      "name": "Miao Coaster",
+      "changes": [
+        "Estado: 'Operating' → 'SBNO'",
+        "Año apertura: 2014 → 2025"
+      ],
+      "scraped": {
+        "rcdb_id": 12432,
+        "rcdb_url": "https://rcdb.com/12432.htm",
+        "main_image_url": "https://rcdb.com/aadkrsc",
+        "name": "Miao Coaster",
+        "park": "Etnaland",
+        "city": "Belpasso",
+        "country": "Italy",
+        "status": "SBNO",
+        "year": 2025,
+        "make": "SBF Visa Group",
+        "model": "Other / Double Coaster (MX605)",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 12865,
+      "name": "Skate Madness / 疯狂滑板",
+      "changes": [
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 12865,
+        "rcdb_url": "https://rcdb.com/12865.htm",
+        "main_image_url": "https://rcdb.com/aaeyyoc",
+        "name": "Skate Madness / 疯狂滑板",
+        "park": "Floraland",
+        "city": "Wenjiang",
+        "country": "China",
+        "status": "Closed",
+        "year": 2015,
+        "make": "Beijing Jiuhua Amusement Rides Manufacturing Co., Ltd.",
+        "model": "Crazy Skateboard",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 13350,
+      "name": "Amerikai Magasvasút",
+      "changes": [
+        "Nombre: 'unknown' → 'Amerikai Magasvasút'"
+      ],
+      "scraped": {
+        "rcdb_id": 13350,
+        "rcdb_url": "https://rcdb.com/13350.htm",
+        "name": "Amerikai Magasvasút",
+        "park": "Holnemvolt Park",
+        "city": "Budapest",
+        "country": "Hungary",
+        "status": "Closed",
+        "year": 1911,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 13918,
+      "name": "Crazy Mouse / 丛林飞鼠",
+      "changes": [
+        "Estado: 'SBNO' → 'Closed'",
+        "Año apertura: 2018 → 2013"
+      ],
+      "scraped": {
+        "rcdb_id": 13918,
+        "rcdb_url": "https://rcdb.com/13918.htm",
+        "main_image_url": "https://rcdb.com/aaecojc",
+        "name": "Crazy Mouse / 丛林飞鼠",
+        "park": "Lotus World",
+        "city": "Sanshui",
+        "country": "China",
+        "status": "Closed",
+        "year": 2013,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 13982,
+      "name": "Central Park / Центрального Парка",
+      "changes": [
+        "Año apertura: 2004 → 1962"
+      ],
+      "scraped": {
+        "rcdb_id": 13982,
+        "rcdb_url": "https://rcdb.com/13982.htm",
+        "name": "Central Park / Центрального Парка",
+        "city": "Bryansk",
+        "country": "Russia",
+        "status": "Operating",
+        "year": 1962
+      }
+    },
+    {
+      "rcdb_id": 14059,
+      "name": "Parc d'Olhain",
+      "changes": [
+        "Año apertura: 2005 → 1973"
+      ],
+      "scraped": {
+        "rcdb_id": 14059,
+        "rcdb_url": "https://rcdb.com/14059.htm",
+        "main_image_url": "https://rcdb.com/aaebrsc",
+        "name": "Parc d'Olhain",
+        "city": "Maisnil-lès Ruitz",
+        "country": "France",
+        "status": "Operating",
+        "year": 1973
+      }
+    },
+    {
+      "rcdb_id": 15762,
+      "name": "Jiaying Shiguang / 嘉应拾光",
+      "changes": [
+        "Nombre: 'Qiaotou Park / 桥头公园' → 'Jiaying Shiguang / 嘉应拾光'",
+        "Estado: 'Operated' → 'Operating'"
+      ],
+      "scraped": {
+        "rcdb_id": 15762,
+        "rcdb_url": "https://rcdb.com/15762.htm",
+        "main_image_url": "https://rcdb.com/aagonfc",
+        "name": "Jiaying Shiguang / 嘉应拾光",
+        "city": "Meijiang",
+        "country": "China",
+        "status": "Operating",
+        "year": 2002
+      }
+    },
+    {
+      "rcdb_id": 15937,
+      "name": "Wild Mouse",
+      "changes": [
+        "Año apertura: 1950 → 1958"
+      ],
+      "scraped": {
+        "rcdb_id": 15937,
+        "rcdb_url": "https://rcdb.com/15937.htm",
+        "name": "Wild Mouse",
+        "park": "Coaster Park",
+        "city": "Jacksonville Beach",
+        "country": "United States",
+        "status": "Closed",
+        "year": 1958,
+        "make": "B. A. Schiff & Associates",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 16050,
+      "name": "Little Dipper",
+      "changes": [
+        "Nombre: 'unknown' → 'Little Dipper'",
+        "Año apertura: 1954 → 1952"
+      ],
+      "scraped": {
+        "rcdb_id": 16050,
+        "rcdb_url": "https://rcdb.com/16050.htm",
+        "name": "Little Dipper",
+        "park": "Kiddie Playland",
+        "city": "North Randall",
+        "country": "United States",
+        "status": "Closed",
+        "year": 1952,
+        "make": "Allan Herschell Company",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 16429,
+      "name": "Roller Coaster / 过山车",
+      "changes": [
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 16429,
+        "rcdb_url": "https://rcdb.com/16429.htm",
+        "main_image_url": "https://rcdb.com/aafgjqc",
+        "name": "Roller Coaster / 过山车",
+        "park": "Haibin Park",
+        "city": "Xiashan",
+        "country": "China",
+        "status": "Closed",
+        "year": 2018,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 17039,
+      "name": "Fruit Worm Train / 果虫车",
+      "changes": [
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 17039,
+        "rcdb_url": "https://rcdb.com/17039.htm",
+        "main_image_url": "https://rcdb.com/aaiihrc",
+        "name": "Fruit Worm Train / 果虫车",
+        "park": "Ying Xiang Ecological Park",
+        "city": "Gaoming",
+        "country": "China",
+        "status": "Closed",
+        "year": 2009,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 17308,
+      "name": "Gliding Dragon / 滑行龙",
+      "changes": [
+        "Nombre: 'unknown' → 'Gliding Dragon / 滑行龙'"
+      ],
+      "scraped": {
+        "rcdb_id": 17308,
+        "rcdb_url": "https://rcdb.com/17308.htm",
+        "main_image_url": "https://rcdb.com/aainagc",
+        "name": "Gliding Dragon / 滑行龙",
+        "park": "Quan Lin Happy World",
+        "city": "Zhongshan",
+        "country": "China",
+        "status": "Operating",
+        "year": 2018,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 18082,
+      "name": "Giza Park",
+      "changes": [
+        "Nombre: 'Safari Park / سفاري بارك' → 'Giza Park'",
+        "Imagen URL: 'https://rcdb.com/aaihbkc' → 'https://rcdb.com/aaivqhc'"
+      ],
+      "scraped": {
+        "rcdb_id": 18082,
+        "rcdb_url": "https://rcdb.com/18082.htm",
+        "main_image_url": "https://rcdb.com/aaivqhc",
+        "name": "Giza Park",
+        "city": "Imbaba",
+        "country": "Egypt",
+        "status": "Operating",
+        "year": 2016
+      }
+    },
+    {
+      "rcdb_id": 18083,
+      "name": "Brucomela",
+      "changes": [
+        "Imagen URL: 'https://rcdb.com/aahmfic' → 'https://rcdb.com/aaivqdc'"
+      ],
+      "scraped": {
+        "rcdb_id": 18083,
+        "rcdb_url": "https://rcdb.com/18083.htm",
+        "main_image_url": "https://rcdb.com/aaivqdc",
+        "name": "Brucomela",
+        "park": "Giza Park",
+        "city": "Imbaba",
+        "country": "Egypt",
+        "status": "Operating",
+        "year": 2016,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 18746,
+      "name": "unknown",
+      "changes": [
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 18746,
+        "rcdb_url": "https://rcdb.com/18746.htm",
+        "name": "unknown",
+        "park": "White Sand Gate Park",
+        "city": "Meilan",
+        "country": "China",
+        "status": "Closed",
+        "year": 2019,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 18750,
+      "name": "Fruit Worm Coaster / 果虫滑车",
+      "changes": [
+        "Nombre: 'unknown' → 'Fruit Worm Coaster / 果虫滑车'"
+      ],
+      "scraped": {
+        "rcdb_id": 18750,
+        "rcdb_url": "https://rcdb.com/18750.htm",
+        "main_image_url": "https://rcdb.com/aaivdrc",
+        "name": "Fruit Worm Coaster / 果虫滑车",
+        "park": "White Sand Gate Park",
+        "city": "Meilan",
+        "country": "China",
+        "status": "Operating",
+        "year": 2019,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 19027,
+      "name": "unknown",
+      "changes": [
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 19027,
+        "rcdb_url": "https://rcdb.com/19027.htm",
+        "main_image_url": "https://rcdb.com/aahdspc",
+        "name": "unknown",
+        "park": "Yanliuqing Manor",
+        "city": "Xiqing",
+        "country": "China",
+        "status": "Closed",
+        "year": 2019,
+        "make": "Sun Shiyoule",
+        "model": "Space Shuttle",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 19076,
+      "name": "unknown",
+      "changes": [
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 19076,
+        "rcdb_url": "https://rcdb.com/19076.htm",
+        "main_image_url": "https://rcdb.com/aahgrkc",
+        "name": "unknown",
+        "park": "Peony Park",
+        "city": "Jianxi",
+        "country": "China",
+        "status": "Closed",
+        "year": 2017,
+        "make": "Chang Long",
+        "model": "Crazy Mouse",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 19445,
+      "name": "Giant Skyrocket",
+      "changes": [
+        "Nombre: 'unknown' → 'Giant Skyrocket'",
+        "Año apertura: 1920 → 1929"
+      ],
+      "scraped": {
+        "rcdb_id": 19445,
+        "rcdb_url": "https://rcdb.com/19445.htm",
+        "name": "Giant Skyrocket",
+        "park": "Kings Park",
+        "city": "Norfolk",
+        "country": "United States",
+        "status": "Closed",
+        "year": 1929,
+        "length_m": 701.0,
+        "height_m": 22.9,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 19523,
+      "name": "unknown",
+      "changes": [
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 19523,
+        "rcdb_url": "https://rcdb.com/19523.htm",
+        "name": "unknown",
+        "park": "Wanrenhaixian Square Amusement Park",
+        "city": "Longhua",
+        "country": "China",
+        "status": "Closed",
+        "year": 2017,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 20489,
+      "name": "Tooty Town / توتي تاون",
+      "changes": [
+        "Estado: 'Operating' → 'SBNO'",
+        "Año apertura: 2006 → 2025"
+      ],
+      "scraped": {
+        "rcdb_id": 20489,
+        "rcdb_url": "https://rcdb.com/20489.htm",
+        "main_image_url": "https://rcdb.com/aahtenc",
+        "name": "Tooty Town / توتي تاون",
+        "city": "Al-Hofuf",
+        "country": "Saudi Arabia",
+        "status": "SBNO",
+        "year": 2025
+      }
+    },
+    {
+      "rcdb_id": 20490,
+      "name": "Mini Gold Coaster",
+      "changes": [
+        "Estado: 'Operating' → 'SBNO'",
+        "Año apertura: 2006 → 2025"
+      ],
+      "scraped": {
+        "rcdb_id": 20490,
+        "rcdb_url": "https://rcdb.com/20490.htm",
+        "main_image_url": "https://rcdb.com/aahtejc",
+        "name": "Mini Gold Coaster",
+        "park": "Tooty Town",
+        "city": "Al-Hofuf",
+        "country": "Saudi Arabia",
+        "status": "SBNO",
+        "year": 2025,
+        "make": "SBF Visa Group",
+        "model": "Other / Double Coaster (MX605)",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 20815,
+      "name": "unknown",
+      "changes": [
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 20815,
+        "rcdb_url": "https://rcdb.com/20815.htm",
+        "name": "unknown",
+        "park": "Al Wadi Park",
+        "city": "Samtah",
+        "country": "Saudi Arabia",
+        "status": "Closed",
+        "year": 2023,
+        "length_m": 120.0,
+        "height_m": 9.0,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 20941,
+      "name": "Running Into The Sky / 冲上云霄",
+      "changes": [
+        "Nombre: 'unknown' → 'Running Into The Sky / 冲上云霄'"
+      ],
+      "scraped": {
+        "rcdb_id": 20941,
+        "rcdb_url": "https://rcdb.com/20941.htm",
+        "name": "Running Into The Sky / 冲上云霄",
+        "park": "China Hiin City",
+        "city": "Xiangshan",
+        "country": "China",
+        "status": "Operating",
+        "year": 2025,
+        "make": "Zamperla",
+        "model": "Thunderbolt / 375m",
+        "length_m": 375.0,
+        "height_m": 21.0,
+        "speed_kmh": 70.0,
+        "inversions": 3
+      }
+    },
+    {
+      "rcdb_id": 21088,
+      "name": "Flash: Vertical Velocity",
+      "changes": [
+        "Imagen URL: 'https://rcdb.com/aaiherc' → 'https://rcdb.com/aaiviec'"
+      ],
+      "scraped": {
+        "rcdb_id": 21088,
+        "rcdb_url": "https://rcdb.com/21088.htm",
+        "main_image_url": "https://rcdb.com/aaiviec",
+        "name": "Flash: Vertical Velocity",
+        "park": "Six Flags Great Adventure",
+        "city": "Jackson",
+        "country": "United States",
+        "status": "Operating",
+        "year": 2025,
+        "make": "Vekoma",
+        "model": "Sit Down Thrill / Super Boomerang",
+        "length_m": 436.0,
+        "speed_kmh": 95.0,
+        "inversions": 2
+      }
+    },
+    {
+      "rcdb_id": 21117,
+      "name": "Spin Coaster",
+      "changes": [
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 21117,
+        "rcdb_url": "https://rcdb.com/21117.htm",
+        "name": "Spin Coaster",
+        "park": "Chillout Theme Park",
+        "city": "Vadamugam Vellode",
+        "country": "India",
+        "status": "Closed",
+        "year": 2018,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 21284,
+      "name": "Dinosaur Express / 恐龍快車",
+      "changes": [
+        "Estado: 'Operating' → 'SBNO'",
+        "Año apertura: 2023 → 2026"
+      ],
+      "scraped": {
+        "rcdb_id": 21284,
+        "rcdb_url": "https://rcdb.com/21284.htm",
+        "main_image_url": "https://rcdb.com/aaibhhc",
+        "name": "Dinosaur Express / 恐龍快車",
+        "park": "Palenteology Fantasy Park",
+        "city": "Fenyuan",
+        "country": "Taiwan",
+        "status": "SBNO",
+        "year": 2026,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 21886,
+      "name": "Family Roller Coaster / 家庭过山车",
+      "changes": [
+        "Nombre: 'unknown' → 'Family Roller Coaster / 家庭过山车'"
+      ],
+      "scraped": {
+        "rcdb_id": 21886,
+        "rcdb_url": "https://rcdb.com/21886.htm",
+        "name": "Family Roller Coaster / 家庭过山车",
+        "park": "China Hiin City",
+        "city": "Xiangshan",
+        "country": "China",
+        "status": "Operating",
+        "year": 2025,
+        "make": "Jinma Rides",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 21887,
+      "name": "Monster Hunting Adventure / 捉妖奇遇",
+      "changes": [
+        "Nombre: 'unknown' → 'Monster Hunting Adventure / 捉妖奇遇'",
+        "Estado: 'Construction' → 'Operating'",
+        "Año apertura: 2025 → 2026"
+      ],
+      "scraped": {
+        "rcdb_id": 21887,
+        "rcdb_url": "https://rcdb.com/21887.htm",
+        "name": "Monster Hunting Adventure / 捉妖奇遇",
+        "park": "China Hiin City",
+        "city": "Xiangshan",
+        "country": "China",
+        "status": "Operating",
+        "year": 2026,
+        "make": "Nanfang Amusement Rides Co.",
+        "length_m": 500.0,
+        "height_m": 14.2,
+        "speed_kmh": 34.3,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 21969,
+      "name": "unknown",
+      "changes": [
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 21969,
+        "rcdb_url": "https://rcdb.com/21969.htm",
+        "main_image_url": "https://rcdb.com/aaidtuc",
+        "name": "unknown",
+        "park": "Sanya Haichang Fantasy Town",
+        "city": "Haitang",
+        "country": "China",
+        "status": "Closed",
+        "year": 2024,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 22150,
+      "name": "Chicken Coop / 小鸡快跑",
+      "changes": [
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 22150,
+        "rcdb_url": "https://rcdb.com/22150.htm",
+        "main_image_url": "https://rcdb.com/aaijjmc",
+        "name": "Chicken Coop / 小鸡快跑",
+        "park": "Wanda Plaza",
+        "city": "Yinzhou",
+        "country": "China",
+        "status": "Closed",
+        "year": 2023,
+        "make": "Risheng Amusement Rides",
+        "model": "Chicken Coop",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 22167,
+      "name": "Crazy 8 Spin Coaster",
+      "changes": [
+        "Nombre: 'Crazy 8 Family Coaster' → 'Crazy 8 Spin Coaster'",
+        "Imagen URL: 'https://rcdb.com/aainjgc' → 'https://rcdb.com/aaivjcc'"
+      ],
+      "scraped": {
+        "rcdb_id": 22167,
+        "rcdb_url": "https://rcdb.com/22167.htm",
+        "main_image_url": "https://rcdb.com/aaivjcc",
+        "name": "Crazy 8 Spin Coaster",
+        "park": "Quassy Amusement Park",
+        "city": "Middlebury",
+        "country": "United States",
+        "status": "Operating",
+        "year": 2025,
+        "make": "SBF Visa Group",
+        "model": "Spinning Coasters / MX608 Park Model B",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 22243,
+      "name": "Tormenta Rampaging Run",
+      "changes": [
+        "Imagen URL: 'https://rcdb.com/aaiuewc' → 'https://rcdb.com/aaivfbc'"
+      ],
+      "scraped": {
+        "rcdb_id": 22243,
+        "rcdb_url": "https://rcdb.com/22243.htm",
+        "main_image_url": "https://rcdb.com/aaivfbc",
+        "name": "Tormenta Rampaging Run",
+        "park": "Six Flags Over Texas",
+        "city": "Arlington",
+        "country": "United States",
+        "status": "Construction",
+        "year": 2026,
+        "make": "Bolliger & Mabillard",
+        "model": "Dive Coaster / Custom Wide",
+        "length_m": 1279.9,
+        "height_m": 94.2,
+        "speed_kmh": 140.0,
+        "inversions": 4
+      }
+    },
+    {
+      "rcdb_id": 22444,
+      "name": "Cliff Roller Coaster / 悬崖过山车",
+      "changes": [
+        "Nombre: 'unknown' → 'Cliff Roller Coaster / 悬崖过山车'"
+      ],
+      "scraped": {
+        "rcdb_id": 22444,
+        "rcdb_url": "https://rcdb.com/22444.htm",
+        "name": "Cliff Roller Coaster / 悬崖过山车",
+        "park": "Hangzhou Sandu Mountain Sports Park",
+        "city": "Lin'an",
+        "country": "China",
+        "status": "Operating",
+        "year": 2024,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 22465,
+      "name": "Rivoli Rotterdam",
+      "changes": [
+        "Nombre: 'Attractiepark Rotterdam' → 'Rivoli Rotterdam'",
+        "Año apertura: 2025 → 2026"
+      ],
+      "scraped": {
+        "rcdb_id": 22465,
+        "rcdb_url": "https://rcdb.com/22465.htm",
+        "name": "Rivoli Rotterdam",
+        "city": "Rotterdam",
+        "country": "Netherlands",
+        "status": "Construction",
+        "year": 2026
+      }
+    },
+    {
+      "rcdb_id": 22585,
+      "name": "Klompi",
+      "changes": [
+        "Nombre: 'unknown' → 'Klompi'"
+      ],
+      "scraped": {
+        "rcdb_id": 22585,
+        "rcdb_url": "https://rcdb.com/22585.htm",
+        "name": "Klompi",
+        "park": "Holland-Park",
+        "city": "Panketal",
+        "country": "Germany",
+        "status": "Construction",
+        "year": 2026,
+        "make": "ART Engineering GmbH",
+        "model": "Family Launch Coaster / 245m",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 22632,
+      "name": "Galacticoaster",
+      "changes": [
+        "Estado: 'Construction' → 'Operating'",
+        "Imagen URL: 'https://rcdb.com/aaipcwc' → 'https://rcdb.com/aaivffc'"
+      ],
+      "scraped": {
+        "rcdb_id": 22632,
+        "rcdb_url": "https://rcdb.com/22632.htm",
+        "main_image_url": "https://rcdb.com/aaivffc",
+        "name": "Galacticoaster",
+        "park": "Legoland Florida",
+        "city": "Winter Haven",
+        "country": "United States",
+        "status": "Operating",
+        "year": 2026,
+        "make": "ART Engineering GmbH",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 22843,
+      "name": "B.Duck Be Playful",
+      "changes": [
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 22843,
+        "rcdb_url": "https://rcdb.com/22843.htm",
+        "name": "B.Duck Be Playful",
+        "park": "B.Duck City Funs",
+        "city": "Wuzhong",
+        "country": "China",
+        "status": "Closed",
+        "year": 2024,
+        "make": "Risheng Amusement Rides",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 23040,
+      "name": "Wadatsumi / わだつみ",
+      "changes": [
+        "Nombre: 'unknown' → 'Wadatsumi / わだつみ'"
+      ],
+      "scraped": {
+        "rcdb_id": 23040,
+        "rcdb_url": "https://rcdb.com/23040.htm",
+        "main_image_url": "https://rcdb.com/aaivqlc",
+        "name": "Wadatsumi / わだつみ",
+        "park": "Greenland",
+        "city": "Arao",
+        "country": "Japan",
+        "status": "Construction",
+        "year": 2028,
+        "make": "Great Coasters International",
+        "length_m": 620.8,
+        "height_m": 19.3,
+        "speed_kmh": 66.5,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 23124,
+      "name": "Maui's Indoor Theme Park",
+      "changes": [
+        "Nombre: \"Malibu Jack's\" → \"Maui's Indoor Theme Park\""
+      ],
+      "scraped": {
+        "rcdb_id": 23124,
+        "rcdb_url": "https://rcdb.com/23124.htm",
+        "name": "Maui's Indoor Theme Park",
+        "city": "Owensboro",
+        "country": "United States",
+        "status": "Construction",
+        "year": 2026
+      }
+    },
+    {
+      "rcdb_id": 23220,
+      "name": "Dream Grand PrIx",
+      "changes": [
+        "Nombre: 'unknown' → 'Dream Grand PrIx'",
+        "Estado: 'Construction' → 'Operating'",
+        "Año apertura: 2025 → 2026"
+      ],
+      "scraped": {
+        "rcdb_id": 23220,
+        "rcdb_url": "https://rcdb.com/23220.htm",
+        "name": "Dream Grand PrIx",
+        "park": "Dream Island",
+        "city": "Moscow City",
+        "country": "Russia",
+        "status": "Operating",
+        "year": 2026,
+        "make": "Zierer",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 23365,
+      "name": "Titan",
+      "changes": [
+        "Nombre: 'unknown' → 'Titan'"
+      ],
+      "scraped": {
+        "rcdb_id": 23365,
+        "rcdb_url": "https://rcdb.com/23365.htm",
+        "name": "Titan",
+        "park": "Walygator Sud-Ouest",
+        "city": "Roquefort",
+        "country": "France",
+        "status": "Construction",
+        "year": 2026,
+        "make": "Gerstlauer Amusement Rides GmbH",
+        "length_m": 600.0,
+        "height_m": 35.0,
+        "speed_kmh": 95.0,
+        "inversions": 2
+      }
+    },
+    {
+      "rcdb_id": 23380,
+      "name": "Undersea Adventure / 海底大冒险",
+      "changes": [
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 23380,
+        "rcdb_url": "https://rcdb.com/23380.htm",
+        "main_image_url": "https://rcdb.com/aairvuc",
+        "name": "Undersea Adventure / 海底大冒险",
+        "park": "Splendors Mall",
+        "city": "Yuelu",
+        "country": "China",
+        "status": "Closed",
+        "year": 2025,
+        "make": "Risheng Amusement Rides",
+        "model": "Undersea Adventure",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 23416,
+      "name": "unknown",
+      "changes": [
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 23416,
+        "rcdb_url": "https://rcdb.com/23416.htm",
+        "main_image_url": "https://rcdb.com/aairwbc",
+        "name": "unknown",
+        "park": "Discovery World",
+        "city": "Houli Hsiang",
+        "country": "Taiwan",
+        "status": "Closed",
+        "year": 2025,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 23417,
+      "name": "unknown",
+      "changes": [
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 23417,
+        "rcdb_url": "https://rcdb.com/23417.htm",
+        "main_image_url": "https://rcdb.com/aairwec",
+        "name": "unknown",
+        "park": "Discovery World",
+        "city": "Houli Hsiang",
+        "country": "Taiwan",
+        "status": "Closed",
+        "year": 2025,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 23421,
+      "name": "unknown",
+      "changes": [
+        "Inversiones: 0 → 3"
+      ],
+      "scraped": {
+        "rcdb_id": 23421,
+        "rcdb_url": "https://rcdb.com/23421.htm",
+        "name": "unknown",
+        "park": "Family Kingdom Amusement Park",
+        "city": "Myrtle Beach",
+        "country": "United States",
+        "status": "Construction",
+        "year": 2026,
+        "make": "Rocky Mountain Construction",
+        "length_m": 594.4,
+        "height_m": 30.5,
+        "speed_kmh": 80.5,
+        "inversions": 3
+      }
+    },
+    {
+      "rcdb_id": 23430,
+      "name": "North Coaster",
+      "changes": [
+        "Nombre: 'unknown' → 'North Coaster'"
+      ],
+      "scraped": {
+        "rcdb_id": 23430,
+        "rcdb_url": "https://rcdb.com/23430.htm",
+        "name": "North Coaster",
+        "park": "Curry's Fun Park Portrush",
+        "city": "Portrush",
+        "country": "United Kingdom",
+        "status": "Construction",
+        "year": 2026,
+        "make": "Zamperla",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 23463,
+      "name": "Mammoth",
+      "changes": [
+        "Nombre: 'unknown' → 'Mammoth'"
+      ],
+      "scraped": {
+        "rcdb_id": 23463,
+        "rcdb_url": "https://rcdb.com/23463.htm",
+        "name": "Mammoth",
+        "park": "Fun Plex",
+        "city": "Omaha",
+        "country": "United States",
+        "status": "Construction",
+        "year": 2026,
+        "make": "Preston & Barbieri"
+      }
+    },
+    {
+      "rcdb_id": 23504,
+      "name": "Longshouyang Water Park",
+      "changes": [
+        "Estado: 'Operating' → 'Operated'"
+      ],
+      "scraped": {
+        "rcdb_id": 23504,
+        "rcdb_url": "https://rcdb.com/23504.htm",
+        "main_image_url": "https://rcdb.com/aaivdyc",
+        "name": "Longshouyang Water Park",
+        "city": "Qionghai",
+        "country": "China",
+        "status": "Operated",
+        "year": 2015
+      }
+    },
+    {
+      "rcdb_id": 23505,
+      "name": "unknown",
+      "changes": [
+        "Estado: 'Operating' → 'Closed'"
+      ],
+      "scraped": {
+        "rcdb_id": 23505,
+        "rcdb_url": "https://rcdb.com/23505.htm",
+        "name": "unknown",
+        "park": "Longshouyang Water Park",
+        "city": "Qionghai",
+        "country": "China",
+        "status": "Closed",
+        "year": 2024,
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 23518,
+      "name": "Soaring Hero Coaster / 飞将凌云过山车",
+      "changes": [
+        "Nombre: 'unknown' → 'Soaring Hero Coaster / 飞将凌云过山车'"
+      ],
+      "scraped": {
+        "rcdb_id": 23518,
+        "rcdb_url": "https://rcdb.com/23518.htm",
+        "name": "Soaring Hero Coaster / 飞将凌云过山车",
+        "park": "Nanchong Panda Three Kingdoms City",
+        "city": "Shunqing",
+        "country": "China",
+        "status": "Construction",
+        "year": 2026,
+        "make": "Jinma Rides",
+        "inversions": 3
+      }
+    },
+    {
+      "rcdb_id": 23618,
+      "name": "Wuyue Plaza / 吾悦广场",
+      "changes": [
+        "Nombre: 'Funtura' → 'Wuyue Plaza / 吾悦广场'",
+        "Año apertura: 2025 → 2022"
+      ],
+      "scraped": {
+        "rcdb_id": 23618,
+        "rcdb_url": "https://rcdb.com/23618.htm",
+        "name": "Wuyue Plaza / 吾悦广场",
+        "city": "Weiyang",
+        "country": "China",
+        "status": "Operating",
+        "year": 2022
+      }
+    },
+    {
+      "rcdb_id": 23619,
+      "name": "Chicken Coop / 小鸡快跑",
+      "changes": [
+        "Nombre: 'Roller Coaster' → 'Chicken Coop / 小鸡快跑'",
+        "Año apertura: 2025 → 2026"
+      ],
+      "scraped": {
+        "rcdb_id": 23619,
+        "rcdb_url": "https://rcdb.com/23619.htm",
+        "main_image_url": "https://rcdb.com/aaivlhc",
+        "name": "Chicken Coop / 小鸡快跑",
+        "park": "Cunjin Park",
+        "city": "Chikan",
+        "country": "China",
+        "status": "Operating",
+        "year": 2026,
+        "make": "Risheng Amusement Rides",
+        "model": "Chicken Coop",
+        "inversions": 0
+      }
+    },
+    {
+      "rcdb_id": 23774,
+      "name": "Dragon",
+      "changes": [
+        "Nombre: 'Dragon Rollercoaster' → 'Dragon'"
+      ],
+      "scraped": {
+        "rcdb_id": 23774,
+        "rcdb_url": "https://rcdb.com/23774.htm",
+        "name": "Dragon",
+        "park": "Newquay Fun Park",
+        "city": "Newquay",
+        "country": "United Kingdom",
+        "status": "Closed",
+        "year": 2025,
+        "inversions": 0
+      }
+    }
+  ]
+}

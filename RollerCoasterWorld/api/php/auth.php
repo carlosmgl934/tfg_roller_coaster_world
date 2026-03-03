@@ -4,38 +4,60 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
-// Log para depurar
-file_put_contents(__DIR__ . '/auth_log.txt', date('Y-m-d H:i:s') . " - POST recibido: " . file_get_contents('php://input') . "\n", FILE_APPEND);
-
-// Ruta corregida al db_conexion.php
 require_once __DIR__ . '/../database/db_conexion.php';
 
 $input = json_decode(file_get_contents('php://input'), true);
 
 if (!$input) {
-    file_put_contents(__DIR__ . '/auth_log.txt', date('Y-m-d H:i:s') . " - Datos inválidos o no recibidos\n", FILE_APPEND);
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Datos inválidos o no recibidos']);
     exit;
 }
 
-$firebase_uid = $input['firebase_uid'] ?? null;
-$email = $input['email'] ?? null;
-$username = $input['username'] ?? 'Usuario_' . substr(md5($firebase_uid ?? ''), 0, 8);
+// ── Verificación del token JWT de Firebase ────────────────────────────────────
+$id_token = $input['id_token'] ?? null;
 
-file_put_contents(__DIR__ . '/auth_log.txt', date('Y-m-d H:i:s') . " - Datos: uid=$firebase_uid, email=$email, username=$username\n", FILE_APPEND);
-
-if (!$firebase_uid || !$email) {
-    file_put_contents(__DIR__ . '/auth_log.txt', date('Y-m-d H:i:s') . " - Faltan datos\n", FILE_APPEND);
-    http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'Faltan firebase_uid o email']);
+if (!$id_token) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Falta el id_token de Firebase']);
     exit;
 }
 
+// Llamar a la API pública de Google para verificar el token
+$verify_url = 'https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($id_token);
+$response = @file_get_contents($verify_url);
+
+if ($response === false) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'No se pudo verificar el token con Google']);
+    exit;
+}
+
+$tokenData = json_decode($response, true);
+
+// Comprobar que el token pertenece a nuestro proyecto Firebase
+$expected_audience = 'tfg-roller-coaster-world-auth';   // ← tu projectId de Firebase
+$aud = $tokenData['aud'] ?? $tokenData['azp'] ?? '';
+
+if (empty($tokenData) || !str_contains($aud, $expected_audience)) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Token inválido o no pertenece a este proyecto']);
+    exit;
+}
+
+// ── Extraer datos del token (ya verificados por Google) ───────────────────────
+$firebase_uid = $tokenData['sub'];           // uid real — no viene del cliente
+$email = $tokenData['email'] ?? null;
+$username = $input['username'] ?? ($email ? explode('@', $email)[0] : 'Usuario_' . substr($firebase_uid, 0, 8));
+
+if (!$firebase_uid || !$email) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Token sin uid o email']);
+    exit;
+}
+
+// ── Insertar o ignorar en Supabase ────────────────────────────────────────────
 $db = new DBConexion();
-
-file_put_contents(__DIR__ . '/auth_log.txt', date('Y-m-d H:i:s') . " - Conexión creada\n", FILE_APPEND);
-
 $stmt = $db->prepare("
     INSERT INTO users (username, email, firebase_uid, rol)
     VALUES (:username, :email, :firebase_uid, 'user')
@@ -43,28 +65,25 @@ $stmt = $db->prepare("
     RETURNING id
 ");
 
-$result = $stmt->execute([
-    ':username'     => $username,
-    ':email'        => $email,
-    ':firebase_uid' => $firebase_uid
+$stmt->execute([
+    ':username' => $username,
+    ':email' => $email,
+    ':firebase_uid' => $firebase_uid,
 ]);
-
-file_put_contents(__DIR__ . '/auth_log.txt', date('Y-m-d H:i:s') . " - Execute: " . ($result ? 'OK' : 'FAIL') . "\n", FILE_APPEND);
 
 $newId = $stmt->fetchColumn();
 
 if ($newId) {
-    file_put_contents(__DIR__ . '/auth_log.txt', date('Y-m-d H:i:s') . " - Insertado ID: $newId\n", FILE_APPEND);
     echo json_encode([
         'success' => true,
         'message' => 'Usuario guardado en Supabase',
-        'user_id' => $newId
+        'user_id' => $newId,
     ]);
 } else {
-    file_put_contents(__DIR__ . '/auth_log.txt', date('Y-m-d H:i:s') . " - No insertado (ya existe o error)\n", FILE_APPEND);
+    // Ya existía — igual es un éxito (ON CONFLICT DO NOTHING)
     echo json_encode([
-        'success' => false,
-        'message' => 'Usuario ya existe en Supabase o error en insert'
+        'success' => true,
+        'message' => 'Usuario ya existía en Supabase (login correcto)',
     ]);
 }
 ?>
