@@ -270,7 +270,7 @@ function cambiarPassword() {
     .catch((err) => {
       msg.textContent =
         err.code === "auth/requires-recent-login"
-          ? "Por seguridad, cierra sesión, vuelve a entrar y repite la operación"
+          ? "Tu sesión ha expirado. Reincia la sesión y repite la operación."
           : "Error: " + err.message;
       msg.style.color = "red";
     });

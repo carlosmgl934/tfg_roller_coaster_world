@@ -1,10 +1,8 @@
 <?php
 require_once 'structure/header.php';
 
-// Protección básica con sesión (si usas sesión PHP)
-session_start();
 if (!isset($_SESSION['firebase_uid'])) {
-  header('Location: ../../firebase/auth/login.php');
+  header('Location: ' . $base_url . '/web/firebase/auth/login.php');
   exit;
 }
 
