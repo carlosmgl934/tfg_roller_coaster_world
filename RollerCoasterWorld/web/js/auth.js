@@ -1,4 +1,4 @@
-// Firebase config (tus claves reales del proyecto)
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAUFVSu8EvuFgeNgnQj4BH4MTuX0r_9qXY",
   authDomain: "tfg-roller-coaster-world-auth.firebaseapp.com",
@@ -15,17 +15,20 @@ if (typeof firebase !== "undefined" && !firebase.apps.length) {
 }
 const auth = firebase.auth();
 
-console.log("Firebase inicializado correctamente - auth.js cargado OK");
+// BASE_URL es inyectada por PHP en el header. Fallback por si acaso.
+const BASE = window.BASE_URL || "";
 
-// Registro con Email y Password
+console.log(
+  "Firebase inicializado correctamente - auth.js cargado OK | BASE:",
+  BASE,
+);
+
+// ── Registro con Email y Password ─────────────────────────────────────────────
 function signUpWithEmail(email, password) {
-  console.log("Intentando registro con:", email);
-
   if (!email || !password) {
     alert("Completa email y contraseña");
     return;
   }
-
   if (password.length < 6) {
     alert("La contraseña debe tener al menos 6 caracteres");
     return;
@@ -35,37 +38,29 @@ function signUpWithEmail(email, password) {
     .createUserWithEmailAndPassword(email, password)
     .then((userCredential) => {
       const user = userCredential.user;
-      console.log("Registro exitoso! UID:", user.uid, "Email:", user.email);
-      alert("¡Registro completado! UID: " + user.uid);
+      console.log("Registro exitoso! UID:", user.uid);
+      alert("¡Registro completado!");
 
-      // Guardar en Supabase (con token verificado)
       user.getIdToken().then((idToken) => {
-        fetch(
-          "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/api/php/auth.php",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              id_token: idToken,
-              username: user.displayName || user.email.split("@")[0],
-            }),
-          },
-        )
-          .then((response) => response.json())
+        fetch(BASE + "/api/php/auth.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id_token: idToken,
+            username: user.displayName || user.email.split("@")[0],
+          }),
+        })
+          .then((r) => r.json())
           .then((data) => {
-            console.log("Respuesta de Supabase:", data);
             if (data.success) console.log("Usuario guardado en Supabase");
-            else console.warn("No se pudo guardar en Supabase:", data.message);
+            else console.warn("Supabase:", data.message);
           })
-          .catch((err) => console.error("Error al guardar en Supabase:", err));
+          .catch((err) => console.error("Error Supabase:", err));
       });
 
-      // Redirigir
-      window.location.href =
-        "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/web/views/home.php";
+      window.location.href = BASE + "/web/views/home.php";
     })
     .catch((error) => {
-      console.error("Error en registro:", error.code, error.message);
       let msg = "Error al registrar: ";
       if (error.code === "auth/email-already-in-use")
         msg += "El email ya está registrado.";
@@ -78,10 +73,8 @@ function signUpWithEmail(email, password) {
     });
 }
 
-// Login con Email y Password
+// ── Login con Email y Password ────────────────────────────────────────────────
 function signInWithEmail(email, password) {
-  console.log("Intentando login con:", email);
-
   if (!email || !password) {
     alert("Completa email y contraseña");
     return;
@@ -91,45 +84,33 @@ function signInWithEmail(email, password) {
     .signInWithEmailAndPassword(email, password)
     .then((userCredential) => {
       const user = userCredential.user;
-      console.log("Login exitoso! UID:", user.uid, "Email:", user.email);
+      console.log("Login exitoso! UID:", user.uid);
 
-      // Guardar sesión PHP
       user.getIdToken().then((idToken) => {
-        fetch(
-          "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/api/php/save_session.php",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ firebase_uid: user.uid, email: user.email }),
-          },
-        )
+        fetch(BASE + "/api/php/save_session.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ firebase_uid: user.uid, email: user.email }),
+        })
           .then((r) => r.json())
-          .then((data) => console.log("Sesión PHP guardada:", data))
-          .catch((err) => console.error("Error guardando sesión PHP:", err));
+          .then((d) => console.log("Sesión PHP:", d));
 
-        // Sync con Supabase (con token verificado)
-        fetch(
-          "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/api/php/auth.php",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              id_token: idToken,
-              username: user.displayName || user.email.split("@")[0],
-            }),
-          },
-        )
+        fetch(BASE + "/api/php/auth.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id_token: idToken,
+            username: user.displayName || user.email.split("@")[0],
+          }),
+        })
           .then((r) => r.json())
-          .then((data) => console.log("Sync Supabase:", data))
-          .catch((err) => console.error("Error sync Supabase:", err));
+          .then((d) => console.log("Sync Supabase:", d));
       });
 
       alert("¡Bienvenido!");
-      window.location.href =
-        "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/web/views/home.php";
+      window.location.href = BASE + "/web/views/home.php";
     })
     .catch((error) => {
-      console.error("Error en login:", error.code, error.message);
       let msg = "Error al iniciar sesión: ";
       if (error.code === "auth/user-not-found") msg += "Usuario no encontrado.";
       else if (error.code === "auth/wrong-password")
@@ -140,9 +121,8 @@ function signInWithEmail(email, password) {
     });
 }
 
-// Login con Google
+// ── Login con Google ──────────────────────────────────────────────────────────
 function signInWithGoogle() {
-  console.log("Intentando login con Google");
   const provider = new firebase.auth.GoogleAuthProvider();
   auth
     .signInWithPopup(provider)
@@ -150,49 +130,35 @@ function signInWithGoogle() {
       const user = result.user;
       console.log("Login Google OK:", user.uid);
 
-      // Guardar sesión PHP + sync Supabase con token verificado
       user.getIdToken().then((idToken) => {
-        fetch(
-          "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/api/php/save_session.php",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ firebase_uid: user.uid, email: user.email }),
-          },
-        )
+        fetch(BASE + "/api/php/save_session.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ firebase_uid: user.uid, email: user.email }),
+        })
           .then((r) => r.json())
-          .then((data) => console.log("Sesión PHP guardada:", data))
-          .catch((err) => console.error("Error guardando sesión PHP:", err));
+          .then((d) => console.log("Sesión PHP:", d));
 
-        fetch(
-          "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/api/php/auth.php",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              id_token: idToken,
-              username: user.displayName || user.email.split("@")[0],
-            }),
-          },
-        )
+        fetch(BASE + "/api/php/auth.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id_token: idToken,
+            username: user.displayName || user.email.split("@")[0],
+          }),
+        })
           .then((r) => r.json())
-          .then((data) => console.log("Sync Supabase (Google):", data))
-          .catch((err) => console.error("Error sync:", err));
+          .then((d) => console.log("Sync Supabase (Google):", d));
       });
 
       alert("¡Bienvenido con Google!");
-      window.location.href =
-        "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/web/views/home.php";
+      window.location.href = BASE + "/web/views/home.php";
     })
-    .catch((error) => {
-      console.error("Error Google:", error.code, error.message);
-      alert("Error con Google: " + error.message);
-    });
+    .catch((error) => alert("Error con Google: " + error.message));
 }
 
-// Login con Facebook
+// ── Login con Facebook ────────────────────────────────────────────────────────
 function signInWithFacebook() {
-  console.log("Intentando login con Facebook");
   const provider = new firebase.auth.FacebookAuthProvider();
   auth
     .signInWithPopup(provider)
@@ -200,98 +166,150 @@ function signInWithFacebook() {
       const user = result.user;
       console.log("Login Facebook OK:", user.uid);
 
-      // Guardar sesión PHP + sync Supabase con token verificado
       user.getIdToken().then((idToken) => {
-        fetch(
-          "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/api/php/save_session.php",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ firebase_uid: user.uid, email: user.email }),
-          },
-        )
+        fetch(BASE + "/api/php/save_session.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ firebase_uid: user.uid, email: user.email }),
+        })
           .then((r) => r.json())
-          .then((data) => console.log("Sesión PHP guardada:", data))
-          .catch((err) => console.error("Error guardando sesión PHP:", err));
+          .then((d) => console.log("Sesión PHP:", d));
 
-        fetch(
-          "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/api/php/auth.php",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              id_token: idToken,
-              username: user.displayName || user.email.split("@")[0],
-            }),
-          },
-        )
+        fetch(BASE + "/api/php/auth.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id_token: idToken,
+            username: user.displayName || user.email.split("@")[0],
+          }),
+        })
           .then((r) => r.json())
-          .then((data) => console.log("Sync Supabase (Facebook):", data))
-          .catch((err) => console.error("Error sync:", err));
+          .then((d) => console.log("Sync Supabase (Facebook):", d));
       });
 
       alert("¡Bienvenido con Facebook!");
-      window.location.href =
-        "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/web/views/home.php";
+      window.location.href = BASE + "/web/views/home.php";
     })
-    .catch((error) => {
-      console.error("Error Facebook:", error.code, error.message);
-      alert("Error con Facebook: " + error.message);
-    });
+    .catch((error) => alert("Error con Facebook: " + error.message));
 }
 
-// Logout
+// ── Logout ────────────────────────────────────────────────────────────────────
 function signOut() {
   auth
     .signOut()
     .then(() => {
-      console.log("Logout exitoso");
+      fetch(BASE + "/api/php/logout.php", { method: "POST" });
       alert("Sesión cerrada");
-
-      // Limpiar sesión PHP (opcional)
-      fetch(
-        "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/api/php/logout.php",
-        {
-          method: "POST",
-        },
-      );
-
-      window.location.href =
-        "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/web/firebase/auth/login.php";
+      window.location.href = BASE + "/web/firebase/auth/login.php";
     })
-    .catch((error) => {
-      console.error("Error logout:", error);
-    });
+    .catch((error) => console.error("Error logout:", error));
 }
 
-// Monitorear estado de autenticación
+// ── Estado de autenticación ───────────────────────────────────────────────────
 auth.onAuthStateChanged((user) => {
-  if (user) {
+  if (user)
     console.log("Usuario logueado:", user.uid, user.email || user.displayName);
-  } else {
-    console.log("No hay usuario logueado");
-  }
+  else console.log("No hay usuario logueado");
 });
 
-// Protección frontend: redirige si no hay usuario logueado en páginas privadas
+// ── Protección de rutas privadas ──────────────────────────────────────────────
 auth.onAuthStateChanged((user) => {
-  const privatePaths = [
-    "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/web/views/profile.php",
-    "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/web/views/carrito.php",
-    "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/web/views/trips.php",
-    "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/web/views/home.php",
-    "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/web/views/admin.php",
-    "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/web/views/coasters.php",
-    "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/web/views/index.php",
-    "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/web/views/parks.php",
-    // Añade más rutas privadas aquí
+  const privatePages = [
+    "/web/views/profile.php",
+    "/web/views/carrito.php",
+    "/web/views/trips.php",
+    "/web/views/home.php",
+    "/web/views/admin.php",
+    "/web/views/coasters.php",
+    "/web/views/index.php",
+    "/web/views/parks.php",
   ];
 
-  if (privatePaths.some((path) => window.location.pathname.includes(path))) {
+  const path = window.location.pathname;
+  if (privatePages.some((p) => path.endsWith(p) || path.includes(p))) {
     if (!user) {
       console.log("Acceso denegado: no logueado");
-      window.location.href =
-        "/tfg/tfg_roller_coaster_world/RollerCoasterWorld/web/firebase/auth/login.php";
+      window.location.href = BASE + "/web/firebase/auth/login.php";
     }
   }
 });
+
+// ── Cambiar contraseña ────────────────────────────────────────────────────────
+function toggleFormPassword() {
+  const form = document.getElementById("form-password");
+  if (!form) return;
+  form.style.display = form.style.display === "none" ? "block" : "none";
+  document.getElementById("nueva-password").value = "";
+  document.getElementById("confirmar-password").value = "";
+  document.getElementById("msg-password").textContent = "";
+}
+
+function cambiarPassword() {
+  const nueva = document.getElementById("nueva-password").value;
+  const confirma = document.getElementById("confirmar-password").value;
+  const msg = document.getElementById("msg-password");
+
+  if (nueva.length < 6) {
+    msg.textContent = "Mínimo 6 caracteres";
+    msg.style.color = "red";
+    return;
+  }
+  if (nueva !== confirma) {
+    msg.textContent = "Las contraseñas no coinciden";
+    msg.style.color = "red";
+    return;
+  }
+
+  auth.currentUser
+    .updatePassword(nueva)
+    .then(() => {
+      msg.textContent = "Contraseña cambiada correctamente.";
+      msg.style.color = "green";
+      setTimeout(toggleFormPassword, 2000);
+    })
+    .catch((err) => {
+      msg.textContent =
+        err.code === "auth/requires-recent-login"
+          ? "Por seguridad, cierra sesión, vuelve a entrar y repite la operación"
+          : "Error: " + err.message;
+      msg.style.color = "red";
+    });
+}
+
+// ── Eliminar cuenta ───────────────────────────────────────────────────────────
+function borrarCuenta() {
+  const user = auth.currentUser;
+  if (!user) {
+    alert("Debes iniciar sesión para eliminar la cuenta");
+    return;
+  }
+
+  if (
+    !confirm(
+      "¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer",
+    )
+  )
+    return;
+
+  user
+    .delete()
+    .then(() => {
+      //Borrar cuenta en Supabase
+      fetch(BASE + "/api/php/delete_user.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ firebase_uid: user.uid }),
+      })
+        .then((r) => r.json())
+        .then((d) => alert("Usuario eliminado de Supabase:" + d))
+        .catch((err) =>
+          console.error("Error al eliminar usuario de Supabase:", err),
+        );
+
+      alert("Cuenta eliminada correctamente");
+      window.location.href = BASE + "/web/firebase/auth/login.php";
+    })
+    .catch((error) => {
+      alert("Error al eliminar la cuenta: " + error.message);
+    });
+}

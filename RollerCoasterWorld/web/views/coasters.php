@@ -1,11 +1,9 @@
 <?php
 require_once 'structure/header.php';
 
-// Protección básica con sesión (si usas sesión PHP)
-session_start();
+// Protección: redirige si no hay sesión activa
 if (!isset($_SESSION['firebase_uid'])) {
-  header('Location: ../../firebase/auth/login.php');
+  header('Location: ' . $base_url . '/web/firebase/auth/login.php');
   exit;
 }
 
-// Opcional: verificación extra con Firebase (más segura, requiere Firebase PHP SDK)
