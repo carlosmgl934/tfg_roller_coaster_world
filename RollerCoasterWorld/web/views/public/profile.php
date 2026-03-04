@@ -1,8 +1,8 @@
 <?php
-require_once 'structure/header.php';
+require_once __DIR__ . '/../partials/header.php';
 
 if (!isset($_SESSION['firebase_uid'])) {
-  header('Location: ' . $base_url . '/web/firebase/auth/login.php');
+  header('Location: ' . $base_url . '/web/views/auth/login.php');
   exit;
 }
 
@@ -58,10 +58,10 @@ $user_uid = $_SESSION['firebase_uid'];
   </div>
 
   <p style="margin-top: 30px;">
-    <a href="<?= $base_url ?>/web/firebase/auth/logout.php" style="color: #e74c3c; font-weight: bold;">Cerrar sesión</a>
+    <a href="<?= $base_url ?>/web/views/auth/logout.php" style="color: #e74c3c; font-weight: bold;">Cerrar sesión</a>
   </p>
 </main>
 
 <?php
-require_once 'structure/footer.php';
+require_once __DIR__ . '/../partials/footer.php';
 ?>

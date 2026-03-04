@@ -3,9 +3,12 @@ CREATE TABLE IF NOT EXISTS contact_messages (
     user_id INT DEFAULT NULL,    -- usuario que nos contacta (si no esta logueado, sera NULL)
     user_name VARCHAR(100) NOT NULL,
     user_email VARCHAR(100) NOT NULL,
+    reason VARCHAR(50) NOT NULL,    -- motivo de contacto 
     subject VARCHAR(150) NOT NULL,  -- asunto del mensaje
     user_message TEXT NOT NULL,
     is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,     -- fecha de envio
+    wants_reply BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
+

@@ -1,5 +1,5 @@
 <?php
-require_once '../../../web/views/structure/header.php';
+require_once __DIR__ . '/../partials/header.php';
 ?>
 
 <main>
@@ -10,5 +10,5 @@ require_once '../../../web/views/structure/header.php';
 
 
 <?php
-require_once '../../../web/views/structure/footer.php';
+require_once __DIR__ . '/../partials/footer.php';
 ?>

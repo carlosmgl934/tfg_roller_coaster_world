@@ -1,10 +1,11 @@
+<?php require_once __DIR__ . '/../../routes/routes.php'; ?>
 <footer class="main-footer">
 
   <div class="legal-section">
     <h4>Comunidad & Legal</h4>
     <ul>
-      <li> <a href="html/contact.html">Contácta con nosotros</a></li>
-      <li> <a href="html/privacy.html"> Privacidad </a></li>
+      <li><a href="<?= $routes['contact'] ?>">Contácta con nosotros</a></li>
+      <li><a href="<?= $routes['privacy'] ?>">Privacidad</a></li>
     </ul>
   </div>
 

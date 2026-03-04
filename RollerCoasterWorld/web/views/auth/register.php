@@ -1,5 +1,5 @@
 <?php
-require_once '../../../web/views/structure/header.php';
+require_once __DIR__ . '/../partials/header.php';
 ?>
 
 <main>
@@ -7,9 +7,10 @@ require_once '../../../web/views/structure/header.php';
   <form id="register-form">
     <input type="email" id="email" placeholder="Email" required>
     <input type="password" id="password" placeholder="Contraseña" required>
-    <button type="button" onclick="signUpWithEmail(document.getElementById('email').value, document.getElementById('password').value)">
-  Registrar con Email
-</button>
+    <button type="button"
+      onclick="signUpWithEmail(document.getElementById('email').value, document.getElementById('password').value)">
+      Registrar con Email
+    </button>
   </form>
   <button onclick="signInWithGoogle()">Registrar con Google</button>
   <button onclick="signInWithFacebook()">Registrar con Facebook</button>
@@ -18,5 +19,5 @@ require_once '../../../web/views/structure/header.php';
 
 
 <?php
-require_once '../../../web/views/structure/footer.php';
+require_once __DIR__ . '/../partials/footer.php';
 ?>

@@ -19,6 +19,15 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       charCount.style.color = "red";
     }
+    if (count > 1850) {
+      charCount.style.color = "yellow";
+    }
+    if (count > 1950) {
+      charCount.style.color = "orange";
+    }
+    if (count > 2000) {
+      charCount.style.color = "red";
+    }
   });
 
   function showError(message) {
@@ -60,6 +69,12 @@ document.addEventListener("DOMContentLoaded", () => {
       messageInput.style.borderColor = "red";
       return;
     }
+    if (messageInput.value.length > 2000) {
+      messageError.textContent =
+        "Por favor, introduce un mensaje con menos de 2000 caracteres";
+      messageInput.style.borderColor = "red";
+      return;
+    }
     messageError.textContent = "";
     messageInput.style.borderColor = "green";
   });
@@ -94,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
     submitBtn.textContent = "Enviando...";
 
     try {
-      const response = await fetch("../../../api/php/contact.php", {
+      const response = await fetch(window.BASE_URL + "/api/php/contact.php", {
         method: "POST",
         body: new FormData(form),
       });
@@ -111,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         setTimeout(() => {
           hideSuccess();
-          window.location.href = "../index.php";
+          window.location.href = window.BASE_URL + "/web/views/home.php";
         }, 10000);
       } else {
         showError("Error al enviar el mensaje: " + result.error);
