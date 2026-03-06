@@ -7,12 +7,13 @@ if (!isset($_SESSION['firebase_uid'])) {
 }
 ?>
 
+<link rel="stylesheet" href="<?= $base_url ?>/web/css/admin.css">
+
 <main>
-    <h1>Dashboard</h1>
-    <!-- TODO: contenido del dashboard -->
+    <h1>Historial de Todos los Pedidos</h1>
+    <!-- TODO: listado de todos los pedidos de todos los usuarios, filtros por estado/fecha/usuario -->
 </main>
 
 <?php require_once __DIR__ . '/../partials/footer.php'; ?>
-
-<!-- Protección cliente: redirige si no hay sesión Firebase activa -->
+<script src="<?= $base_url ?>/web/js/admin.js"></script>
 <script src="<?= $base_url ?>/web/js/auth-check.js"></script>

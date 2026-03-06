@@ -5,14 +5,18 @@ if (!isset($_SESSION['firebase_uid'])) {
     header('Location: ' . $base_url . '/web/views/auth/login.php');
     exit;
 }
+
+$park_id = $_GET['id'] ?? null;
 ?>
 
+<link rel="stylesheet" href="<?= $base_url ?>/web/css/parks.css">
+
 <main>
-    <h1>Dashboard</h1>
-    <!-- TODO: contenido del dashboard -->
+    <h1>Ficha de Parque</h1>
+    <!-- TODO: datos del parque, fotos, mapa Leaflet, comentarios -->
 </main>
 
 <?php require_once __DIR__ . '/../partials/footer.php'; ?>
-
-<!-- Protección cliente: redirige si no hay sesión Firebase activa -->
+<script src="<?= $base_url ?>/web/js/parks.js"></script>
+<script src="<?= $base_url ?>/web/js/map.js"></script>
 <script src="<?= $base_url ?>/web/js/auth-check.js"></script>

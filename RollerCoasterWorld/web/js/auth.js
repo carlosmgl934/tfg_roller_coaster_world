@@ -25,6 +25,9 @@ console.log(
 
 // ── Registro con Email y Password ─────────────────────────────────────────────
 function signUpWithEmail(email, password) {
+  email = document.getElementById("email").value;
+  password = document.getElementById("password").value;
+
   if (!email || !password) {
     alert("Completa email y contraseña");
     return;
@@ -58,7 +61,7 @@ function signUpWithEmail(email, password) {
           .catch((err) => console.error("Error Supabase:", err));
       });
 
-      window.location.href = BASE + "/web/views/home.php";
+      window.location.href = BASE + "/web/views/public/index.php";
     })
     .catch((error) => {
       let msg = "Error al registrar: ";
@@ -75,6 +78,9 @@ function signUpWithEmail(email, password) {
 
 // ── Login con Email y Password ────────────────────────────────────────────────
 function signInWithEmail(email, password) {
+  email = document.getElementById("email").value;
+  password = document.getElementById("password").value;
+
   if (!email || !password) {
     alert("Completa email y contraseña");
     return;
@@ -126,7 +132,7 @@ function signInWithEmail(email, password) {
       });
 
       alert("¡Bienvenido!");
-      window.location.href = BASE + "/web/views/home.php";
+      window.location.href = BASE + "/web/views/public/index.php";
     })
     .catch((error) => {
       let msg = "Error al iniciar sesión: ";
@@ -188,7 +194,7 @@ function signInWithGoogle() {
       });
 
       alert("¡Bienvenido con Google!");
-      window.location.href = BASE + "/web/views/home.php";
+      window.location.href = BASE + "/web/views/public/index.php";
     })
     .catch((error) => alert("Error con Google: " + error.message));
 }
@@ -224,7 +230,7 @@ function signInWithFacebook() {
       });
 
       alert("¡Bienvenido con Facebook!");
-      window.location.href = BASE + "/web/views/home.php";
+      window.location.href = BASE + "/web/views/public/index.php";
     })
     .catch((error) => alert("Error con Facebook: " + error.message));
 }
@@ -254,7 +260,6 @@ auth.onAuthStateChanged((user) => {
     "/web/views/profile.php",
     "/web/views/carrito.php",
     "/web/views/trips.php",
-    "/web/views/home.php",
     "/web/views/admin.php",
     "/web/views/coasters.php",
     "/web/views/index.php",

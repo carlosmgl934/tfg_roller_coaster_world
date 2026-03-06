@@ -2,32 +2,30 @@
 require_once __DIR__ . '/../partials/header.php';
 ?>
 
-<main style="padding: 40px 20px; max-width: 600px; margin: 0 auto;">
+<link rel="stylesheet" href="<?= $base_url ?>/web/css/login.css">
+
+<main>
   <h2>Iniciar Sesión</h2>
 
-  <form id="login-form" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px;">
-    <input type="email" id="email" placeholder="Email" required style="padding: 12px; font-size: 1em;">
-    <input type="password" id="password" placeholder="Contraseña" required style="padding: 12px; font-size: 1em;">
-    <button type="button"
-      onclick="signInWithEmail(document.getElementById('email').value, document.getElementById('password').value)"
-      style="padding: 12px; background: #2ecc71; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1.1em;">
+  <form id="login-form">
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Contraseña" required>
+    <button type="button" onclick="signInWithEmail()">
       Iniciar sesión con Email
     </button>
   </form>
 
-  <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px;">
-    <button onclick="signInWithGoogle()"
-      style="padding: 12px; background: #4285F4; color: white; border: none; border-radius: 6px; cursor: pointer;">
+  <div class="auth-providers">
+    <button onclick="signInWithGoogle()">
       Iniciar con Google
     </button>
-    <button onclick="signInWithFacebook()"
-      style="padding: 12px; background: #3b5998; color: white; border: none; border-radius: 6px; cursor: pointer;">
+    <button onclick="signInWithFacebook()">
       Iniciar con Facebook
     </button>
   </div>
 
   <p style="text-align: center;">
-    ¿No tienes cuenta? <a href="register.php">Regístrate aquí</a>
+    ¿No tienes cuenta? <a href="<?= $base_url ?>/web/views/auth/register.php">Regístrate aquí</a>
   </p>
 
   <!-- BOTÓN PROVISIONAL DE CERRAR SESIÓN (para pruebas rápidas) -->

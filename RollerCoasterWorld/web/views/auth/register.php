@@ -7,8 +7,7 @@ require_once __DIR__ . '/../partials/header.php';
   <form id="register-form">
     <input type="email" id="email" placeholder="Email" required>
     <input type="password" id="password" placeholder="Contraseña" required>
-    <button type="button"
-      onclick="signUpWithEmail(document.getElementById('email').value, document.getElementById('password').value)">
+    <button type="button" onclick="signUpWithEmail()">
       Registrar con Email
     </button>
   </form>
