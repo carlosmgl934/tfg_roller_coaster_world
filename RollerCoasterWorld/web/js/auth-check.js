@@ -3,13 +3,28 @@ const BASE_CHECK = window.BASE_URL || "";
 
 auth.onAuthStateChanged((user) => {
   const privatePages = [
-    "/web/views/profile.php",
-    "/web/views/carrito.php",
-    "/web/views/trips.php",
-    "/web/views/admin.php",
-    "/web/views/home.php",
-    "/web/views/coasters.php",
-    "/web/views/parks.php",
+    // --- Vistas Privadas de Usuario ---
+    "/home.php",
+    "/profile.php",
+    "/carrito.php",
+    "/trips.php",
+    "/forums.php",
+    "/parks.php",
+    "/coaster_search.php",
+    "/coaster_detail.php",
+    "/park_detail.php",
+    "/friends.php",
+    "/checkout.php",
+    "/orders.php",
+
+    // --- Panel de Administrador (Todas son privadas) ---
+    "/admin.php",
+    "/dashboard.php",
+    "/users.php",
+    "/coasters.php", // La vista de admin/coasters.php
+    "/messages.php",
+    "/photos.php",
+    "/comments.php",
   ];
 
   const path = window.location.pathname;

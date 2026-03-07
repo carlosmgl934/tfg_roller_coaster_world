@@ -62,7 +62,9 @@ function listCoasters()
     try {
         $db = new DBConexion();
         $sql = "SELECT
-        coasters.id, coasters.coaster_name, coasters.imagen_url, parks.park_name
+        coasters.id, coasters.coaster_name, coasters.imagen_url, parks.park_name, coasters.coaster_manufacter AS manufacturer,
+        coasters.coaster_model AS modelo,
+        coasters.opening_year
         FROM coasters
         INNER JOIN parks ON coasters.park_id = parks.id
         LIMIT :limit OFFSET :offset";
@@ -109,7 +111,9 @@ function filterCoasters()
     try {
         $db = new DBConexion();
         $sql = "SELECT
-        coasters.id, coasters.coaster_name, coasters.imagen_url, parks.park_name
+        coasters.id, coasters.coaster_name, coasters.imagen_url, parks.park_name, coasters.coaster_manufacter AS manufacturer,
+        coasters.coaster_model AS modelo,
+        coasters.opening_year
         FROM coasters
         INNER JOIN parks ON coasters.park_id = parks.id
         WHERE coasters.coaster_name ILIKE :name

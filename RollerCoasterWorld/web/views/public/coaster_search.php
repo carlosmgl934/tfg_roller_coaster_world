@@ -32,7 +32,6 @@ if (!isset($_SESSION['firebase_uid'])) {
 
         <!-- CENTRO: Lista -->
         <div class="col-12 col-lg-6">
-            <!-- Quitamos 'coaster-list' genérico y ponemos 'list-group' puro -->
             <div class="list-group shadow-sm" id="coaster-list" style="border-radius: 8px;"></div>
 
             <div class="pagination mt-4 justify-content-center" id="pagination"></div>

@@ -74,14 +74,12 @@ $(document).ready(function () {
   }
 
   function displayCoasters(coasters) {
-    // Usamos el ID directamente
     const container = document.querySelector("#coaster-list");
     container.innerHTML = "";
     coasters.forEach(function (coaster) {
       const coasterCard = document.createElement("a");
       coasterCard.href =
         BASE_URL + `/web/views/public/coaster_detail.php?id=${coaster.id}`;
-      // Estilo de filas de tabla horizontales
       coasterCard.classList.add(
         "list-group-item",
         "list-group-item-action",
@@ -94,15 +92,18 @@ $(document).ready(function () {
         ? `<img src="${coaster.imagen_url}" alt="${coaster.coaster_name}" class="rounded shadow-sm" style="width: 100px; height: 100px; object-fit: cover; margin-right: 20px;">`
         : `<img src="https://www.hussrides.com/fileadmin/_processed_/5/e/csm_giant-frisbee-cedarpoint-01_0697df513a.jpg" alt="Sin imagen" class="rounded shadow-sm" style="width: 100px; height: 100px; object-fit: cover; margin-right: 20px;">`;
 
+      const manufacturer = coaster.manufacturer || "Desconocido";
+      const modelo = coaster.modelo || "Desconocido";
+      const year = coaster.opening_year || "N/A";
+
       coasterCard.innerHTML = `
-      ${img}
-      <div class="flex-grow-1">
-        <h5 class="mb-1 fw-bold text-primary" style="font-size: 1.25rem;">${coaster.coaster_name}</h5>
-        <p class="mb-1 text-muted"><i class="fa-solid fa-map-pin me-1"></i>${coaster.park_name}</p>
-        <!-- Dummy data for now matching your screenshot style -->
-        <small class="text-secondary">Intamin • Steel • 2021</small>
-      </div>
-      <i class="fa-solid fa-chevron-right text-muted ms-3"></i>
+        ${img}
+        <div class="flex-grow-1">
+          <h5 class="mb-1 fw-bold text-primary" style="font-size: 1.25rem;">${coaster.coaster_name}</h5>
+          <p class="mb-1 text-muted"><i class="fa-solid fa-map-pin me-1"></i>${coaster.park_name}</p>
+          <small class="text-secondary">${manufacturer} • ${modelo} • ${year}</small>
+        </div>
+        <i class="fa-solid fa-chevron-right text-muted ms-3"></i>
       `;
       container.appendChild(coasterCard);
     });

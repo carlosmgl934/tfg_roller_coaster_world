@@ -11,7 +11,7 @@ require_once __DIR__ . '/../partials/header.php';
     <input type="email" id="email" placeholder="Email" required>
     <input type="password" id="password" placeholder="Contraseña" required>
     <button type="button" onclick="signInWithEmail()">
-      Iniciar sesión con Email
+      Iniciar Sesión
     </button>
   </form>
 
