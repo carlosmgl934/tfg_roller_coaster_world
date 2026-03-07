@@ -32,7 +32,7 @@ auth.onAuthStateChanged((user) => {
   if (privatePages.some((p) => path.endsWith(p) || path.includes(p))) {
     if (!user) {
       console.log("Acceso denegado: no logueado en página privada");
-      window.location.href = BASE_CHECK + "/web/firebase/auth/login.php";
+      window.location.href = BASE_CHECK + "/web/views/auth/login.php";
     } else {
       console.log("Usuario logueado en página privada:", user.uid);
     }
