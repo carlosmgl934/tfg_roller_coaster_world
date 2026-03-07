@@ -3,7 +3,7 @@
 /**
  * Importar datos de RCDB (JSON) a Supabase (PostgreSQL)
  *
- * Uso:  php db_import.php ../scrapper/rcdb_complete.json
+ * Uso:  php db_import.php ../scraper/rcdb_complete.json
  *
  * Cambios respecto a versión anterior:
  *  - city vacío ya NO descarta el coaster (se usa 'Desconocido' como fallback)
@@ -16,7 +16,7 @@ require_once __DIR__ . '/db_conexion.php';
 
 if ($argc < 2) {
     echo "Uso: php db_import.php <ruta_al_json>\n";
-    echo "Ejemplo: php db_import.php ../scrapper/rcdb_complete.json\n";
+    echo "Ejemplo: php db_import.php ../scraper/rcdb_complete.json\n";
     exit(1);
 }
 

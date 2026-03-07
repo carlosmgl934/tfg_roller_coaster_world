@@ -1,7 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../routes/routes.php';
-require_once __DIR__ . '/../db_conexion.php';
+require_once __DIR__ . '/../database/db_conexion.php';
 session_start();
 
 header('Content-Type: application/json');

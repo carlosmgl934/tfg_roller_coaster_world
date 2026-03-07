@@ -5,15 +5,13 @@ if (!isset($_SESSION['firebase_uid'])) {
     header('Location: ' . $base_url . '/web/views/auth/login.php');
     exit;
 }
-
-$coaster_id = $_GET['id'] ?? null;
 ?>
 
 <link rel="stylesheet" href="<?= $base_url ?>/web/css/coasters.css">
 
 <main>
-    <h1>Ficha de Montaña Rusa</h1>
-    <!-- TODO: datos del coaster, valoraciones, videos -->
+    <h1>Tops de Montañas Rusas</h1>
+    <!-- TODO: tops globales de usuarios, top personal vs top global, podio -->
 </main>
 
 <?php require_once __DIR__ . '/../partials/footer.php'; ?>

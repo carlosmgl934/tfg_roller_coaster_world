@@ -10,11 +10,11 @@
   </div>
 
   <div class="social-links">
-    <a href="https://x.com/CarlosCoas61432?s=20" aria-label="Twitter / X"><i class="fab fa-twitter"></i>
+    <a href="https://x.com/CarlosCoas61432?s=20" aria-label="Twitter / X"><i class="fa-brands fa-x-twitter"></i>
       Twitter</a>
-    <a href="https://www.instagram.com/carloscoasters/" aria-label="Instagram"><i class="fab fa-instagram"></i>
+    <a href="https://www.instagram.com/carloscoasters/" aria-label="Instagram"><i class="fa-brands fa-instagram"></i>
       Instagram</a>
-    <a href="https://www.youtube.com/@CarlosCoasters" aria-label="Youtube"><i class="fab fa-youtube"></i>
+    <a href="https://www.youtube.com/@CarlosCoasters" aria-label="Youtube"><i class="fa-brands fa-youtube"></i>
       Youtube</a>
   </div>
 

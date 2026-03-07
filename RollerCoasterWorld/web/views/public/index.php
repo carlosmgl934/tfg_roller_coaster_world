@@ -24,25 +24,6 @@ $user_uid = $_SESSION['firebase_uid'];
     <p><strong>UID:</strong> <?php echo htmlspecialchars($user_uid); ?></p>
   </div>
 
-  <div style="margin: 40px 0;">
-    <a href="<?= $base_url ?>/web/views/public/profile.php"
-      style="margin: 10px; padding: 12px 30px; background: #1976d2; color: white; text-decoration: none; border-radius: 6px; display: inline-block;">
-      Ver mi perfil
-    </a>
-    <a href="<?= $base_url ?>/web/views/public/coasters.php"
-      style="margin: 10px; padding: 12px 30px; background: #1976d2; color: white; text-decoration: none; border-radius: 6px; display: inline-block;">
-      Montañas Rusas
-    </a>
-    <a href="<?= $base_url ?>/web/views/public/parks.php"
-      style="margin: 10px; padding: 12px 30px; background: #1976d2; color: white; text-decoration: none; border-radius: 6px; display: inline-block;">
-      Parques
-    </a>
-    <a href="<?= $base_url ?>/web/views/public/carrito.php"
-      style="margin: 10px; padding: 12px 30px; background: #1976d2; color: white; text-decoration: none; border-radius: 6px; display: inline-block;">
-      Carrito
-    </a>
-  </div>
-
   <p style="margin-top: 50px;">
     <a href="<?= $base_url ?>/web/views/auth/logout.php"
       style="color: #d32f2f; font-weight: bold; text-decoration: none;">

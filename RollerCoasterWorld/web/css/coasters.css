@@ -1,1 +1,50 @@
 /* coasters.css — Estilos de la página de montañas rusas y ficha */
+.page-btn.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.page-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.page-btn:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.page-btn:disabled {
+  background-color: #007bff;
+  color: white;
+}
+
+.page-btn:disabled:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.page-btn:disabled:active {
+  background-color: #007bff;
+  color: white;
+}
+
+.page-btn:disabled:focus {
+  background-color: #007bff;
+  color: white;
+}
+
+.page-btn:disabled:focus:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.page-btn:disabled:focus:active {
+  background-color: #007bff;
+  color: white;
+}
+
+.page-btn:disabled:focus:active:hover {
+  background-color: #007bff;
+  color: white;
+}
