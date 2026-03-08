@@ -242,7 +242,7 @@ function signOut() {
     .then(() => {
       fetch(BASE + "/api/php/logout.php", { method: "POST" });
       alert("Sesión cerrada");
-      window.location.href = BASE + "/web/firebase/auth/login.php";
+      window.location.href = BASE + "/web/views/auth/login.php";
     })
     .catch((error) => console.error("Error logout:", error));
 }

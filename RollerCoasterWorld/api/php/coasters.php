@@ -28,6 +28,9 @@ switch ($action) {
     case 'apply_filters':
         applyFilters();
         break;
+    case 'detail':
+        getCoasterDetail();
+        break;
     default:
         echo json_encode(['success' => false, 'error' => 'Acción no válida']);
         exit;
@@ -158,7 +161,7 @@ function listCoasters()
         exit;
 
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => 'Error mostrando montañas rusas']);
+        echo json_encode(['success' => false, 'error' => 'Error mostrando montañas rusas: ' . $e->getMessage()]);
         exit;
     }
 

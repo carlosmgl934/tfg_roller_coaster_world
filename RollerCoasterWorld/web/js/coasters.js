@@ -1,4 +1,14 @@
 $(document).ready(function () {
+  window.addEventListener("pageshow", function () {
+    document.getElementById("height-filter").value = 0;
+    document.getElementById("speed-filter").value = 0;
+    document.getElementById("length-filter").value = 0;
+    document.getElementById("inversions-filter").value = 0;
+    document.getElementById("height-val").textContent = "0m";
+    document.getElementById("speed-val").textContent = "0km/h";
+    document.getElementById("length-val").textContent = "0m";
+    document.getElementById("inversions-val").textContent = "0";
+  });
   document
     .getElementById("height-filter")
     .addEventListener("input", function () {
@@ -54,7 +64,7 @@ $(document).ready(function () {
           if (data.length > 0) {
             data.forEach(function (coaster) {
               html += `
-              <a href="${BASE_URL}/web/views/public/coaster_detail.php?id=${coaster.id}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+              <a href="${BASE_URL}/web/views/public/coasters.php?id=${coaster.id}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                 <div>
                   <h6 class="mb-0 fw-bold">${coaster.coaster_name}</h6>
                   <small class="text-muted"><i class="fa-solid fa-location-dot me-1"></i>${coaster.park_name}</small>
@@ -213,6 +223,16 @@ $(document).ready(function () {
     document.getElementById("length-val").textContent = "0 m";
     document.getElementById("inversions-val").textContent = "0";
 
+    $("#coaster-search").val("");
+    searchIcon
+      .removeClass("fa-xmark text-danger")
+      .addClass("fa-magnifying-glass text-muted")
+      .css("cursor", "text");
+    $("#search-results").html("").hide();
+    isFiltering = false;
+    currentSearchQuery = "";
+    $("h1").text("Base de Datos de Montañas Rusas");
+
     loadCoasters(1);
   }
 
@@ -222,7 +242,7 @@ $(document).ready(function () {
     coasters.forEach(function (coaster) {
       const coasterCard = document.createElement("a");
       coasterCard.href =
-        BASE_URL + `/web/views/public/coaster_detail.php?id=${coaster.id}`;
+        BASE_URL + `/web/views/public/coasters.php?id=${coaster.id}`;
       coasterCard.classList.add(
         "list-group-item",
         "list-group-item-action",
