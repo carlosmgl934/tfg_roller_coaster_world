@@ -1,4 +1,44 @@
 $(document).ready(function () {
+  document
+    .getElementById("height-filter")
+    .addEventListener("input", function () {
+      document.getElementById("height-val").textContent = this.value + "m";
+    });
+
+  document
+    .getElementById("speed-filter")
+    .addEventListener("input", function () {
+      document.getElementById("speed-val").textContent = this.value + "km/h";
+    });
+
+  document
+    .getElementById("length-filter")
+    .addEventListener("input", function () {
+      document.getElementById("length-val").textContent = this.value + "m";
+    });
+
+  document
+    .getElementById("inversions-filter")
+    .addEventListener("input", function () {
+      document.getElementById("inversions-val").textContent = this.value;
+    });
+
+  // Inicializar los valores en caso de que el navegador restaure el estado del formulario al navegar atrás
+  document.getElementById("height-val").textContent =
+    document.getElementById("height-filter").value + "m";
+  document.getElementById("speed-val").textContent =
+    document.getElementById("speed-filter").value + "km/h";
+  document.getElementById("length-val").textContent =
+    document.getElementById("length-filter").value + "m";
+  document.getElementById("inversions-val").textContent =
+    document.getElementById("inversions-filter").value;
+
+  document
+    .getElementById("btn-filtrar")
+    .addEventListener("click", applyFilters);
+
+  document.getElementById("btn-borrar").addEventListener("click", clearFilters);
+
   $("#coaster-search").on("keyup", function () {
     const search = $(this).val();
     if (search.length >= 3) {
@@ -14,7 +54,7 @@ $(document).ready(function () {
           if (data.length > 0) {
             data.forEach(function (coaster) {
               html += `
-              <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+              <a href="${BASE_URL}/web/views/public/coaster_detail.php?id=${coaster.id}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                 <div>
                   <h6 class="mb-0 fw-bold">${coaster.coaster_name}</h6>
                   <small class="text-muted"><i class="fa-solid fa-location-dot me-1"></i>${coaster.park_name}</small>
@@ -42,9 +82,52 @@ $(document).ready(function () {
   let currentPage = 1;
   let currentSearchQuery = "";
   let isFiltering = false;
+  let isAdvancedFiltering = false;
 
   function loadCoasters(page) {
     currentPage = page;
+
+    if (isAdvancedFiltering) {
+      let opened = document.getElementById("status-filter").checked;
+      let ridden = document.getElementById("ridden-filter").checked;
+      let height = document.getElementById("height-filter").value;
+      let speed = document.getElementById("speed-filter").value;
+      let length = document.getElementById("length-filter").value;
+      let inversions = document.getElementById("inversions-filter").value;
+      let manufacter = document.getElementById("manufacter-filter").value;
+      let country = document.getElementById("country-filter").value;
+      let year = document.getElementById("year-select").value;
+      let search = document.getElementById("coaster-search").value;
+
+      $.ajax({
+        url: BASE_URL + "/api/php/coasters.php",
+        type: "GET",
+        data: {
+          action: "apply_filters",
+          page: page,
+          opened: opened,
+          ridden: ridden,
+          height: height,
+          speed: speed,
+          length: length,
+          inversions: inversions,
+          manufacter: manufacter,
+          country: country,
+          year: year,
+          search: search,
+        },
+        success: function (data) {
+          if (data.success) {
+            displayCoasters(data.coasters);
+            displayPagination(data.total, page);
+          } else {
+            document.getElementById("coaster-list").innerHTML =
+              "<p style='color: red;'>Error cargando montañas rusas</p>";
+          }
+        },
+      });
+      return;
+    }
 
     let actionName = isFiltering ? "filter" : "list";
     let ajaxData = {
@@ -73,6 +156,66 @@ $(document).ready(function () {
     });
   }
 
+  function loadFilters() {
+    $.ajax({
+      url: BASE_URL + "/api/php/coasters.php",
+      type: "GET",
+      data: { action: "manufacter" },
+      success: function (data) {
+        if (data.success) {
+          data.manufacters.forEach(function (manufacter) {
+            const option = document.createElement("option");
+            option.value = manufacter.coaster_manufacter;
+            option.textContent = manufacter.coaster_manufacter;
+            document.querySelector("#manufacter-filter").appendChild(option);
+          });
+        }
+      },
+    });
+
+    $.ajax({
+      url: BASE_URL + "/api/php/coasters.php",
+      type: "GET",
+      data: { action: "country" },
+      success: function (data) {
+        if (data.success) {
+          data.countries.forEach(function (country) {
+            const option = document.createElement("option");
+            option.value = country.park_country;
+            option.textContent = country.park_country;
+            document.querySelector("#country-filter").appendChild(option);
+          });
+        }
+      },
+    });
+  }
+
+  function applyFilters() {
+    isAdvancedFiltering = true;
+    isFiltering = false;
+    loadCoasters(1);
+  }
+
+  function clearFilters() {
+    isAdvancedFiltering = false;
+    document.getElementById("height-filter").value = 0;
+    document.getElementById("speed-filter").value = 0;
+    document.getElementById("length-filter").value = 0;
+    document.getElementById("inversions-filter").value = 0;
+    document.getElementById("status-filter").checked = false;
+    document.getElementById("ridden-filter").checked = false;
+    document.getElementById("year-select").value = "";
+    document.getElementById("manufacter-filter").value = "";
+    document.getElementById("country-filter").value = "";
+
+    document.getElementById("height-val").textContent = "0 m";
+    document.getElementById("speed-val").textContent = "0 km/h";
+    document.getElementById("length-val").textContent = "0 m";
+    document.getElementById("inversions-val").textContent = "0";
+
+    loadCoasters(1);
+  }
+
   function displayCoasters(coasters) {
     const container = document.querySelector("#coaster-list");
     container.innerHTML = "";
@@ -92,7 +235,7 @@ $(document).ready(function () {
         ? `<img src="${coaster.imagen_url}" alt="${coaster.coaster_name}" class="rounded shadow-sm" style="width: 100px; height: 100px; object-fit: cover; margin-right: 20px;">`
         : `<img src="https://www.hussrides.com/fileadmin/_processed_/5/e/csm_giant-frisbee-cedarpoint-01_0697df513a.jpg" alt="Sin imagen" class="rounded shadow-sm" style="width: 100px; height: 100px; object-fit: cover; margin-right: 20px;">`;
 
-      const manufacturer = coaster.manufacturer || "Desconocido";
+      const manufacter = coaster.manufacter || "Desconocido";
       const modelo = coaster.modelo || "Desconocido";
       const year = coaster.opening_year || "N/A";
 
@@ -101,7 +244,7 @@ $(document).ready(function () {
         <div class="flex-grow-1">
           <h5 class="mb-1 fw-bold text-primary" style="font-size: 1.25rem;">${coaster.coaster_name}</h5>
           <p class="mb-1 text-muted"><i class="fa-solid fa-map-pin me-1"></i>${coaster.park_name}</p>
-          <small class="text-secondary">${manufacturer} • ${modelo} • ${year}</small>
+          <small class="text-secondary">${manufacter} • ${modelo} • ${year}</small>
         </div>
         <i class="fa-solid fa-chevron-right text-muted ms-3"></i>
       `;
@@ -192,6 +335,7 @@ $(document).ready(function () {
   }
 
   loadCoasters(1);
+  loadFilters();
 
   // --- ICONO DE BUSQUEDA X ---
   const searchInput = $("#coaster-search");
@@ -220,6 +364,7 @@ $(document).ready(function () {
         .addClass("fa-magnifying-glass text-muted")
         .css("cursor", "text");
       isFiltering = false;
+      isAdvancedFiltering = false;
       currentSearchQuery = "";
       $("h1").text("Buscar Montañas Rusas");
       loadCoasters(1);

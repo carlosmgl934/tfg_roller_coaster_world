@@ -1,10 +1,7 @@
 <?php
 require_once __DIR__ . '/../partials/header.php';
 
-if (!isset($_SESSION['firebase_uid'])) {
-    header('Location: ' . $base_url . '/web/views/auth/login.php');
-    exit;
-}
+
 ?>
 
 <link rel="stylesheet" href="<?= $base_url ?>/web/css/coasters.css">
@@ -24,8 +21,76 @@ if (!isset($_SESSION['firebase_uid'])) {
                     <h5 class="mb-0"><i class="fa-solid fa-filter me-2"></i>Filtros</h5>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted small">Los filtros irán aquí...</p>
-                    <!-- Aquí meteremos los checks de marca, tipo, año, etc -->
+
+                    <div class="form-check form-switch mb-2">
+                        <input class="form-check-input" type="checkbox" id="status-filter">
+                        <label class="form-check-label" for="status-filter">Abiertas</label>
+                    </div>
+
+                    <div class="form-check form-switch mb-4">
+                        <input class="form-check-input" type="checkbox" id="ridden-filter">
+                        <label class="form-check-label" for="ridden-filter">Ya montadas</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="height-filter" class="form-label d-flex justify-content-between">
+                            Altura mínima <span class="badge bg-success" id="height-val">0m</span>
+                        </label>
+                        <input type="range" class="form-range" id="height-filter" min="0" max="200" value="0">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="speed-filter" class="form-label d-flex justify-content-between">
+                            Velocidad mínima <span class="badge bg-success" id="speed-val">0km/h</span>
+                        </label>
+                        <input type="range" class="form-range" id="speed-filter" min="0" max="300" value="0">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="length-filter" class="form-label d-flex justify-content-between">
+                            Longitud mínima <span class="badge bg-success" id="length-val">0m</span>
+                        </label>
+                        <input type="range" class="form-range" id="length-filter" min="0" max="5000" value="0">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="inversions-filter" class="form-label d-flex justify-content-between">
+                            Inversiones mínimas <span class="badge bg-success" id="inversions-val">0</span>
+                        </label>
+                        <input type="range" class="form-range" id="inversions-filter" min="0" max="20" value="0">
+                    </div>
+
+                    <div class="mb-3">
+                        <select class="form-select shadow-sm" id="manufacter-filter">
+                            <option value="">Fabricante</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <select class="form-select shadow-sm" id="country-filter">
+                            <option value="">País</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <select class="form-select shadow-sm" name="year-select" id="year-select">
+                            <option value="">Fecha de Apertura</option>
+                            <?php for ($i = date('Y') + 3; $i >= 1870; $i--) { ?>
+                                <option value="<?= $i ?>">
+                                    <?= $i ?>
+                                </option>
+                            <?php } ?>
+                        </select>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-success fw-bold shadow-sm" id="btn-filtrar">
+                            <i class="fa-solid fa-filter me-2"></i>Filtrar
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary shadow-sm" id="btn-borrar">
+                            <i class="fa-solid fa-eraser me-2"></i>Limpiar filtros
+                        </button>
+                    </div>
                 </div>
             </div>
         </aside>

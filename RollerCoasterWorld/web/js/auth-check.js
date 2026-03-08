@@ -9,10 +9,6 @@ auth.onAuthStateChanged((user) => {
     "/carrito.php",
     "/trips.php",
     "/forums.php",
-    "/parks.php",
-    "/coaster_search.php",
-    "/coaster_detail.php",
-    "/park_detail.php",
     "/friends.php",
     "/checkout.php",
     "/orders.php",
@@ -21,7 +17,7 @@ auth.onAuthStateChanged((user) => {
     "/admin.php",
     "/dashboard.php",
     "/users.php",
-    "/coasters.php", // La vista de admin/coasters.php
+    "/admin/coasters.php", // La vista de admin/coasters.php
     "/messages.php",
     "/photos.php",
     "/comments.php",
