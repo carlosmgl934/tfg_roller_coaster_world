@@ -16,8 +16,8 @@ require_once __DIR__ . '/../partials/header.php';
     <div class="row g-4">
         <!-- IZQUIERDA: Filtros -->
         <aside class="col-12 col-lg-3 sidebar-filter" id="sidebar-filter">
-            <div class="card shadow-sm border-0 sticky-top" style="top: 90px; z-index: 1;">
-                <div class="card-header bg-success text-white">
+            <div class="card shadow-sm border-0 sticky-top rounded-0" style="top: 90px; z-index: 1;">
+                <div class="card-header bg-success text-white rounded-0">
                     <h5 class="mb-0"><i class="fa-solid fa-filter me-2"></i>Filtros</h5>
                 </div>
                 <div class="card-body">
@@ -61,19 +61,19 @@ require_once __DIR__ . '/../partials/header.php';
                     </div>
 
                     <div class="mb-3">
-                        <select class="form-select shadow-sm" id="manufacter-filter">
+                        <select class="form-select shadow-sm rounded-0" id="manufacter-filter">
                             <option value="">Fabricante</option>
                         </select>
                     </div>
 
                     <div class="mb-3">
-                        <select class="form-select shadow-sm" id="country-filter">
+                        <select class="form-select shadow-sm rounded-0" id="country-filter">
                             <option value="">País</option>
                         </select>
                     </div>
 
                     <div class="mb-4">
-                        <select class="form-select shadow-sm" name="year-select" id="year-select">
+                        <select class="form-select shadow-sm rounded-0" name="year-select" id="year-select">
                             <option value="">Fecha de Apertura</option>
                             <?php for ($i = date('Y') + 3; $i >= 1870; $i--) { ?>
                                 <option value="<?= $i ?>">
@@ -84,10 +84,10 @@ require_once __DIR__ . '/../partials/header.php';
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button type="button" class="btn btn-success fw-bold shadow-sm" id="btn-filtrar">
+                        <button type="button" class="btn btn-success fw-bold shadow-sm rounded-0" id="btn-filtrar">
                             <i class="fa-solid fa-filter me-2"></i>Filtrar
                         </button>
-                        <button type="button" class="btn btn-outline-secondary shadow-sm" id="btn-borrar">
+                        <button type="button" class="btn btn-outline-secondary shadow-sm rounded-0" id="btn-borrar">
                             <i class="fa-solid fa-eraser me-2"></i>Limpiar filtros
                         </button>
                     </div>
@@ -97,7 +97,7 @@ require_once __DIR__ . '/../partials/header.php';
 
         <!-- CENTRO: Lista -->
         <div class="col-12 col-lg-6">
-            <div class="list-group shadow-sm" id="coaster-list" style="border-radius: 8px;"></div>
+            <div class="list-group shadow-sm rounded-0" id="coaster-list" style="border-radius: 0;"></div>
 
             <div class="pagination mt-4 justify-content-center" id="pagination"></div>
         </div>
@@ -107,7 +107,7 @@ require_once __DIR__ . '/../partials/header.php';
             <div class="sticky-top" style="top: 90px; z-index: 100;">
                 <div class="position-relative">
                     <input type="text" id="coaster-search" name="coaster-search"
-                        class="form-control shadow-sm pe-5 border-success" placeholder="Buscar por nombre..."
+                        class="form-control shadow-sm pe-5 border-success rounded-0" placeholder="Buscar por nombre..."
                         style="border-width: 2px;">
                     <i id="search-icon" class="fa-solid fa-magnifying-glass text-muted position-absolute"
                         style="right: 15px; top: 50%; transform: translateY(-50%); cursor: text;"></i>

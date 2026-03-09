@@ -32,6 +32,12 @@ switch ($action) {
     case 'coaster':
         getCoasters();
         break;
+    case 'photos':
+        getCoasterPhotos();
+        break;
+    case 'reviews':
+        getCoasterReviews();
+        break;
     default:
         echo json_encode(['success' => false, 'error' => 'Acción no válida']);
         exit;
@@ -332,9 +338,11 @@ function getCoasters()
         global $db;
         $sql = "SELECT coasters.*, parks.park_name,
         parks.park_country, parks.id AS park_id,
-        (SELECT ROUND(AVG(stars) * 20) FROM reviews WHERE coaster_id = coasters.id) AS score,
-                    (SELECT COUNT(*) + 1 FROM coasters AS c2 WHERE (SELECT AVG(stars) FROM reviews WHERE coaster_id = c2.id) > (SELECT AVG(stars) FROM reviews WHERE coaster_id = coasters.id)) AS global_rank,
-                    (SELECT COUNT(*) FROM user_credits WHERE coaster_id = coasters.id AND user_id = :user_id) AS is_ridden
+        (SELECT ROUND(AVG(note) * 20) FROM coaster_ratings WHERE coaster_id = coasters.id) AS score,
+        (SELECT COUNT(*) + 1 FROM coasters AS c2 
+            WHERE (SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = c2.id) 
+                > (SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = coasters.id)) AS global_rank,
+        (SELECT rank_position FROM user_credits WHERE coaster_id = coasters.id AND user_id = :user_id LIMIT 1) AS personal_ranking
     FROM coasters
     INNER JOIN parks ON coasters.park_id = parks.id
     WHERE coasters.id = :id";
@@ -355,6 +363,58 @@ function getCoasters()
         }
         exit;
 
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'error' => 'Error en la base de datos']);
+        exit;
+    }
+}
+
+function getCoasterReviews()
+{
+
+    $id = intval($_GET['id'] ?? 0);
+    $order = $$_GET['order'] ?? 'default';
+
+    if ($id <= 0) {
+        echo json_encode(['success' => false, 'error' => 'ID no válido']);
+        exit;
+    }
+
+    $orderSql = match ($order) {
+        'recent' => 'cr.created_at DESC',
+        'best' => 'cr.note DESC',
+        'worst' => 'cr.note ASC',
+        default => 'cr.created_at DESC'
+    };
+
+    try {
+        global $db;
+        $sql = "SELECT cr.id, cr.note, cr.review, cr.created_at, user.username, user.profile_image 
+        FROM coaster_rating AS cr
+        INNER JOIN users ON cr.user_id = user.id
+        WHERE cr.coaster_id = :id
+        ORDER BY $orderSql";
+
+        $sql_count = "SELECT COUNT(*) FROM coaster_rating WHERE coaster_id = :id";
+
+        $stmt = $db->prepare($sql);
+        $stmt_count = $db->prepare($sql_count);
+
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt_count->bindValue(':id', $id, PDO::PARAM_INT);
+
+        $stmt->execute();
+        $stmt_count->execute();
+
+        $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $total = $stmt_count->fetchColumn();
+
+        echo json_encode([
+            'success' => true,
+            'reviews' => $reviews,
+            'total' => $total
+        ]);
+        exit;
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'error' => 'Error en la base de datos']);
         exit;
