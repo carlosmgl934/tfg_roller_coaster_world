@@ -30,11 +30,12 @@ $is_logged = isset($_SESSION['firebase_uid']);
   ?>
   <script>window.BASE_URL = '<?= $base_url ?>';</script>
 
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
   <!-- Firebase auth init (global) -->
   <script src="<?= $base_url ?>/web/js/auth.js"></script>
 
-  <!-- jQuery -->
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>

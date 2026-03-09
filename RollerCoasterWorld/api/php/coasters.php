@@ -4,6 +4,7 @@ require_once __DIR__ . '/../database/db_conexion.php';
 
 header('Content-Type: application/json');
 
+$db = new DBConexion();
 $action = $_GET['action'] ?? 'list';
 
 switch ($action) {
@@ -36,7 +37,6 @@ switch ($action) {
         exit;
 }
 
-$db = new DBConexion();
 function getManufacturers()
 {
     try {

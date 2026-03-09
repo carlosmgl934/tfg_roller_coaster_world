@@ -1,7 +1,21 @@
 // auth-check.js — protección de rutas usando BASE_URL inyectada por PHP
 const BASE_CHECK = window.BASE_URL || "";
 
-auth.onAuthStateChanged((user) => {
+if (typeof firebase !== "undefined" && !firebase.apps.length) {
+  firebase.initializeApp({
+    apiKey: "AIzaSyAUFVSu8EvuFgeNgnQj4BH4MTuX0r_9qXY",
+    authDomain: "tfg-roller-coaster-world-auth.firebaseapp.com",
+    projectId: "tfg-roller-coaster-world-auth",
+    storageBucket: "tfg-roller-coaster-world-auth.appspot.com",
+    messagingSenderId: "882619658485",
+    appId: "1:882619658485:web:568601d00570ca35dd55bc",
+  });
+}
+if (!window.auth) {
+  window.auth = firebase.app().auth();
+}
+
+window.auth.onAuthStateChanged((user) => {
   const privatePages = [
     // --- Vistas Privadas de Usuario ---
     "/home.php",
