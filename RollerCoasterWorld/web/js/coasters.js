@@ -420,4 +420,106 @@ $(document).ready(function () {
       $("#search-results").show();
     }
   });
+
+
+
+
+// -------------------------------------
+// FUNCIÓN PARA FICHAS DE MONTAÑAS RUSAS
+// -------------------------------------
+let coasterName = document.getElementById("coaster-name")
+let parkName = document.getElementById("park-name")
+let parkNameTable = document.getElementById("park-name-table")
+let positionRank = document.getElementById("global-ranking")
+let puntuacion = document.getElementById("coaster-score")
+let personalRanking = document.getElementById("pesonal-ranking")
+let currentState = document.getElementById("current-state")
+let currentStateTable = document.getElementById("current-state-table")
+let isRidden = document.getElementById("coaster-ridden")
+let coasterHeight = document.getElementById("coaster-height")
+let coasterSpeed = document.getElementById("coaster-speed")
+let coasterLength = document.getElementById("coaster-length")
+let coasterInversions = document.getElementById("coaster-inversions")
+let coasterManufacter = document.getElementById("coaster-manufacter")
+let coasterModel = document.getElementById("coaster-model")
+let coasterYear = document.getElementById("coaster-year")
+
+
+function loadCoastersData(id) { 
+    $.ajax({
+        url: BASE_URL + "/api/php/coasters.php",
+        type: "GET",
+        data: {
+            action: "coaster",
+            id: id
+        },
+        dataType: "json",
+        success: function (data) {
+            if (data.success) {
+                let coaster = data.coaster;
+
+                // --- Información principal (Hero) ---
+                if(coasterName) coasterName.textContent = coaster.coaster_name;
+                if(parkName) parkName.textContent = coaster.park_name;
+                
+                // Nuevo: País (Hero)
+                let coasterCountry = document.getElementById("coaster-country");
+                if(coasterCountry) coasterCountry.textContent = coaster.park_country || "N/A";
+
+                // Enlace dinámico del parque en el Hero
+                let parkLink = document.getElementById("park-link");
+                if(parkLink) parkLink.href = BASE_URL + `/web/views/public/park_detail.php?id=${coaster.park_id}`;
+
+                // --- Ficha técnica (Tabla) ---
+                if(parkNameTable) {
+                    parkNameTable.textContent = coaster.park_name;
+                    parkNameTable.href = BASE_URL + `/web/views/public/park_detail.php?id=${coaster.park_id}`;
+                }
+                
+                // Estadísticas técnicas
+                if(coasterHeight) coasterHeight.textContent = coaster.height ? coaster.height + "m" : "N/A";
+                if(coasterSpeed) coasterSpeed.textContent = coaster.speed ? coaster.speed + " km/h" : "N/A";
+                if(coasterLength) coasterLength.textContent = coaster.coaster_length ? coaster.coaster_length + "m" : "N/A";
+                if(coasterInversions) coasterInversions.textContent = coaster.inversions || "0";
+
+                // Datos de fabricación
+                if(coasterManufacter) coasterManufacter.textContent = coaster.coaster_manufacter || "Desconocido";
+                if(coasterModel) coasterModel.textContent = coaster.coaster_model || "Desconocido";
+                if(coasterYear) coasterYear.textContent = coaster.opening_year || "N/A";
+
+                // --- Rankings y Estados ---
+                if(positionRank) positionRank.textContent = coaster.global_rank ? "#" + coaster.global_rank : "#" + coaster.id;
+                if(puntuacion) puntuacion.textContent = coaster.score ? coaster.score + "%" : "N/A";
+                
+                if(currentState) currentState.textContent = coaster.status || "Operativa";
+                if(currentStateTable) currentStateTable.textContent = coaster.status || "Operativa";
+                
+                // --- Multimedia ---
+                if (coaster.imagen_url) {
+                    $(".col-lg-7 img").attr("src", coaster.imagen_url).attr("alt", coaster.coaster_name);
+                }
+
+                // --- Lógica del botón "Montada" (Visual) ---
+                if (coaster.is_ridden > 0) {
+                    $("#coaster-ridden").removeClass("fa-regular").addClass("fa-solid text-success");
+                    $("#coaster-ridden").closest('button').addClass("border-success");
+                }
+
+            } else {
+                console.error("Error de la API: " + data.error);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error en la conexión con la API:", error);
+        }
+    });
+}
+// --- LÓGICA PARA CARGAR LA FICHA INDIVIDUAL ---
+  const urlParams = new URLSearchParams(window.location.search);
+  const coasterId = urlParams.get('id'); // Extrae el "id" de la URL
+
+  if (coasterId) {
+    loadCoastersData(coasterId);
+  }
 });
+ 

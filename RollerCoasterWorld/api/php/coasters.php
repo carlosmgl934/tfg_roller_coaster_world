@@ -28,18 +28,19 @@ switch ($action) {
     case 'apply_filters':
         applyFilters();
         break;
-    case 'detail':
-        getCoasterDetail();
+    case 'coaster':
+        getCoasters();
         break;
     default:
         echo json_encode(['success' => false, 'error' => 'Acción no válida']);
         exit;
 }
 
+$db = new DBConexion();
 function getManufacturers()
 {
     try {
-        $db = new DBConexion();
+        global $db;
         $sql = "SELECT DISTINCT coaster_manufacter FROM coasters ORDER BY coaster_manufacter ASC";
         $stmt = $db->prepare($sql);
         $stmt->execute();
@@ -56,7 +57,7 @@ function getManufacturers()
 function getCountries()
 {
     try {
-        $db = new DBConexion();
+        global $db;
         $sql = "SELECT DISTINCT park_country FROM parks ORDER BY park_country ASC";
         $stmt = $db->prepare($sql);
         $stmt->execute();
@@ -78,7 +79,7 @@ function getRidden()
     }
 
     try {
-        $db = new DBConexion();
+        global $db;
         $sql = "SELECT DISTINCT coaster_id FROM user_credits WHERE user_id = :user_id";
         $stmt = $db->prepare($sql);
         $stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
@@ -103,7 +104,7 @@ function searchCoasters()
     }
 
     try {
-        $db = new DBConexion();
+        global $db;
         $sql = "SELECT 
     coasters.id, coasters.coaster_name, parks.park_name
     FROM coasters
@@ -132,7 +133,7 @@ function listCoasters()
     $offset = ($page - 1) * $limit;
 
     try {
-        $db = new DBConexion();
+        global $db;
         $sql = "SELECT
         coasters.id, coasters.coaster_name, coasters.imagen_url, parks.park_name, coasters.coaster_manufacter AS manufacter,
         coasters.coaster_model AS modelo,
@@ -181,7 +182,7 @@ function filterCoasters()
     $offset = ($page - 1) * $limit;
 
     try {
-        $db = new DBConexion();
+        global $db;
         $sql = "SELECT
         coasters.id, coasters.coaster_name, coasters.imagen_url, parks.park_name, coasters.coaster_manufacter AS manufacter,
         coasters.coaster_model AS modelo,
@@ -278,7 +279,7 @@ function applyFilters()
     $where = implode(" AND ", $conditions);
 
     try {
-        $db = new DBConexion();
+        global $db;
         $sql = "SELECT coasters.id, coasters.coaster_name, coasters.imagen_url, 
                 parks.park_name, coasters.coaster_manufacter AS manufacter,
                 coasters.coaster_model AS modelo, coasters.opening_year
@@ -316,3 +317,46 @@ function applyFilters()
     }
 }
 
+function getCoasters()
+{
+
+    $id = intval($_GET['id'] ?? 0);
+    $userId = $_SESSION['user_id'] ?? 0; // Para saber si el usuario ha montado la coaster
+
+    if ($id <= 0) {
+        echo json_encode(['success' => false, 'error' => 'ID no válido']);
+        exit;
+    }
+
+    try {
+        global $db;
+        $sql = "SELECT coasters.*, parks.park_name,
+        parks.park_country, parks.id AS park_id,
+        (SELECT ROUND(AVG(stars) * 20) FROM reviews WHERE coaster_id = coasters.id) AS score,
+                    (SELECT COUNT(*) + 1 FROM coasters AS c2 WHERE (SELECT AVG(stars) FROM reviews WHERE coaster_id = c2.id) > (SELECT AVG(stars) FROM reviews WHERE coaster_id = coasters.id)) AS global_rank,
+                    (SELECT COUNT(*) FROM user_credits WHERE coaster_id = coasters.id AND user_id = :user_id) AS is_ridden
+    FROM coasters
+    INNER JOIN parks ON coasters.park_id = parks.id
+    WHERE coasters.id = :id";
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($result) {
+            echo json_encode([
+                'success' => true,
+                'coaster' => $result
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Montaña rusa no encontrada']);
+        }
+        exit;
+
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'error' => 'Error en la base de datos']);
+        exit;
+    }
+}
