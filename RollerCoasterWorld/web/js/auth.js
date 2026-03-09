@@ -1,3 +1,12 @@
+$(document).ready(function () {
+let registro = document.getElementById("signUpWithEmail");
+let registroGoogle = document.getElementById("signInWithGoogle");
+let registroFacebook = document.getElementById("signInWithFacebook");
+let login = document.getElementById("signInWithEmail");
+let signOut = document.getElementById("signOut");
+let cambiarPsw = document.getElementById("cambiarPassword");
+let togglePsw = document.getElementById("toggleFormPassword");
+
 // Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAUFVSu8EvuFgeNgnQj4BH4MTuX0r_9qXY",
@@ -24,7 +33,9 @@ console.log(
 );
 
 // ── Registro con Email y Password ─────────────────────────────────────────────
-function signUpWithEmail(email, password) {
+registro.addEventListener("click", signUpWithEmail)
+
+function signUpWithEmail() {
   email = document.getElementById("email").value;
   password = document.getElementById("password").value;
 
@@ -77,7 +88,8 @@ function signUpWithEmail(email, password) {
 }
 
 // ── Login con Email y Password ────────────────────────────────────────────────
-function signInWithEmail(email, password) {
+login.addEventListener("click", signInWithEmail)
+function signInWithEmail() {
   email = document.getElementById("email").value;
   password = document.getElementById("password").value;
 
@@ -146,6 +158,7 @@ function signInWithEmail(email, password) {
 }
 
 // ── Login con Google ──────────────────────────────────────────────────────────
+registroGoogle.addEventListener("click", signInWithGoogle)
 function signInWithGoogle() {
   const provider = new firebase.auth.GoogleAuthProvider();
   auth
@@ -200,6 +213,7 @@ function signInWithGoogle() {
 }
 
 // ── Login con Facebook ────────────────────────────────────────────────────────
+registroFacebook.addEventListener("click", signInWithFacebook)
 function signInWithFacebook() {
   const provider = new firebase.auth.FacebookAuthProvider();
   auth
@@ -276,6 +290,10 @@ auth.onAuthStateChanged((user) => {
 });
 
 // ── Cambiar contraseña ────────────────────────────────────────────────────────
+cambiarPsw.addEventListener("click", cambiarPassword)
+togglePsw.addEventListener("click", toggleFormPassword)
+
+
 function toggleFormPassword() {
   const form = document.getElementById("form-password");
   if (!form) return;
@@ -318,6 +336,7 @@ function cambiarPassword() {
 }
 
 // ── Eliminar cuenta ───────────────────────────────────────────────────────────
+signOut.addEventListener("click", borrarCuenta)
 function borrarCuenta() {
   const user = auth.currentUser;
   if (!user) {
@@ -367,3 +386,4 @@ function borrarCuenta() {
       }
     });
 }
+})

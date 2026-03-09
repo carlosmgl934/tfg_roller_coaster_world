@@ -7,12 +7,12 @@ require_once __DIR__ . '/../partials/header.php';
   <form id="register-form">
     <input type="email" id="email" placeholder="Email" required>
     <input type="password" id="password" placeholder="Contraseña" required>
-    <button type="button" onclick="signUpWithEmail()">
+    <button type="button" id="signUpWithEmail">
       Registrar con Email
     </button>
   </form>
-  <button onclick="signInWithGoogle()">Registrar con Google</button>
-  <button onclick="signInWithFacebook()">Registrar con Facebook</button>
+  <button id="signInWithGoogle">Registrar con Google</button>
+  <button id="signInWithFacebook()">Registrar con Facebook</button>
 </main>
 
 

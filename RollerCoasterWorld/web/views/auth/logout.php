@@ -4,7 +4,7 @@ require_once __DIR__ . '/../partials/header.php';
 
 <main>
   <h2>Cerrar Sesión</h2>
-  <button type="button" onclick="signOut()">Logout</button>
+  <button type="button" id="signOut">Logout</button>
 </main>
 
 

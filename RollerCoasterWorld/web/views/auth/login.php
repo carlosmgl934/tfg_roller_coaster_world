@@ -10,16 +10,16 @@ require_once __DIR__ . '/../partials/header.php';
   <form id="login-form">
     <input type="email" id="email" placeholder="Email" required>
     <input type="password" id="password" placeholder="Contraseña" required>
-    <button type="button" onclick="signInWithEmail()">
+    <button type="button" id="signInWithEmail">
       Iniciar Sesión
     </button>
   </form>
 
   <div class="auth-providers">
-    <button onclick="signInWithGoogle()">
+    <button id="signInWithGoogle">
       Iniciar con Google
     </button>
-    <button onclick="signInWithFacebook()">
+    <button id="signInWithFacebook">
       Iniciar con Facebook
     </button>
   </div>
