@@ -35,11 +35,11 @@ $user_uid = $_SESSION['firebase_uid'];
       <input type="password" id="confirmar-password" placeholder="Repite la contraseña"
         style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;margin-bottom:16px;box-sizing:border-box;">
 
-      <button onclick="cambiarPassword"
+      <button id="cambiarPassword"
         style="background:#27ae60;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;margin-right:10px;">
         ✅ Guardar
       </button>
-      <button onclick="toggleFormPassword"
+      <button id="toggleFormPassword"
         style="background:#aaa;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;">
         Cancelar
       </button>
