@@ -14,6 +14,7 @@ if (typeof firebase !== "undefined" && !firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 window.auth = firebase.auth();
+window.storage = firebase.storage();
 
 // BASE_URL es inyectada por PHP en el header. Fallback por si acaso.
 const BASE = window.BASE_URL || "";
@@ -140,7 +141,10 @@ $(document).ready(function () {
             })
             .catch((err) => console.error("Error Supabase:", err));
         });
-        window.location.href = BASE + "/web/views/public/index.php";
+        const params = new URLSearchParams(window.location.search);
+        const redirectUrl =
+          params.get("redirect") || BASE + "/web/views/public/index.php";
+        window.location.href = redirectUrl;
       })
       .catch((error) => {
         let msg = "Error al registrar: ";
@@ -211,7 +215,10 @@ $(document).ready(function () {
         });
 
         showAlert("¡Bienvenido!");
-        window.location.href = BASE + "/web/views/public/index.php";
+        const params = new URLSearchParams(window.location.search);
+        const redirectUrl =
+          params.get("redirect") || BASE + "/web/views/public/index.php";
+        window.location.href = redirectUrl;
       })
       .catch((error) => {
         let msg = "Error al iniciar sesión: ";
@@ -220,6 +227,8 @@ $(document).ready(function () {
         else if (error.code === "auth/wrong-password")
           msg += "Contraseña incorrecta.";
         else if (error.code === "auth/invalid-email") msg += "Email inválido.";
+        else if (error.code === "auth/invalid-credential")
+          msg += "Email o contraseña incorrectos.";
         else msg += error.message;
         showAlert(msg);
       });
@@ -274,9 +283,18 @@ $(document).ready(function () {
         });
 
         showAlert("¡Bienvenido con Google!");
-        window.location.href = BASE + "/web/views/public/index.php";
+        const params = new URLSearchParams(window.location.search);
+        const redirectUrl =
+          params.get("redirect") || BASE + "/web/views/public/index.php";
+        window.location.href = redirectUrl;
       })
-      .catch((error) => showAlert("Error con Google: " + error.message));
+      .catch((error) => {
+        if (error.code === "auth/invalid-credential")
+          showAlert(
+            "Credenciales incorrectas o expiradas. Inténtalo de nuevo.",
+          );
+        else showAlert("Error con Google: " + error.message);
+      });
   }
 
   // ── Login con Facebook ────────────────────────────────────────────────────────
@@ -307,7 +325,10 @@ $(document).ready(function () {
             .then((d) => console.log("Sync Supabase (Facebook):", d));
         });
         showAlert("¡Bienvenido con Facebook!");
-        window.location.href = BASE + "/web/views/public/index.php";
+        const params = new URLSearchParams(window.location.search);
+        const redirectUrl =
+          params.get("redirect") || BASE + "/web/views/public/index.php";
+        window.location.href = redirectUrl;
       })
       .catch((error) => showAlert("Error con Facebook: " + error.message));
   }

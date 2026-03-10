@@ -80,7 +80,7 @@ $db = new DBConexion();
 $stmt = $db->prepare("
     INSERT INTO users (username, email, firebase_uid, rol)
     VALUES (:username, :email, :firebase_uid, 'user')
-    ON CONFLICT (firebase_uid) DO NOTHING
+    ON CONFLICT (firebase_uid) DO UPDATE SET email = EXCLUDED.email
     RETURNING id
 ");
 

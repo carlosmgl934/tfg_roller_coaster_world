@@ -67,7 +67,7 @@ $(document).ready(function () {
             if (data.length > 0) {
               data.forEach(function (coaster) {
                 html += `
-              <a href="${BASE_URL}/web/views/public/coasters.php?id=${coaster.id}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+              <a href="${BASE_URL}/web/views/public/coasters/coasters.php?id=${coaster.id}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                 <div>
                   <h6 class="mb-0 fw-bold">${coaster.coaster_name}</h6>
                   <small class="text-muted"><i class="fa-solid fa-location-dot me-1"></i>${coaster.park_name}</small>
@@ -245,7 +245,7 @@ $(document).ready(function () {
       coasters.forEach(function (coaster) {
         const coasterCard = document.createElement("a");
         coasterCard.href =
-          BASE_URL + `/web/views/public/coasters.php?id=${coaster.id}`;
+          BASE_URL + `/web/views/public/coasters/coasters.php?id=${coaster.id}`;
         coasterCard.classList.add(
           "list-group-item",
           "list-group-item-action",
@@ -476,14 +476,14 @@ $(document).ready(function () {
             if (parkLink)
               parkLink.href =
                 BASE_URL +
-                `/web/views/public/park_detail.php?id=${coaster.park_id}`;
+                `/web/views/public/parks/park_detail.php?id=${coaster.park_id}`;
 
             // --- Ficha técnica (Tabla) ---
             if (parkNameTable) {
               parkNameTable.textContent = coaster.park_name;
               parkNameTable.href =
                 BASE_URL +
-                `/web/views/public/park_detail.php?id=${coaster.park_id}`;
+                `/web/views/public/parks/park_detail.php?id=${coaster.park_id}`;
             }
 
             // Estadísticas técnicas
@@ -567,6 +567,33 @@ $(document).ready(function () {
       });
     }
 
+    function renderStars(note) {
+      const full = Math.floor(note);
+      const half = note % 1 >= 0.5 ? 1 : 0;
+      const empty = 5 - full - half;
+
+      let html = "";
+      for (let i = 0; i < full; i++)
+        html += '<i class="fa-solid fa-star text-warning"></i>';
+      if (half)
+        html += '<i class="fa-solid fa-star-half-stroke text-warning"></i>';
+      for (let i = 0; i < empty; i++)
+        html += '<i class="fa-regular fa-star text-warning"></i>';
+
+      return html;
+    }
+
+    function timeAgo(dateString) {
+      const diff = Math.floor((new Date() - new Date(dateString)) / 1000);
+      if (diff < 60) return "hace un momento";
+      if (diff < 3600) return `hace ${Math.floor(diff / 60)} minutos`;
+      if (diff < 86400) return `hace ${Math.floor(diff / 3600)} horas`;
+      if (diff < 2592000) return `hace ${Math.floor(diff / 86400)} días`;
+      if (diff < 31536000) return `hace ${Math.floor(diff / 2592000)} meses`;
+      return `hace ${Math.floor(diff / 31536000)} años`;
+    }
+
+    // --- LÓGICA PARA EL FORMULARIO DE FOTOS ---
     function loadPhotos(id) {
       $.ajax({
         url: BASE_URL + "/api/php/coasters.php",
@@ -584,6 +611,7 @@ $(document).ready(function () {
               );
               return;
             }
+
             data.photos.forEach(function (photo) {
               const col = document.createElement("div");
               col.className = "col-6 col-md-3";
@@ -595,12 +623,252 @@ $(document).ready(function () {
             });
           }
         },
+        error: function (xhr, status, error) {
+          console.error("Error en la conexión con la API:", error);
+        },
+      });
+    }
+
+    function loadReviews(order) {
+      order = order || "default";
+      $("#reviews-list").html(
+        '<div class="text-center text-muted py-4"><i class="fa-solid fa-spinner fa-spin fs-3"></i></div>',
+      );
+      $.ajax({
+        url: BASE_URL + "/api/php/coasters.php",
+        type: "GET",
+        data: {
+          action: "reviews",
+          id: coasterId,
+          order: order,
+        },
+        success: function (data) {
+          if (data.success) {
+            $("#reviews-count").text(data.total);
+            if (data.reviews.length === 0) {
+              $("#reviews-list").html(
+                '<p class="text-muted text-center py-4">Aún no hay reseñas para esta montaña rusa.</p>',
+              );
+              return;
+            }
+            // Limpiar la caja por si tenía el mensaje de "Aún no hay reseñas"
+            $("#reviews-list").empty();
+
+            data.reviews.forEach(function (review) {
+              let tagsHtml = "";
+              if (review.tags && review.tags.length > 0) {
+                tagsHtml = '<div class="d-flex flex-wrap gap-2 mt-2 mb-2">';
+                review.tags.forEach((t) => {
+                  if (t.type === "pro") {
+                    tagsHtml += `<span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-1" style="font-weight: 600; font-size: 0.75rem;">${t.tag.replace(/_/g, " ").toUpperCase()}</span>`;
+                  } else {
+                    tagsHtml += `<span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill px-3 py-1" style="font-weight: 600; font-size: 0.75rem;">${t.tag.replace(/_/g, " ").toUpperCase()}</span>`;
+                  }
+                });
+                tagsHtml += "</div>";
+              }
+
+              $("#reviews-list").append(
+                `<div class="border-bottom pb-3 mb-3">
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <img src="${review.profile_image || "https://placehold.co/40x40"}" 
+                     alt="${review.username}" class="review-avatar" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
+                <strong>${review.username}</strong>
+                <span class="stars-display ms-2">${renderStars(review.note)}</span>
+                <span class="text-muted small ms-2">• ${timeAgo(review.created_at)}</span>
+            </div>
+            ${tagsHtml}
+            <p class="mb-0 mt-2">${review.review || ""}</p>
+        </div>`,
+              );
+            });
+          }
+        },
+        error: function (xhr, status, error) {
+          console.error("Error en la conexión con la API:", error);
+        },
       });
     }
 
     if (coasterId) {
       loadCoastersData(coasterId);
       loadPhotos(coasterId);
+      loadReviews();
+
+      $("#reviews-order").on("change", function () {
+        loadReviews($(this).val());
+      });
     }
+  }
+
+  // --- LÓGICA PARA EL FORMULARIO DE RESEÑAS ---
+  if (document.getElementById("review-form")) {
+    new Choices("#pros-select", {
+      removeItemButton: true,
+      placeholderValue: "Selecciona las ventajas...",
+    });
+    new Choices("#contras-select", {
+      removeItemButton: true,
+      placeholderValue: "Selecciona las contras...",
+    });
+
+    document
+      .getElementById("review-form")
+      .addEventListener("submit", function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const coasterId = formData.get("coaster_id");
+        const note = formData.get("note");
+
+        if (!note) {
+          alert("Por favor, califica con estrellas la montaña rusa.");
+          return;
+        }
+
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML =
+          'Publicando... <i class="fa-solid fa-spinner fa-spin ms-2"></i>';
+
+        fetch(window.BASE_URL + "/api/php/coasters.php?action=save_review", {
+          method: "POST",
+          body: formData,
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.success) {
+              window.location.href =
+                window.BASE_URL +
+                "/web/views/public/coasters/coasters.php?id=" +
+                coasterId;
+            } else {
+              alert("Error: " + data.error);
+              submitBtn.disabled = false;
+              submitBtn.innerHTML =
+                'Publicar Reseña <i class="fa-solid fa-paper-plane ms-2"></i>';
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+            alert("Error de conexión");
+            submitBtn.disabled = false;
+            submitBtn.innerHTML =
+              'Publicar Reseña <i class="fa-solid fa-paper-plane ms-2"></i>';
+          });
+      });
+  }
+
+  // --- LÓGICA PARA EL MODAL DE FOTOS (Firebase + Cropper) ---
+  if (document.getElementById("upload-photo-modal")) {
+    let cropper = null;
+    const photoInput = document.getElementById("photo");
+    const cropPreview = document.getElementById("crop-preview");
+    const cropContainer = document.getElementById("crop-container");
+    const uploadBtn = document.getElementById("upload-photo-btn");
+
+    // Al seleccionar archivo, mostrar previsualización e iniciar Cropper
+    photoInput.addEventListener("change", function () {
+      const file = this.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        cropPreview.src = e.target.result;
+        cropContainer.style.display = "block";
+
+        if (cropper) cropper.destroy();
+        cropper = new Cropper(cropPreview, {
+          aspectRatio: 16 / 9,
+          viewMode: 1,
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Al pulsar subir
+    uploadBtn.addEventListener("click", async function () {
+      if (!cropper) {
+        alert("Por favor selecciona una foto primero.");
+        return;
+      }
+
+      // Desactivar botón mientras sube
+      uploadBtn.disabled = true;
+      uploadBtn.innerHTML =
+        'Subiendo... <i class="fa-solid fa-spinner fa-spin ms-2"></i>';
+
+      try {
+        // 1. Obtener imagen recortada como Blob
+        cropper.getCroppedCanvas({ width: 1280, height: 720 }).toBlob(
+          async function (blob) {
+            if (!blob) throw new Error("Error al recortar la imagen");
+
+            // Nombre de archivo único
+            const ext = photoInput.files[0].name.split(".").pop();
+            const filename = `${Date.now()}_img.${ext}`;
+
+            // 2. Subir a Firebase Storage
+            const ref = window.storage.ref(`coasters/${coasterId}/${filename}`);
+            const snapshot = await ref.put(blob);
+            const url = await snapshot.ref.getDownloadURL();
+
+            // 3. Guardar en PostgreSQL vía API PHP
+            const captionVal = document.getElementById("photo-caption").value;
+
+            $.ajax({
+              url: window.BASE_URL + "/api/php/coasters.php?action=save_photo",
+              type: "POST",
+              data: {
+                coaster_id: coasterId,
+                photo_url: url,
+                caption: captionVal,
+              },
+              success: function (data) {
+                if (data.success) {
+                  // Cerrar modal
+                  const modalEl = document.getElementById("upload-photo-modal");
+                  const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                  modalInstance.hide();
+
+                  // Limpiar formulario y cropper
+                  document.getElementById("upload-photo-form").reset();
+                  cropContainer.style.display = "none";
+                  if (cropper) {
+                    cropper.destroy();
+                    cropper = null;
+                  }
+
+                  alert(
+                    "¡Foto enviada! Esperando aprobación del administrador.",
+                  );
+                } else {
+                  alert(
+                    "Error al guardar la foto: " +
+                      (data.error || "Desconocido"),
+                  );
+                }
+              },
+              error: function () {
+                alert("Error en la conexión con la API.");
+              },
+              complete: function () {
+                // Restaurar botón
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML =
+                  'Subir foto <i class="fa-solid fa-upload ms-1"></i>';
+              },
+            });
+          },
+          "image/jpeg",
+          0.85,
+        ); // Exportar en JPG con calidad 85%
+      } catch (err) {
+        console.error("Error subiendo foto:", err);
+        alert("Ocurrió un error al subir la foto.");
+        uploadBtn.disabled = false;
+        uploadBtn.innerHTML =
+          'Subir foto <i class="fa-solid fa-upload ms-1"></i>';
+      }
+    });
   }
 });

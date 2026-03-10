@@ -1,10 +1,14 @@
 <?php
-require_once __DIR__ . '/../partials/header.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_SERVER['SCRIPT_NAME']);
 
 if (!isset($_SESSION['user_id'])) {
-    $_SESSION['message'] = 'Debes iniciar sesión para calificar una montaña rusa';
-    $_SESSION['message_type'] = 'error';
-    header('Location: ' . $base_url . '/web/views/public/login.php');
+    $id = intval($_GET['id'] ?? 0);
+    $redirect_url = urlencode($base_url . '/web/views/public/coasters/form_rating.php?id=' . $id);
+    header('Location: ' . $base_url . '/web/views/auth/login.php?redirect=' . $redirect_url . '&msg=review');
     exit;
 } else {
     $user_id = $_SESSION['user_id'];
@@ -12,11 +16,11 @@ if (!isset($_SESSION['user_id'])) {
 
 $id = intval($_GET['id'] ?? 0);
 if ($id === 0) {
-    $_SESSION['message'] = 'No se ha encontrado la montaña rusa';
-    $_SESSION['message_type'] = 'error';
-    header('Location: ' . $base_url . '/web/views/public/coaster_search.php');
+    header('Location: ' . $base_url . '/web/views/public/coasters/coaster_search.php');
     exit;
 }
+
+require_once __DIR__ . '/../../partials/header.php';
 ?>
 <!-- Librerias para poder usar select múltiples-->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
@@ -109,18 +113,8 @@ if ($id === 0) {
             </div>
         </div>
     </div>
-    <script>
-        new Choices('#pros-select', {
-            removeItemButton: true,
-            placeholderValue: 'Selecciona las ventajas...'
-        });
-        new Choices('#contras-select', {
-            removeItemButton: true,
-            placeholderValue: 'Selecciona las contras...'
-        });
-    </script>
 </main>
 
-<?php require_once __DIR__ . '/../partials/footer.php'; ?>
+<?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 <script src="<?= $base_url ?>/web/js/coasters.js"></script>
 <script src="<?= $base_url ?>/web/js/auth-check.js"></script>

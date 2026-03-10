@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../partials/header.php';
+require_once __DIR__ . '/../../partials/header.php';
 ?>
 
 <link rel="stylesheet" href="<?= $base_url ?>/web/css/ranking.css">
@@ -9,5 +9,5 @@ require_once __DIR__ . '/../partials/header.php';
     <!-- TODO: top global con filtros por país, parque, tipo, fabricante -->
 </main>
 
-<?php require_once __DIR__ . '/../partials/footer.php'; ?>
+<?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 <script src="<?= $base_url ?>/web/js/ranking.js"></script>

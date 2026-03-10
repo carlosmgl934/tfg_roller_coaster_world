@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS coaster_photos (
     photo_url VARCHAR(500) NOT NULL,
     caption VARCHAR(255) DEFAULT NULL,
     likes INT DEFAULT 0,
+    status VARCHAR(10) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (coaster_id) REFERENCES coasters(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

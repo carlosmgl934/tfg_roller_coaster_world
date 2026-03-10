@@ -19,13 +19,13 @@ window.auth.onAuthStateChanged((user) => {
   const privatePages = [
     // --- Vistas Privadas de Usuario ---
     "/home.php",
-    "/profile.php",
-    "/carrito.php",
-    "/trips.php",
-    "/forums.php",
-    "/friends.php",
-    "/checkout.php",
-    "/orders.php",
+    "/users/profile.php",
+    "/shop/carrito.php",
+    "/trips/trips.php",
+    "/forums/forums.php",
+    "/users/friends.php",
+    "/shop/checkout.php",
+    "/shop/orders.php",
 
     // --- Panel de Administrador (Todas son privadas) ---
     "/admin.php",

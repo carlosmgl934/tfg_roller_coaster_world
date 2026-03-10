@@ -1,13 +1,15 @@
 <?php
-require_once __DIR__ . '/../partials/header.php';
+require_once __DIR__ . '/../../partials/header.php';
 
 $id = intval($_GET['id'] ?? 0);
 if ($id === 0) {
-    header('Location: ' . $base_url . '/web/views/public/coaster_search.php');
+    header('Location: ' . $base_url . '/web/views/public/coasters/coaster_search.php');
     exit;
 }
 ?>
 <link rel="stylesheet" href="<?= $base_url ?>/web/css/coasters.css">
+<!-- CropperJS para recortar imágenes al subir fotos -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 
 <main class="container-fluid px-lg-5 my-5">
 
@@ -33,7 +35,6 @@ if ($id === 0) {
                 </a>
                 <span class="text-muted">•</span>
                 <span id="coaster-country" class="fw-semibold text-dark" style="font-size:.95rem;">País</span>
-                <span id="status-badge" class="status-badge status-default ms-1">N/A</span>
             </div>
 
             <hr class="my-3">
@@ -126,27 +127,27 @@ if ($id === 0) {
                 <div class="card-body p-0">
                     <table class="table table-borderless mb-0">
                         <tbody>
-                            <tr class="border-bottom">
-                                <td class="text-muted ps-4 py-3" style="width:45%">Fabricante</td>
-                                <td class="fw-semibold py-3" id="coaster-manufacter">—</td>
+                            <tr class="ficha-row">
+                                <td class="ficha-label">Fabricante</td>
+                                <td class="ficha-value" id="coaster-manufacter">—</td>
                             </tr>
-                            <tr class="border-bottom">
-                                <td class="text-muted ps-4 py-3">Modelo</td>
-                                <td class="fw-semibold py-3" id="coaster-model">—</td>
+                            <tr class="ficha-row ficha-row-alt">
+                                <td class="ficha-label">Modelo</td>
+                                <td class="ficha-value" id="coaster-model">—</td>
                             </tr>
-                            <tr class="border-bottom">
-                                <td class="text-muted ps-4 py-3">Año apertura</td>
-                                <td class="fw-semibold py-3" id="coaster-year">—</td>
+                            <tr class="ficha-row">
+                                <td class="ficha-label">Año apertura</td>
+                                <td class="ficha-value" id="coaster-year">—</td>
                             </tr>
-                            <tr class="border-bottom">
-                                <td class="text-muted ps-4 py-3">Estado</td>
-                                <td class="fw-semibold py-3" id="current-state-table">—</td>
+                            <tr class="ficha-row ficha-row-alt">
+                                <td class="ficha-label">Estado</td>
+                                <td class="ficha-value" id="current-state-table">—</td>
                             </tr>
-                            <tr>
-                                <td class="text-muted ps-4 py-3">Parque</td>
-                                <td class="py-3">
-                                    <a href="<?= $base_url ?>/web/views/public/park_detail.php?id=<?= $id ?>"
-                                        class="text-success fw-semibold text-decoration-none" id="park-name-table">—</a>
+                            <tr class="ficha-row">
+                                <td class="ficha-label">Parque</td>
+                                <td class="ficha-value">
+                                    <a href="<?= $base_url ?>/web/views/public/parks/park_detail.php?id=<?= $id ?>"
+                                        class="text-success fw-bold text-decoration-none" id="park-name-table">—</a>
                                 </td>
                             </tr>
                         </tbody>
@@ -166,7 +167,8 @@ if ($id === 0) {
                         <span class="fw-semibold">Fotos</span>
                         <span class="badge bg-white text-success" id="photos-count">0</span>
                     </div>
-                    <button class="btn btn-sm btn-outline-light rounded-0 px-3">
+                    <button class="btn btn-sm btn-outline-light rounded-0 px-3" id="upload-photo" data-bs-toggle="modal"
+                        data-bs-target="#upload-photo-modal">
                         <i class="fa-solid fa-upload me-1"></i>Subir foto
                     </button>
                 </div>
@@ -179,6 +181,38 @@ if ($id === 0) {
                             Ver todas las fotos <i class="fa-solid fa-arrow-right ms-1"></i>
                         </a>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PARA SUBIR FOTO -->
+    <div class="modal fade" id="upload-photo-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="upload-photo-title">Subir foto</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="upload-photo-form">
+                        <div class="mb-3">
+                            <label for="photo" class="form-label">Selecciona una foto</label>
+                            <input class="form-control" type="file" id="photo" accept="image/*" required>
+                        </div>
+                        <div id="crop-container" class="mb-3" style="display:none; overflow:hidden; max-height:320px;">
+                            <img id="crop-preview" style="max-width:100%; display:block;">
+                        </div>
+                        <div class="mb-3">
+                            <label for="photo-caption" class="form-label">Descripción (opcional)</label>
+                            <textarea class="form-control" id="photo-caption" rows="2"
+                                placeholder="¿De qué va esta foto?"></textarea>
+                        </div>
+                        <button type="button" class="btn btn-success w-100" id="upload-photo-btn">
+                            Subir foto <i class="fa-solid fa-upload ms-1"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -203,7 +237,7 @@ if ($id === 0) {
                             <option value="worst">Peor valoración</option>
                         </select>
                         <a class="btn btn-sm btn-outline-light rounded-0 px-3" id="btn-write-review"
-                            href="<?= $base_url ?>/web/views/public/form_rating.php?id=<?= $id ?>">
+                            href="<?= $base_url ?>/web/views/public/coasters/form_rating.php?id=<?= $id ?>">
                             <i class="fa-solid fa-pen me-1"></i>Escribir reseña
                         </a>
                     </div>
@@ -220,6 +254,8 @@ if ($id === 0) {
 
 </main>
 
-<?php require_once __DIR__ . '/../partials/footer.php'; ?>
+<?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 <script src="<?= $base_url ?>/web/js/coasters.js"></script>
 <script src="<?= $base_url ?>/web/js/auth-check.js"></script>
+<!-- CropperJS para recortar imágenes al subir fotos -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>

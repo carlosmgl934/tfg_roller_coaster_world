@@ -38,6 +38,12 @@ switch ($action) {
     case 'reviews':
         getCoasterReviews();
         break;
+    case 'save_review':
+        saveReview();
+        break;
+    case 'save_photo':
+        savePhoto();
+        break;
     default:
         echo json_encode(['success' => false, 'error' => 'Acción no válida']);
         exit;
@@ -388,7 +394,9 @@ function getCoasterReviews()
 
     try {
         global $db;
-        $sql = "SELECT cr.id, cr.note, cr.review, cr.created_at, users.username, users.profile_image 
+        $sql = "SELECT cr.id, cr.note, cr.review, cr.created_at, users.username, users.profile_image, 
+                       (SELECT json_agg(json_build_object('tag', rt.tag, 'type', rt.type))
+                        FROM review_tags rt WHERE rt.review_id = cr.id) AS tags
                 FROM coaster_ratings AS cr
                 INNER JOIN users ON cr.user_id = users.id
                 WHERE cr.coaster_id = :id
@@ -406,6 +414,9 @@ function getCoasterReviews()
         $stmt_count->execute();
 
         $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($reviews as &$r) {
+            $r['tags'] = $r['tags'] ? json_decode($r['tags'], true) : [];
+        }
         $total = $stmt_count->fetchColumn();
 
         echo json_encode(['success' => true, 'reviews' => $reviews, 'total' => $total]);
@@ -417,6 +428,153 @@ function getCoasterReviews()
     }
 }
 
-function getCoasterPhotos(){
-    
+function getCoasterPhotos()
+{
+    $id = intval($_GET['id'] ?? 0);
+
+    if ($id <= 0) {
+        echo json_encode(['success' => false, 'error' => 'ID no válido']);
+        exit;
+    }
+
+    try {
+        global $db;
+        $sql = "SELECT cp.*, u.username 
+                FROM coaster_photos cp
+                INNER JOIN users u ON cp.user_id = u.id
+                WHERE cp.coaster_id = :id AND cp.status = 'approved'
+                ORDER BY cp.created_at DESC";
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $photos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        echo json_encode([
+            'success' => true,
+            'photos' => $photos,
+            'total' => count($photos)
+        ]);
+        exit;
+
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'error' => 'Error al cargar fotos']);
+        exit;
+    }
+}
+
+function saveReview()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        echo json_encode(['success' => false, 'error' => 'Método no permitido']);
+        exit;
+    }
+
+    if (!isset($_SESSION['user_id'])) {
+        echo json_encode(['success' => false, 'error' => 'No autorizado']);
+        exit;
+    }
+
+    $userId = $_SESSION['user_id'];
+    $coasterId = intval($_POST['coaster_id'] ?? 0);
+    $note = floatval($_POST['note'] ?? 0);
+    $reviewText = trim($_POST['review'] ?? '');
+    $pros = $_POST['pros'] ?? [];
+    $contras = $_POST['contras'] ?? [];
+
+    if ($coasterId <= 0 || $note <= 0) {
+        echo json_encode(['success' => false, 'error' => 'Debes seleccionar una puntuación válida']);
+        exit;
+    }
+
+    try {
+        global $db;
+        $db->beginTransaction();
+
+        $sql = "INSERT INTO coaster_ratings (user_id, coaster_id, review, note)
+                VALUES (:user_id, :coaster_id, :review, :note)
+                RETURNING id";
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':coaster_id', $coasterId, PDO::PARAM_INT);
+        $stmt->bindValue(':review', empty($reviewText) ? null : $reviewText, PDO::PARAM_STR);
+        $stmt->bindValue(':note', $note);
+        $stmt->execute();
+
+        $reviewId = $stmt->fetchColumn();
+
+        $tagSql = "INSERT INTO review_tags (review_id, tag, type) VALUES (:review_id, :tag, :type)";
+        $tagStmt = $db->prepare($tagSql);
+
+        if (is_array($pros)) {
+            foreach ($pros as $pro) {
+                $tagStmt->execute([
+                    ':review_id' => $reviewId,
+                    ':tag' => $pro,
+                    ':type' => 'pro'
+                ]);
+            }
+        }
+
+        if (is_array($contras)) {
+            foreach ($contras as $con) {
+                $tagStmt->execute([
+                    ':review_id' => $reviewId,
+                    ':tag' => $con,
+                    ':type' => 'con'
+                ]);
+            }
+        }
+
+        $db->commit();
+        echo json_encode(['success' => true]);
+        exit;
+    } catch (PDOException $e) {
+        $db->rollBack();
+        echo json_encode(['success' => false, 'error' => 'Error al guardar reseña: ' . $e->getMessage()]);
+        exit;
+    }
+}
+
+function savePhoto()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        echo json_encode(['success' => false, 'error' => 'Método no permitido']);
+        exit;
+    }
+
+    if (!isset($_SESSION['user_id'])) {
+        echo json_encode(['success' => false, 'error' => 'No autorizado']);
+        exit;
+    }
+
+    $userId = $_SESSION['user_id'];
+    $coasterId = intval($_POST['coaster_id'] ?? 0);
+    $photoUrl = $_POST['photo_url'] ?? '';
+    $caption = $_POST['caption'] ?? null;
+
+    if ($coasterId <= 0 || empty($photoUrl)) {
+        echo json_encode(['success' => false, 'error' => 'Datos inválidos']);
+        exit;
+    }
+
+    try {
+        global $db;
+        // Insertamos con estado pending (esto cuadra con el ALTER TABLE que hicimos)
+        $sql = "INSERT INTO coaster_photos (user_id, coaster_id, photo_url, caption, status) 
+                VALUES (:user_id, :coaster_id, :photo_url, :caption, 'pending')";
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':coaster_id', $coasterId, PDO::PARAM_INT);
+        $stmt->bindValue(':photo_url', $photoUrl);
+        $stmt->bindValue(':caption', $caption);
+        $stmt->execute();
+
+        echo json_encode(['success' => true]);
+    } catch (PDOException $e) {
+        // Log the actual error internally
+        error_log("Error guardando foto: " . $e->getMessage());
+        echo json_encode(['success' => false, 'error' => 'Error al guardar la foto en la base de datos']);
+    }
 }

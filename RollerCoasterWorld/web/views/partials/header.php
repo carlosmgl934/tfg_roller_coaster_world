@@ -6,6 +6,9 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Determina si el usuario está logueado
 $is_logged = isset($_SESSION['firebase_uid']);
+
+// Base URL calculada automáticamente (funciona en cualquier servidor)
+$base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_SERVER['SCRIPT_NAME']);
 ?>
 
 <!doctype html>
@@ -23,11 +26,8 @@ $is_logged = isset($_SESSION['firebase_uid']);
   <!-- Firebase SDK - versión COMPAT (necesaria para proyectos PHP sin módulos) -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <!-- Base URL calculada automáticamente (funciona en cualquier servidor) -->
-  <?php
-  $base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_SERVER['SCRIPT_NAME']);
-  ?>
   <script>window.BASE_URL = '<?= $base_url ?>';</script>
 
   <!-- jQuery -->
@@ -70,13 +70,13 @@ $is_logged = isset($_SESSION['firebase_uid']);
               Coasters
             </a>
             <ul class="dropdown-menu shadow border-0">
-              <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/coaster_search.php"><i
+              <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/coasters/coaster_search.php"><i
                     class="fa-solid fa-magnifying-glass w-20px text-center me-2 text-primary"></i> Buscar</a></li>
-              <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/ranking.php"><i
+              <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/users/ranking.php"><i
                     class="fa-solid fa-earth-europe w-20px text-center me-2 text-success"></i> Ranking Global</a></li>
-              <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/coaster_reviews.php"><i
+              <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/coasters/coaster_reviews.php"><i
                     class="fa-solid fa-star w-20px text-center me-2 text-warning"></i> Reseñas Globales</a></li>
-              <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/coaster_tops.php"><i
+              <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/coasters/coaster_tops.php"><i
                     class="fa-solid fa-trophy w-20px text-center me-2 text-info"></i> Tops Usuarios</a></li>
             </ul>
           </li>
@@ -88,9 +88,9 @@ $is_logged = isset($_SESSION['firebase_uid']);
               Parques
             </a>
             <ul class="dropdown-menu shadow border-0">
-              <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/parks.php"><i
+              <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/parks/parks.php"><i
                     class="fa-solid fa-list w-20px text-center me-2"></i> Listado</a></li>
-              <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/park_detail.php"><i
+              <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/parks/park_detail.php"><i
                     class="fa-solid fa-circle-info w-20px text-center me-2"></i> Ficha Parque</a></li>
             </ul>
           </li>
@@ -102,7 +102,7 @@ $is_logged = isset($_SESSION['firebase_uid']);
               <i class="fa-solid fa-comments me-1"></i> Foros
             </a>
             <ul class="dropdown-menu shadow border-0">
-              <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/forums.php"><i
+              <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/forums/forums.php"><i
                     class="fa-solid fa-users w-20px text-center me-2"></i> Todos los foros</a></li>
             </ul>
           </li>
@@ -115,9 +115,9 @@ $is_logged = isset($_SESSION['firebase_uid']);
                 <i class="fa-solid fa-suitcase-rolling me-1"></i> Viajes
               </a>
               <ul class="dropdown-menu shadow border-0">
-                <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/trips.php"><i
+                <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/trips/trips.php"><i
                       class="fa-solid fa-suitcase w-20px text-center me-2"></i> Mis viajes</a></li>
-                <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/trip_generator.php"><i
+                <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/trips/trip_generator.php"><i
                       class="fa-solid fa-wand-magic-sparkles w-20px text-center me-2"></i> Generador de viajes</a></li>
               </ul>
             </li>
@@ -131,13 +131,13 @@ $is_logged = isset($_SESSION['firebase_uid']);
                 <i class="fa-solid fa-user me-1"></i> Perfil
               </a>
               <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/profile.php"><i
+                <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/users/profile.php"><i
                       class="fa-solid fa-id-card w-20px text-center me-2"></i> Mi perfil</a></li>
-                <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/friends.php"><i
+                <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/users/friends.php"><i
                       class="fa-solid fa-user-group w-20px text-center me-2"></i> Amigos</a></li>
-                <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/carrito.php"><i
+                <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/shop/carrito.php"><i
                       class="fa-solid fa-cart-shopping w-20px text-center me-2"></i> Carrito</a></li>
-                <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/orders.php"><i
+                <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/shop/orders.php"><i
                       class="fa-solid fa-box w-20px text-center me-2"></i> Mis pedidos</a></li>
                 <li>
                   <hr class="dropdown-divider">

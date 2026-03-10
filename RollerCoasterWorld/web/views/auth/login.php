@@ -7,6 +7,12 @@ require_once __DIR__ . '/../partials/header.php';
 <main>
   <h2>Iniciar Sesión</h2>
 
+  <?php if (isset($_GET['msg']) && $_GET['msg'] === 'review'): ?>
+    <div class="alert alert-warning text-center mx-auto mb-4" style="max-width: 400px;" role="alert">
+      Tienes que iniciar sesión para escribir una reseña.
+    </div>
+  <?php endif; ?>
+
   <form id="login-form">
     <input type="email" id="email" placeholder="Email" required>
     <input type="password" id="password" placeholder="Contraseña" required>
@@ -24,8 +30,14 @@ require_once __DIR__ . '/../partials/header.php';
     </button>
   </div>
 
+  <?php
+  $registerUrl = $base_url . '/web/views/auth/register.php';
+  if (isset($_GET['redirect'])) {
+    $registerUrl .= '?redirect=' . urlencode($_GET['redirect']);
+  }
+  ?>
   <p style="text-align: center;">
-    ¿No tienes cuenta? <a href="<?= $base_url ?>/web/views/auth/register.php">Regístrate aquí</a>
+    ¿No tienes cuenta? <a href="<?= $registerUrl ?>">Regístrate aquí</a>
   </p>
 
   <!-- BOTÓN PROVISIONAL DE CERRAR SESIÓN (para pruebas rápidas) -->

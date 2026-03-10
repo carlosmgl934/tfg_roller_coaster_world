@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../partials/header.php';
+require_once __DIR__ . '/../../partials/header.php';
 
 // Perfil público de otro usuario — no requiere login
 $user_id = $_GET['id'] ?? null;
@@ -12,5 +12,5 @@ $user_id = $_GET['id'] ?? null;
     <!-- TODO: bio, avatar, top personal, lista de amigos visibles -->
 </main>
 
-<?php require_once __DIR__ . '/../partials/footer.php'; ?>
+<?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 <script src="<?= $base_url ?>/web/js/profile.js"></script>

@@ -158,19 +158,53 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
   transition: background-color 0.2s ease;
 }
 .stat-block:hover {
-  background-color: #e8f5ee;
+  background-color: #dcf5ea;
 }
 .stat-block .stat-label {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.09em;
-  color: #86a899;
-  margin-bottom: 4px;
+  letter-spacing: 0.1em;
+  color: #6dab8a;
+  font-weight: 700;
+  margin-bottom: 6px;
 }
 .stat-block .stat-value {
-  font-size: 1.25rem;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0f2d1a;
+  letter-spacing: -0.02em;
+}
+
+/* Ficha Técnica table rows */
+.ficha-row {
+  transition: background 0.15s;
+  border-bottom: 1px solid #e2e8f0;
+}
+.ficha-row:last-child {
+  border-bottom: none;
+}
+.ficha-row:hover {
+  background-color: #f1f8f4 !important;
+}
+.ficha-label {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   font-weight: 700;
-  color: #1e293b;
+  color: #64748b;
+  padding: 12px 20px !important;
+  width: 45%;
+  vertical-align: middle;
+}
+.ficha-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  padding: 12px 12px !important;
+  vertical-align: middle;
+}
+.ficha-row-alt {
+  background-color: #f8fafc;
 }
 
 /* ============================================================

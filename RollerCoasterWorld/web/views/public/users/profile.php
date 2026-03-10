@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../partials/header.php';
+require_once __DIR__ . '/../../partials/header.php';
 
 if (!isset($_SESSION['firebase_uid'])) {
   header('Location: ' . $base_url . '/web/views/auth/login.php');
@@ -61,5 +61,5 @@ $user_uid = $_SESSION['firebase_uid'];
 <script src="<?= $base_url ?>/web/js/profile.js"></script>
 
 <?php
-require_once __DIR__ . '/../partials/footer.php';
+require_once __DIR__ . '/../../partials/footer.php';
 ?>

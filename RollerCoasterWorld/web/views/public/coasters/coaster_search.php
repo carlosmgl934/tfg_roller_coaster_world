@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../partials/header.php';
+require_once __DIR__ . '/../../partials/header.php';
 
 
 ?>
@@ -123,6 +123,6 @@ require_once __DIR__ . '/../partials/header.php';
 </main>
 
 
-<?php require_once __DIR__ . '/../partials/footer.php'; ?>
+<?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 <script src="<?= $base_url ?>/web/js/coasters.js"></script>
 <script src="<?= $base_url ?>/web/js/auth-check.js"></script>
