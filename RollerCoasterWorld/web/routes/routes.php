@@ -19,6 +19,8 @@ $routes = [
     'contact' => $base_url . '/web/views/public/contact.php',
     'privacy' => $base_url . '/web/views/public/privacy.php',
     'notice' => $base_url . '/web/views/public/notice.php',
+    'form_rating' => $base_url . '/web/views/public/form_rating.php',
+    'trip_generator' => $base_url . '/web/views/public/trip_generator.php',
 
     // Perfil y social
     'profile' => $base_url . '/web/views/public/profile.php',

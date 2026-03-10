@@ -188,7 +188,6 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
   transform: scale(1.04);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
 }
-
 /* ============================================================
    RESEÑAS
    ============================================================ */
@@ -203,4 +202,58 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
   color: #f59e0b;
   font-size: 1rem;
   letter-spacing: 1px;
+}
+
+.star-rating {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  --star-width: 1.1em;
+  font-size: 2.5rem;
+}
+
+.star-rating input {
+  display: none;
+}
+
+.star-rating label {
+  cursor: pointer;
+  width: var(--star-width);
+  text-align: center;
+  color: #e4e4e7;
+  line-height: 1;
+  margin: 0 !important;
+  padding: 0;
+  display: inline-block;
+  position: relative;
+  transition:
+    color 0.2s ease,
+    text-shadow 0.2s ease;
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+}
+
+.star-rating label::before {
+  content: "\f005";
+}
+
+/* The half star lies completely on top of the next full star */
+.star-rating label.half {
+  margin-right: calc(-1 * var(--star-width)) !important;
+  clip-path: inset(0 50% 0 0);
+  z-index: 2;
+}
+
+/* Base styles for hover and selection */
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label {
+  color: #f59e0b;
+}
+
+/* Adding a glow effect for the selected rating */
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label {
+  text-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
 }

@@ -371,9 +371,8 @@ function getCoasters()
 
 function getCoasterReviews()
 {
-
     $id = intval($_GET['id'] ?? 0);
-    $order = $$_GET['order'] ?? 'default';
+    $order = $_GET['order'] ?? 'default';
 
     if ($id <= 0) {
         echo json_encode(['success' => false, 'error' => 'ID no válido']);
@@ -389,13 +388,13 @@ function getCoasterReviews()
 
     try {
         global $db;
-        $sql = "SELECT cr.id, cr.note, cr.review, cr.created_at, user.username, user.profile_image 
-        FROM coaster_rating AS cr
-        INNER JOIN users ON cr.user_id = user.id
-        WHERE cr.coaster_id = :id
-        ORDER BY $orderSql";
+        $sql = "SELECT cr.id, cr.note, cr.review, cr.created_at, users.username, users.profile_image 
+                FROM coaster_ratings AS cr
+                INNER JOIN users ON cr.user_id = users.id
+                WHERE cr.coaster_id = :id
+                ORDER BY $orderSql";
 
-        $sql_count = "SELECT COUNT(*) FROM coaster_rating WHERE coaster_id = :id";
+        $sql_count = "SELECT COUNT(*) FROM coaster_ratings WHERE coaster_id = :id";
 
         $stmt = $db->prepare($sql);
         $stmt_count = $db->prepare($sql_count);
@@ -409,14 +408,15 @@ function getCoasterReviews()
         $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $total = $stmt_count->fetchColumn();
 
-        echo json_encode([
-            'success' => true,
-            'reviews' => $reviews,
-            'total' => $total
-        ]);
+        echo json_encode(['success' => true, 'reviews' => $reviews, 'total' => $total]);
         exit;
+
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => 'Error en la base de datos']);
+        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         exit;
     }
+}
+
+function getCoasterPhotos(){
+    
 }

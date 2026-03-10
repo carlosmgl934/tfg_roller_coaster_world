@@ -425,6 +425,10 @@ $(document).ready(function () {
     });
   }
   if (document.getElementById("coaster-name")) {
+    // --- LÓGICA PARA CARGAR LA FICHA INDIVIDUAL ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const coasterId = urlParams.get("id"); // Extrae el "id" de la URL
+
     // -------------------------------------
     // FUNCIÓN PARA FICHAS DE MONTAÑAS RUSAS
     // -------------------------------------
@@ -562,44 +566,41 @@ $(document).ready(function () {
         },
       });
     }
-    // --- LÓGICA PARA CARGAR LA FICHA INDIVIDUAL ---
-    const urlParams = new URLSearchParams(window.location.search);
-    const coasterId = urlParams.get("id"); // Extrae el "id" de la URL
 
-    if (coasterId) {
-      loadCoastersData(coasterId);
-    }
-  }
-
-  function loadPhotos() {
-    $.ajax({
-      url: BASE_URL + "/api/php/coasters.php",
-      type: "GET",
-      data: {
-        action: "photos",
-        id: coasterId,
-      },
-      success: function (data) {
-        if (data.success) {
-          $("#photos-count").text(data.total);
-          if (data.photos.length === 0) {
-            $("#photos-grid").html(
-              '<p class="text-muted text-center py-3">Aún no hay fotos</p>',
-            );
-            return;
-          }
-          data.photos.forEach(function (photo) {
-            const col = document.createElement("div");
-            col.className = "col-6 col-md-3";
-            col.innerHTML = `
+    function loadPhotos(id) {
+      $.ajax({
+        url: BASE_URL + "/api/php/coasters.php",
+        type: "GET",
+        data: {
+          action: "photos",
+          id: id,
+        },
+        success: function (data) {
+          if (data.success) {
+            $("#photos-count").text(data.total);
+            if (data.photos.length === 0) {
+              $("#photos-grid").html(
+                '<p class="text-muted text-center py-3">Aún no hay fotos</p>',
+              );
+              return;
+            }
+            data.photos.forEach(function (photo) {
+              const col = document.createElement("div");
+              col.className = "col-6 col-md-3";
+              col.innerHTML = `
                 <img src="${photo.photo_url}" alt="${photo.caption || "Foto"}" 
                 class="photo-thumb w-100"
                 title="${photo.username}">`;
-            document.querySelector("#photos-grid").appendChild(col);
-          });
-        }
-      },
-    });
+              document.querySelector("#photos-grid").appendChild(col);
+            });
+          }
+        },
+      });
+    }
+
+    if (coasterId) {
+      loadCoastersData(coasterId);
+      loadPhotos(coasterId);
+    }
   }
-  loadPhotos();
 });

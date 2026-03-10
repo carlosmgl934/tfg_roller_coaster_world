@@ -23,6 +23,58 @@ console.log(
   BASE,
 );
 
+// ── Helpers de modal ──────────────────────────────────────────────────────────
+function showAlert(msg) {
+  const existing = document.getElementById("auth-modal");
+  if (existing) existing.remove();
+
+  const html = `
+  <div class="modal fade" id="auth-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-body text-center p-4">
+          <p class="mb-3" style="font-size:1rem;">${msg}</p>
+          <button class="btn btn-success px-4" data-bs-dismiss="modal">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML("beforeend", html);
+  const modal = new bootstrap.Modal(document.getElementById("auth-modal"));
+  modal.show();
+}
+
+function showConfirm(msg, onConfirm) {
+  const existing = document.getElementById("auth-confirm-modal");
+  if (existing) existing.remove();
+
+  const html = `
+  <div class="modal fade" id="auth-confirm-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-body text-center p-4">
+          <p class="mb-4" style="font-size:1rem;">${msg}</p>
+          <div class="d-flex gap-2 justify-content-center">
+            <button class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+            <button class="btn btn-danger px-4" id="confirm-yes-btn">Confirmar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML("beforeend", html);
+  const modal = new bootstrap.Modal(
+    document.getElementById("auth-confirm-modal"),
+  );
+  modal.show();
+  document
+    .getElementById("confirm-yes-btn")
+    .addEventListener("click", function () {
+      modal.hide();
+      onConfirm();
+    });
+}
+
 $(document).ready(function () {
   let registro = document.getElementById("signUpWithEmail");
   let registroGoogle = document.getElementById("signInWithGoogle");
@@ -31,6 +83,7 @@ $(document).ready(function () {
   let logOut = document.getElementById("signOut");
   let cambiarPsw = document.getElementById("cambiarPassword");
   let togglePsw = document.getElementById("toggleFormPassword");
+  let eliminar = document.getElementById("borrarCuenta");
 
   if (registro) registro.addEventListener("click", signUpWithEmail);
   if (registroGoogle)
@@ -38,9 +91,18 @@ $(document).ready(function () {
   if (registroFacebook)
     registroFacebook.addEventListener("click", signInWithFacebook);
   if (login) login.addEventListener("click", signInWithEmail);
-  if (logOut) logOut.addEventListener("click", borrarCuenta);
   if (cambiarPsw) cambiarPsw.addEventListener("click", cambiarPassword);
   if (togglePsw) togglePsw.addEventListener("click", toggleFormPassword);
+  if (eliminar) eliminar.addEventListener("click", borrarCuenta);
+
+  if (logOut)
+    logOut.addEventListener("click", function () {
+      fetch(BASE + "/api/php/logout.php", { method: "POST" }).finally(() => {
+        window.auth.signOut().then(() => {
+          window.location.href = BASE + "/web/views/auth/login.php";
+        });
+      });
+    });
 
   // ── Registro con Email y Password ─────────────────────────────────────────────
   function signUpWithEmail() {
@@ -48,11 +110,11 @@ $(document).ready(function () {
     password = document.getElementById("password").value;
 
     if (!email || !password) {
-      alert("Completa email y contraseña");
+      showAlert("Completa email y contraseña");
       return;
     }
     if (password.length < 6) {
-      alert("La contraseña debe tener al menos 6 caracteres");
+      showAlert("La contraseña debe tener al menos 6 caracteres");
       return;
     }
 
@@ -61,7 +123,7 @@ $(document).ready(function () {
       .then((userCredential) => {
         const user = userCredential.user;
         console.log("Registro exitoso! UID:", user.uid);
-        alert("¡Registro completado!");
+        showAlert("¡Registro completado!");
         user.getIdToken().then((idToken) => {
           fetch(BASE + "/api/php/auth.php", {
             method: "POST",
@@ -89,7 +151,7 @@ $(document).ready(function () {
         else if (error.code === "auth/weak-password")
           msg += "Contraseña muy débil (mínimo 6 caracteres).";
         else msg += error.message;
-        alert(msg);
+        showAlert(msg);
       });
   }
 
@@ -99,7 +161,7 @@ $(document).ready(function () {
     password = document.getElementById("password").value;
 
     if (!email || !password) {
-      alert("Completa email y contraseña");
+      showAlert("Completa email y contraseña");
       return;
     }
 
@@ -119,11 +181,11 @@ $(document).ready(function () {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ firebase_uid: user.uid }),
               }).catch((e) => console.error("Error borrando de Supabase:", e));
-              alert("Cuenta eliminada correctamente.");
-              window.location.href = BASE + "/web/firebase/auth/login.php";
+              showAlert("Cuenta eliminada correctamente.");
+              window.location.href = BASE + "/web/views/auth/login.php";
             })
             .catch((err) =>
-              alert("Error al eliminar la cuenta: " + err.message),
+              showAlert("Error al eliminar la cuenta: " + err.message),
             );
           return;
         }
@@ -148,7 +210,7 @@ $(document).ready(function () {
             .then((d) => console.log("Sync Supabase:", d));
         });
 
-        alert("¡Bienvenido!");
+        showAlert("¡Bienvenido!");
         window.location.href = BASE + "/web/views/public/index.php";
       })
       .catch((error) => {
@@ -159,7 +221,7 @@ $(document).ready(function () {
           msg += "Contraseña incorrecta.";
         else if (error.code === "auth/invalid-email") msg += "Email inválido.";
         else msg += error.message;
-        alert(msg);
+        showAlert(msg);
       });
   }
 
@@ -182,11 +244,11 @@ $(document).ready(function () {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ firebase_uid: user.uid }),
               }).catch((e) => console.error("Error borrando de Supabase:", e));
-              alert("Cuenta eliminada correctamente.");
-              window.location.href = BASE + "/web/firebase/auth/login.php";
+              showAlert("Cuenta eliminada correctamente.");
+              window.location.href = BASE + "/web/views/auth/login.php";
             })
             .catch((err) =>
-              alert("Error al eliminar la cuenta: " + err.message),
+              showAlert("Error al eliminar la cuenta: " + err.message),
             );
           return;
         }
@@ -211,10 +273,10 @@ $(document).ready(function () {
             .then((d) => console.log("Sync Supabase (Google):", d));
         });
 
-        alert("¡Bienvenido con Google!");
+        showAlert("¡Bienvenido con Google!");
         window.location.href = BASE + "/web/views/public/index.php";
       })
-      .catch((error) => alert("Error con Google: " + error.message));
+      .catch((error) => showAlert("Error con Google: " + error.message));
   }
 
   // ── Login con Facebook ────────────────────────────────────────────────────────
@@ -244,10 +306,10 @@ $(document).ready(function () {
             .then((r) => r.json())
             .then((d) => console.log("Sync Supabase (Facebook):", d));
         });
-        alert("¡Bienvenido con Facebook!");
+        showAlert("¡Bienvenido con Facebook!");
         window.location.href = BASE + "/web/views/public/index.php";
       })
-      .catch((error) => alert("Error con Facebook: " + error.message));
+      .catch((error) => showAlert("Error con Facebook: " + error.message));
   }
 
   // ── Estado de autenticación ───────────────────────────────────────────────────
@@ -276,7 +338,7 @@ $(document).ready(function () {
     if (privatePages.some((p) => path.endsWith(p) || path.includes(p))) {
       if (!user) {
         console.log("Acceso denegado: no logueado");
-        window.location.href = BASE + "/web/firebase/auth/login.php";
+        window.location.href = BASE + "/web/views/auth/login.php";
       }
     }
   });
@@ -327,47 +389,46 @@ $(document).ready(function () {
   function borrarCuenta() {
     const user = window.auth.currentUser;
     if (!user) {
-      alert("Debes iniciar sesión para eliminar la cuenta");
+      showAlert("Debes iniciar sesión para eliminar la cuenta");
       return;
     }
-    if (
-      !confirm(
-        "¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer",
-      )
-    )
-      return;
 
-    user
-      .delete()
-      .then(() => {
-        fetch(BASE + "/api/php/delete_user.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ firebase_uid: user.uid }),
-        })
-          .then((r) => r.json())
-          .catch((err) =>
-            console.error("Error al eliminar usuario de Supabase:", err),
-          );
-        alert("Cuenta eliminada correctamente");
-        window.location.href = BASE + "/web/firebase/auth/login.php";
-      })
-      .catch((error) => {
-        if (error.code === "auth/requires-recent-login") {
-          sessionStorage.setItem("pending_delete", "1");
-          alert(
-            "Por seguridad, necesitas volver a iniciar sesión antes de eliminar tu cuenta.\n\nInicia sesión y la cuenta se eliminará automáticamente.",
-          );
-          fetch(BASE + "/api/php/logout.php", { method: "POST" }).finally(
-            () => {
-              window.auth.signOut().then(() => {
-                window.location.href = BASE + "/web/firebase/auth/login.php";
-              });
-            },
-          );
-        } else {
-          alert("Error al eliminar la cuenta: " + error.message);
-        }
-      });
+    showConfirm(
+      "¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer",
+      function () {
+        user
+          .delete()
+          .then(() => {
+            fetch(BASE + "/api/php/delete_user.php", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ firebase_uid: user.uid }),
+            })
+              .then((r) => r.json())
+              .catch((err) =>
+                console.error("Error al eliminar usuario de Supabase:", err),
+              );
+            showAlert("Cuenta eliminada correctamente");
+            window.location.href = BASE + "/web/views/auth/login.php";
+          })
+          .catch((error) => {
+            if (error.code === "auth/requires-recent-login") {
+              sessionStorage.setItem("pending_delete", "1");
+              showAlert(
+                "Por seguridad, necesitas volver a iniciar sesión antes de eliminar tu cuenta. Inicia sesión y la cuenta se eliminará automáticamente.",
+              );
+              fetch(BASE + "/api/php/logout.php", { method: "POST" }).finally(
+                () => {
+                  window.auth.signOut().then(() => {
+                    window.location.href = BASE + "/web/views/auth/login.php";
+                  });
+                },
+              );
+            } else {
+              showAlert("Error al eliminar la cuenta: " + error.message);
+            }
+          });
+      },
+    );
   }
 });

@@ -47,7 +47,7 @@ $user_uid = $_SESSION['firebase_uid'];
   <div class="danger-zone">
     <h3 class="danger-title">Eliminar cuenta</h3>
     <p class="danger-desc">Esta acción es irreversible. Tu cuenta y tus datos se eliminarán permanentemente.</p>
-    <button onclick="borrarCuenta()" class="btn-red-bold">
+    <button id="borrarCuenta" class="btn-red-bold">
       Eliminar mi cuenta
     </button>
   </div>

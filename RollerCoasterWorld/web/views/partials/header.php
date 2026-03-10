@@ -107,6 +107,22 @@ $is_logged = isset($_SESSION['firebase_uid']);
             </ul>
           </li>
 
+          <!-- Viajes -->
+          <?php if ($is_logged): ?>
+            <li class="nav-item dropdown custom-dropdown">
+              <a class="nav-link px-3 rounded text-white dropdown-toggle" href="#" role="button"
+                data-bs-toggle="dropdown">
+                <i class="fa-solid fa-suitcase-rolling me-1"></i> Viajes
+              </a>
+              <ul class="dropdown-menu shadow border-0">
+                <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/trips.php"><i
+                      class="fa-solid fa-suitcase w-20px text-center me-2"></i> Mis viajes</a></li>
+                <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/trip_generator.php"><i
+                      class="fa-solid fa-wand-magic-sparkles w-20px text-center me-2"></i> Generador de viajes</a></li>
+              </ul>
+            </li>
+          <?php endif; ?>
+
           <!-- Perfil / Login -->
           <?php if ($is_logged): ?>
             <li class="nav-item dropdown custom-dropdown">
@@ -119,8 +135,6 @@ $is_logged = isset($_SESSION['firebase_uid']);
                       class="fa-solid fa-id-card w-20px text-center me-2"></i> Mi perfil</a></li>
                 <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/friends.php"><i
                       class="fa-solid fa-user-group w-20px text-center me-2"></i> Amigos</a></li>
-                <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/trips.php"><i
-                      class="fa-solid fa-suitcase w-20px text-center me-2"></i> Mis viajes</a></li>
                 <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/carrito.php"><i
                       class="fa-solid fa-cart-shopping w-20px text-center me-2"></i> Carrito</a></li>
                 <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/orders.php"><i

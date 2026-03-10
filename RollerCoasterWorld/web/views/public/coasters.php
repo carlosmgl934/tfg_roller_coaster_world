@@ -202,9 +202,10 @@ if ($id === 0) {
                             <option value="best">Mejor valoración</option>
                             <option value="worst">Peor valoración</option>
                         </select>
-                        <button class="btn btn-sm btn-outline-light rounded-0 px-3" id="btn-write-review">
+                        <a class="btn btn-sm btn-outline-light rounded-0 px-3" id="btn-write-review"
+                            href="<?= $base_url ?>/web/views/public/form_rating.php?id=<?= $id ?>">
                             <i class="fa-solid fa-pen me-1"></i>Escribir reseña
-                        </button>
+                        </a>
                     </div>
                 </div>
                 <div class="card-body" id="reviews-list">
