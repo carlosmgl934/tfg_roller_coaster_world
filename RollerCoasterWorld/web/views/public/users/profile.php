@@ -157,6 +157,16 @@ $user_uid = $_SESSION['firebase_uid'];
                   <span class="text-muted fw-medium"><i class="fa-solid fa-earth-americas me-2 text-success"></i>Países</span>
                   <span class="badge badge-profile fs-6" id="countries-count">0</span>
                 </li>
+                <li
+                  class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3 border-top">
+                  <span class="text-muted fw-medium"><i class="fa-solid fa-star me-2 text-warning"></i>Valoraciones totales</span>
+                  <span class="badge badge-profile fs-6" id="reviews-count">0</span>
+                </li>
+                <li
+                  class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3 border-top">
+                  <span class="text-muted fw-medium"><i class="fa-solid fa-trophy me-2 text-warning"></i>Ranking</span>
+                  <span class="badge badge-profile fs-6" id="user-ranking">—</span>
+                </li>
               </ul>
             </div>
           </div>
@@ -192,6 +202,14 @@ $user_uid = $_SESSION['firebase_uid'];
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
                   <span class="text-muted">Inversiones totales</span>
                   <span class="fw-bold text-dark fs-5" id="total-investments">0</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
+                  <span class="text-muted">Más rápida</span>
+                  <span class="fw-bold text-end text-truncate ms-3 text-dark" id="fastest-coaster" style="max-width: 150px;">—</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
+                  <span class="text-muted">Más larga</span>
+                  <span class="fw-bold text-end text-truncate ms-3 text-dark" id="longest-coaster" style="max-width: 150px;">—</span>
                 </li>
               </ul>
             </div>

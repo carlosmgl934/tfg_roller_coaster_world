@@ -118,7 +118,8 @@ $base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_S
                 <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/trips/trips.php"><i
                       class="fa-solid fa-suitcase w-20px text-center me-2 text-warning"></i> Mis viajes</a></li>
                 <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/trips/trip_generator.php"><i
-                      class="fa-solid fa-wand-magic-sparkles w-20px text-center me-2 text-danger"></i> Generador de viajes</a></li>
+                      class="fa-solid fa-wand-magic-sparkles w-20px text-center me-2 text-danger"></i> Generador de
+                    viajes</a></li>
               </ul>
             </li>
           <?php endif; ?>
@@ -134,7 +135,7 @@ $base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_S
                 <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/users/profile.php"><i
                       class="fa-solid fa-id-card w-20px text-center me-2 text-secondary"></i> Mi perfil</a></li>
                 <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/users/friends.php"><i
-                      class="fa-solid fa-user-group w-20px text-center me-2 text-primary"></i> Amigos</a></li>
+                      class="fa-solid fa-user-group w-20px text-center me-2 text-primary"></i> Usuarios</a></li>
                 <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/shop/carrito.php"><i
                       class="fa-solid fa-cart-shopping w-20px text-center me-2 text-success"></i> Carrito</a></li>
                 <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/shop/orders.php"><i
