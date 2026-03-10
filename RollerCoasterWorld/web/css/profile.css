@@ -1,75 +1,86 @@
-.perfil-container {
-    padding: 40px 20px;
-    max-width: 800px;
-    margin: 0 auto;
+body {
+  background-color: #f7fbf9;
 }
 
-.perfil-info-card {
-    background: #f8f9fa;
-    padding: 30px;
-    border-radius: 12px;
+/* ============================================================
+   PERFIL — Estilos unificados (estilo coasters)
+   ============================================================ */
+.avatar-circle {
+  width: 140px;
+  height: 140px;
+  background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+  color: white;
+  font-size: 64px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
 }
 
-.password-section {
-    margin-top: 30px;
+/* Cartas estilo "section-card" */
+.profile-card {
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+  background-color: #ffffff;
+}
+.profile-card .card-header {
+  border-radius: 0 !important;
+  padding: 13px 20px;
+  letter-spacing: 0.01em;
+  background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+  color: white;
+  border-bottom: none;
+}
+.profile-card .card-header h4, .profile-card .card-header h5 {
+  color: white !important;
+}
+.profile-card .card-header i {
+  color: white !important;
 }
 
-.password-form-box {
-    display: none; 
-    margin-top: 16px; 
-    background: #f0f4ff; 
-    padding: 20px; 
-    border-radius: 10px; 
-    max-width: 400px;
+/* Menú lateral */
+.profile-menu .list-group-item {
+  border-radius: 0 !important;
+  border: none;
+  font-weight: 500;
+  color: #4b5563;
+  transition: background-color 0.2s, color 0.2s;
+  padding: 1rem 1.25rem;
+}
+.profile-menu .list-group-item:hover {
+  background-color: #dcf5ea;
+  color: #0f5132;
+}
+.profile-menu .list-group-item.active {
+  background-color: #e8f5ee;
+  color: #198754;
+  border-left: 4px solid #198754 !important;
 }
 
-.input-label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: bold;
+/* Badges */
+.badge-profile {
+  background-color: #198754;
+  color: white;
+  border-radius: 0 !important;
+  padding: 6px 12px !important;
 }
 
-.input-field {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    margin-bottom: 12px;
-    box-sizing: border-box;
+/* Favoritos */
+.fav-box {
+  background-color: #f7fbf9;
+  border-left: 4px solid #198754 !important;
+  transition: background-color 0.2s;
+  border-radius: 0 !important;
+}
+.fav-box:hover {
+  background-color: #e8f5ee;
 }
 
-.button-group {
-    display: flex;
+.square-box {
+  border-radius: 0 !important;
 }
-
-/* Botones */
-.btn-blue {
-    background: #3498db; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;
-}
-.btn-green {
-    background: #27ae60; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px;
-}
-.btn-gray {
-    background: #aaa; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;
-}
-.btn-red-bold {
-    background: #e74c3c; color: #fff; border: none; padding: 10px 24px; border-radius: 8px; cursor: pointer; font-weight: bold;
-}
-
-#msg-password {
-    margin-top: 10px;
-    font-size: 14px;
-}
-
-/* Zona de peligro */
-.danger-zone {
-    margin-top: 40px; 
-    border-top: 2px solid #e74c3c; 
-    padding-top: 20px;
-}
-.danger-title { color: #e74c3c; }
-.danger-desc { color: #555; }
-
-/* Logout */
-.logout-section { margin-top: 30px; }
-.logout-link { color: #e74c3c; font-weight: bold; text-decoration: none; }

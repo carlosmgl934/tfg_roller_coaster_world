@@ -85,6 +85,7 @@ $(document).ready(function () {
   let cambiarPsw = document.getElementById("cambiarPassword");
   let togglePsw = document.getElementById("toggleFormPassword");
   let eliminar = document.getElementById("borrarCuenta");
+  let cancelar = document.getElementById("btn-cancelar-password");
 
   if (registro) registro.addEventListener("click", signUpWithEmail);
   if (registroGoogle)
@@ -95,6 +96,7 @@ $(document).ready(function () {
   if (cambiarPsw) cambiarPsw.addEventListener("click", cambiarPassword);
   if (togglePsw) togglePsw.addEventListener("click", toggleFormPassword);
   if (eliminar) eliminar.addEventListener("click", borrarCuenta);
+  if (cancelar) cancelar.addEventListener("click", cancelarPassword);
 
   if (logOut)
     logOut.addEventListener("click", function () {
@@ -404,6 +406,10 @@ $(document).ready(function () {
             : "Error: " + err.message;
         msg.style.color = "red";
       });
+  }
+
+  function cancelarPassword() {
+    toggleFormPassword();
   }
 
   // ── Eliminar cuenta ───────────────────────────────────────────────────────────

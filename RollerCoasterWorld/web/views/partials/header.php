@@ -89,9 +89,9 @@ $base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_S
             </a>
             <ul class="dropdown-menu shadow border-0">
               <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/parks/parks.php"><i
-                    class="fa-solid fa-list w-20px text-center me-2"></i> Listado</a></li>
+                    class="fa-solid fa-list w-20px text-center me-2 text-success"></i> Listado</a></li>
               <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/parks/park_detail.php"><i
-                    class="fa-solid fa-circle-info w-20px text-center me-2"></i> Ficha Parque</a></li>
+                    class="fa-solid fa-circle-info w-20px text-center me-2 text-info"></i> Ficha Parque</a></li>
             </ul>
           </li>
 
@@ -103,7 +103,7 @@ $base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_S
             </a>
             <ul class="dropdown-menu shadow border-0">
               <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/forums/forums.php"><i
-                    class="fa-solid fa-users w-20px text-center me-2"></i> Todos los foros</a></li>
+                    class="fa-solid fa-users w-20px text-center me-2 text-primary"></i> Todos los foros</a></li>
             </ul>
           </li>
 
@@ -116,9 +116,9 @@ $base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_S
               </a>
               <ul class="dropdown-menu shadow border-0">
                 <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/trips/trips.php"><i
-                      class="fa-solid fa-suitcase w-20px text-center me-2"></i> Mis viajes</a></li>
+                      class="fa-solid fa-suitcase w-20px text-center me-2 text-warning"></i> Mis viajes</a></li>
                 <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/trips/trip_generator.php"><i
-                      class="fa-solid fa-wand-magic-sparkles w-20px text-center me-2"></i> Generador de viajes</a></li>
+                      class="fa-solid fa-wand-magic-sparkles w-20px text-center me-2 text-danger"></i> Generador de viajes</a></li>
               </ul>
             </li>
           <?php endif; ?>
@@ -132,13 +132,13 @@ $base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_S
               </a>
               <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                 <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/users/profile.php"><i
-                      class="fa-solid fa-id-card w-20px text-center me-2"></i> Mi perfil</a></li>
+                      class="fa-solid fa-id-card w-20px text-center me-2 text-secondary"></i> Mi perfil</a></li>
                 <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/users/friends.php"><i
-                      class="fa-solid fa-user-group w-20px text-center me-2"></i> Amigos</a></li>
+                      class="fa-solid fa-user-group w-20px text-center me-2 text-primary"></i> Amigos</a></li>
                 <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/shop/carrito.php"><i
-                      class="fa-solid fa-cart-shopping w-20px text-center me-2"></i> Carrito</a></li>
+                      class="fa-solid fa-cart-shopping w-20px text-center me-2 text-success"></i> Carrito</a></li>
                 <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/shop/orders.php"><i
-                      class="fa-solid fa-box w-20px text-center me-2"></i> Mis pedidos</a></li>
+                      class="fa-solid fa-box w-20px text-center me-2 text-info"></i> Mis pedidos</a></li>
                 <li>
                   <hr class="dropdown-divider">
                 </li>
@@ -165,27 +165,27 @@ $base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_S
             </a>
             <ul class="dropdown-menu dropdown-menu-end shadow border-0">
               <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/admin/dashboard.php"><i
-                    class="fa-solid fa-chart-line w-20px text-center me-2 text-danger"></i> Dashboard</a></li>
+                    class="fa-solid fa-chart-line w-20px text-center me-2 text-primary"></i> Dashboard</a></li>
               <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/admin/users.php"><i
-                    class="fa-solid fa-users w-20px text-center me-2"></i> Usuarios</a></li>
+                    class="fa-solid fa-users w-20px text-center me-2 text-primary"></i> Usuarios</a></li>
               <li>
                 <hr class="dropdown-divider">
               </li>
               <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/admin/coasters.php"><i
-                    class="fa-solid fa-train-tram w-20px text-center me-2"></i> Coasters</a></li>
+                    class="fa-solid fa-train-tram w-20px text-center me-2 text-success"></i> Coasters</a></li>
               <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/admin/parks.php"><i
-                    class="fa-solid fa-tree-city w-20px text-center me-2"></i> Parques</a></li>
+                    class="fa-solid fa-tree-city w-20px text-center me-2 text-success"></i> Parques</a></li>
               <li>
                 <hr class="dropdown-divider">
               </li>
               <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/admin/messages.php"><i
-                    class="fa-solid fa-envelope w-20px text-center me-2"></i> Mensajes</a></li>
+                    class="fa-solid fa-envelope w-20px text-center me-2 text-warning"></i> Mensajes</a></li>
               <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/admin/photos.php"><i
-                    class="fa-solid fa-image w-20px text-center me-2"></i> Fotos</a></li>
+                    class="fa-solid fa-image w-20px text-center me-2 text-info"></i> Fotos</a></li>
               <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/admin/comments.php"><i
-                    class="fa-solid fa-comment w-20px text-center me-2"></i> Comentarios</a></li>
+                    class="fa-solid fa-comment w-20px text-center me-2 text-secondary"></i> Comentarios</a></li>
               <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/admin/orders.php"><i
-                    class="fa-solid fa-box w-20px text-center me-2"></i> Pedidos</a></li>
+                    class="fa-solid fa-box w-20px text-center me-2 text-info"></i> Pedidos</a></li>
             </ul>
           </li>
 
