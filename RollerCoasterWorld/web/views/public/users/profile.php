@@ -44,18 +44,18 @@ $user_uid = $_SESSION['firebase_uid'];
 
       <!-- Menú Lateral -->
       <div class="card profile-card">
-        <div class="list-group list-group-flush profile-menu" id="profile-menu">
-          <a href="#" class="list-group-item list-group-item-action py-3 active fw-medium"><i
+        <div class="list-group list-group-flush profile-menu" id="sidebar-menu">
+          <a href="#" id="menu-profile" class="list-group-item list-group-item-action py-3 active fw-medium"><i
               class="fa-solid fa-user me-2 w-20px text-center"></i> Mi Perfil</a>
-          <a href="#" class="list-group-item list-group-item-action py-3"><i
+          <a href="#" id="menu-config" class="list-group-item list-group-item-action py-3"><i
               class="fa-solid fa-gear me-2 w-20px text-center"></i> Configuración</a>
-          <a href="#" class="list-group-item list-group-item-action py-3"><i
+          <a href="#" id="menu-tops" class="list-group-item list-group-item-action py-3"><i
               class="fa-solid fa-list-ol me-2 w-20px text-center"></i> Mis tops</a>
-          <a href="#" class="list-group-item list-group-item-action py-3"><i
+          <a href="#" id="menu-reviews" class="list-group-item list-group-item-action py-3"><i
               class="fa-solid fa-pen-to-square me-2 w-20px text-center"></i> Mis reseñas</a>
-          <a href="#" class="list-group-item list-group-item-action py-3"><i
+          <a href="#" id="menu-friends" class="list-group-item list-group-item-action py-3"><i
               class="fa-solid fa-users me-2 w-20px text-center"></i> Mis amigos</a>
-          <a href="#" class="list-group-item list-group-item-action py-3"><i
+          <a href="#" id="menu-map" class="list-group-item list-group-item-action py-3"><i
               class="fa-solid fa-map-pin me-2 w-20px text-center"></i> Mi mapa</a>
           <a href="<?= $base_url ?>/web/views/auth/logout.php"
             class="list-group-item list-group-item-action text-danger mt-1 py-3 border-top"><i
@@ -65,7 +65,7 @@ $user_uid = $_SESSION['firebase_uid'];
     </div>
 
     <!-- Columna Derecha: Contenido Dinámico - Mi perfil -->
-    <div class="col-lg-9 col-md-8">
+    <div class="col-lg-9 col-md-8" id="section-profile-content">
 
       <!-- Sección: Información del Usuario -->
       <div class="card profile-card mb-4 content-section" id="section-info">
@@ -75,58 +75,69 @@ $user_uid = $_SESSION['firebase_uid'];
         </div>
         <div class="card-body p-4">
           <div class="row g-4 mb-5">
-            <div class="col-sm-6 col-lg-4">
-              <p class="text-muted mb-1 small text-uppercase fw-semibold" style="letter-spacing: 0.5px;">Nombre Completo
-              </p>
-              <p class="fw-medium fs-5 text-dark mb-0" id="full-name">—</p>
+            <div class="col-sm-6 col-md-4">
+              <div class="data-box square-box">
+                <p class="data-label"><i class="fa-regular fa-id-badge"></i>Nombre Completo</p>
+                <p class="data-value text-truncate" id="full-name">—</p>
+              </div>
             </div>
-            <div class="col-sm-6 col-lg-4">
-              <p class="text-muted mb-1 small text-uppercase fw-semibold" style="letter-spacing: 0.5px;">Nombre de
-                usuario</p>
-              <p class="fw-medium fs-5 text-dark mb-0" id="username">—</p>
+            <div class="col-sm-6 col-md-4">
+              <div class="data-box square-box">
+                <p class="data-label"><i class="fa-solid fa-at"></i>Nombre de usuario</p>
+                <p class="data-value text-truncate" id="username">—</p>
+              </div>
             </div>
-            <div class="col-sm-6 col-lg-4">
-              <p class="text-muted mb-1 small text-uppercase fw-semibold" style="letter-spacing: 0.5px;">Correo
-                electrónico</p>
-              <p class="fw-medium fs-5 text-dark mb-0 text-truncate" id="email"
-                title="<?php echo htmlspecialchars($user_email); ?>">—</p>
+            <div class="col-sm-6 col-md-4">
+              <div class="data-box square-box">
+                <p class="data-label"><i class="fa-regular fa-envelope"></i>Correo electrónico</p>
+                <p class="data-value text-truncate" id="email" title="<?php echo htmlspecialchars($user_email); ?>">—
+                </p>
+              </div>
             </div>
-            <div class="col-sm-6 col-lg-4">
-              <p class="text-muted mb-1 small text-uppercase fw-semibold" style="letter-spacing: 0.5px;">Fecha de
-                nacimiento</p>
-              <p class="fw-medium fs-5 text-dark mb-0" id="birth-date">—</p>
+            <div class="col-sm-6 col-md-4">
+              <div class="data-box square-box">
+                <p class="data-label"><i class="fa-regular fa-calendar"></i>Fecha de nacimiento</p>
+                <p class="data-value" id="birth-date">—</p>
+              </div>
             </div>
-            <div class="col-sm-6 col-lg-4">
-              <p class="text-muted mb-1 small text-uppercase fw-semibold" style="letter-spacing: 0.5px;">Género</p>
-              <p class="fw-medium fs-5 text-dark mb-0" id="gender">—</p>
+            <div class="col-sm-6 col-md-4">
+              <div class="data-box square-box">
+                <p class="data-label"><i class="fa-solid fa-venus-mars"></i>Género</p>
+                <p class="data-value" id="gender">—</p>
+              </div>
             </div>
-            <div class="col-sm-6 col-lg-4">
-              <p class="text-muted mb-1 small text-uppercase fw-semibold" style="letter-spacing: 0.5px;">Ubicación</p>
-              <p class="fw-medium fs-5 text-dark mb-0" id="location">—</p>
+            <div class="col-sm-6 col-md-4">
+              <div class="data-box square-box">
+                <p class="data-label"><i class="fa-solid fa-location-dot"></i>Ubicación</p>
+                <p class="data-value text-truncate" id="location">—</p>
+              </div>
             </div>
           </div>
 
-          <h5 class="fw-bold mb-3 border-bottom pb-2 text-success">Favoritos</h5>
+          <h5 class="fw-bold mb-3 border-bottom pb-2 text-success"><i class="fa-solid fa-heart me-2"></i>Favoritos</h5>
           <div class="row g-3">
             <div class="col-sm-4">
-              <div class="p-3 fav-box text-center">
-                <i class="fa-solid fa-star text-success mb-2 fs-3"></i>
-                <p class="text-muted mb-1 small fw-semibold">Top Coaster</p>
-                <p class="fw-bold mb-0 text-truncate fs-6 text-dark" id="favorite-coaster">—</p>
+              <div class="p-3 fav-box text-center square-box">
+                <div class="fav-icon"><i class="fa-solid fa-star"></i></div>
+                <p class="text-muted mb-1 small fw-bold text-uppercase"
+                  style="letter-spacing: 0.5px; font-size: 0.75rem;">Top Coaster</p>
+                <p class="fw-bold mb-0 text-truncate text-dark" style="font-size: 1.05rem;" id="favorite-coaster">—</p>
               </div>
             </div>
             <div class="col-sm-4">
-              <div class="p-3 fav-box text-center">
-                <i class="fa-solid fa-map-pin text-success mb-2 fs-3"></i>
-                <p class="text-muted mb-1 small fw-semibold">Top Park</p>
-                <p class="fw-bold mb-0 text-truncate fs-6 text-dark" id="favorite-park">—</p>
+              <div class="p-3 fav-box text-center square-box">
+                <div class="fav-icon"><i class="fa-solid fa-map-pin"></i></div>
+                <p class="text-muted mb-1 small fw-bold text-uppercase"
+                  style="letter-spacing: 0.5px; font-size: 0.75rem;">Top Park</p>
+                <p class="fw-bold mb-0 text-truncate text-dark" style="font-size: 1.05rem;" id="favorite-park">—</p>
               </div>
             </div>
             <div class="col-sm-4">
-              <div class="p-3 fav-box text-center">
-                <i class="fa-solid fa-house text-success mb-2 fs-3"></i>
-                <p class="text-muted mb-1 small fw-semibold">Home Park</p>
-                <p class="fw-bold mb-0 text-truncate fs-6 text-dark" id="home-park">—</p>
+              <div class="p-3 fav-box text-center square-box">
+                <div class="fav-icon"><i class="fa-solid fa-house"></i></div>
+                <p class="text-muted mb-1 small fw-bold text-uppercase"
+                  style="letter-spacing: 0.5px; font-size: 0.75rem;">Home Park</p>
+                <p class="fw-bold mb-0 text-truncate text-dark" style="font-size: 1.05rem;" id="home-park">—</p>
               </div>
             </div>
           </div>
@@ -221,7 +232,7 @@ $user_uid = $_SESSION['firebase_uid'];
     </div>
 
     <!-- Columna Derecha: Contenido Dinámico - Configuración -->
-    <div class="col-lg-9 col-md-8">
+    <div class="col-lg-9 col-md-8 d-none" id="section-config-content">
 
       <!-- Card: Datos Personales -->
       <div class="card profile-card mb-4 content-section" id="section-config-personal">
@@ -232,30 +243,32 @@ $user_uid = $_SESSION['firebase_uid'];
         <div class="card-body p-4">
           <div class="row g-4">
             <div class="col-md-6">
-              <label for="config-user-name" class="form-label fw-semibold text-dark small mb-1">Nombre completo</label>
-              <input type="text" id="config-user-name" class="form-control form-control-lg fs-6 square-box"
-                placeholder="Ingresa tu nombre y apellidos">
+              <label for="config-user-name" class="form-label"><i class="fa-regular fa-id-badge me-2"></i>Nombre
+                completo</label>
+              <input type="text" id="config-user-name" class="form-control square-box"
+                placeholder="Ej: Carlos Montero González">
             </div>
             <div class="col-md-6">
-              <label for="config-user-username" class="form-label fw-semibold text-dark small mb-1">Nombre de
+              <label for="config-user-username" class="form-label"><i class="fa-solid fa-at me-2"></i>Nombre de
                 usuario</label>
-              <input type="text" id="config-user-username" class="form-control form-control-lg fs-6 square-box"
-                placeholder="Ingresa tu nombre de usuario en la web">
+              <input type="text" id="config-user-username" class="form-control square-box"
+                placeholder="Ej: carloscoasters">
             </div>
             <div class="col-md-6">
-              <label for="config-user-email" class="form-label fw-semibold text-dark small mb-1">Correo
+              <label for="config-user-email" class="form-label"><i class="fa-regular fa-envelope me-2"></i>Correo
                 Electrónico</label>
-              <input type="email" id="config-user-email" class="form-control form-control-lg fs-6 square-box bg-light"
-                disabled>
+              <input type="email" id="config-user-email" class="form-control square-box"
+                placeholder="correo@ejemplo.com" disabled>
             </div>
             <div class="col-md-6">
-              <label for="config-user-birthdate" class="form-label fw-semibold text-dark small mb-1">Fecha de
+              <label for="config-user-birthdate" class="form-label"><i class="fa-regular fa-calendar me-2"></i>Fecha de
                 nacimiento</label>
-              <input type="date" id="config-user-birthdate" class="form-control form-control-lg fs-6 square-box">
+              <input type="date" id="config-user-birthdate" class="form-control square-box">
             </div>
             <div class="col-md-4">
-              <label for="config-user-gender" class="form-label fw-semibold text-dark small mb-1">Género</label>
-              <select id="config-user-gender" class="form-select form-select-lg fs-6 square-box">
+              <label for="config-user-gender" class="form-label"><i
+                  class="fa-solid fa-venus-mars me-2"></i>Género</label>
+              <select id="config-user-gender" class="form-select square-box">
                 <option value="">Seleccionar género</option>
                 <option value="Masculino">Masculino</option>
                 <option value="Femenino">Femenino</option>
@@ -263,20 +276,20 @@ $user_uid = $_SESSION['firebase_uid'];
               </select>
             </div>
             <div class="col-md-4">
-              <label for="config-user-city" class="form-label fw-semibold text-dark small mb-1">Ciudad</label>
+              <label for="config-user-city" class="form-label"><i class="fa-solid fa-building me-2"></i>Ciudad</label>
               <div class="position-relative">
-                <input type="text" id="config-user-city" class="form-control form-control-lg fs-6 square-box"
-                  placeholder="Ej: Madrid, Barcelona, París">
+                <input type="text" id="config-user-city" class="form-control square-box" placeholder="Ej: Madrid">
                 <span id="city-loading"
-                  class="position-absolute top-50 end-0 translate-middle-y me-3 text-muted small d-none">
+                  class="position-absolute top-50 end-0 translate-middle-y me-3 text-muted small d-none"
+                  style="z-index: 5;">
                   <i class="fa-solid fa-spinner fa-spin"></i>
                 </span>
               </div>
             </div>
             <div class="col-md-4">
-              <label for="config-user-country" class="form-label fw-semibold text-dark small mb-1">País</label>
-              <input type="text" id="config-user-country" class="form-control form-control-lg fs-6 square-box"
-                placeholder="Se rellena automáticamente al escribir tu ciudad">
+              <label for="config-user-country" class="form-label"><i
+                  class="fa-solid fa-earth-americas me-2"></i>País</label>
+              <input type="text" id="config-user-country" class="form-control square-box" placeholder="País" disabled>
             </div>
           </div>
         </div>
@@ -291,37 +304,45 @@ $user_uid = $_SESSION['firebase_uid'];
         <div class="card-body p-4">
           <div class="row g-4">
             <div class="col-md-6">
-              <label for="top-coaster-user" class="form-label fw-semibold text-dark small mb-1">Coaster
+              <label for="top-coaster-user" class="form-label"><i class="fa-solid fa-star text-warning me-2"></i>Coaster
                 Favorita</label>
               <div class="position-relative">
-                <input type="text" id="top-coaster-user" class="form-control form-control-lg fs-6 square-box bg-light"
-                  placeholder="Se configura desde tus tops" disabled>
+                <input type="text" id="top-coaster-user" class="form-control square-box" placeholder="Desconocida"
+                  disabled>
                 <span id="top-coaster-loading"
-                  class="position-absolute top-50 end-0 translate-middle-y me-3 text-muted small d-none">
+                  class="position-absolute top-50 end-0 translate-middle-y me-3 text-muted small d-none"
+                  style="z-index: 5;">
                   <i class="fa-solid fa-spinner fa-spin"></i>
                 </span>
               </div>
+              <div class="form-text mt-2 ms-1 fw-medium text-muted"><i class="fa-solid fa-circle-info me-1"></i> Se
+                configura automáticamente desde tus tops</div>
             </div>
             <div class="col-md-6">
-              <label for="home-park-user" class="form-label fw-semibold text-dark small mb-1">Home Park</label>
+              <label for="home-park-user" class="form-label"><i class="fa-solid fa-house text-success me-2"></i>Home
+                Park</label>
               <div class="position-relative">
-                <input type="text" id="home-park-user" class="form-control form-control-lg fs-6 square-box"
-                  placeholder="Busca tu home park..." autocomplete="off">
+                <input type="text" id="home-park-user" class="form-control square-box"
+                  placeholder="Busca tu home park habitual" autocomplete="off">
                 <span id="home-park-loading"
-                  class="position-absolute top-50 end-0 translate-middle-y me-3 text-muted small d-none">
+                  class="position-absolute top-50 end-0 translate-middle-y me-4 text-muted small d-none"
+                  style="z-index: 5;">
                   <i class="fa-solid fa-spinner fa-spin"></i>
                 </span>
-                <ul id="home-park-dropdown" class="list-group position-absolute w-100 shadow-sm z-3 d-none"
-                  style="max-height: 200px; overflow-y: auto; top: 100%; left: 0;">
+                <ul id="home-park-dropdown" class="list-group position-absolute w-100 shadow-sm d-none"
+                  style="max-height: 200px; overflow-y: auto; top: 100%; left: 0; z-index: 1050; border: 1px solid #10b981; border-top: none;">
                 </ul>
               </div>
+              <div class="form-text mt-2 ms-1 fw-medium text-muted"><i class="fa-solid fa-magnifying-glass me-1"></i>
+                Busca tu parque más cercano</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="guardar-config-btn">
-        <button type="button" id="guardar-config-btn" class="btn btn-success btn-lg square-box px-5 fw-semibold">
+      <div class="guardar-config-btn d-flex justify-content-end align-items-center mt-4 mb-5">
+        <h3 id="msg-guardar-config" class="text-success mb-0 me-4 d-none fw-bold" style="font-size: 1.1rem;"></h3>
+        <button type="button" id="guardar-config-btn" class="btn btn-success btn-lg square-box px-5 fw-bold shadow-sm">
           <i class="fa-solid fa-floppy-disk me-2"></i>Guardar configuración
         </button>
       </div>
@@ -346,23 +367,27 @@ $user_uid = $_SESSION['firebase_uid'];
           </button>
 
           <div id="form-password" class="bg-light p-4 square-box mb-3"
-            style="display: none; border: 1px solid #e9ecef;">
-            <div class="row g-3">
+            style="display: none; border: 2px solid #e2e8f0; background-color: #f8fafc !important;">
+            <div class="row g-4 mt-1">
               <div class="col-md-6">
-                <label class="form-label fw-semibold text-dark small">Nueva contraseña</label>
-                <input type="password" id="nueva-password" class="form-control form-control-lg fs-6 square-box"
+                <label for="nueva-password" class="form-label"><i class="fa-solid fa-lock me-2"></i>Nueva
+                  contraseña</label>
+                <input type="password" id="nueva-password" class="form-control square-box"
                   placeholder="Mínimo 6 caracteres">
+                <div class="form-text ms-1 mt-2 text-muted"><i class="fa-solid fa-circle-exclamation me-1"></i> Mínimo 6
+                  caracteres</div>
               </div>
               <div class="col-md-6">
-                <label class="form-label fw-semibold text-dark small">Confirmar contraseña</label>
-                <input type="password" id="confirmar-password" class="form-control form-control-lg fs-6 square-box"
-                  placeholder="Repita la contraseña">
+                <label for="confirmar-password" class="form-label"><i class="fa-solid fa-lock-open me-2"></i>Confirmar
+                  contraseña</label>
+                <input type="password" id="confirmar-password" class="form-control square-box"
+                  placeholder="Repite la contraseña">
               </div>
               <div class="col-12 mt-4 d-flex align-items-center">
-                <button id="cambiarPassword" class="btn btn-success me-2 px-4 fw-medium shadow-sm square-box"><i
+                <button id="cambiarPassword" class="btn btn-success me-2 px-4 fw-bold shadow-sm square-box"><i
                     class="fa-solid fa-check me-2"></i>Guardar cambios</button>
-                <button id="btn-cancelar-password"
-                  class="btn btn-light border px-4 fw-medium square-box">Cancelar</button>
+                <button id="btn-cancelar-password" class="btn btn-light border px-4 fw-bold square-box"
+                  style="background: white; color: #4b5563;">Cancelar</button>
               </div>
               <div class="col-12 mt-2">
                 <p id="msg-password" class="mb-0 fw-medium small"></p>
