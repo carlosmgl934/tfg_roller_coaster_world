@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../partials/header.php';
+/** @var string $base_url */
 ?>
 
 <link rel="stylesheet" href="<?= $base_url ?>/web/css/ranking.css">

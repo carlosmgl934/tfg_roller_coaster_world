@@ -21,6 +21,7 @@ if ($id === 0) {
 }
 
 require_once __DIR__ . '/../../partials/header.php';
+/** @var string $base_url */
 ?>
 <!-- Librerias para poder usar select múltiples-->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">

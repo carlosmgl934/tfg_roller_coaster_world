@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../partials/header.php';
+/** @var string $base_url */
 ?>
 
 <main class="container-fluid px-lg-5 my-5">

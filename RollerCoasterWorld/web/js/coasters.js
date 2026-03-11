@@ -740,14 +740,22 @@ $(document).ready(function () {
           async function (blob) {
             if (!blob) throw new Error("Error al recortar la imagen");
 
-            // Nombre de archivo único
             const ext = photoInput.files[0].name.split(".").pop();
             const filename = `${Date.now()}_img.${ext}`;
 
-            // 2. Subir a Firebase Storage
-            const ref = window.storage.ref(`coasters/${coasterId}/${filename}`);
-            const snapshot = await ref.put(blob);
-            const url = await snapshot.ref.getDownloadURL();
+            // 2. Subir a Supabase Storage via PHP proxy
+            const uploadForm = new FormData();
+            uploadForm.append('file', blob, filename);
+            uploadForm.append('bucket', 'coasters');
+            uploadForm.append('path', coasterId);
+
+            const uploadRes = await fetch(`${window.BASE_URL}/api/php/upload.php`, {
+              method: 'POST',
+              body: uploadForm,
+            });
+            const uploadData = await uploadRes.json();
+            if (!uploadData.success) throw new Error(uploadData.error || 'Error al subir la foto');
+            const url = uploadData.url;
 
             // 3. Guardar en PostgreSQL vía API PHP
             const captionVal = document.getElementById("photo-caption").value;

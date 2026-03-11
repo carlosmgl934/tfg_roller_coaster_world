@@ -5,7 +5,7 @@ require_once __DIR__ . '/../database/db_conexion.php';
 header('Content-Type: application/json');
 
 $db = new DBConexion();
-$postActions = ['save_profile'];
+$postActions = ['save_profile', 'update_avatar'];
 
 $action = in_array($_GET['action'] ?? '', $postActions)
     ? ($_GET['action'] ?? '')
@@ -14,6 +14,7 @@ $action = in_array($_GET['action'] ?? '', $postActions)
 $actions = [
     'search' => 'searchParks',
     'save_profile' => 'saveProfile',
+    'update_avatar' => 'updateAvatar',
     'get_profile' => 'getProfile',
 ];
 
@@ -113,7 +114,7 @@ function saveProfile()
 function getProfile()
 {
     if (!isset($_SESSION['user_id'])) {
-        echo json_encode(['success' => false, 'error' => 'No está logueado']);
+        echo json_encode(['success' => false, 'error' => 'No estás logueado']);
         exit;
     }
     global $db;
@@ -127,12 +128,14 @@ function getProfile()
             city,
             country,
             favorite_coaster,
-            home_park
+            home_park,
+            profile_image
         FROM users
         WHERE id = :id
     ");
     try {
-        $stmt->execute([':id' => $_SESSION['user_id']]);
+        $stmt->bindParam(':id', $_SESSION['user_id'], PDO::PARAM_INT);
+        $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($user) {
             echo json_encode(['success' => true, 'user' => $user]);
@@ -141,6 +144,35 @@ function getProfile()
         }
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'error' => 'Error al obtener los datos: ' . $e->getMessage()]);
+    }
+    exit;
+}
+
+function updateAvatar()
+{
+    if (!isset($_SESSION['user_id'])) {
+        echo json_encode(['success' => false, 'error' => 'No estás logueado']);
+        exit;
+    }
+
+    $input = json_decode(file_get_contents('php://input'), true);
+    $photoUrl = $input['photo_url'] ?? '';
+
+    if (empty($photoUrl)) {
+        echo json_encode(['success' => false, 'error' => 'URL no válida']);
+        exit;
+    }
+
+    global $db;
+    try {
+        $stmt = $db->prepare("
+        UPDATE users SET profile_image = :photoUrl WHERE id = :id");
+        $stmt->bindParam(':id', $_SESSION['user_id'], PDO::PARAM_INT);
+        $stmt->bindParam(':photoUrl', $photoUrl, PDO::PARAM_STR);
+        $stmt->execute();
+        echo json_encode(['success' => true]);
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'error' => 'Error al actualizar el avatar: ' . $e->getMessage()]);
     }
     exit;
 }

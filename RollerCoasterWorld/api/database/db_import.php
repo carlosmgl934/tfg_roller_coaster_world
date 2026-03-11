@@ -101,13 +101,13 @@ $coaster_upsert = $db->prepare("
 ");
 
 // ── Helper: obtener o crear park_id ───────────────────────────────────────
-function getOrCreatePark($park_find, $park_insert, &$parks_created, $name, $location, $country): int|false
+function getOrCreatePark($park_find, $park_insert, &$parks_created, $name, $location, $country): ?int
 {
     // 1. Intentar insertar (ON CONFLICT DO NOTHING)
     $park_insert->execute([
-        ':park_name' => $name,
+        ':park_name'     => $name,
         ':park_location' => $location,
-        ':park_country' => $country,
+        ':park_country'  => $country,
     ]);
     $id = $park_insert->fetchColumn();
 
@@ -119,7 +119,7 @@ function getOrCreatePark($park_find, $park_insert, &$parks_created, $name, $loca
     // 2. Fallback: ya existía → buscarlo por nombre
     $park_find->execute([':park_name' => $name]);
     $row = $park_find->fetch(PDO::FETCH_ASSOC);
-    return $row ? (int) $row['id'] : false;
+    return $row ? (int) $row['id'] : null;
 }
 
 // ── Conversión de unidades ─────────────────────────────────────────────────
@@ -164,7 +164,7 @@ foreach ($coasters as $index => $item) {
 
     $park_id = getOrCreatePark($park_find, $park_insert, $parks_created, $park_name, $park_location, $park_country);
 
-    if ($park_id === false) {
+    if ($park_id === null) {
         // Rarísimo, pero si ocurre no podemos insertar el coaster
         $skipped++;
         continue;

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../partials/header.php';
+/** @var string $base_url */
 
 if (!isset($_SESSION['firebase_uid'])) {
   header('Location: ' . $base_url . '/web/views/auth/login.php');
@@ -236,9 +237,17 @@ $user_uid = $_SESSION['firebase_uid'];
 
       <!-- Card: Datos Personales -->
       <div class="card profile-card mb-4 content-section" id="section-config-personal">
-        <div class="card-header pt-3 pb-3 d-flex align-items-center gap-2">
-          <i class="fa-solid fa-user-pen fs-5"></i>
-          <h5 class="fw-bold mb-0">Datos Personales</h5>
+        <div class="card-header pt-3 pb-3 d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-user-pen fs-5"></i>
+            <h5 class="fw-bold mb-0">Datos Personales</h5>
+          </div>
+          <div class="profile-photo">
+            <button id="change-avatar-btn" class="btn btn-sm btn-outline-success square-box px-3 fw-bold shadow-sm">
+              <i class="fa-solid fa-camera me-2"></i>Editar foto de perfil
+            </button>
+            <input type="file" id="avatar-input" accept="image/*" class="d-none">
+          </div>
         </div>
         <div class="card-body p-4">
           <div class="row g-4">

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../partials/header.php';
+/** @var string $base_url */
 
 // Perfil público de otro usuario — no requiere login
 $user_id = $_GET['id'] ?? null;

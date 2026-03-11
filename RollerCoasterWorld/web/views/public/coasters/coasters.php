@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../partials/header.php';
+/** @var string $base_url */
 
 $id = intval($_GET['id'] ?? 0);
 if ($id === 0) {

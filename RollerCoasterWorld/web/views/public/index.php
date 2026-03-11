@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../partials/header.php';
+/** @var string $base_url */
 
 // Protección: si no hay firebase_uid en sesión, redirige a login
 if (!isset($_SESSION['firebase_uid'])) {

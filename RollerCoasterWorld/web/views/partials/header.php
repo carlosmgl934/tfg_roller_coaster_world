@@ -8,7 +8,8 @@ if (session_status() === PHP_SESSION_NONE) {
 $is_logged = isset($_SESSION['firebase_uid']);
 
 // Base URL calculada automáticamente (funciona en cualquier servidor)
-$base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_SERVER['SCRIPT_NAME']);
+/** @var string $base_url */
+$base_url = (string) preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_SERVER['SCRIPT_NAME']);
 ?>
 
 <!doctype html>

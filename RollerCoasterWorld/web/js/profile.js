@@ -8,31 +8,31 @@ $(document).ready(function () {
   const loadingEl = document.getElementById("city-loading");
 
   if (cityInput && countryInput) {
-    cityInput.addEventListener("blur", async function () {
-      const city = this.value.trim();
+    async function fetchCountry() {
+      const city = cityInput.value.trim();
       if (!city) return;
 
       if (loadingEl) loadingEl.classList.remove("d-none");
 
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city)}&format=json&limit=1&addressdetails=1`,
+          `https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(city)}&format=json&limit=1&addressdetails=1`,
           { headers: { "Accept-Language": "es" } },
         );
         const data = await res.json();
 
         if (data.length > 0 && data[0].address?.country) {
-          // Solo rellenar si el usuario no ha escrito ya un país manualmente
-          if (!countryInput.value.trim()) {
-            countryInput.value = data[0].address.country;
-          }
+          countryInput.value = data[0].address.country;
         }
       } catch (e) {
         console.warn("No se pudo obtener el país automáticamente:", e);
       } finally {
         if (loadingEl) loadingEl.classList.add("d-none");
       }
-    });
+    }
+
+    cityInput.addEventListener("blur", fetchCountry);
+    cityInput.addEventListener("change", fetchCountry);
   }
 
   // ── Cargar datos del usuario ───────────────────────────────────────────────
@@ -213,6 +213,14 @@ $(document).ready(function () {
         document.getElementById("home-park-user").value =
           data.user.home_park || "";
 
+        // Actualizar avatar si hay imagen guardada
+        if (data.user.profile_image) {
+          const avatarDiv = document.querySelector(".avatar-circle");
+          if (avatarDiv) {
+            avatarDiv.innerHTML = `<img src="${data.user.profile_image}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+          }
+        }
+
         // Actualizar tarjeta de perfil visual
         document.getElementById("full-name").textContent =
           data.user.full_name.charAt(0).toUpperCase() +
@@ -235,8 +243,17 @@ $(document).ready(function () {
         document.getElementById("gender").textContent = data.user.gender || "—";
         document.getElementById("location").textContent =
           data.user.city && data.user.country
-            ? `${data.user.city}, ${data.user.country}`
-            : data.user.city || data.user.country || "—";
+            ? `${
+                data.user.city.charAt(0).toUpperCase() + data.user.city.slice(1)
+              }, ${
+                data.user.country.charAt(0).toUpperCase() +
+                data.user.country.slice(1)
+              }`
+            : data.user.city.charAt(0).toUpperCase() +
+                data.user.city.slice(1) ||
+              data.user.country.charAt(0).toUpperCase() +
+                data.user.country.slice(1) ||
+              "—";
 
         document.getElementById("favorite-coaster").textContent =
           data.user.favorite_coaster || "—";
@@ -248,12 +265,120 @@ $(document).ready(function () {
     }
   }
 
+  document
+    .getElementById("change-avatar-btn")
+    .addEventListener("click", function () {
+      $("#avatar-input").click();
+    });
+
+  document
+    .getElementById("avatar-input")
+    .addEventListener("change", async function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Comprimir imagen antes de subir (max 400×400, calidad 85%)
+      const compressedBlob = await comprimirImagen(file, 400, 400, 0.85);
+
+      // Preview inmediata con la imagen comprimida
+      const previewUrl = URL.createObjectURL(compressedBlob);
+      const avatarDiv = document.querySelector(".avatar-circle");
+      if (avatarDiv) {
+        avatarDiv.innerHTML = `<img src="${previewUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+      }
+
+      try {
+        const photoUrl = await subirFoto(compressedBlob, file.name);
+        const res = await fetch(
+          BASE_URL + "/api/php/profile_config.php?action=update_avatar",
+          {
+            method: "POST",
+            body: JSON.stringify({ photo_url: photoUrl }),
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+        const data = await res.json();
+        if (data.success) {
+          console.log("Foto de perfil actualizada correctamente");
+        } else {
+          console.error("Error al actualizar la foto de perfil:", data.error);
+          showAvatarError("No se pudo guardar la foto. Inténtalo de nuevo.");
+        }
+      } catch (err) {
+        console.error("Error subiendo avatar:", err);
+        showAvatarError(err.message);
+      }
+    });
+
+  // Modal de error para problemas con el avatar
+  function showAvatarError(msg) {
+    const existing = document.getElementById("avatar-error-modal");
+    if (existing) existing.remove();
+    const html = `
+    <div class="modal fade" id="avatar-error-modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+          <div class="modal-body text-center p-4">
+            <i class="fa-solid fa-triangle-exclamation text-warning fs-1 mb-3 d-block"></i>
+            <h5 class="fw-bold mb-2">Error al subir la foto</h5>
+            <p class="text-muted mb-3">${msg}</p>
+            <button class="btn btn-success px-4" data-bs-dismiss="modal">Entendido</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+    document.body.insertAdjacentHTML("beforeend", html);
+    new bootstrap.Modal(document.getElementById("avatar-error-modal")).show();
+  }
+
+  // Comprime una imagen a un tamaño máximo antes de subirla
+  function comprimirImagen(file, maxW, maxH, quality) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = function () {
+        let w = img.width,
+          h = img.height;
+        if (w > maxW || h > maxH) {
+          const ratio = Math.min(maxW / w, maxH / h);
+          w = Math.round(w * ratio);
+          h = Math.round(h * ratio);
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(url);
+        canvas.toBlob(resolve, "image/jpeg", quality);
+      };
+      img.src = url;
+    });
+  }
+
+  async function subirFoto(blob, originalName) {
+    const formData = new FormData();
+    const filename =
+      (originalName || "avatar").replace(/\.[^.]+$/, "") + ".jpg";
+    formData.append("file", blob, filename);
+    formData.append("bucket", "avatars");
+
+    const res = await fetch(`${BASE_URL}/api/php/upload.php`, {
+      method: "POST",
+      body: formData,
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || "Error al subir la foto");
+    return data.url;
+  }
+
   cargarParques();
   cargarDatos();
 
   function showSection(sectionId) {
     // Ocultar todas las secciones principales
-    $("#section-profile-content, #section-config-content").addClass("d-none");
+    $(
+      "#section-profile-content, #section-config-content, #section-tops-content, #section-reviews-content, #section-friends-content, #section-map-content",
+    ).addClass("d-none");
 
     // Quitar el active de todos los enlaces del menú
     $("#sidebar-menu .list-group-item").removeClass("active");
@@ -266,12 +391,16 @@ $(document).ready(function () {
       $("#section-config-content").removeClass("d-none");
       $("#menu-config").addClass("active");
     } else if (sectionId === "#profile-tops") {
+      $("#section-tops-content").removeClass("d-none");
       $("#menu-tops").addClass("active");
     } else if (sectionId === "#profile-reviews") {
+      $("#section-reviews-content").removeClass("d-none");
       $("#menu-reviews").addClass("active");
     } else if (sectionId === "#profile-friends") {
+      $("#section-friends-content").removeClass("d-none");
       $("#menu-friends").addClass("active");
     } else if (sectionId === "#profile-map") {
+      $("#section-map-content").removeClass("d-none");
       $("#menu-map").addClass("active");
     }
   }
