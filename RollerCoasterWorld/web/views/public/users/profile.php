@@ -64,7 +64,7 @@ $user_uid = $_SESSION['firebase_uid'];
       </div>
     </div>
 
-    <!-- Columna Derecha: Contenido Dinámico -->
+    <!-- Columna Derecha: Contenido Dinámico - Mi perfil -->
     <div class="col-lg-9 col-md-8">
 
       <!-- Sección: Información del Usuario -->
@@ -144,22 +144,26 @@ $user_uid = $_SESSION['firebase_uid'];
             <div class="card-body">
               <ul class="list-group list-group-flush">
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3">
-                  <span class="text-muted fw-medium"><i class="fa-solid fa-bolt me-2 text-success"></i>Montañas rusas</span>
+                  <span class="text-muted fw-medium"><i class="fa-solid fa-bolt me-2 text-success"></i>Montañas
+                    rusas</span>
                   <span class="badge badge-profile fs-6" id="coasters-count">0</span>
                 </li>
                 <li
                   class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3 border-top">
-                  <span class="text-muted fw-medium"><i class="fa-solid fa-map-location-dot me-2 text-success"></i>Parques visitados</span>
+                  <span class="text-muted fw-medium"><i
+                      class="fa-solid fa-map-location-dot me-2 text-success"></i>Parques visitados</span>
                   <span class="badge badge-profile fs-6" id="parks-count">0</span>
                 </li>
                 <li
                   class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3 border-top">
-                  <span class="text-muted fw-medium"><i class="fa-solid fa-earth-americas me-2 text-success"></i>Países</span>
+                  <span class="text-muted fw-medium"><i
+                      class="fa-solid fa-earth-americas me-2 text-success"></i>Países</span>
                   <span class="badge badge-profile fs-6" id="countries-count">0</span>
                 </li>
                 <li
                   class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3 border-top">
-                  <span class="text-muted fw-medium"><i class="fa-solid fa-star me-2 text-warning"></i>Valoraciones totales</span>
+                  <span class="text-muted fw-medium"><i class="fa-solid fa-star me-2 text-warning"></i>Valoraciones
+                    totales</span>
                   <span class="badge badge-profile fs-6" id="reviews-count">0</span>
                 </li>
                 <li
@@ -205,16 +209,121 @@ $user_uid = $_SESSION['firebase_uid'];
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
                   <span class="text-muted">Más rápida</span>
-                  <span class="fw-bold text-end text-truncate ms-3 text-dark" id="fastest-coaster" style="max-width: 150px;">—</span>
+                  <span class="fw-bold text-end text-truncate ms-3 text-dark" id="fastest-coaster"
+                    style="max-width: 150px;">—</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
                   <span class="text-muted">Más larga</span>
-                  <span class="fw-bold text-end text-truncate ms-3 text-dark" id="longest-coaster" style="max-width: 150px;">—</span>
-                </li>
-              </ul>
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Columna Derecha: Contenido Dinámico - Configuración -->
+    <div class="col-lg-9 col-md-8">
+
+      <!-- Card: Datos Personales -->
+      <div class="card profile-card mb-4 content-section" id="section-config-personal">
+        <div class="card-header pt-3 pb-3 d-flex align-items-center gap-2">
+          <i class="fa-solid fa-user-pen fs-5"></i>
+          <h5 class="fw-bold mb-0">Datos Personales</h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-4">
+            <div class="col-md-6">
+              <label for="config-user-name" class="form-label fw-semibold text-dark small mb-1">Nombre completo</label>
+              <input type="text" id="config-user-name" class="form-control form-control-lg fs-6 square-box"
+                placeholder="Ingresa tu nombre y apellidos">
+            </div>
+            <div class="col-md-6">
+              <label for="config-user-username" class="form-label fw-semibold text-dark small mb-1">Nombre de
+                usuario</label>
+              <input type="text" id="config-user-username" class="form-control form-control-lg fs-6 square-box"
+                placeholder="Ingresa tu nombre de usuario en la web">
+            </div>
+            <div class="col-md-6">
+              <label for="config-user-email" class="form-label fw-semibold text-dark small mb-1">Correo
+                Electrónico</label>
+              <input type="email" id="config-user-email" class="form-control form-control-lg fs-6 square-box bg-light"
+                disabled>
+            </div>
+            <div class="col-md-6">
+              <label for="config-user-birthdate" class="form-label fw-semibold text-dark small mb-1">Fecha de
+                nacimiento</label>
+              <input type="date" id="config-user-birthdate" class="form-control form-control-lg fs-6 square-box">
+            </div>
+            <div class="col-md-4">
+              <label for="config-user-gender" class="form-label fw-semibold text-dark small mb-1">Género</label>
+              <select id="config-user-gender" class="form-select form-select-lg fs-6 square-box">
+                <option value="">Seleccionar género</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="config-user-city" class="form-label fw-semibold text-dark small mb-1">Ciudad</label>
+              <div class="position-relative">
+                <input type="text" id="config-user-city" class="form-control form-control-lg fs-6 square-box"
+                  placeholder="Ej: Madrid, Barcelona, París">
+                <span id="city-loading"
+                  class="position-absolute top-50 end-0 translate-middle-y me-3 text-muted small d-none">
+                  <i class="fa-solid fa-spinner fa-spin"></i>
+                </span>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label for="config-user-country" class="form-label fw-semibold text-dark small mb-1">País</label>
+              <input type="text" id="config-user-country" class="form-control form-control-lg fs-6 square-box"
+                placeholder="Se rellena automáticamente al escribir tu ciudad">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Preferencias -->
+      <div class="card profile-card mb-4 content-section" id="section-config-prefs">
+        <div class="card-header pt-3 pb-3 d-flex align-items-center gap-2">
+          <i class="fa-solid fa-heart fs-5 text-danger"></i>
+          <h5 class="fw-bold mb-0">Atracciones favoritas</h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-4">
+            <div class="col-md-6">
+              <label for="top-coaster-user" class="form-label fw-semibold text-dark small mb-1">Coaster
+                Favorita</label>
+              <div class="position-relative">
+                <input type="text" id="top-coaster-user" class="form-control form-control-lg fs-6 square-box bg-light"
+                  placeholder="Se configura desde tus tops" disabled>
+                <span id="top-coaster-loading"
+                  class="position-absolute top-50 end-0 translate-middle-y me-3 text-muted small d-none">
+                  <i class="fa-solid fa-spinner fa-spin"></i>
+                </span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="home-park-user" class="form-label fw-semibold text-dark small mb-1">Home Park</label>
+              <div class="position-relative">
+                <input type="text" id="home-park-user" class="form-control form-control-lg fs-6 square-box"
+                  placeholder="Busca tu home park..." autocomplete="off">
+                <span id="home-park-loading"
+                  class="position-absolute top-50 end-0 translate-middle-y me-3 text-muted small d-none">
+                  <i class="fa-solid fa-spinner fa-spin"></i>
+                </span>
+                <ul id="home-park-dropdown" class="list-group position-absolute w-100 shadow-sm z-3 d-none"
+                  style="max-height: 200px; overflow-y: auto; top: 100%; left: 0;">
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="guardar-config-btn">
+        <button type="button" id="guardar-config-btn" class="btn btn-success btn-lg square-box px-5 fw-semibold">
+          <i class="fa-solid fa-floppy-disk me-2"></i>Guardar configuración
+        </button>
       </div>
 
       <!-- Sección: Seguridad (Contraseña) -->
@@ -236,7 +345,8 @@ $user_uid = $_SESSION['firebase_uid'];
             <i class="fa-solid fa-key me-2"></i>Cambiar contraseña
           </button>
 
-          <div id="form-password" class="bg-light p-4 square-box mb-3" style="display: none; border: 1px solid #e9ecef;">
+          <div id="form-password" class="bg-light p-4 square-box mb-3"
+            style="display: none; border: 1px solid #e9ecef;">
             <div class="row g-3">
               <div class="col-md-6">
                 <label class="form-label fw-semibold text-dark small">Nueva contraseña</label>
@@ -251,7 +361,8 @@ $user_uid = $_SESSION['firebase_uid'];
               <div class="col-12 mt-4 d-flex align-items-center">
                 <button id="cambiarPassword" class="btn btn-success me-2 px-4 fw-medium shadow-sm square-box"><i
                     class="fa-solid fa-check me-2"></i>Guardar cambios</button>
-                <button id="btn-cancelar-password" class="btn btn-light border px-4 fw-medium square-box">Cancelar</button>
+                <button id="btn-cancelar-password"
+                  class="btn btn-light border px-4 fw-medium square-box">Cancelar</button>
               </div>
               <div class="col-12 mt-2">
                 <p id="msg-password" class="mb-0 fw-medium small"></p>
@@ -283,6 +394,8 @@ $user_uid = $_SESSION['firebase_uid'];
 
 <script src="<?= $base_url ?>/web/js/auth-check.js"></script>
 <script src="<?= $base_url ?>/web/js/profile.js"></script>
+
+
 
 <?php
 require_once __DIR__ . '/../../partials/footer.php';

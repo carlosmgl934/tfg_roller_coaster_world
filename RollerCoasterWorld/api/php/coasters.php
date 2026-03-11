@@ -5,49 +5,36 @@ require_once __DIR__ . '/../database/db_conexion.php';
 header('Content-Type: application/json');
 
 $db = new DBConexion();
-$action = $_GET['action'] ?? 'list';
+// Acciones que requieren POST
+$postActions = ['save_review', 'save_photo'];
 
-switch ($action) {
-    case 'search':
-        searchCoasters();
-        break;
-    case 'list':
-        listCoasters();
-        break;
-    case 'filter':
-        filterCoasters();
-        break;
-    case 'manufacter':
-        getManufacturers();
-        break;
-    case 'country':
-        getCountries();
-        break;
-    case 'ridden':
-        getRidden();
-        break;
-    case 'apply_filters':
-        applyFilters();
-        break;
-    case 'coaster':
-        getCoasters();
-        break;
-    case 'photos':
-        getCoasterPhotos();
-        break;
-    case 'reviews':
-        getCoasterReviews();
-        break;
-    case 'save_review':
-        saveReview();
-        break;
-    case 'save_photo':
-        savePhoto();
-        break;
-    default:
-        echo json_encode(['success' => false, 'error' => 'Acción no válida']);
-        exit;
+// Leer la acción: POST para escritura, GET para lectura
+$action = in_array($_GET['action'] ?? '', $postActions)
+    ? ($_GET['action'] ?? '')
+    : ($_GET['action'] ?? 'list');
+
+// Mapa de acciones → funciones
+$actions = [
+    'search'        => 'searchCoasters',
+    'list'          => 'listCoasters',
+    'filter'        => 'filterCoasters',
+    'manufacter'    => 'getManufacturers',
+    'country'       => 'getCountries',
+    'ridden'        => 'getRidden',
+    'apply_filters' => 'applyFilters',
+    'coaster'       => 'getCoasters',
+    'photos'        => 'getCoasterPhotos',
+    'reviews'       => 'getCoasterReviews',
+    'save_review'   => 'saveReview',
+    'save_photo'    => 'savePhoto',
+];
+
+if (!array_key_exists($action, $actions)) {
+    echo json_encode(['success' => false, 'error' => 'Acción no válida']);
+    exit;
 }
+
+call_user_func($actions[$action]);
 
 function getManufacturers()
 {
