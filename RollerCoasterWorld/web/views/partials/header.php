@@ -103,7 +103,7 @@ $base_url = (string) preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWo
               <i class="fa-solid fa-comments me-1"></i> Foros
             </a>
             <ul class="dropdown-menu shadow border-0">
-              <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/forums/forums.php"><i
+              <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/forums/forum_search.php"><i
                     class="fa-solid fa-users w-20px text-center me-2 text-primary"></i> Todos los foros</a></li>
             </ul>
           </li>

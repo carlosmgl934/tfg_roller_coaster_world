@@ -1,0 +1,166 @@
+/* ============================================================
+   contact.css — Formulario de contacto
+   ============================================================ */
+
+/* ── HERO ───────────────────────────────────────────────── */
+.contact-hero {
+  background: linear-gradient(135deg, #0f2d1a 0%, #198754 100%);
+  padding: 56px 0 44px;
+  border-bottom: 4px solid #146c43;
+  text-align: center;
+}
+.contact-hero-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  font-size: 1.7rem;
+  margin-bottom: 16px;
+}
+.contact-hero-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 6px;
+  letter-spacing: -0.02em;
+}
+.contact-hero-sub {
+  color: rgba(255,255,255,0.65);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* ── LAYOUT ─────────────────────────────────────────────── */
+.contact-body {
+  padding-top: 48px;
+  padding-bottom: 64px;
+}
+
+/* ── CARD ───────────────────────────────────────────────── */
+.contact-card {
+  background: #fff;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  border-top: 4px solid #198754;
+  padding: 36px;
+}
+
+/* ── LABELS & INPUTS ────────────────────────────────────── */
+.contact-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: #1e293b;
+  margin-bottom: 6px;
+}
+.contact-input {
+  border-radius: 0 !important;
+  border-color: #d1d5db;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.contact-input:focus {
+  border-color: #198754;
+  box-shadow: 0 0 0 3px rgba(25,135,84,0.15);
+}
+
+/* ── RADIO GROUP ────────────────────────────────────────── */
+.contact-radio-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.contact-radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border: 2px solid #e5e7eb;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #64748b;
+  background: #f8fafc;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+  user-select: none;
+}
+.contact-radio input[type="radio"] {
+  display: none;
+}
+.contact-radio:has(input:checked) {
+  border-color: #198754;
+  background: #f0faf5;
+  color: #198754;
+}
+.contact-radio:hover {
+  border-color: #6dab8a;
+  background: #f5fbf7;
+}
+
+/* ── CHECKBOX ───────────────────────────────────────────── */
+.contact-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #374151;
+  font-weight: 500;
+}
+.contact-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #198754;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ── CHAR COUNT ─────────────────────────────────────────── */
+.contact-char-count {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+/* ── FIELD ERRORS ───────────────────────────────────────── */
+.contact-field-error {
+  display: block;
+  font-size: 0.82rem;
+  color: #dc2626;
+  margin-top: 4px;
+}
+
+/* ── SUBMIT BUTTON ───────────────────────────────────────── */
+.contact-btn-submit {
+  background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+  border: none;
+  border-radius: 0;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 14px;
+  letter-spacing: 0.02em;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 14px rgba(25,135,84,0.35);
+}
+.contact-btn-submit:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(25,135,84,0.45);
+  color: #fff;
+}
+.contact-btn-submit:active {
+  transform: translateY(0);
+}
+
+/* ── FEEDBACK MESSAGES ───────────────────────────────────── */
+.contact-feedback {
+  text-align: center;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 10px;
+}
+.contact-feedback--error   { color: #dc2626; background: #fef2f2; }
+.contact-feedback--success { color: #065f46; background: #d1fae5; }
+.contact-feedback:empty    { display: none; }

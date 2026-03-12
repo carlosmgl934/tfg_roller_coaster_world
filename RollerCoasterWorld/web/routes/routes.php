@@ -1,5 +1,8 @@
 <?php
 
+/** @var string $base_url */
+$base_url = $base_url ?? '';
+
 $routes = [
     // Vistas públicas
     'index' => $base_url . '/web/views/public/index.php',

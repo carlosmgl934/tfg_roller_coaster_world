@@ -21,7 +21,8 @@ if (isset($input['firebase_uid']) && isset($input['email'])) {
   }
 
   echo json_encode(['success' => true, 'message' => 'Sesión PHP actualizada']);
-} else {
+}
+else {
   echo json_encode(['success' => false, 'message' => 'Faltan firebase_uid o email']);
 }
 ?>

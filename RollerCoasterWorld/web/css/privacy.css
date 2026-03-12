@@ -1,0 +1,108 @@
+/* ============================================================
+   privacy.css — Política de Privacidad
+   ============================================================ */
+
+/* ── HERO ───────────────────────────────────────────────── */
+.privacy-hero {
+  background: linear-gradient(135deg, #0f2d1a 0%, #198754 100%);
+  padding: 56px 0 44px;
+  border-bottom: 4px solid #146c43;
+  text-align: center;
+}
+.privacy-hero-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  font-size: 1.7rem;
+  margin-bottom: 16px;
+}
+.privacy-hero-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 6px;
+  letter-spacing: -0.02em;
+}
+.privacy-hero-sub {
+  color: rgba(255,255,255,0.65);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* ── LAYOUT ─────────────────────────────────────────────── */
+.privacy-body {
+  max-width: 780px;
+  padding-top: 48px;
+  padding-bottom: 64px;
+}
+
+/* ── CARD ───────────────────────────────────────────────── */
+.privacy-card {
+  background: #fff;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  border-top: 4px solid #198754;
+}
+
+/* ── SECTIONS ───────────────────────────────────────────── */
+.privacy-section {
+  padding: 28px 36px;
+  border-bottom: 1px solid #f0f4f2;
+}
+.privacy-section--last {
+  border-bottom: none;
+}
+.privacy-section h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f2d1a;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+.privacy-section p {
+  color: #374151;
+  line-height: 1.7;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+}
+.privacy-section p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── LIST ───────────────────────────────────────────────── */
+.privacy-list {
+  padding-left: 20px;
+  margin: 0;
+  color: #374151;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+.privacy-list li {
+  margin-bottom: 8px;
+}
+.privacy-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* ── EMAIL LINK ─────────────────────────────────────────── */
+.privacy-email {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 8px;
+  padding: 10px 20px;
+  background: #f0faf5;
+  border: 1px solid #d1fae5;
+  border-left: 3px solid #198754;
+  color: #198754;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+.privacy-email:hover {
+  background: #198754;
+  color: #fff;
+}
