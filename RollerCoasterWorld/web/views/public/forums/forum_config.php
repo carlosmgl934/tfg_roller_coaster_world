@@ -5,15 +5,15 @@ require_once __DIR__ . '/../../partials/header.php';
 $park_id     = $_GET['id'] ?? null;
 $forumId     = $_GET['forum_id'] ?? null;
 $privacy     = $_POST['privacy'] ?? 'public';
-$friends     = $friends ?? [];
 $hiddenStyle = ($privacy !== 'private') ? 'style="display:none"' : '';
+$is_logged   = isset($_SESSION['user_id']);
 ?>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <link rel="stylesheet" href="<?= $base_url ?>/web/css/forums.css">
 
-<main class="container py-5" style="max-width: 680px;">
+<main class="container py-5" style="max-width: 680px;" data-logged="<?= $is_logged ? 'true' : 'false' ?>" id="forum-main-container">
 
     <!-- Cabecera centrada -->
     <div class="text-center mb-4">
@@ -33,16 +33,16 @@ $hiddenStyle = ($privacy !== 'private') ? 'style="display:none"' : '';
                 <p class="form-section-title">Personaliza tu foro</p>
 
                 <div class="mb-4">
-                    <label for="name" class="form-label">Nombre del foro</label>
-                    <input type="text" name="name" id="name"
+                    <label for="title" class="form-label">Nombre del foro</label>
+                    <input type="text" name="title" id="title"
                            class="form-control form-control-lg"
                            placeholder="Ej: Mejores montañas rusas 2026" required>
                 </div>
 
                 <div class="mb-5">
-                    <label for="description" class="form-label">Descripción</label>
-                    <textarea name="description" id="description"
-                              class="form-control" rows="4"
+                    <label for="form_subject" class="form-label">Descripción</label>
+                    <textarea name="form_subject" id="form_subject"
+                              class="form-control" rows="4" maxlength="255"
                               placeholder="Describe brevemente de qué trata tu foro..." required></textarea>
                 </div>
 
@@ -75,30 +75,40 @@ $hiddenStyle = ($privacy !== 'private') ? 'style="display:none"' : '';
 
                     <div class="mb-5">
                         <label for="collaborators" class="form-label">
-                            Selecciona colaboradores
+                            Selecciona colaboradores entre tus amigos
                             <span class="text-muted fw-normal ms-1">(opcional)</span>
                         </label>
-                        <select name="collaborators[]" id="collaborators" class="form-select" multiple>
-                            <?php foreach ($friends as $friend): ?>
-                                <option value="<?= htmlspecialchars($friend['id']) ?>">
-                                    <?= htmlspecialchars($friend['username']) ?>
-                                </option>
-                            <?php endforeach; ?>
+                        <select name="collaborators[]" id="collaborators" class="form-select" multiple> 
                         </select>
                     </div>
                 </div>
 
                 <!-- BOTÓN -->
                 <div class="d-grid">
+                    <div class="error-success-message" id="error-success-message" style="display: none; margin-bottom: 15px; text-align: center; font-weight: 500;">
+                        <p id="error-success-message-text" class="mb-0"></p>
+                    </div>
                     <button type="button" id="forum-submit-btn" class="btn btn-forum-submit">
                         <i class="fa-solid fa-plus me-2"></i>Crear foro
                     </button>
-                    <div class="error-sucess-message" id="error-sucess-message">
-                        <p id="error-sucess-message-text"></p>
-                    </div>
                 </div>
 
             </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE LOGIN -->
+    <div class="modal fade" id="loginModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-body text-center p-4">
+                    <p class="mb-4" style="font-size:1rem;">Para crear un foro necesitas estar registrado</p>
+                    <div class="d-flex gap-2 justify-content-center">
+                        <button class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                        <a href="<?= $base_url ?>/web/views/auth/login.php?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn btn-success px-4">Ir al Login</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -107,19 +117,6 @@ $hiddenStyle = ($privacy !== 'private') ? 'style="display:none"' : '';
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const el = document.getElementById('collaborators');
-    if (el) {
-        new Choices(el, {
-            removeItemButton: true,
-            searchEnabled: true,
-            searchPlaceholderValue: 'Buscar colaborador...',
-            placeholderValue: 'Selecciona colaboradores',
-            noResultsText: 'Sin resultados',
-            noChoicesText: 'No hay más opciones',
-            itemSelectText: '',
-            shouldSort: true,
-        });
-    }
-});
+    window.BASE_URL = '<?= $base_url ?>';
 </script>
+<script src="<?= $base_url ?>/web/js/forums.js"></script>

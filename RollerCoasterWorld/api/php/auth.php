@@ -98,7 +98,8 @@ if ($newId) {
         'message' => 'Usuario guardado en Supabase',
         'user_id' => $newId,
     ]);
-} else {
+}
+else {
     echo json_encode([
         'success' => true,
         'message' => 'Usuario ya existía en Supabase (login correcto)',

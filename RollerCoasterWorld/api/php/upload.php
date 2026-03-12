@@ -29,18 +29,21 @@ if (empty($_FILES['file'])) {
 
 // ── Leer credenciales de Supabase desde .env ─────────────────────────────────
 $envPath = __DIR__ . '/../../.env';
-$supabaseUrl  = null;
-$supabaseKey  = null;
+$supabaseUrl = null;
+$supabaseKey = null;
 
 if (file_exists($envPath)) {
     foreach (file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
-        if (strpos(trim($line), '#') === 0) continue;
+        if (strpos(trim($line), '#') === 0)
+            continue;
         if (strpos($line, '=') !== false) {
             [$k, $v] = explode('=', $line, 2);
             $k = trim($k);
             $v = trim($v);
-            if ($k === 'SUPABASE_URL')         $supabaseUrl = $v;
-            if ($k === 'SUPABASE_SERVICE_KEY')  $supabaseKey = $v;
+            if ($k === 'SUPABASE_URL')
+                $supabaseUrl = $v;
+            if ($k === 'SUPABASE_SERVICE_KEY')
+                $supabaseKey = $v;
         }
     }
 }
@@ -51,12 +54,12 @@ if (!$supabaseUrl || !$supabaseKey) {
 }
 
 // ── Parámetros de la subida ───────────────────────────────────────────────────
-$file     = $_FILES['file'];
-$bucket   = preg_replace('/[^a-z0-9\-_]/', '', $_POST['bucket'] ?? 'avatars');
-$subpath  = trim($_POST['path'] ?? '', '/');
+$file = $_FILES['file'];
+$bucket = preg_replace('/[^a-z0-9\-_]/', '', $_POST['bucket'] ?? 'avatars');
+$subpath = trim($_POST['path'] ?? '', '/');
 
-$ext      = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-$allowed  = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+$ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+$allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
 if (!in_array($ext, $allowed)) {
     echo json_encode(['success' => false, 'error' => 'Tipo de archivo no permitido']);
@@ -68,29 +71,29 @@ if ($file['size'] > 10 * 1024 * 1024) {
     exit;
 }
 
-$filename   = time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+$filename = time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
 $objectPath = $subpath ? "{$subpath}/{$filename}" : $filename;
 
 // ── Subir a Supabase Storage ──────────────────────────────────────────────────
 $uploadUrl = rtrim($supabaseUrl, '/') . "/storage/v1/object/{$bucket}/{$objectPath}";
-$mimeType  = $file['type'] ?: 'application/octet-stream';
-$fileData  = file_get_contents($file['tmp_name']);
+$mimeType = $file['type'] ?: 'application/octet-stream';
+$fileData = file_get_contents($file['tmp_name']);
 
 $ch = curl_init($uploadUrl);
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_CUSTOMREQUEST  => 'POST',
-    CURLOPT_POSTFIELDS     => $fileData,
-    CURLOPT_HTTPHEADER     => [
+    CURLOPT_CUSTOMREQUEST => 'POST',
+    CURLOPT_POSTFIELDS => $fileData,
+    CURLOPT_HTTPHEADER => [
         "Authorization: Bearer {$supabaseKey}",
         "Content-Type: {$mimeType}",
         "x-upsert: true",
     ],
 ]);
 
-$response   = curl_exec($ch);
-$httpCode   = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-$curlError  = curl_error($ch);
+$response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$curlError = curl_error($ch);
 curl_close($ch);
 
 if ($curlError) {

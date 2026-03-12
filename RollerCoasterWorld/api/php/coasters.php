@@ -5,36 +5,24 @@ require_once __DIR__ . '/../database/db_conexion.php';
 header('Content-Type: application/json');
 
 $db = new DBConexion();
-// Acciones que requieren POST
-$postActions = ['save_review', 'save_photo'];
+require_once __DIR__ . '/utils/ApiRouter.php';
 
-// Leer la acción: POST para escritura, GET para lectura
-$action = in_array($_GET['action'] ?? '', $postActions)
-    ? ($_GET['action'] ?? '')
-    : ($_GET['action'] ?? 'list');
+$router = new ApiRouter('list');
 
-// Mapa de acciones → funciones
-$actions = [
-    'search'        => 'searchCoasters',
-    'list'          => 'listCoasters',
-    'filter'        => 'filterCoasters',
-    'manufacter'    => 'getManufacturers',
-    'country'       => 'getCountries',
-    'ridden'        => 'getRidden',
-    'apply_filters' => 'applyFilters',
-    'coaster'       => 'getCoasters',
-    'photos'        => 'getCoasterPhotos',
-    'reviews'       => 'getCoasterReviews',
-    'save_review'   => 'saveReview',
-    'save_photo'    => 'savePhoto',
-];
+$router->register('search',        'searchCoasters');
+$router->register('list',          'listCoasters');
+$router->register('filter',        'filterCoasters');
+$router->register('manufacter',    'getManufacturers');
+$router->register('country',       'getCountries');
+$router->register('ridden',        'getRidden');
+$router->register('apply_filters', 'applyFilters');
+$router->register('coaster',       'getCoasters');
+$router->register('photos',        'getCoasterPhotos');
+$router->register('reviews',       'getCoasterReviews');
+$router->register('save_review',   'saveReview', 'POST');
+$router->register('save_photo',    'savePhoto', 'POST');
 
-if (!array_key_exists($action, $actions)) {
-    echo json_encode(['success' => false, 'error' => 'Acción no válida']);
-    exit;
-}
-
-call_user_func($actions[$action]);
+$router->dispatch();
 
 function getManufacturers()
 {
@@ -44,12 +32,10 @@ function getManufacturers()
         $stmt = $db->prepare($sql);
         $stmt->execute();
         $manufacturers = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode(['success' => true, 'manufacters' => $manufacturers]);
-        exit;
+        Response::success(['manufacters' => $manufacturers]);
 
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => 'Error obteniendo fabricantes']);
-        exit;
+        Response::error('Error obteniendo fabricantes');
     }
 }
 
@@ -61,20 +47,17 @@ function getCountries()
         $stmt = $db->prepare($sql);
         $stmt->execute();
         $countries = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode(['success' => true, 'countries' => $countries]);
-        exit;
+        Response::success(['countries' => $countries]);
 
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => 'Error obteniendo países']);
-        exit;
+        Response::error('Error obteniendo países');
     }
 }
 
 function getRidden()
 {
     if (!isset($_SESSION['user_id'])) {
-        echo json_encode(['success' => false, 'error' => 'No autenticado']);
-        exit;
+        Response::unauthorized();
     }
 
     try {
@@ -84,12 +67,10 @@ function getRidden()
         $stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
         $stmt->execute();
         $ridden = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode(['success' => true, 'ridden' => $ridden]);
-        exit;
+        Response::success(['ridden' => $ridden]);
 
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => 'Error obteniendo montañas rusas']);
-        exit;
+        Response::error('Error obteniendo montañas rusas');
     }
 }
 
@@ -98,8 +79,7 @@ function searchCoasters()
 
     $search = trim($_GET['search'] ?? '');
     if ($search === '') {
-        echo json_encode([]);
-        exit;
+        Response::success([]);
     }
 
     try {
@@ -116,12 +96,12 @@ function searchCoasters()
 
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        header('Content-Type: application/json');
         echo json_encode($result);
         exit;
 
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => 'Error buscando montaña rusa']);
-        exit;
+        Response::error('Error buscando montaña rusa');
     }
 }
 
@@ -153,16 +133,13 @@ function listCoasters()
         $stmt_2->execute();
         $total = $stmt_2->fetchColumn();
 
-        echo json_encode([
-            'success' => true,
+        Response::success([
             'coasters' => $coasters,
             'total' => $total
         ]);
-        exit;
 
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => 'Error mostrando montañas rusas: ' . $e->getMessage()]);
-        exit;
+        Response::error('Error mostrando montañas rusas: ' . $e->getMessage());
     }
 
 }
@@ -172,8 +149,7 @@ function filterCoasters()
 
     $search = trim($_GET['search'] ?? '');
     if ($search === '') {
-        echo json_encode([]);
-        exit;
+        Response::success([]);
     }
 
     $page = intval($_GET['page'] ?? 1);
@@ -205,16 +181,13 @@ function filterCoasters()
 
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $total = $stmt_2->fetchColumn();
-        echo json_encode([
-            'success' => true,
+        Response::success([
             'coasters' => $result,
             'total' => $total
         ]);
-        exit;
 
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => 'Error mostrando montañas rusas']);
-        exit;
+        Response::error('Error mostrando montañas rusas');
     }
 }
 
@@ -307,12 +280,10 @@ function applyFilters()
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $total = $stmt_2->fetchColumn();
 
-        echo json_encode(['success' => true, 'coasters' => $result, 'total' => $total]);
-        exit;
+        Response::success(['coasters' => $result, 'total' => $total]);
 
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
-        exit;
+        Response::error($e->getMessage());
     }
 }
 
@@ -323,8 +294,7 @@ function getCoasters()
     $userId = $_SESSION['user_id'] ?? 0; // Para saber si el usuario ha montado la coaster
 
     if ($id <= 0) {
-        echo json_encode(['success' => false, 'error' => 'ID no válido']);
-        exit;
+        Response::error('ID no válido');
     }
 
     try {
@@ -347,18 +317,13 @@ function getCoasters()
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($result) {
-            echo json_encode([
-                'success' => true,
-                'coaster' => $result
-            ]);
+            Response::success(['coaster' => $result]);
         } else {
-            echo json_encode(['success' => false, 'error' => 'Montaña rusa no encontrada']);
+            Response::notFound('Montaña rusa no encontrada');
         }
-        exit;
 
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => 'Error en la base de datos']);
-        exit;
+        Response::error('Error en la base de datos');
     }
 }
 
@@ -368,8 +333,7 @@ function getCoasterReviews()
     $order = $_GET['order'] ?? 'default';
 
     if ($id <= 0) {
-        echo json_encode(['success' => false, 'error' => 'ID no válido']);
-        exit;
+        Response::error('ID no válido');
     }
 
     $orderSql = match ($order) {
@@ -406,12 +370,10 @@ function getCoasterReviews()
         }
         $total = $stmt_count->fetchColumn();
 
-        echo json_encode(['success' => true, 'reviews' => $reviews, 'total' => $total]);
-        exit;
+        Response::success(['reviews' => $reviews, 'total' => $total]);
 
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
-        exit;
+        Response::error($e->getMessage());
     }
 }
 
@@ -420,8 +382,7 @@ function getCoasterPhotos()
     $id = intval($_GET['id'] ?? 0);
 
     if ($id <= 0) {
-        echo json_encode(['success' => false, 'error' => 'ID no válido']);
-        exit;
+        Response::error('ID no válido');
     }
 
     try {
@@ -438,16 +399,13 @@ function getCoasterPhotos()
 
         $photos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        echo json_encode([
-            'success' => true,
+        Response::success([
             'photos' => $photos,
             'total' => count($photos)
         ]);
-        exit;
 
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => 'Error al cargar fotos']);
-        exit;
+        Response::error('Error al cargar fotos');
     }
 }
 
@@ -459,8 +417,7 @@ function saveReview()
     }
 
     if (!isset($_SESSION['user_id'])) {
-        echo json_encode(['success' => false, 'error' => 'No autorizado']);
-        exit;
+        Response::unauthorized();
     }
 
     $userId = $_SESSION['user_id'];
@@ -471,8 +428,7 @@ function saveReview()
     $contras = $_POST['contras'] ?? [];
 
     if ($coasterId <= 0 || $note <= 0) {
-        echo json_encode(['success' => false, 'error' => 'Debes seleccionar una puntuación válida']);
-        exit;
+        Response::error('Debes seleccionar una puntuación válida');
     }
 
     try {
@@ -515,12 +471,10 @@ function saveReview()
         }
 
         $db->commit();
-        echo json_encode(['success' => true]);
-        exit;
+        Response::success();
     } catch (PDOException $e) {
         $db->rollBack();
-        echo json_encode(['success' => false, 'error' => 'Error al guardar reseña: ' . $e->getMessage()]);
-        exit;
+        Response::error('Error al guardar reseña: ' . $e->getMessage());
     }
 }
 
@@ -532,8 +486,7 @@ function savePhoto()
     }
 
     if (!isset($_SESSION['user_id'])) {
-        echo json_encode(['success' => false, 'error' => 'No autorizado']);
-        exit;
+        Response::unauthorized();
     }
 
     $userId = $_SESSION['user_id'];
@@ -542,8 +495,7 @@ function savePhoto()
     $caption = $_POST['caption'] ?? null;
 
     if ($coasterId <= 0 || empty($photoUrl)) {
-        echo json_encode(['success' => false, 'error' => 'Datos inválidos']);
-        exit;
+        Response::error('Datos inválidos');
     }
 
     try {
@@ -558,10 +510,10 @@ function savePhoto()
         $stmt->bindValue(':caption', $caption);
         $stmt->execute();
 
-        echo json_encode(['success' => true]);
+        Response::success();
     } catch (PDOException $e) {
         // Log the actual error internally
         error_log("Error guardando foto: " . $e->getMessage());
-        echo json_encode(['success' => false, 'error' => 'Error al guardar la foto en la base de datos']);
+        Response::error('Error al guardar la foto en la base de datos');
     }
 }
