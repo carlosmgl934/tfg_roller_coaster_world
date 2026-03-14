@@ -254,14 +254,12 @@ $user_uid = $_SESSION['firebase_uid'];
             <div class="col-md-6">
               <label for="config-user-name" class="form-label"><i class="fa-regular fa-id-badge me-2"></i>Nombre
                 completo</label>
-              <input type="text" id="config-user-name" class="form-control square-box"
-                placeholder="Ej: Carlos Montero González">
+              <input type="text" id="config-user-name" class="form-control square-box">
             </div>
             <div class="col-md-6">
               <label for="config-user-username" class="form-label"><i class="fa-solid fa-at me-2"></i>Nombre de
                 usuario</label>
-              <input type="text" id="config-user-username" class="form-control square-box"
-                placeholder="Ej: carloscoasters">
+              <input type="text" id="config-user-username" class="form-control square-box">
             </div>
             <div class="col-md-6">
               <label for="config-user-email" class="form-label"><i class="fa-regular fa-envelope me-2"></i>Correo
@@ -332,7 +330,7 @@ $user_uid = $_SESSION['firebase_uid'];
                 Park</label>
               <div class="position-relative">
                 <input type="text" id="home-park-user" class="form-control square-box"
-                  placeholder="Busca tu home park habitual" autocomplete="off">
+                  placeholder="Busca tu home park" autocomplete="off">
                 <span id="home-park-loading"
                   class="position-absolute top-50 end-0 translate-middle-y me-4 text-muted small d-none"
                   style="z-index: 5;">

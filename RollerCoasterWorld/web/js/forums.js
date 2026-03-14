@@ -61,11 +61,33 @@ $(document).ready(function () {
 
       msgDiv.style.display = "none";
 
-      const title = formData.get("title");
-      const subject = formData.get("form_subject");
-      if (!title || !subject) {
+      const titleInput = document.getElementById("title");
+      const subjectInput = document.getElementById("form_subject");
+      const privacyRadios = document.querySelectorAll('input[name="privacy"]');
+
+      // Limpiar bordes rojos previos
+      titleInput.classList.remove("is-invalid");
+      subjectInput.classList.remove("is-invalid");
+
+      let hasError = false;
+
+      const title = titleInput.value.trim();
+      const subject = subjectInput.value.trim();
+
+      if (!title) {
+        titleInput.classList.add("is-invalid");
+        hasError = true;
+      }
+
+      if (!subject) {
+        subjectInput.classList.add("is-invalid");
+        hasError = true;
+      }
+
+      if (hasError) {
         msgDiv.style.display = "block";
-        msgText.textContent = "Por favor, completa todos los campos";
+        msgText.textContent =
+          "Por favor, completa todos los campos marcados en rojo";
         msgText.style.color = "red";
         return;
       }
@@ -79,6 +101,7 @@ $(document).ready(function () {
       }
 
       if (subject.length > 255) {
+        subjectInput.classList.add("is-invalid");
         msgDiv.style.display = "block";
         msgText.textContent =
           "La descripción no puede exceder los 255 caracteres";
@@ -87,11 +110,28 @@ $(document).ready(function () {
       }
 
       if (title.length > 50) {
+        titleInput.classList.add("is-invalid");
         msgDiv.style.display = "block";
         msgText.textContent = "El título no puede exceder los 50 caracteres";
         msgText.style.color = "red";
         return;
       }
+
+      // Remover clase is-invalid al escribir
+      titleInput.addEventListener(
+        "input",
+        function () {
+          this.classList.remove("is-invalid");
+        },
+        { once: true },
+      );
+      subjectInput.addEventListener(
+        "input",
+        function () {
+          this.classList.remove("is-invalid");
+        },
+        { once: true },
+      );
 
       btn.disabled = true;
       btn.textContent = "Creando foro...";

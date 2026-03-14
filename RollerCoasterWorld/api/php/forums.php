@@ -1,8 +1,8 @@
 <?php
 session_start();
 require_once __DIR__ . '/../database/db_conexion.php';
-require_once __DIR__ . '/../utils/ApiRouter.php';
-require_once __DIR__ . '/../utils/Response.php';
+require_once __DIR__ . '/utils/ApiRouter.php';
+require_once __DIR__ . '/utils/Response.php';
 
 $db = new DBConexion();
 
@@ -34,6 +34,26 @@ function createForum()
 
     global $db;
     try {
+        //Comprobar si el usuario ha creado un foro en los últimos 5 días
+        $stmt = $db->prepare("SELECT created_at FROM forums WHERE author_id = :user_id ORDER BY created_at DESC LIMIT 1");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $lastForumDate = $stmt->fetchColumn();
+
+        if ($lastForumDate) {
+            $lastDate = new DateTime($lastForumDate);
+            $now = new DateTime();
+            $daysPassed = $now->diff($lastDate)->days;
+            if ($daysPassed < 5) {
+                Response::error('Solo puedes crear un foro cada 5 días, te quedan ' . (5 - $daysPassed) . ' días para crear otro');
+            }
+        }
+    }
+    catch (PDOException $e) {
+        Response::error('Error al comprobar la fecha del último foro: ' . $e->getMessage());
+    }
+
+    try {
         // Usar una transacción para asegurar que tanto el foro como los colaboradores se guardan
         $db->beginTransaction();
 
@@ -42,12 +62,11 @@ function createForum()
             VALUES (:title, :subject, :author_id, :privacy) 
             RETURNING id
         ");
-        $stmt->execute([
-            ':title' => $title,
-            ':subject' => $subject,
-            ':author_id' => $userId,
-            ':privacy' => $privacy
-        ]);
+        $stmt->bindParam(':title', $title, PDO::PARAM_STR);
+        $stmt->bindParam(':subject', $subject, PDO::PARAM_STR);
+        $stmt->bindParam(':author_id', $userId, PDO::PARAM_INT);
+        $stmt->bindParam(':privacy', $privacy, PDO::PARAM_STR);
+        $stmt->execute();
         $forumId = $stmt->fetchColumn();
 
         if ($privacy === 'private' && is_array($collaborators) && count($collaborators) > 0) {

@@ -1,12 +1,16 @@
 <?php
-require_once __DIR__ . '/../partials/header.php';
-/** @var string $base_url */
-
-// Protección: si no hay firebase_uid en sesión, redirige a login
+// Protección: si no hay firebase_uid en sesión, redirige a login.
+// IMPORTANTE: esta redirección debe ir ANTES de incluir header.php,
+// porque header.php emite HTML y ya no se pueden enviar cabeceras HTTP.
+if (session_status() === PHP_SESSION_NONE) session_start();
 if (!isset($_SESSION['firebase_uid'])) {
-  header('Location: ' . $base_url . '/web/views/auth/login.php');
+  $base_url_tmp = (string) preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_SERVER['SCRIPT_NAME']);
+  header('Location: ' . $base_url_tmp . '/web/views/auth/login.php');
   exit;
 }
+
+require_once __DIR__ . '/../partials/header.php';
+/** @var string $base_url */
 
 // Mostrar datos del usuario logueado
 $user_email = $_SESSION['user_email'] ?? 'Desconocido';

@@ -126,7 +126,6 @@ $(document).ready(function () {
       .then((userCredential) => {
         const user = userCredential.user;
         console.log("Registro exitoso! UID:", user.uid);
-        showAlert("¡Registro completado!");
         user.getIdToken().then((idToken) => {
           fetch(BASE + "/api/php/auth.php", {
             method: "POST",
@@ -143,10 +142,9 @@ $(document).ready(function () {
             })
             .catch((err) => console.error("Error Supabase:", err));
         });
-        const params = new URLSearchParams(window.location.search);
-        const redirectUrl =
-          params.get("redirect") || BASE + "/web/views/public/index.php";
-        window.location.href = redirectUrl;
+        // Redirigir al login con mensaje de éxito para que el usuario inicie sesión
+        window.location.href =
+          BASE + "/web/views/auth/login.php?msg=registered";
       })
       .catch((error) => {
         let msg = "Error al registrar: ";
@@ -223,15 +221,37 @@ $(document).ready(function () {
         window.location.href = redirectUrl;
       })
       .catch((error) => {
-        let msg = "Error al iniciar sesión: ";
-        if (error.code === "auth/user-not-found")
-          msg += "Usuario no encontrado.";
-        else if (error.code === "auth/wrong-password")
-          msg += "Contraseña incorrecta.";
-        else if (error.code === "auth/invalid-email") msg += "Email inválido.";
-        else if (error.code === "auth/invalid-credential")
-          msg += "Email o contraseña incorrectos.";
-        else msg += error.message;
+        let msg;
+        switch (error.code) {
+          case "auth/user-not-found":
+            msg =
+              "No existe ninguna cuenta con este email. ¿Quieres registrarte?";
+            break;
+          case "auth/wrong-password":
+            msg = "Contraseña incorrecta. Revísala e inténtalo de nuevo.";
+            break;
+          case "auth/invalid-email":
+            msg = "El formato del email no es válido.";
+            break;
+          case "auth/user-disabled":
+            msg =
+              "Esta cuenta ha sido desactivada. Contacta con el administrador.";
+            break;
+          case "auth/too-many-requests":
+            msg =
+              "Demasiados intentos fallidos. Espera unos minutos antes de volver a intentarlo.";
+            break;
+          case "auth/invalid-credential":
+            msg =
+              "Email o contraseña incorrectos. Comprueba tus datos e inténtalo de nuevo.";
+            break;
+          case "auth/network-request-failed":
+            msg =
+              "Sin conexión a internet. Revisa tu red e inténtalo de nuevo.";
+            break;
+          default:
+            msg = "Error al iniciar sesión: " + error.message;
+        }
         showAlert(msg);
       });
   }

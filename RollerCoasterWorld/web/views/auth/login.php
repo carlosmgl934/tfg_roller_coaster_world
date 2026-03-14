@@ -13,6 +13,13 @@ require_once __DIR__ . '/../partials/header.php';
     </div>
   <?php endif; ?>
 
+  <?php if (isset($_GET['msg']) && $_GET['msg'] === 'registered'): ?>
+    <div class="alert alert-success text-center mx-auto mb-4" style="max-width: 450px;" role="alert">
+      <i class="fa-solid fa-circle-check me-2"></i>
+      <strong>¡Cuenta creada con éxito!</strong> Ahora inicia sesión para continuar.
+    </div>
+  <?php endif; ?>
+
   <form id="login-form">
     <input type="email" id="email" placeholder="Email" required>
     <input type="password" id="password" placeholder="Contraseña" required>

@@ -6,10 +6,8 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Determina si el usuario está logueado
 $is_logged = isset($_SESSION['firebase_uid']);
+$base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_SERVER['SCRIPT_NAME']);
 
-// Base URL calculada automáticamente (funciona en cualquier servidor)
-/** @var string $base_url */
-$base_url = (string) preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_SERVER['SCRIPT_NAME']);
 ?>
 
 <!doctype html>
@@ -177,6 +175,8 @@ $base_url = (string) preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWo
                     class="fa-solid fa-train-tram w-20px text-center me-2 text-success"></i> Coasters</a></li>
               <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/admin/parks.php"><i
                     class="fa-solid fa-tree-city w-20px text-center me-2 text-success"></i> Parques</a></li>
+              <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/admin/forums.php"><i
+                    class="fa-solid fa-comments w-20px text-center me-2 text-success"></i> Foros</a></li>
               <li>
                 <hr class="dropdown-divider">
               </li>

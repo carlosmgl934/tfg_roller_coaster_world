@@ -1,7 +1,8 @@
 <?php
 
+// Base URL calculada automáticamente (funciona en cualquier servidor)
 /** @var string $base_url */
-$base_url = $base_url ?? '';
+$base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_SERVER['SCRIPT_NAME']) ?? '';
 
 $routes = [
     // Vistas públicas

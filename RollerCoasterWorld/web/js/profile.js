@@ -39,6 +39,16 @@ $(document).ready(function () {
 
   const btnGuardar = document.getElementById("guardar-config-btn");
 
+  // Capitalizar primera letra del username al perder el foco
+  const usernameInput = document.getElementById("config-user-username");
+  if (usernameInput) {
+    usernameInput.addEventListener("blur", function () {
+      if (this.value.length > 0) {
+        this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1);
+      }
+    });
+  }
+
   btnGuardar.addEventListener("click", async function () {
     const btn = this;
     const originalText = btn.innerHTML;
@@ -86,6 +96,7 @@ $(document).ready(function () {
 
       if (data.success) {
         if (msgEl) {
+          msgEl.classList.remove("d-none");
           msgEl.innerHTML =
             '<i class="fa-solid fa-circle-check me-2"></i>Guardado correctamente';
           msgEl.className = "text-success mb-0 me-4 fw-bold";
@@ -93,6 +104,7 @@ $(document).ready(function () {
         } else {
           alert("Configuración guardada correctamente.");
         }
+        cargarDatos();
       } else {
         if (msgEl) {
           msgEl.innerHTML =
@@ -221,17 +233,22 @@ $(document).ready(function () {
           }
         }
 
+        // Helper: capitaliza primera letra de un string, o devuelve fallback
+        const cap = (s, fallback = "—") =>
+          s ? s.charAt(0).toUpperCase() + s.slice(1) : fallback;
+
         // Actualizar tarjeta de perfil visual
-        document.getElementById("full-name").textContent =
-          data.user.full_name.charAt(0).toUpperCase() +
-            data.user.full_name.slice(1) || "—";
-        document.getElementById("username").textContent =
-          data.user.username.charAt(0).toUpperCase() +
-            data.user.username.slice(1) || "—";
+        document.getElementById("full-name").textContent = cap(
+          data.user.full_name,
+        );
+        document.getElementById("username").textContent = cap(
+          data.user.username,
+        );
         document.getElementById("email").textContent = data.user.email || "—";
-        document.getElementById("profile-display-name").textContent =
-          data.user.username.charAt(0).toUpperCase() +
-            data.user.username.slice(1) || "Usuario";
+        document.getElementById("profile-display-name").textContent = cap(
+          data.user.username,
+          "Usuario",
+        );
 
         let birthDateFormatted = "—";
         if (data.user.birthdate) {
@@ -241,19 +258,17 @@ $(document).ready(function () {
         document.getElementById("birth-date").textContent = birthDateFormatted;
 
         document.getElementById("gender").textContent = data.user.gender || "—";
-        document.getElementById("location").textContent =
-          data.user.city && data.user.country
-            ? `${
-                data.user.city.charAt(0).toUpperCase() + data.user.city.slice(1)
-              }, ${
-                data.user.country.charAt(0).toUpperCase() +
-                data.user.country.slice(1)
-              }`
-            : data.user.city.charAt(0).toUpperCase() +
-                data.user.city.slice(1) ||
-              data.user.country.charAt(0).toUpperCase() +
-                data.user.country.slice(1) ||
-              "—";
+
+        // Ubicación: ciudad, país, o ambos, de forma null-safe
+        let locationText = "—";
+        if (data.user.city && data.user.country) {
+          locationText = cap(data.user.city) + ", " + cap(data.user.country);
+        } else if (data.user.city) {
+          locationText = cap(data.user.city);
+        } else if (data.user.country) {
+          locationText = cap(data.user.country);
+        }
+        document.getElementById("location").textContent = locationText;
 
         document.getElementById("favorite-coaster").textContent =
           data.user.favorite_coaster || "—";
