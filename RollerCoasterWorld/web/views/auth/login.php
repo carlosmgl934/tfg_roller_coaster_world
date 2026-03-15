@@ -49,10 +49,7 @@ require_once __DIR__ . '/../partials/header.php';
 
   <!-- BOTÓN PROVISIONAL DE CERRAR SESIÓN (para pruebas rápidas) -->
   <div style="margin-top: 40px; text-align: center;">
-    <button onclick="signOut()"
-      style="padding: 12px 30px; background: #e74c3c; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1.1em;">
-      Cerrar sesión (prueba)
-    </button>
+  <button type="button" id="signOut">Logout</button>
     <p style="font-size: 0.9em; color: #777; margin-top: 10px;">
       (Botón provisional para probar logout desde esta misma página)
     </p>

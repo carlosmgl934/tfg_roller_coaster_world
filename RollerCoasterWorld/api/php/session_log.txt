@@ -1,0 +1,14 @@
+2026-03-14 20:53:07 - POST recibido: {"firebase_uid":"4G8i3HGF6YaYWbG7uuE3sQ1hNBP2","email":"u1646291625@gmail.com"}
+2026-03-14 20:53:07 - Sesión guardada: UID=4G8i3HGF6YaYWbG7uuE3sQ1hNBP2
+2026-03-14 20:53:15 - POST recibido: {"firebase_uid":"4G8i3HGF6YaYWbG7uuE3sQ1hNBP2","email":"u1646291625@gmail.com"}
+2026-03-14 20:53:15 - Sesión guardada: UID=4G8i3HGF6YaYWbG7uuE3sQ1hNBP2
+2026-03-14 21:04:45 - POST recibido: {"firebase_uid":"04k73FtL98TNxH1lelpVsY4UoPq1","email":"usuario@gmail.com"}
+2026-03-14 21:04:45 - Sesión guardada: UID=04k73FtL98TNxH1lelpVsY4UoPq1
+2026-03-14 21:50:50 - POST recibido: {"firebase_uid":"ppgiOBSRzIcN3KDfZZjRoxoBuAc2","email":"usuario@gmail.com"}
+2026-03-14 21:50:50 - Sesión guardada: UID=ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+2026-03-14 21:51:41 - POST recibido: {"firebase_uid":"ppgiOBSRzIcN3KDfZZjRoxoBuAc2","email":"usuario@gmail.com"}
+2026-03-14 21:51:41 - Sesión guardada: UID=ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+2026-03-15 17:22:01 - POST recibido: {"firebase_uid":"ppgiOBSRzIcN3KDfZZjRoxoBuAc2","email":"usuario@gmail.com"}
+2026-03-15 17:22:01 - Sesión guardada: UID=ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+2026-03-15 17:38:22 - POST recibido: {"firebase_uid":"ppgiOBSRzIcN3KDfZZjRoxoBuAc2","email":"usuario@gmail.com"}
+2026-03-15 17:38:22 - Sesión guardada: UID=ppgiOBSRzIcN3KDfZZjRoxoBuAc2

@@ -29,12 +29,12 @@ $user_uid = $_SESSION['firebase_uid'];
     <p><strong>UID:</strong> <?php echo htmlspecialchars($user_uid); ?></p>
   </div>
 
-  <p style="margin-top: 50px;">
-    <a href="<?= $base_url ?>/web/views/auth/logout.php"
-      style="color: #d32f2f; font-weight: bold; text-decoration: none;">
-      Cerrar sesión
-    </a>
-  </p>
+  <div style="margin-top: 40px; text-align: center;">
+  <button type="button" id="signOut">Logout</button>
+    <p style="font-size: 0.9em; color: #777; margin-top: 10px;">
+      (Botón provisional para probar logout desde esta misma página)
+    </p>
+  </div>
 </main>
 
 <?php
