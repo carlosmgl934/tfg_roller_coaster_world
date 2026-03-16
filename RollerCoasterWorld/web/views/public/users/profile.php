@@ -58,8 +58,8 @@ $user_uid = $_SESSION['firebase_uid'];
               class="fa-solid fa-users me-2 w-20px text-center"></i> Mis amigos</a>
           <a href="#" id="menu-map" class="list-group-item list-group-item-action py-3"><i
               class="fa-solid fa-map-pin me-2 w-20px text-center"></i> Mi mapa</a>
-          <a href="<?= $base_url ?>/web/views/auth/logout.php"
-            class="list-group-item list-group-item-action text-danger mt-1 py-3 border-top"><i
+          <a href="#"
+            class="list-group-item list-group-item-action text-danger mt-1 py-3 border-top signOutBtn"><i
               class="fa-solid fa-arrow-right-from-bracket me-2 w-20px text-center"></i> Cerrar sesión</a>
         </div>
       </div>

@@ -43,3 +43,85 @@ Payload decodificado: Array
 Datos para insertar: uid=ANcajDPKBSXdt4nWgsK6TkB72FL2, email=carlosmgl934@gmail.com, username=Carlos Montero
 Intentando cargar db_conexion.php...
 ERROR: db_conexion.php NO existe en: C:/xampp/htdocs/tfg/tfg_roller_coaster_world/RollerCoasterWorld/api/database/db_conexion.php
+2026-03-16 17:56:56 ── Nueva petición recibida ──
+RAW INPUT: {"id_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6ImEyZGZiOGEzOGI1MmQ5ZjA5ZWRjYWE1MDcwYTBlOGYwYTllMDk4YmEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3MzY4MDIxOCwidXNlcl9pZCI6InBwZ2lPQlNSekljTjNLRGZaWmpSb3hvQnVBYzIiLCJzdWIiOiJwcGdpT0JTUnpJY04zS0RmWlpqUm94b0J1QWMyIiwiaWF0IjoxNzczNjgwMjE4LCJleHAiOjE3NzM2ODM4MTgsImVtYWlsIjoidXN1YXJpb0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidXN1YXJpb0BnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.bk0TcpH-kCEoAn60eqTxRB9wtbwTI0CW5x4WFUR-Hq-NEIZShDCmeXWyZ3SV6hmBueKouHiYaxF9AXHJnt5VUH1DDe-U-_-5e4r37Gl3sNaKuUwhYEzOtkahN2FDb5BFBq4gL1X5IXdBufL_42NAyVVOh60t3WnGIzXyQNiSm10g--OCJjutSeUUIULpO9ZEFtcX4QY1XCIVgGxDW9LSLSoj1e8TPGLmd95ezasDM1ItBcM5RoTZ4N2tUrF1IJ_YTtGazh9pBe9kFgfd_wuR48vnanE2_1ypLGpIygeikIWAJFKQi2kGiugDjqV-guThHsCP9M3ajSUHu-x18UbV-A","username":"usuario"}
+Input parseado: Array
+(
+    [id_token] => eyJhbGciOiJSUzI1NiIsImtpZCI6ImEyZGZiOGEzOGI1MmQ5ZjA5ZWRjYWE1MDcwYTBlOGYwYTllMDk4YmEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3MzY4MDIxOCwidXNlcl9pZCI6InBwZ2lPQlNSekljTjNLRGZaWmpSb3hvQnVBYzIiLCJzdWIiOiJwcGdpT0JTUnpJY04zS0RmWlpqUm94b0J1QWMyIiwiaWF0IjoxNzczNjgwMjE4LCJleHAiOjE3NzM2ODM4MTgsImVtYWlsIjoidXN1YXJpb0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidXN1YXJpb0BnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.bk0TcpH-kCEoAn60eqTxRB9wtbwTI0CW5x4WFUR-Hq-NEIZShDCmeXWyZ3SV6hmBueKouHiYaxF9AXHJnt5VUH1DDe-U-_-5e4r37Gl3sNaKuUwhYEzOtkahN2FDb5BFBq4gL1X5IXdBufL_42NAyVVOh60t3WnGIzXyQNiSm10g--OCJjutSeUUIULpO9ZEFtcX4QY1XCIVgGxDW9LSLSoj1e8TPGLmd95ezasDM1ItBcM5RoTZ4N2tUrF1IJ_YTtGazh9pBe9kFgfd_wuR48vnanE2_1ypLGpIygeikIWAJFKQi2kGiugDjqV-guThHsCP9M3ajSUHu-x18UbV-A
+    [username] => usuario
+)
+
+Payload decodificado: Array
+(
+    [iss] => https://securetoken.google.com/tfg-roller-coaster-world-auth
+    [aud] => tfg-roller-coaster-world-auth
+    [auth_time] => 1773680218
+    [user_id] => ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+    [sub] => ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+    [iat] => 1773680218
+    [exp] => 1773683818
+    [email] => usuario@gmail.com
+    [email_verified] => 
+    [firebase] => Array
+        (
+            [identities] => Array
+                (
+                    [email] => Array
+                        (
+                            [0] => usuario@gmail.com
+                        )
+
+                )
+
+            [sign_in_provider] => password
+        )
+
+)
+
+Datos para insertar: uid=ppgiOBSRzIcN3KDfZZjRoxoBuAc2, email=usuario@gmail.com, username=usuario
+Intentando cargar db_conexion.php...
+db_conexion.php cargado OK
+DBConexion instanciada OK
+Query preparada OK
+Insertado nuevo ID: 28
+2026-03-16 18:02:19 ── Nueva petición recibida ──
+RAW INPUT: {"id_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6ImEyZGZiOGEzOGI1MmQ5ZjA5ZWRjYWE1MDcwYTBlOGYwYTllMDk4YmEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3MzY4MDU0MSwidXNlcl9pZCI6InBwZ2lPQlNSekljTjNLRGZaWmpSb3hvQnVBYzIiLCJzdWIiOiJwcGdpT0JTUnpJY04zS0RmWlpqUm94b0J1QWMyIiwiaWF0IjoxNzczNjgwNTQxLCJleHAiOjE3NzM2ODQxNDEsImVtYWlsIjoidXN1YXJpb0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidXN1YXJpb0BnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.bnEQ4BpZZ3lQHwz9ks4RWJ2JHE89ZF535udbbLD1BW4ZIA41DdESBW5jreykCYIbOKAVnfgbzWslcb-MxIFSvOuIr0H_XRXQhr413N_1CPEHrb-7W7K_a4BF3lb2RZrONOrQeJFPQA6EWEBkqqV1exBeDKB3_YvIvxDffuPsKy-xdr6I5cZCDW04QyVQa5UDcbYDEyrDwdLhbSGPDRyfja-khQxmg8-_trDVhcQnAghu1QykuIFoGzSwLgjxXDj5B1JSN52z4kdxH79rZmIkDBfOF6bSprDiw7AxnNsD1Ps0BVgSB4Ug0dAVBQ6lh7FG-qzWQTINKNQNk1s8ysNrig","username":"usuario"}
+Input parseado: Array
+(
+    [id_token] => eyJhbGciOiJSUzI1NiIsImtpZCI6ImEyZGZiOGEzOGI1MmQ5ZjA5ZWRjYWE1MDcwYTBlOGYwYTllMDk4YmEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3MzY4MDU0MSwidXNlcl9pZCI6InBwZ2lPQlNSekljTjNLRGZaWmpSb3hvQnVBYzIiLCJzdWIiOiJwcGdpT0JTUnpJY04zS0RmWlpqUm94b0J1QWMyIiwiaWF0IjoxNzczNjgwNTQxLCJleHAiOjE3NzM2ODQxNDEsImVtYWlsIjoidXN1YXJpb0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidXN1YXJpb0BnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.bnEQ4BpZZ3lQHwz9ks4RWJ2JHE89ZF535udbbLD1BW4ZIA41DdESBW5jreykCYIbOKAVnfgbzWslcb-MxIFSvOuIr0H_XRXQhr413N_1CPEHrb-7W7K_a4BF3lb2RZrONOrQeJFPQA6EWEBkqqV1exBeDKB3_YvIvxDffuPsKy-xdr6I5cZCDW04QyVQa5UDcbYDEyrDwdLhbSGPDRyfja-khQxmg8-_trDVhcQnAghu1QykuIFoGzSwLgjxXDj5B1JSN52z4kdxH79rZmIkDBfOF6bSprDiw7AxnNsD1Ps0BVgSB4Ug0dAVBQ6lh7FG-qzWQTINKNQNk1s8ysNrig
+    [username] => usuario
+)
+
+Payload decodificado: Array
+(
+    [iss] => https://securetoken.google.com/tfg-roller-coaster-world-auth
+    [aud] => tfg-roller-coaster-world-auth
+    [auth_time] => 1773680541
+    [user_id] => ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+    [sub] => ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+    [iat] => 1773680541
+    [exp] => 1773684141
+    [email] => usuario@gmail.com
+    [email_verified] => 
+    [firebase] => Array
+        (
+            [identities] => Array
+                (
+                    [email] => Array
+                        (
+                            [0] => usuario@gmail.com
+                        )
+
+                )
+
+            [sign_in_provider] => password
+        )
+
+)
+
+Datos para insertar: uid=ppgiOBSRzIcN3KDfZZjRoxoBuAc2, email=usuario@gmail.com, username=usuario
+Intentando cargar db_conexion.php...
+db_conexion.php cargado OK
+DBConexion instanciada OK
+Query preparada OK
+Insertado nuevo ID: 28

@@ -84,7 +84,7 @@ file_put_contents($log, "Datos para insertar: uid=$firebase_uid, email=$email, u
 // ── CONEXIÓN Y QUERY ─────────────────────────────────────────────────────────
 file_put_contents($log, "Intentando cargar db_conexion.php...\n", FILE_APPEND);
 
-$conexionPath = 'C:/xampp/htdocs/tfg/tfg_roller_coaster_world/RollerCoasterWorld/api/database/db_conexion.php';
+$conexionPath = __DIR__ . '/../database/db_conexion.php';
 
 if (!file_exists($conexionPath)) {
   file_put_contents($log, "ERROR: db_conexion.php NO existe en: $conexionPath\n", FILE_APPEND);

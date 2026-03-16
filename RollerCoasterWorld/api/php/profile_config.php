@@ -22,16 +22,19 @@ function searchParks()
     $search = $_GET['search'] ?? '';
 
     if (strlen($search) < 3) {
-        Response::success([]);
+        echo json_encode([]);
+        exit;
     }
 
     try {
         $stmt = $db->prepare("SELECT id AS park_id, park_name FROM parks WHERE park_name ILIKE :search LIMIT 10");
         $stmt->execute([':search' => '%' . $search . '%']);
-        Response::success($stmt->fetchAll(PDO::FETCH_ASSOC));
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        exit;
     }
     catch (PDOException $e) {
-        Response::success([]);
+        echo json_encode([]);
+        exit;
     }
 }
 

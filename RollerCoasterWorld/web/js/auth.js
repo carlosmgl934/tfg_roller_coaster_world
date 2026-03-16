@@ -98,14 +98,18 @@ $(document).ready(function () {
   if (eliminar) eliminar.addEventListener("click", borrarCuenta);
   if (cancelar) cancelar.addEventListener("click", cancelarPassword);
 
-  if (logOut)
-    logOut.addEventListener("click", function () {
+  // Logout handler para todos los botones de cerrar sesión
+  const logoutButtons = document.querySelectorAll('.signOutBtn, #signOut');
+  logoutButtons.forEach(btn => {
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
       fetch(BASE + "/api/php/logout.php", { method: "POST" }).finally(() => {
         window.auth.signOut().then(() => {
           window.location.href = BASE + "/web/views/auth/login.php";
         });
       });
     });
+  });
 
   // ── Registro con Email y Password ─────────────────────────────────────────────
   function signUpWithEmail() {

@@ -142,7 +142,7 @@ $base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_S
                 <li>
                   <hr class="dropdown-divider">
                 </li>
-                <li><a class="dropdown-item py-2 text-danger" href="<?= $base_url ?>/web/views/auth/logout.php"><i
+                <li><a class="dropdown-item py-2 text-danger signOutBtn" href="#"><i
                       class="fa-solid fa-arrow-right-from-bracket w-20px text-center me-2"></i> Cerrar sesión</a></li>
               </ul>
             </li>
