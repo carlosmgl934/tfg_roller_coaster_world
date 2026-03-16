@@ -87,7 +87,7 @@ $base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_S
               Parques
             </a>
             <ul class="dropdown-menu shadow border-0">
-              <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/parks/parks.php"><i
+              <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/parks/park_search.php"><i
                     class="fa-solid fa-list w-20px text-center me-2 text-success"></i> Listado</a></li>
               <li><a class="dropdown-item py-2" href="<?= $base_url ?>/web/views/public/parks/park_detail.php"><i
                     class="fa-solid fa-circle-info w-20px text-center me-2 text-info"></i> Ficha Parque</a></li>

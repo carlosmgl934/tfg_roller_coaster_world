@@ -19,8 +19,8 @@ if ($id === 0) {
 ?>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
-<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/coasters.css"> <!-- Reutilizamos el mismo CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+<link rel="stylesheet" href="<?= $base_url ?>/web/css/coasters.css">
 
 <main class="container my-5">
     <div class="row justify-content-center">
@@ -96,89 +96,11 @@ if ($id === 0) {
     </div>
 </main>
 
-<?php require_once __DIR__ . '/../../../../partials/footer.php'; ?>
+<?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 
-<script src="<?= $base_url ?>/web/js/parks.js"></script>
-<script src="<?= $base_url ?>/web/js/auth-check.js"></script>
 <!-- Choices.js para select múltiple -->
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <!-- CropperJS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
-
-<script>
-// Inicializar Choices.js para pros/contras múltiple
-const choices = new Choices('#pros-contras', {
-  removeItemButton: true,
-  placeholderValue: 'Selecciona pros y contras',
-  noResultsText: 'No se encontraron resultados',
-});
-
-// Subida de foto con Cropper (igual que en coasters)
-let cropper;
-$("#photo-upload").on("change", function (e) {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      $("#cropper-image").attr("src", e.target.result);
-      $(".crop-container").show();
-      $("#crop-save-btn").show();
-
-      if (cropper) cropper.destroy();
-      cropper = new Cropper($("#cropper-image")[0], {
-        aspectRatio: 16 / 9,
-        viewMode: 1,
-        autoCropArea: 0.8,
-      });
-    };
-    reader.readAsDataURL(file);
-  }
-});
-
-$("#crop-save-btn").click(function () {
-  if (cropper) {
-    cropper.getCroppedCanvas().toBlob(function (blob) {
-      const formData = new FormData();
-      formData.append('photo', blob, 'park-photo.jpg');
-      formData.append('park_id', <?= $id ?>);
-
-      $.ajax({
-        url: '/api/parks/upload-photo',
-        method: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function (data) {
-          if (data.success) {
-            alert("¡Foto enviada! Esperando aprobación");
-            $("#uploadPhotoModal").modal("hide");
-            $("#photo-upload").val("");
-            $(".crop-container").hide();
-            $("#crop-save-btn").hide();
-            if (cropper) cropper.destroy();
-          } else {
-            alert("Error: " + (data.error || "Desconocido"));
-          }
-        },
-        error: function () {
-          alert("Error al subir la foto");
-        }
-      });
-    }, 'image/jpeg', 0.85);
-  }
-});
-
-// Enviar reseña
-$("#park-review-form").submit(function (e) {
-  e.preventDefault();
-
-  const formData = $(this).serializeArray();
-  const rating = $("input[name='rating']:checked").val();
-  if (!rating) {
-    alert("Selecciona una valoración");
-    return;
-  }
-
-  // ... resto del envío AJAX similar a coasters
-});
-</script>
+<script src="<?= $base_url ?>/web/js/parks.js"></script>
+<script src="<?= $base_url ?>/web/js/auth-check.js"></script>

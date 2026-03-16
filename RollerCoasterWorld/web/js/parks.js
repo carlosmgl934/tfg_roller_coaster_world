@@ -1,7 +1,11 @@
 $(document).ready(function () {
+
+  // =====================================================
   // === BÚSQUEDA Y LISTADO DE PARQUES (park_search.php) ===
+  // =====================================================
 
   if (document.getElementById("park-list")) {
+
     // Resetear filtros al recargar página
     window.addEventListener("pageshow", function () {
       document.getElementById("opening-year-min").value = "";
@@ -9,7 +13,6 @@ $(document).ready(function () {
       document.getElementById("num-coaster-min").value = "";
       document.getElementById("num-coaster-max").value = "";
       document.getElementById("rating-filter").value = "";
-      // Limpiar país y ubicación si se cargan dinámicamente
     });
 
     // Buscador en tiempo real (debounce para no saturar)
@@ -17,7 +20,6 @@ $(document).ready(function () {
     $("#park-search").on("input", function () {
       clearTimeout(searchTimeout);
       const query = $(this).val().trim();
-
       searchTimeout = setTimeout(() => {
         if (query.length >= 2) {
           buscarParques(query);
@@ -27,7 +29,6 @@ $(document).ready(function () {
       }, 300);
     });
 
-    // Función para buscar parques
     function buscarParques(query) {
       $.ajax({
         url: '/api/parks/search',
@@ -36,12 +37,10 @@ $(document).ready(function () {
         success: function (data) {
           const results = $("#search-results");
           results.empty().show();
-
           if (data.length === 0) {
             results.append('<div class="list-group-item text-muted">No se encontraron parques</div>');
             return;
           }
-
           data.forEach(park => {
             const item = `
               <a href="/parks.php?id=${park.id}" class="list-group-item list-group-item-action">
@@ -57,14 +56,14 @@ $(document).ready(function () {
       });
     }
 
-    // Ocultar resultados al hacer click fuera
+    // Ocultar resultados al hacer clic fuera
     $(document).on("click", function (e) {
       if (!$(e.target).closest("#park-search, #search-results").length) {
         $("#search-results").hide();
       }
     });
 
-    // Filtros dinámicos (al cambiar cualquier filtro)
+    // Filtros dinámicos
     $("#country-filter, #location-filter, #opening-year-min, #opening-year-max, #num-coaster-min, #num-coaster-max, #rating-filter").on("change input", function () {
       aplicarFiltros();
     });
@@ -79,23 +78,18 @@ $(document).ready(function () {
     });
 
     function aplicarFiltros() {
-      // Aquí iría la lógica de filtrado (puede ser AJAX o JS local si tienes todos los datos)
-      // Por simplicidad, recargamos con parámetros GET o usamos JS para filtrar
       console.log("Aplicando filtros...");
-      // Ejemplo con AJAX:
+      // TODO: implementar llamada AJAX con los filtros activos
       // $.get('/api/parks', { filters: ... }, function(data) { renderizarParques(data); });
     }
 
-    // Renderizar parques (ejemplo básico)
     function renderizarParques(parques) {
       const contenedor = $("#park-list");
       contenedor.empty();
-
       if (parques.length === 0) {
         contenedor.html('<p class="text-center text-muted py-5">No se encontraron parques con esos filtros</p>');
         return;
       }
-
       parques.forEach(park => {
         const card = `
           <div class="col-12 col-md-6 col-lg-4">
@@ -119,7 +113,10 @@ $(document).ready(function () {
     }
   }
 
-  // === DETALLE DE PARQUE (parks.php) ===
+  // =====================================================
+  // === DETALLE DE PARQUE (parks.php / park_detail.php) ===
+  // =====================================================
+
   if (document.getElementById("park-name")) {
     const parkId = new URLSearchParams(window.location.search).get('id');
 
@@ -138,8 +135,6 @@ $(document).ready(function () {
         $("#park-description").text(park.description || "Sin descripción disponible");
         $("#btn-website").attr("href", park.web || "#");
         $("#park-hero-img").attr("src", park.imagen_url || "https://placehold.co/900x500");
-
-        // Cargar galería de fotos (ejemplo)
         $("#park-gallery").html('<p class="text-muted">Galería en desarrollo...</p>');
       },
       error: function () {
@@ -147,12 +142,100 @@ $(document).ready(function () {
       }
     });
 
-    // Subida de foto (similar a coasters)
+    // Abrir modal de subida de foto
     $("#btn-upload-photo").click(function () {
       $("#uploadPhotoModal").modal("show");
     });
-
-    // ... resto del código de CropperJS, galería, reseñas, etc. (igual que en coasters.js)
-    // Puedes copiar y adaptar las funciones de subida de foto y reseñas del archivo coasters.js
   }
+
+  // =====================================================
+  // === FORMULARIO DE RESEÑA DE PARQUE (form_park_rating.php) ===
+  // =====================================================
+
+  if (document.getElementById("park-review-form")) {
+
+    // Inicializar Choices.js para el select múltiple de pros/contras
+    if (document.getElementById("pros-contras")) {
+      new Choices('#pros-contras', {
+        removeItemButton: true,
+        placeholderValue: 'Selecciona pros y contras',
+        noResultsText: 'No se encontraron resultados',
+      });
+    }
+
+    // Subida de foto con CropperJS
+    let cropper;
+
+    $("#photo-upload").on("change", function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        $("#cropper-image").attr("src", e.target.result);
+        $(".crop-container").show();
+        $("#crop-save-btn").show();
+
+        if (cropper) cropper.destroy();
+        cropper = new Cropper($("#cropper-image")[0], {
+          aspectRatio: 16 / 9,
+          viewMode: 1,
+          autoCropArea: 0.8,
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+
+    $("#crop-save-btn").click(function () {
+      if (!cropper) return;
+
+      // Leer el park_id desde el input hidden del formulario
+      const parkId = $("input[name='park_id']").val();
+
+      cropper.getCroppedCanvas().toBlob(function (blob) {
+        const formData = new FormData();
+        formData.append('photo', blob, 'park-photo.jpg');
+        formData.append('park_id', parkId);
+
+        $.ajax({
+          url: '/api/parks/upload-photo',
+          method: 'POST',
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (data) {
+            if (data.success) {
+              alert("¡Foto enviada! Esperando aprobación");
+              $("#uploadPhotoModal").modal("hide");
+              $("#photo-upload").val("");
+              $(".crop-container").hide();
+              $("#crop-save-btn").hide();
+              if (cropper) { cropper.destroy(); cropper = null; }
+            } else {
+              alert("Error: " + (data.error || "Desconocido"));
+            }
+          },
+          error: function () {
+            alert("Error al subir la foto");
+          }
+        });
+      }, 'image/jpeg', 0.85);
+    });
+
+    // Enviar reseña
+    $("#park-review-form").submit(function (e) {
+      e.preventDefault();
+
+      const rating = $("input[name='rating']:checked").val();
+      if (!rating) {
+        alert("Selecciona una valoración");
+        return;
+      }
+
+      // TODO: completar el envío AJAX de la reseña
+      // const formData = $(this).serializeArray();
+      // $.ajax({ url: '/api/parks/review', method: 'POST', data: ..., success: ... });
+    });
+  }
+
 });

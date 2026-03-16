@@ -1,12 +1,15 @@
 <?php
-require_once __DIR__ . '/../../partials/header.php';
-/** @var string $base_url */
+// Calcular $base_url aquí (igual que header.php) para poder redirigir antes de emitir HTML
+$base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_SERVER['SCRIPT_NAME']);
 
 $id = intval($_GET['id'] ?? 0);
 if ($id === 0) {
     header('Location: ' . $base_url . '/web/views/public/parks/park_search.php');
     exit;
 }
+
+require_once __DIR__ . '/../../partials/header.php';
+/** @var string $base_url */
 ?>
 
 <link rel="stylesheet" href="<?= $base_url ?>/web/css/coasters.css"> <!-- Reutilizamos el mismo CSS -->

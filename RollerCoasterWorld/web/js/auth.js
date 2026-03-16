@@ -195,13 +195,7 @@ $(document).ready(function () {
         }
 
         user.getIdToken().then((idToken) => {
-          fetch(BASE + "/api/php/save_session.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ firebase_uid: user.uid, email: user.email }),
-          })
-            .then((r) => r.json())
-            .then((d) => console.log("Sesión PHP:", d));
+          // Sincronizar con Supabase en paralelo (no bloqueante)
           fetch(BASE + "/api/php/auth.php", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -212,13 +206,29 @@ $(document).ready(function () {
           })
             .then((r) => r.json())
             .then((d) => console.log("Sync Supabase:", d));
-        });
 
-        showAlert("¡Bienvenido!");
-        const params = new URLSearchParams(window.location.search);
-        const redirectUrl =
-          params.get("redirect") || BASE + "/web/views/public/index.php";
-        window.location.href = redirectUrl;
+          // Guardar sesión PHP y redirigir SOLO cuando esté confirmada
+          const params = new URLSearchParams(window.location.search);
+          const redirectUrl =
+            params.get("redirect") || BASE + "/web/views/public/index.php";
+
+          fetch(BASE + "/api/php/save_session.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ firebase_uid: user.uid, email: user.email }),
+          })
+            .then((r) => r.json())
+            .then((d) => {
+              console.log("Sesión PHP:", d);
+              showAlert("¡Bienvenido!");
+              window.location.href = redirectUrl;
+            })
+            .catch(() => {
+              // Si falla la petición, redirigimos igualmente
+              showAlert("¡Bienvenido!");
+              window.location.href = redirectUrl;
+            });
+        });
       })
       .catch((error) => {
         let msg;
@@ -285,13 +295,6 @@ $(document).ready(function () {
         }
 
         user.getIdToken().then((idToken) => {
-          fetch(BASE + "/api/php/save_session.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ firebase_uid: user.uid, email: user.email }),
-          })
-            .then((r) => r.json())
-            .then((d) => console.log("Sesión PHP:", d));
           fetch(BASE + "/api/php/auth.php", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -302,13 +305,27 @@ $(document).ready(function () {
           })
             .then((r) => r.json())
             .then((d) => console.log("Sync Supabase (Google):", d));
-        });
 
-        showAlert("¡Bienvenido con Google!");
-        const params = new URLSearchParams(window.location.search);
-        const redirectUrl =
-          params.get("redirect") || BASE + "/web/views/public/index.php";
-        window.location.href = redirectUrl;
+          const params = new URLSearchParams(window.location.search);
+          const redirectUrl =
+            params.get("redirect") || BASE + "/web/views/public/index.php";
+
+          fetch(BASE + "/api/php/save_session.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ firebase_uid: user.uid, email: user.email }),
+          })
+            .then((r) => r.json())
+            .then((d) => {
+              console.log("Sesión PHP:", d);
+              showAlert("¡Bienvenido con Google!");
+              window.location.href = redirectUrl;
+            })
+            .catch(() => {
+              showAlert("¡Bienvenido con Google!");
+              window.location.href = redirectUrl;
+            });
+        });
       })
       .catch((error) => {
         if (error.code === "auth/invalid-credential")
@@ -328,13 +345,6 @@ $(document).ready(function () {
         const user = result.user;
         console.log("Login Facebook OK:", user.uid);
         user.getIdToken().then((idToken) => {
-          fetch(BASE + "/api/php/save_session.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ firebase_uid: user.uid, email: user.email }),
-          })
-            .then((r) => r.json())
-            .then((d) => console.log("Sesión PHP:", d));
           fetch(BASE + "/api/php/auth.php", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -345,12 +355,27 @@ $(document).ready(function () {
           })
             .then((r) => r.json())
             .then((d) => console.log("Sync Supabase (Facebook):", d));
+
+          const params = new URLSearchParams(window.location.search);
+          const redirectUrl =
+            params.get("redirect") || BASE + "/web/views/public/index.php";
+
+          fetch(BASE + "/api/php/save_session.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ firebase_uid: user.uid, email: user.email }),
+          })
+            .then((r) => r.json())
+            .then((d) => {
+              console.log("Sesión PHP:", d);
+              showAlert("¡Bienvenido con Facebook!");
+              window.location.href = redirectUrl;
+            })
+            .catch(() => {
+              showAlert("¡Bienvenido con Facebook!");
+              window.location.href = redirectUrl;
+            });
         });
-        showAlert("¡Bienvenido con Facebook!");
-        const params = new URLSearchParams(window.location.search);
-        const redirectUrl =
-          params.get("redirect") || BASE + "/web/views/public/index.php";
-        window.location.href = redirectUrl;
       })
       .catch((error) => showAlert("Error con Facebook: " + error.message));
   }

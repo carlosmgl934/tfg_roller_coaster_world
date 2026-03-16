@@ -9,14 +9,14 @@ require_once __DIR__ . '/../partials/header.php';
 
   <?php if (isset($_GET['msg']) && $_GET['msg'] === 'review'): ?>
     <div class="alert alert-warning text-center mx-auto mb-4" style="max-width: 400px;" role="alert">
-      Tienes que iniciar sesión para escribir una reseña.
+      Tienes que iniciar sesión para escribir una reseña
     </div>
   <?php endif; ?>
 
   <?php if (isset($_GET['msg']) && $_GET['msg'] === 'registered'): ?>
     <div class="alert alert-success text-center mx-auto mb-4" style="max-width: 450px;" role="alert">
       <i class="fa-solid fa-circle-check me-2"></i>
-      <strong>¡Cuenta creada con éxito!</strong> Ahora inicia sesión para continuar.
+      <strong>¡Cuenta creada con éxito!</strong> Ahora inicia sesión para continuar
     </div>
   <?php endif; ?>
 
