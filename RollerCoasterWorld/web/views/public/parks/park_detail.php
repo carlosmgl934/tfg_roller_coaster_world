@@ -12,7 +12,7 @@ if ($id === 0) {
 <link rel="stylesheet" href="<?= $base_url ?>/web/css/coasters.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 
-<main class="container-fluid px-lg-5 my-5">
+<main class="container-fluid px-lg-5 my-5" data-logged="<?= $is_logged ? 'true' : 'false' ?>">
     <div class="row g-4 mb-5">
         <!-- Hero imagen -->
         <div class="col-12 col-lg-7">
@@ -106,7 +106,7 @@ if ($id === 0) {
                         <option value="best">Mejor valoración</option>
                         <option value="worst">Peor valoración</option>
                     </select>
-                    <a class="btn btn-success rounded-0 px-4" href="<?= $base_url ?>/web/views/public/parks/form_park_rating.php?id=<?= $id ?>">
+                    <a class="btn btn-success rounded-0 px-4" id="btn-write-review" href="<?= $base_url ?>/web/views/public/parks/form_park_rating.php?id=<?= $id ?>">
                         <i class="fa-solid fa-pen me-2"></i>Escribir reseña
                     </a>
                 </div>
@@ -139,6 +139,21 @@ if ($id === 0) {
                 <input type="file" id="photo-upload" accept="image/*" class="form-control mb-3">
                 <div class="text-center">
                     <button class="btn btn-success" id="crop-save-btn" style="display:none;">Guardar foto recortada</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Login -->
+<div class="modal fade" id="loginModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-body text-center p-4">
+                <p class="mb-4" style="font-size:1rem;">Para escribir una reseña necesitas estar registrado</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <button class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <a href="<?= $base_url ?>/web/views/auth/login.php?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn btn-success px-4">Ir al Login</a>
                 </div>
             </div>
         </div>

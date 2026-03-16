@@ -1,11 +1,9 @@
 $(document).ready(function () {
-
   // =====================================================
   // === BÚSQUEDA Y LISTADO DE PARQUES (park_search.php) ===
   // =====================================================
 
   if (document.getElementById("park-list")) {
-
     // Resetear filtros al recargar página
     window.addEventListener("pageshow", function () {
       document.getElementById("opening-year-min").value = "";
@@ -31,17 +29,19 @@ $(document).ready(function () {
 
     function buscarParques(query) {
       $.ajax({
-        url: '/api/parks/search',
-        method: 'GET',
+        url: "/api/parks/search",
+        method: "GET",
         data: { q: query },
         success: function (data) {
           const results = $("#search-results");
           results.empty().show();
           if (data.length === 0) {
-            results.append('<div class="list-group-item text-muted">No se encontraron parques</div>');
+            results.append(
+              '<div class="list-group-item text-muted">No se encontraron parques</div>',
+            );
             return;
           }
-          data.forEach(park => {
+          data.forEach((park) => {
             const item = `
               <a href="/parks.php?id=${park.id}" class="list-group-item list-group-item-action">
                 <strong>${park.park_name}</strong><br>
@@ -51,8 +51,12 @@ $(document).ready(function () {
           });
         },
         error: function () {
-          $("#search-results").html('<div class="list-group-item text-danger">Error al buscar</div>').show();
-        }
+          $("#search-results")
+            .html(
+              '<div class="list-group-item text-danger">Error al buscar</div>',
+            )
+            .show();
+        },
       });
     }
 
@@ -64,7 +68,9 @@ $(document).ready(function () {
     });
 
     // Filtros dinámicos
-    $("#country-filter, #location-filter, #opening-year-min, #opening-year-max, #num-coaster-min, #num-coaster-max, #rating-filter").on("change input", function () {
+    $(
+      "#country-filter, #location-filter, #opening-year-min, #opening-year-max, #num-coaster-min, #num-coaster-max, #rating-filter",
+    ).on("change input", function () {
       aplicarFiltros();
     });
 
@@ -87,20 +93,22 @@ $(document).ready(function () {
       const contenedor = $("#park-list");
       contenedor.empty();
       if (parques.length === 0) {
-        contenedor.html('<p class="text-center text-muted py-5">No se encontraron parques con esos filtros</p>');
+        contenedor.html(
+          '<p class="text-center text-muted py-5">No se encontraron parques con esos filtros</p>',
+        );
         return;
       }
-      parques.forEach(park => {
+      parques.forEach((park) => {
         const card = `
           <div class="col-12 col-md-6 col-lg-4">
             <div class="card h-100 shadow-sm border-0">
-              <img src="${park.imagen_url || 'https://placehold.co/400x300'}" class="card-img-top" alt="${park.park_name}">
+              <img src="${park.imagen_url || "https://placehold.co/400x300"}" class="card-img-top" alt="${park.park_name}">
               <div class="card-body">
                 <h5 class="card-title">${park.park_name}</h5>
                 <p class="card-text text-muted">${park.park_location}, ${park.park_country}</p>
                 <p class="mb-1"><strong>Apertura:</strong> ${park.opening_year}</p>
                 <p class="mb-1"><strong>Coasters:</strong> ${park.num_coaster} (${park.operating_coasters} operativas)</p>
-                <p class="mb-1"><strong>Entrada:</strong> $${park.precio_entrada || 'N/A'}</p>
+                <p class="mb-1"><strong>Entrada:</strong> $${park.precio_entrada || "N/A"}</p>
                 <p class="mb-0"><strong>Rating:</strong> ${park.stars} ★</p>
               </div>
               <div class="card-footer text-center">
@@ -118,11 +126,11 @@ $(document).ready(function () {
   // =====================================================
 
   if (document.getElementById("park-name")) {
-    const parkId = new URLSearchParams(window.location.search).get('id');
+    const parkId = new URLSearchParams(window.location.search).get("id");
 
     $.ajax({
-      url: '/api/parks/' + parkId,
-      method: 'GET',
+      url: "/api/parks/" + parkId,
+      method: "GET",
       success: function (park) {
         $("#park-name").text(park.park_name);
         $("#park-rating").text("★ " + (park.stars || "N/A"));
@@ -131,21 +139,49 @@ $(document).ready(function () {
         $("#park-country").text(park.park_country);
         $("#num-coaster").text(park.num_coaster || "N/A");
         $("#operating-coasters").text(park.operating_coasters || "N/A");
-        $("#precio-entrada").text(park.precio_entrada ? "$" + park.precio_entrada : "N/A");
-        $("#park-description").text(park.description || "Sin descripción disponible");
+        $("#precio-entrada").text(
+          park.precio_entrada ? "$" + park.precio_entrada : "N/A",
+        );
+        $("#park-description").text(
+          park.description || "Sin descripción disponible",
+        );
         $("#btn-website").attr("href", park.web || "#");
-        $("#park-hero-img").attr("src", park.imagen_url || "https://placehold.co/900x500");
-        $("#park-gallery").html('<p class="text-muted">Galería en desarrollo...</p>');
+        $("#park-hero-img").attr(
+          "src",
+          park.imagen_url || "https://placehold.co/900x500",
+        );
+        $("#park-gallery").html(
+          '<p class="text-muted">Galería en desarrollo...</p>',
+        );
       },
       error: function () {
         $("#park-name").text("Error al cargar el parque");
-      }
+      },
     });
 
     // Abrir modal de subida de foto
     $("#btn-upload-photo").click(function () {
-      $("#uploadPhotoModal").modal("show");
+      const isLogged = document.querySelector("main").getAttribute("data-logged") === "true";
+      if (!isLogged) {
+        const loginModal = new bootstrap.Modal(document.getElementById("loginModal"));
+        loginModal.show();
+      } else {
+        $("#uploadPhotoModal").modal("show");
+      }
     });
+
+    // Validar login antes de escribir reseña
+    const btnWriteReview = document.getElementById("btn-write-review");
+    if (btnWriteReview) {
+      btnWriteReview.addEventListener("click", function(e) {
+        const isLogged = document.querySelector("main").getAttribute("data-logged") === "true";
+        if (!isLogged) {
+          e.preventDefault(); // Evita navegar a form_park_rating.php
+          const loginModal = new bootstrap.Modal(document.getElementById("loginModal"));
+          loginModal.show();
+        }
+      });
+    }
   }
 
   // =====================================================
@@ -153,13 +189,12 @@ $(document).ready(function () {
   // =====================================================
 
   if (document.getElementById("park-review-form")) {
-
     // Inicializar Choices.js para el select múltiple de pros/contras
     if (document.getElementById("pros-contras")) {
-      new Choices('#pros-contras', {
+      new Choices("#pros-contras", {
         removeItemButton: true,
-        placeholderValue: 'Selecciona pros y contras',
-        noResultsText: 'No se encontraron resultados',
+        placeholderValue: "Selecciona pros y contras",
+        noResultsText: "No se encontraron resultados",
       });
     }
 
@@ -192,34 +227,41 @@ $(document).ready(function () {
       // Leer el park_id desde el input hidden del formulario
       const parkId = $("input[name='park_id']").val();
 
-      cropper.getCroppedCanvas().toBlob(function (blob) {
-        const formData = new FormData();
-        formData.append('photo', blob, 'park-photo.jpg');
-        formData.append('park_id', parkId);
+      cropper.getCroppedCanvas().toBlob(
+        function (blob) {
+          const formData = new FormData();
+          formData.append("photo", blob, "park-photo.jpg");
+          formData.append("park_id", parkId);
 
-        $.ajax({
-          url: '/api/parks/upload-photo',
-          method: 'POST',
-          data: formData,
-          processData: false,
-          contentType: false,
-          success: function (data) {
-            if (data.success) {
-              alert("¡Foto enviada! Esperando aprobación");
-              $("#uploadPhotoModal").modal("hide");
-              $("#photo-upload").val("");
-              $(".crop-container").hide();
-              $("#crop-save-btn").hide();
-              if (cropper) { cropper.destroy(); cropper = null; }
-            } else {
-              alert("Error: " + (data.error || "Desconocido"));
-            }
-          },
-          error: function () {
-            alert("Error al subir la foto");
-          }
-        });
-      }, 'image/jpeg', 0.85);
+          $.ajax({
+            url: "/api/parks/upload-photo",
+            method: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+              if (data.success) {
+                alert("¡Foto enviada! Esperando aprobación");
+                $("#uploadPhotoModal").modal("hide");
+                $("#photo-upload").val("");
+                $(".crop-container").hide();
+                $("#crop-save-btn").hide();
+                if (cropper) {
+                  cropper.destroy();
+                  cropper = null;
+                }
+              } else {
+                alert("Error: " + (data.error || "Desconocido"));
+              }
+            },
+            error: function () {
+              alert("Error al subir la foto");
+            },
+          });
+        },
+        "image/jpeg",
+        0.85,
+      );
     });
 
     // Enviar reseña
@@ -237,5 +279,4 @@ $(document).ready(function () {
       // $.ajax({ url: '/api/parks/review', method: 'POST', data: ..., success: ... });
     });
   }
-
 });

@@ -636,6 +636,18 @@ $(document).ready(function () {
         loadReviews($(this).val());
       });
     }
+
+    const btnWriteReview = document.getElementById("btn-write-review");
+    if (btnWriteReview) {
+      btnWriteReview.addEventListener("click", function (e) {
+        const isLogged = document.querySelector("main").getAttribute("data-logged") === "true";
+        if (!isLogged) {
+          e.preventDefault();
+          const loginModal = new bootstrap.Modal(document.getElementById("loginModal"));
+          loginModal.show();
+        }
+      });
+    }
   }
 
   // --- LÓGICA PARA EL FORMULARIO DE RESEÑAS ---

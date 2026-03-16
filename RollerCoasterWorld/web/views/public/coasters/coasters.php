@@ -12,7 +12,7 @@ if ($id === 0) {
 <!-- CropperJS para recortar imágenes al subir fotos -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 
-<main class="container-fluid px-lg-5 my-5">
+<main class="container-fluid px-lg-5 my-5" data-logged="<?= $is_logged ? 'true' : 'false' ?>">
 
     <!-- HERO -->
     <div class="row g-4 mb-4 align-items-start">
@@ -254,6 +254,21 @@ if ($id === 0) {
     </div>
 
 </main>
+
+<!-- Modal de Login -->
+<div class="modal fade" id="loginModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-body text-center p-4">
+                <p class="mb-4" style="font-size:1rem;">Para escribir una reseña necesitas estar registrado</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <button class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <a href="<?= $base_url ?>/web/views/auth/login.php?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn btn-success px-4">Ir al Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 <script src="<?= $base_url ?>/web/js/coasters.js"></script>
