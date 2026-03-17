@@ -4,13 +4,43 @@ if (session_status() === PHP_SESSION_NONE) {
   session_start();
 }
 
-// Determina si el usuario está logueado
-$is_logged = isset($_SESSION['firebase_uid']);
+// Configuración de URL base
 $base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_SERVER['SCRIPT_NAME']);
 
-?>
+// Páginas públicas que no requieren login
+$public_pages = [
+  '/web/views/auth/login.php',
+  '/web/views/auth/register.php',
+  '/web/views/public/contact.php',
+  '/web/views/public/privacy.php',
+  '/web/views/public/notice.php'
+];
 
-<!doctype html>
+// Determina si el usuario está logueado
+$is_logged = isset($_SESSION['firebase_uid']);
+
+// Comprobar si la página actual es pública o privada
+$current_script = $_SERVER['SCRIPT_NAME'];
+$is_public = false;
+
+foreach ($public_pages as $page) {
+  if (strpos($current_script, $page) !== false) {
+    $is_public = true;
+    break;
+  }
+}
+
+// Redirigir a login si no está logueado y la página es privada
+if (!$is_logged && !$is_public) {
+  header('Location: ' . $base_url . '/web/views/auth/login.php');
+  exit;
+}
+
+// Evitar que el navegador guarde en caché páginas protegidas para que no se pueda volver atrás tras un logout
+header("Cache-Control: no-cache, no-store, must-revalidate"); // HTTP 1.1
+header("Pragma: no-cache"); // HTTP 1.0
+header("Expires: 0"); // Proxies
+?><!doctype html>
 <html lang="es">
 
 <head>
@@ -35,11 +65,12 @@ $base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_S
   <!-- Firebase auth init (global) -->
   <script src="<?= $base_url ?>/web/js/auth.js"></script>
 
+  <!-- Estilos globales y sticky footer -->
+  <link rel="stylesheet" href="<?= $base_url ?>/web/css/header.css">
+
 </head>
 
 <body>
-  <link rel="stylesheet" href="<?= $base_url ?>/web/css/header.css">
-  </header>
 
   <nav class="navbar navbar-expand-lg custom-navbar sticky-top shadow-sm">
     <div class="container-fluid px-4">
@@ -197,5 +228,4 @@ $base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_S
   </nav>
 
   <!-- Añade el JS completo de Bootstrap para que los dropdowns funcionen -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  </header>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

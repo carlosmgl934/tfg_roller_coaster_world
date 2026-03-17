@@ -47,13 +47,6 @@ require_once __DIR__ . '/../partials/header.php';
     ¿No tienes cuenta? <a href="<?= $registerUrl ?>">Regístrate aquí</a>
   </p>
 
-  <!-- BOTÓN PROVISIONAL DE CERRAR SESIÓN (para pruebas rápidas) -->
-  <div style="margin-top: 40px; text-align: center;">
-  <button type="button" id="signOut">Logout</button>
-    <p style="font-size: 0.9em; color: #777; margin-top: 10px;">
-      (Botón provisional para probar logout desde esta misma página)
-    </p>
-  </div>
 </main>
 
 <?php

@@ -125,3 +125,208 @@ db_conexion.php cargado OK
 DBConexion instanciada OK
 Query preparada OK
 Insertado nuevo ID: 28
+2026-03-16 19:44:56 ── Nueva petición recibida ──
+RAW INPUT: {"id_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3MzY4NjY5OCwidXNlcl9pZCI6InBwZ2lPQlNSekljTjNLRGZaWmpSb3hvQnVBYzIiLCJzdWIiOiJwcGdpT0JTUnpJY04zS0RmWlpqUm94b0J1QWMyIiwiaWF0IjoxNzczNjg2Njk4LCJleHAiOjE3NzM2OTAyOTgsImVtYWlsIjoidXN1YXJpb0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidXN1YXJpb0BnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.TF1xGi5f9FrlymY5TECmHMdOSfSoaRNur_DzvVpplXWwMaoRRT5X1Om_4rdv3Npva8O78yN2qkHP5VMgMyx-U3gKbu9bmCczqb0CHeBO618JvSQMDlxOZhrLRYBifjAvVi8CCmd7PCBQTvqp9D7ThNYJMkKtYgNMPLXOi6RMmBydoSCs4IDdH2Cz3GjbI8l9Dgo7AnpWCgN_rd17OUAgF3B5IqGazXE35Z1g2J4YNyFIGe09v9lBPzF9OpNxhDZ-paMwXYj74xQ1vsz7rANhZLvc8s8bkrs_TsNadUguL9CJeE1ZGBPFjUQr8uxevGmJI7MmJEM0cr6KEvWsmkuMCw","username":"usuario"}
+Input parseado: Array
+(
+    [id_token] => eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3MzY4NjY5OCwidXNlcl9pZCI6InBwZ2lPQlNSekljTjNLRGZaWmpSb3hvQnVBYzIiLCJzdWIiOiJwcGdpT0JTUnpJY04zS0RmWlpqUm94b0J1QWMyIiwiaWF0IjoxNzczNjg2Njk4LCJleHAiOjE3NzM2OTAyOTgsImVtYWlsIjoidXN1YXJpb0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidXN1YXJpb0BnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.TF1xGi5f9FrlymY5TECmHMdOSfSoaRNur_DzvVpplXWwMaoRRT5X1Om_4rdv3Npva8O78yN2qkHP5VMgMyx-U3gKbu9bmCczqb0CHeBO618JvSQMDlxOZhrLRYBifjAvVi8CCmd7PCBQTvqp9D7ThNYJMkKtYgNMPLXOi6RMmBydoSCs4IDdH2Cz3GjbI8l9Dgo7AnpWCgN_rd17OUAgF3B5IqGazXE35Z1g2J4YNyFIGe09v9lBPzF9OpNxhDZ-paMwXYj74xQ1vsz7rANhZLvc8s8bkrs_TsNadUguL9CJeE1ZGBPFjUQr8uxevGmJI7MmJEM0cr6KEvWsmkuMCw
+    [username] => usuario
+)
+
+Payload decodificado: Array
+(
+    [iss] => https://securetoken.google.com/tfg-roller-coaster-world-auth
+    [aud] => tfg-roller-coaster-world-auth
+    [auth_time] => 1773686698
+    [user_id] => ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+    [sub] => ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+    [iat] => 1773686698
+    [exp] => 1773690298
+    [email] => usuario@gmail.com
+    [email_verified] => 
+    [firebase] => Array
+        (
+            [identities] => Array
+                (
+                    [email] => Array
+                        (
+                            [0] => usuario@gmail.com
+                        )
+
+                )
+
+            [sign_in_provider] => password
+        )
+
+)
+
+Datos para insertar: uid=ppgiOBSRzIcN3KDfZZjRoxoBuAc2, email=usuario@gmail.com, username=usuario
+Intentando cargar db_conexion.php...
+db_conexion.php cargado OK
+DBConexion instanciada OK
+Query preparada OK
+Insertado nuevo ID: 28
+2026-03-17 19:57:42 ── Nueva petición recibida ──
+RAW INPUT: {"id_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc3Mzg2NSwidXNlcl9pZCI6InBwZ2lPQlNSekljTjNLRGZaWmpSb3hvQnVBYzIiLCJzdWIiOiJwcGdpT0JTUnpJY04zS0RmWlpqUm94b0J1QWMyIiwiaWF0IjoxNzczNzczODY1LCJleHAiOjE3NzM3Nzc0NjUsImVtYWlsIjoidXN1YXJpb0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidXN1YXJpb0BnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.Uksf0Ly7ISxpb9PJ7obqb_MdexW6vOn1i7n3tdYIN7VxPSfbw1QNsiXMqnHMAauZVNjBujlA0BOcESVcQ-Kekrmazt_-vwl1kLqTlI4rk3i6pwqxGdu3NQSDyiVx71Uz4y6tN53rdpWVKdtblFuBnyYXvJAefBWYUHlmfbx05I4nbMoVZOqL0Ssgx22MYg8Qo0SIC8oTj7jXvzUQsl5_nsJq8LTld2f23pI3L45OxPJWPPscHife2k4zV5A7jJCaeFEvIrhpVRMMU-dqzwkOw9tQCSCqEDF4JGiWQlwd-pFlunve9M7DKWRhT1NL4tCwehhsQ_-A1fP3ngwE-_jdiw","username":"usuario"}
+Input parseado: Array
+(
+    [id_token] => eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc3Mzg2NSwidXNlcl9pZCI6InBwZ2lPQlNSekljTjNLRGZaWmpSb3hvQnVBYzIiLCJzdWIiOiJwcGdpT0JTUnpJY04zS0RmWlpqUm94b0J1QWMyIiwiaWF0IjoxNzczNzczODY1LCJleHAiOjE3NzM3Nzc0NjUsImVtYWlsIjoidXN1YXJpb0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidXN1YXJpb0BnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.Uksf0Ly7ISxpb9PJ7obqb_MdexW6vOn1i7n3tdYIN7VxPSfbw1QNsiXMqnHMAauZVNjBujlA0BOcESVcQ-Kekrmazt_-vwl1kLqTlI4rk3i6pwqxGdu3NQSDyiVx71Uz4y6tN53rdpWVKdtblFuBnyYXvJAefBWYUHlmfbx05I4nbMoVZOqL0Ssgx22MYg8Qo0SIC8oTj7jXvzUQsl5_nsJq8LTld2f23pI3L45OxPJWPPscHife2k4zV5A7jJCaeFEvIrhpVRMMU-dqzwkOw9tQCSCqEDF4JGiWQlwd-pFlunve9M7DKWRhT1NL4tCwehhsQ_-A1fP3ngwE-_jdiw
+    [username] => usuario
+)
+
+Payload decodificado: Array
+(
+    [iss] => https://securetoken.google.com/tfg-roller-coaster-world-auth
+    [aud] => tfg-roller-coaster-world-auth
+    [auth_time] => 1773773865
+    [user_id] => ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+    [sub] => ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+    [iat] => 1773773865
+    [exp] => 1773777465
+    [email] => usuario@gmail.com
+    [email_verified] => 
+    [firebase] => Array
+        (
+            [identities] => Array
+                (
+                    [email] => Array
+                        (
+                            [0] => usuario@gmail.com
+                        )
+
+                )
+
+            [sign_in_provider] => password
+        )
+
+)
+
+Datos para insertar: uid=ppgiOBSRzIcN3KDfZZjRoxoBuAc2, email=usuario@gmail.com, username=usuario
+Intentando cargar db_conexion.php...
+db_conexion.php cargado OK
+DBConexion instanciada OK
+Query preparada OK
+Insertado nuevo ID: 28
+2026-03-17 20:27:03 ── Nueva petición recibida ──
+RAW INPUT: {"id_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6ImEyZGZiOGEzOGI1MmQ5ZjA5ZWRjYWE1MDcwYTBlOGYwYTllMDk4YmEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc3NTYyNiwidXNlcl9pZCI6InBwZ2lPQlNSekljTjNLRGZaWmpSb3hvQnVBYzIiLCJzdWIiOiJwcGdpT0JTUnpJY04zS0RmWlpqUm94b0J1QWMyIiwiaWF0IjoxNzczNzc1NjI2LCJleHAiOjE3NzM3NzkyMjYsImVtYWlsIjoidXN1YXJpb0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidXN1YXJpb0BnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.kFjAZ3eGeLCLUtE_ByGUW0pNEiUE0CXdj1UfjHC_rlAqlVrxznCanRpm8TCLBm1-Yoppg6nYM0y_niJi05M6dLdWU5Nej5940vPfpI3gr5jhFHf1baLbKbmLWo1NATLlqoW9MgpJ0I3x_HMDqzhNXSOqNLQHca1wBNwNNtFO1R2qyIgvXrZyB8BFF5lPPlv3gTo2wKWKp2dCSJ2vx7Y0cNIhI7rhqRMwL3MpQSLWKgmV2gOQ4ihVwRR2NCRZamgm3-7LRqtRE1nSh6T-oS2SYAi2C6whLNjM0Rh1utKNpV2j-Jg6yt-WJNo9B_Pvu1vlAV1WfHJwCDcyOn4X32siwQ","username":"usuario"}
+Input parseado: Array
+(
+    [id_token] => eyJhbGciOiJSUzI1NiIsImtpZCI6ImEyZGZiOGEzOGI1MmQ5ZjA5ZWRjYWE1MDcwYTBlOGYwYTllMDk4YmEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc3NTYyNiwidXNlcl9pZCI6InBwZ2lPQlNSekljTjNLRGZaWmpSb3hvQnVBYzIiLCJzdWIiOiJwcGdpT0JTUnpJY04zS0RmWlpqUm94b0J1QWMyIiwiaWF0IjoxNzczNzc1NjI2LCJleHAiOjE3NzM3NzkyMjYsImVtYWlsIjoidXN1YXJpb0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidXN1YXJpb0BnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.kFjAZ3eGeLCLUtE_ByGUW0pNEiUE0CXdj1UfjHC_rlAqlVrxznCanRpm8TCLBm1-Yoppg6nYM0y_niJi05M6dLdWU5Nej5940vPfpI3gr5jhFHf1baLbKbmLWo1NATLlqoW9MgpJ0I3x_HMDqzhNXSOqNLQHca1wBNwNNtFO1R2qyIgvXrZyB8BFF5lPPlv3gTo2wKWKp2dCSJ2vx7Y0cNIhI7rhqRMwL3MpQSLWKgmV2gOQ4ihVwRR2NCRZamgm3-7LRqtRE1nSh6T-oS2SYAi2C6whLNjM0Rh1utKNpV2j-Jg6yt-WJNo9B_Pvu1vlAV1WfHJwCDcyOn4X32siwQ
+    [username] => usuario
+)
+
+Payload decodificado: Array
+(
+    [iss] => https://securetoken.google.com/tfg-roller-coaster-world-auth
+    [aud] => tfg-roller-coaster-world-auth
+    [auth_time] => 1773775626
+    [user_id] => ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+    [sub] => ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+    [iat] => 1773775626
+    [exp] => 1773779226
+    [email] => usuario@gmail.com
+    [email_verified] => 
+    [firebase] => Array
+        (
+            [identities] => Array
+                (
+                    [email] => Array
+                        (
+                            [0] => usuario@gmail.com
+                        )
+
+                )
+
+            [sign_in_provider] => password
+        )
+
+)
+
+Datos para insertar: uid=ppgiOBSRzIcN3KDfZZjRoxoBuAc2, email=usuario@gmail.com, username=usuario
+Intentando cargar db_conexion.php...
+db_conexion.php cargado OK
+DBConexion instanciada OK
+Query preparada OK
+Insertado nuevo ID: 28
+2026-03-17 20:27:31 ── Nueva petición recibida ──
+RAW INPUT: {"id_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6ImEyZGZiOGEzOGI1MmQ5ZjA5ZWRjYWE1MDcwYTBlOGYwYTllMDk4YmEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc3NTY1NCwidXNlcl9pZCI6InBwZ2lPQlNSekljTjNLRGZaWmpSb3hvQnVBYzIiLCJzdWIiOiJwcGdpT0JTUnpJY04zS0RmWlpqUm94b0J1QWMyIiwiaWF0IjoxNzczNzc1NjU0LCJleHAiOjE3NzM3NzkyNTQsImVtYWlsIjoidXN1YXJpb0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidXN1YXJpb0BnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.TbPMH7ZOqF9BDI6QYuuwKZPzsuLTCSwqk0apcbtnopX-fULP2TgiRsOLWsaR_cbasiMqR-IBqDyaRfhHmfR5qp7TUwkih2d8_IenYx-4qBKJskVs6b9wAGqEsyX18ocDdH85dAawH6_FOCG2FabLKukWCbtNeXanjBVmqQCLXDSVQSnzWUU4L13I37THc-6xLFSOZ0fL_Jm2c-rElmXEGyIdIwlnc4GzyGR07_f1KxuJ3FxUylbzMA6-f9GkfWj7NMkde4p4hS8p0UU66SshDPPFSx7CDL9WwLvfdWumqqQxJ7Ov3zdmV1hbEkaGaxRv7a4TGwm3T0GqyU5PIx7g9g","username":"usuario"}
+Input parseado: Array
+(
+    [id_token] => eyJhbGciOiJSUzI1NiIsImtpZCI6ImEyZGZiOGEzOGI1MmQ5ZjA5ZWRjYWE1MDcwYTBlOGYwYTllMDk4YmEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc3NTY1NCwidXNlcl9pZCI6InBwZ2lPQlNSekljTjNLRGZaWmpSb3hvQnVBYzIiLCJzdWIiOiJwcGdpT0JTUnpJY04zS0RmWlpqUm94b0J1QWMyIiwiaWF0IjoxNzczNzc1NjU0LCJleHAiOjE3NzM3NzkyNTQsImVtYWlsIjoidXN1YXJpb0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidXN1YXJpb0BnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.TbPMH7ZOqF9BDI6QYuuwKZPzsuLTCSwqk0apcbtnopX-fULP2TgiRsOLWsaR_cbasiMqR-IBqDyaRfhHmfR5qp7TUwkih2d8_IenYx-4qBKJskVs6b9wAGqEsyX18ocDdH85dAawH6_FOCG2FabLKukWCbtNeXanjBVmqQCLXDSVQSnzWUU4L13I37THc-6xLFSOZ0fL_Jm2c-rElmXEGyIdIwlnc4GzyGR07_f1KxuJ3FxUylbzMA6-f9GkfWj7NMkde4p4hS8p0UU66SshDPPFSx7CDL9WwLvfdWumqqQxJ7Ov3zdmV1hbEkaGaxRv7a4TGwm3T0GqyU5PIx7g9g
+    [username] => usuario
+)
+
+Payload decodificado: Array
+(
+    [iss] => https://securetoken.google.com/tfg-roller-coaster-world-auth
+    [aud] => tfg-roller-coaster-world-auth
+    [auth_time] => 1773775654
+    [user_id] => ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+    [sub] => ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+    [iat] => 1773775654
+    [exp] => 1773779254
+    [email] => usuario@gmail.com
+    [email_verified] => 
+    [firebase] => Array
+        (
+            [identities] => Array
+                (
+                    [email] => Array
+                        (
+                            [0] => usuario@gmail.com
+                        )
+
+                )
+
+            [sign_in_provider] => password
+        )
+
+)
+
+Datos para insertar: uid=ppgiOBSRzIcN3KDfZZjRoxoBuAc2, email=usuario@gmail.com, username=usuario
+Intentando cargar db_conexion.php...
+db_conexion.php cargado OK
+DBConexion instanciada OK
+Query preparada OK
+Insertado nuevo ID: 28
+2026-03-17 20:28:07 ── Nueva petición recibida ──
+RAW INPUT: {"id_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc3NTY5MCwidXNlcl9pZCI6InBwZ2lPQlNSekljTjNLRGZaWmpSb3hvQnVBYzIiLCJzdWIiOiJwcGdpT0JTUnpJY04zS0RmWlpqUm94b0J1QWMyIiwiaWF0IjoxNzczNzc1NjkwLCJleHAiOjE3NzM3NzkyOTAsImVtYWlsIjoidXN1YXJpb0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidXN1YXJpb0BnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.NBa87ridcHf9v49Q6XwsYIrrh43hosp7F2z-muEpvKP73ekHGUJAqiU-WgEP_lf_ou05TZbibHF5UGeseGhtLDoBOfh6iDh2OOVrJ8ztY4iXeetQ1h17V5eH1er2bcrw4wEyxLabdbC4VTqFUiHTv3Mfehxg0ThUGis_yeFgbGlAQhf0uJ4BZLaQ4iMa2ojsifIE5drUpf58-bgd46R9sDF1N2s6E14rF7Eq2rTuEJNDp52XVQ8AJI_5A_v8kaF_Cc7g99tLniCxBgpE6YPk75nxjXmBB0MLUjVMmp6ZXQwq_iDR9tXEbq0WA9dHBFU5GfmVPTwiGIiuG6LJ_nEE5w","username":"usuario"}
+Input parseado: Array
+(
+    [id_token] => eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc3NTY5MCwidXNlcl9pZCI6InBwZ2lPQlNSekljTjNLRGZaWmpSb3hvQnVBYzIiLCJzdWIiOiJwcGdpT0JTUnpJY04zS0RmWlpqUm94b0J1QWMyIiwiaWF0IjoxNzczNzc1NjkwLCJleHAiOjE3NzM3NzkyOTAsImVtYWlsIjoidXN1YXJpb0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidXN1YXJpb0BnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.NBa87ridcHf9v49Q6XwsYIrrh43hosp7F2z-muEpvKP73ekHGUJAqiU-WgEP_lf_ou05TZbibHF5UGeseGhtLDoBOfh6iDh2OOVrJ8ztY4iXeetQ1h17V5eH1er2bcrw4wEyxLabdbC4VTqFUiHTv3Mfehxg0ThUGis_yeFgbGlAQhf0uJ4BZLaQ4iMa2ojsifIE5drUpf58-bgd46R9sDF1N2s6E14rF7Eq2rTuEJNDp52XVQ8AJI_5A_v8kaF_Cc7g99tLniCxBgpE6YPk75nxjXmBB0MLUjVMmp6ZXQwq_iDR9tXEbq0WA9dHBFU5GfmVPTwiGIiuG6LJ_nEE5w
+    [username] => usuario
+)
+
+Payload decodificado: Array
+(
+    [iss] => https://securetoken.google.com/tfg-roller-coaster-world-auth
+    [aud] => tfg-roller-coaster-world-auth
+    [auth_time] => 1773775690
+    [user_id] => ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+    [sub] => ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+    [iat] => 1773775690
+    [exp] => 1773779290
+    [email] => usuario@gmail.com
+    [email_verified] => 
+    [firebase] => Array
+        (
+            [identities] => Array
+                (
+                    [email] => Array
+                        (
+                            [0] => usuario@gmail.com
+                        )
+
+                )
+
+            [sign_in_provider] => password
+        )
+
+)
+
+Datos para insertar: uid=ppgiOBSRzIcN3KDfZZjRoxoBuAc2, email=usuario@gmail.com, username=usuario
+Intentando cargar db_conexion.php...
+db_conexion.php cargado OK
+DBConexion instanciada OK
+Query preparada OK
+Insertado nuevo ID: 28

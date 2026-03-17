@@ -1,14 +1,4 @@
 <?php
-// Protección: si no hay firebase_uid en sesión, redirige a login.
-// IMPORTANTE: esta redirección debe ir ANTES de incluir header.php,
-// porque header.php emite HTML y ya no se pueden enviar cabeceras HTTP.
-if (session_status() === PHP_SESSION_NONE) session_start();
-if (!isset($_SESSION['firebase_uid'])) {
-  $base_url_tmp = (string) preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_SERVER['SCRIPT_NAME']);
-  header('Location: ' . $base_url_tmp . '/web/views/auth/login.php');
-  exit;
-}
-
 require_once __DIR__ . '/../partials/header.php';
 /** @var string $base_url */
 
@@ -29,12 +19,6 @@ $user_uid = $_SESSION['firebase_uid'];
     <p><strong>UID:</strong> <?php echo htmlspecialchars($user_uid); ?></p>
   </div>
 
-  <div style="margin-top: 40px; text-align: center;">
-  <button type="button" id="signOut">Logout</button>
-    <p style="font-size: 0.9em; color: #777; margin-top: 10px;">
-      (Botón provisional para probar logout desde esta misma página)
-    </p>
-  </div>
 </main>
 
 <?php

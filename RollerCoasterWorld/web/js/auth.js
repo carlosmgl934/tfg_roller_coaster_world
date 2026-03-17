@@ -395,25 +395,6 @@ $(document).ready(function () {
     else console.log("No hay usuario logueado");
   });
 
-  // ── Protección de rutas privadas ──────────────────────────────────────────────
-  window.auth.onAuthStateChanged((user) => {
-    const privatePages = [
-      "/web/views/profile.php",
-      "/web/views/carrito.php",
-      "/web/views/trips.php",
-      "/web/views/admin.php",
-      "/web/views/coasters.php",
-      "/web/views/index.php",
-      "/web/views/parks.php",
-    ];
-    const path = window.location.pathname;
-    if (privatePages.some((p) => path.endsWith(p) || path.includes(p))) {
-      if (!user) {
-        console.log("Acceso denegado: no logueado");
-        window.location.href = BASE + "/web/views/auth/login.php";
-      }
-    }
-  });
 
   // ── Cambiar contraseña ────────────────────────────────────────────────────────
   function toggleFormPassword() {

@@ -4,3 +4,13 @@
 2026-03-16 17:56:57 - Sesión guardada: UID=ppgiOBSRzIcN3KDfZZjRoxoBuAc2
 2026-03-16 18:02:19 - POST recibido: {"firebase_uid":"ppgiOBSRzIcN3KDfZZjRoxoBuAc2","email":"usuario@gmail.com"}
 2026-03-16 18:02:19 - Sesión guardada: UID=ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+2026-03-16 19:44:56 - POST recibido: {"firebase_uid":"ppgiOBSRzIcN3KDfZZjRoxoBuAc2","email":"usuario@gmail.com"}
+2026-03-16 19:44:56 - Sesión guardada: UID=ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+2026-03-17 19:57:43 - POST recibido: {"firebase_uid":"ppgiOBSRzIcN3KDfZZjRoxoBuAc2","email":"usuario@gmail.com"}
+2026-03-17 19:57:43 - Sesión guardada: UID=ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+2026-03-17 20:27:03 - POST recibido: {"firebase_uid":"ppgiOBSRzIcN3KDfZZjRoxoBuAc2","email":"usuario@gmail.com"}
+2026-03-17 20:27:03 - Sesión guardada: UID=ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+2026-03-17 20:27:31 - POST recibido: {"firebase_uid":"ppgiOBSRzIcN3KDfZZjRoxoBuAc2","email":"usuario@gmail.com"}
+2026-03-17 20:27:31 - Sesión guardada: UID=ppgiOBSRzIcN3KDfZZjRoxoBuAc2
+2026-03-17 20:28:08 - POST recibido: {"firebase_uid":"ppgiOBSRzIcN3KDfZZjRoxoBuAc2","email":"usuario@gmail.com"}
+2026-03-17 20:28:08 - Sesión guardada: UID=ppgiOBSRzIcN3KDfZZjRoxoBuAc2
