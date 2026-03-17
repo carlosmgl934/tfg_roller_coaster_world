@@ -20,7 +20,7 @@ if ($id === 0) {
         <!-- Imagen -->
         <div class="col-12 col-lg-7">
             <div class="hero-img-wrapper">
-                <img src="https://placehold.co/900x500" alt="Coaster" id="coaster-hero-img">
+                <img src="https://placehold.co/900x500" alt="Coaster" id="coaster-hero-img" referrerpolicy="no-referrer">
                 <div class="img-overlay"></div>
             </div>
         </div>

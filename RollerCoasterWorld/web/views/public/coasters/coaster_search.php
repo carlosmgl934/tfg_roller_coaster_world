@@ -98,6 +98,8 @@ require_once __DIR__ . '/../../partials/header.php';
 
         <!-- CENTRO: Lista -->
         <div class="col-12 col-lg-6">
+            <p class="mb-3 text-muted fw-bold" id="coaster-count"></p>
+            <div class="list-group shadow-sm rounded-0" id="coaster-list" style="border-radius: 0;"></div>
             <div class="list-group shadow-sm rounded-0" id="coaster-list" style="border-radius: 0;"></div>
 
             <div class="pagination mt-4 justify-content-center" id="pagination"></div>

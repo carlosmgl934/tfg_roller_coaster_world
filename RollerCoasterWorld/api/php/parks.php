@@ -62,11 +62,11 @@ function listParks() {
         $bind[':max_year'] = (int)$_GET['opening_year_max'];
     }
     if (!empty($_GET['min_coasters'])) {
-        $where[] = "num_coasters >= :min_coasters";
+        $where[] = "operating_coasters >= :min_coasters";
         $bind[':min_coasters'] = (int)$_GET['min_coasters'];
     }
     if (!empty($_GET['max_coasters'])) {
-        $where[] = "num_coasters <= :max_coasters";
+        $where[] = "operating_coasters <= :max_coasters";
         $bind[':max_coasters'] = (int)$_GET['max_coasters'];
     }
     if (!empty($_GET['min_stars'])) {
@@ -117,7 +117,7 @@ function searchParks() {
            OR park_location ILIKE :query 
            OR park_country ILIKE :query
         ORDER BY park_name ASC
-        LIMIT 20
+        LIMIT 5
     ");
     $stmt->execute([':query' => $query]);
 
@@ -140,7 +140,7 @@ function filterParks() {
         $bind[':min_stars'] = (float)$_GET['min_stars'];
     }
     if (!empty($_GET['max_coasters'])) {
-        $where[] = "num_coasters <= :max_coasters";
+        $where[] = "operating_coasters <= :max_coasters";
         $bind[':max_coasters'] = (int)$_GET['max_coasters'];
     }
 
@@ -350,7 +350,7 @@ function updateParkStats() {
     if ($parkId <= 0) Response::error("park_id inválido", 400);
 
     // Recalcular desde coasters (ejemplo simple)
-    $countStmt = $db->prepare("SELECT COUNT(*) FROM coasters WHERE park_id = :id");
+    $countStmt = $db->prepare("SELECT COUNT(*) FROM coasters WHERE park_id = :id AND coaster_status IN ('Operating', 'Operativa', 'Abierta')");
     $countStmt->execute([':id' => $parkId]);
     $numCoasters = $countStmt->fetchColumn();
 
