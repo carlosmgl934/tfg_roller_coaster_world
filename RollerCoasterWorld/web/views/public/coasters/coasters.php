@@ -168,8 +168,12 @@ if ($id === 0) {
                         <span class="fw-semibold">Fotos</span>
                         <span class="badge bg-white text-success" id="photos-count">0</span>
                     </div>
-                    <button class="btn btn-sm btn-outline-light rounded-0 px-3" id="upload-photo" data-bs-toggle="modal"
-                        data-bs-target="#upload-photo-modal">
+                    <button class="btn btn-sm btn-outline-light rounded-0 px-3"
+                        <?php if ($is_logged): ?>
+                          id="upload-photo" data-bs-toggle="modal" data-bs-target="#upload-photo-modal"
+                        <?php else: ?>
+                          id="upload-photo" data-bs-toggle="modal" data-bs-target="#loginModal"
+                        <?php endif; ?>>
                         <i class="fa-solid fa-upload me-1"></i>Subir foto
                     </button>
                 </div>
@@ -238,7 +242,11 @@ if ($id === 0) {
                             <option value="worst">Peor valoración</option>
                         </select>
                         <a class="btn btn-sm btn-outline-light rounded-0 px-3" id="btn-write-review"
-                            href="<?= $base_url ?>/web/views/public/coasters/form_rating.php?id=<?= $id ?>">
+                            <?php if ($is_logged): ?>
+                              href="<?= $base_url ?>/web/views/public/coasters/form_rating.php?id=<?= $id ?>"
+                            <?php else: ?>
+                              href="#" data-bs-toggle="modal" data-bs-target="#loginModal"
+                            <?php endif; ?>>
                             <i class="fa-solid fa-pen me-1"></i>Escribir reseña
                         </a>
                     </div>
@@ -255,23 +263,13 @@ if ($id === 0) {
 
 </main>
 
-<!-- Modal de Login -->
-<div class="modal fade" id="loginModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-body text-center p-4">
-                <p class="mb-4" style="font-size:1rem;">Para escribir una reseña necesitas estar registrado</p>
-                <div class="d-flex gap-2 justify-content-center">
-                    <button class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
-                    <a href="<?= $base_url ?>/web/views/auth/login.php?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn btn-success px-4">Ir al Login</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<?php
+$login_msg = 'Para subir fotos o escribir reseñas necesitas iniciar sesión.';
+require_once __DIR__ . '/../../partials/login_modal.php';
+?>
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 <script src="<?= $base_url ?>/web/js/coasters.js"></script>
-<script src="<?= $base_url ?>/web/js/auth-check.js"></script>
+
 <!-- CropperJS para recortar imágenes al subir fotos -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>

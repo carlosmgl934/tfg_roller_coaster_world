@@ -15,9 +15,17 @@ $park_id = $_GET['id'] ?? null;
             <h1 class="display-6 fw-bold text-success mb-3 mb-md-0">
                 <i class="fa-solid fa-comments me-2"></i>Búsqueda de Foros
             </h1>
-            <a href="<?= $base_url ?>/web/views/public/forums/forum_config.php" class="btn btn-success fw-bold shadow-sm rounded-0 px-4" id="create-forum-btn">
+            <?php if ($is_logged): ?>
+            <a href="<?= $base_url ?>/web/views/public/forums/forum_config.php"
+               class="btn btn-success fw-bold shadow-sm rounded-0 px-4" id="create-forum-btn">
                 <i class="fa-solid fa-plus me-2"></i>Crear Foro
             </a>
+            <?php else: ?>
+            <button class="btn btn-success fw-bold shadow-sm rounded-0 px-4" id="create-forum-btn"
+                    data-bs-toggle="modal" data-bs-target="#loginModal">
+                <i class="fa-solid fa-plus me-2"></i>Crear Foro
+            </button>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -43,4 +51,8 @@ $park_id = $_GET['id'] ?? null;
 </main>
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
+<?php
+$login_msg = 'Para crear o participar en foros necesitas iniciar sesión.';
+require_once __DIR__ . '/../../partials/login_modal.php';
+?>
 <script src="<?= $base_url ?>/web/js/forums.js"></script>

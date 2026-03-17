@@ -330,3 +330,387 @@ db_conexion.php cargado OK
 DBConexion instanciada OK
 Query preparada OK
 Insertado nuevo ID: 28
+2026-03-17 20:41:23 ── Nueva petición recibida ──
+RAW INPUT: {"id_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2FybG9zIE1vbnRlcm8iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSk93UjlKNzFuNGQ2bG15WV81UlIwdW5fNGVzaktFYXIxaF9CQlQteTBmS2dNamQyVXo9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc3NjQ4MywidXNlcl9pZCI6IkFOY2FqRFBLQlNYZHQ0bldnc0s2VGtCNzJGTDIiLCJzdWIiOiJBTmNhakRQS0JTWGR0NG5XZ3NLNlRrQjcyRkwyIiwiaWF0IjoxNzczNzc2NDgzLCJleHAiOjE3NzM3ODAwODMsImVtYWlsIjoiY2FybG9zbWdsOTM0QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTAzNjM5NDA3OTg5NTA4NzgwMjUxIl0sImVtYWlsIjpbImNhcmxvc21nbDkzNEBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.YZxV3kaWVbBJeLDnW-LYGBqvEnG8AmT0gWL_yd0FI9pPN3mCucVktgLe0S1As4XAEyVqKgN2cPgv0BkBzbeoeSKQJYKciXlWT_0VxdcuVa7-BkVp-wUBUScRy9riWea1pPj8YwdhGfzlqIFK3-12E2aPK2p5U_f_SlJzF_Z3PAltEdxjc2RKyF3YwGQ57oZXeSULBbmDPavFwrxuhKAeOeLTiU6qMxHTCFm2tWmgJyyWcTiTAPXF0f_WHZlzHfzf7ktEsLHPBPFIDzT0sRWJR7RMQitvNH69IkfLfE_3kdbH6nfe1dDsspqAZI-IEABgDSwPgUERUwO8-Vnzy4dsRQ","username":"Carlos Montero"}
+Input parseado: Array
+(
+    [id_token] => eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2FybG9zIE1vbnRlcm8iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSk93UjlKNzFuNGQ2bG15WV81UlIwdW5fNGVzaktFYXIxaF9CQlQteTBmS2dNamQyVXo9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc3NjQ4MywidXNlcl9pZCI6IkFOY2FqRFBLQlNYZHQ0bldnc0s2VGtCNzJGTDIiLCJzdWIiOiJBTmNhakRQS0JTWGR0NG5XZ3NLNlRrQjcyRkwyIiwiaWF0IjoxNzczNzc2NDgzLCJleHAiOjE3NzM3ODAwODMsImVtYWlsIjoiY2FybG9zbWdsOTM0QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTAzNjM5NDA3OTg5NTA4NzgwMjUxIl0sImVtYWlsIjpbImNhcmxvc21nbDkzNEBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.YZxV3kaWVbBJeLDnW-LYGBqvEnG8AmT0gWL_yd0FI9pPN3mCucVktgLe0S1As4XAEyVqKgN2cPgv0BkBzbeoeSKQJYKciXlWT_0VxdcuVa7-BkVp-wUBUScRy9riWea1pPj8YwdhGfzlqIFK3-12E2aPK2p5U_f_SlJzF_Z3PAltEdxjc2RKyF3YwGQ57oZXeSULBbmDPavFwrxuhKAeOeLTiU6qMxHTCFm2tWmgJyyWcTiTAPXF0f_WHZlzHfzf7ktEsLHPBPFIDzT0sRWJR7RMQitvNH69IkfLfE_3kdbH6nfe1dDsspqAZI-IEABgDSwPgUERUwO8-Vnzy4dsRQ
+    [username] => Carlos Montero
+)
+
+Payload decodificado: Array
+(
+    [name] => Carlos Montero
+    [picture] => https://lh3.googleusercontent.com/a/ACg8ocJOwR9J71n4d6lmyY_5RR0un_4esjKEar1h_BBT-y0fKgMjd2Uz=s96-c
+    [iss] => https://securetoken.google.com/tfg-roller-coaster-world-auth
+    [aud] => tfg-roller-coaster-world-auth
+    [auth_time] => 1773776483
+    [user_id] => ANcajDPKBSXdt4nWgsK6TkB72FL2
+    [sub] => ANcajDPKBSXdt4nWgsK6TkB72FL2
+    [iat] => 1773776483
+    [exp] => 1773780083
+    [email] => carlosmgl934@gmail.com
+    [email_verified] => 1
+    [firebase] => Array
+        (
+            [identities] => Array
+                (
+                    [google.com] => Array
+                        (
+                            [0] => 103639407989508780251
+                        )
+
+                    [email] => Array
+                        (
+                            [0] => carlosmgl934@gmail.com
+                        )
+
+                )
+
+            [sign_in_provider] => password
+        )
+
+)
+
+Datos para insertar: uid=ANcajDPKBSXdt4nWgsK6TkB72FL2, email=carlosmgl934@gmail.com, username=Carlos Montero
+Intentando cargar db_conexion.php...
+db_conexion.php cargado OK
+DBConexion instanciada OK
+Query preparada OK
+Insertado nuevo ID: 16
+2026-03-17 20:44:52 ── Nueva petición recibida ──
+RAW INPUT: {"id_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6ImEyZGZiOGEzOGI1MmQ5ZjA5ZWRjYWE1MDcwYTBlOGYwYTllMDk4YmEiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2FybG9zIE1vbnRlcm8iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSk93UjlKNzFuNGQ2bG15WV81UlIwdW5fNGVzaktFYXIxaF9CQlQteTBmS2dNamQyVXo9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc3NjY5MiwidXNlcl9pZCI6IkFOY2FqRFBLQlNYZHQ0bldnc0s2VGtCNzJGTDIiLCJzdWIiOiJBTmNhakRQS0JTWGR0NG5XZ3NLNlRrQjcyRkwyIiwiaWF0IjoxNzczNzc2NjkyLCJleHAiOjE3NzM3ODAyOTIsImVtYWlsIjoiY2FybG9zbWdsOTM0QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTAzNjM5NDA3OTg5NTA4NzgwMjUxIl0sImVtYWlsIjpbImNhcmxvc21nbDkzNEBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJnb29nbGUuY29tIn19.GCwhV2BIq2dqim_oGF7ZYr0pODTiFv_a60uJO1l20oD9njzeqLY4YrvQF5ReYS1UMHcZC0LDODUlK8v3ciw74wnKoM_JH7wVPnYdabz_725yGqtpMm3qg__z1hs3lVDb1fDY0TkrB_15HkO9Ovs4S_yLo5lcClnrZrbjhB2axNED4kU2OD9h-jCb5OABO-a4DKuDLD1hQld3Mu_Atuv9nNoI7cABTpxoOVUVQvbfhZzLCaz12iKukVcr1AEjZB8dXnk_2Ax5r5ZoYVQiXQ2C7wHTB38Gmp-mmYiPlUnVUAfl4ne0YMosbIdPttVXwobWgWpulJkAJtQZHWX01vrvDw","username":"Carlos Montero"}
+Input parseado: Array
+(
+    [id_token] => eyJhbGciOiJSUzI1NiIsImtpZCI6ImEyZGZiOGEzOGI1MmQ5ZjA5ZWRjYWE1MDcwYTBlOGYwYTllMDk4YmEiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2FybG9zIE1vbnRlcm8iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSk93UjlKNzFuNGQ2bG15WV81UlIwdW5fNGVzaktFYXIxaF9CQlQteTBmS2dNamQyVXo9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc3NjY5MiwidXNlcl9pZCI6IkFOY2FqRFBLQlNYZHQ0bldnc0s2VGtCNzJGTDIiLCJzdWIiOiJBTmNhakRQS0JTWGR0NG5XZ3NLNlRrQjcyRkwyIiwiaWF0IjoxNzczNzc2NjkyLCJleHAiOjE3NzM3ODAyOTIsImVtYWlsIjoiY2FybG9zbWdsOTM0QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTAzNjM5NDA3OTg5NTA4NzgwMjUxIl0sImVtYWlsIjpbImNhcmxvc21nbDkzNEBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJnb29nbGUuY29tIn19.GCwhV2BIq2dqim_oGF7ZYr0pODTiFv_a60uJO1l20oD9njzeqLY4YrvQF5ReYS1UMHcZC0LDODUlK8v3ciw74wnKoM_JH7wVPnYdabz_725yGqtpMm3qg__z1hs3lVDb1fDY0TkrB_15HkO9Ovs4S_yLo5lcClnrZrbjhB2axNED4kU2OD9h-jCb5OABO-a4DKuDLD1hQld3Mu_Atuv9nNoI7cABTpxoOVUVQvbfhZzLCaz12iKukVcr1AEjZB8dXnk_2Ax5r5ZoYVQiXQ2C7wHTB38Gmp-mmYiPlUnVUAfl4ne0YMosbIdPttVXwobWgWpulJkAJtQZHWX01vrvDw
+    [username] => Carlos Montero
+)
+
+Payload decodificado: Array
+(
+    [name] => Carlos Montero
+    [picture] => https://lh3.googleusercontent.com/a/ACg8ocJOwR9J71n4d6lmyY_5RR0un_4esjKEar1h_BBT-y0fKgMjd2Uz=s96-c
+    [iss] => https://securetoken.google.com/tfg-roller-coaster-world-auth
+    [aud] => tfg-roller-coaster-world-auth
+    [auth_time] => 1773776692
+    [user_id] => ANcajDPKBSXdt4nWgsK6TkB72FL2
+    [sub] => ANcajDPKBSXdt4nWgsK6TkB72FL2
+    [iat] => 1773776692
+    [exp] => 1773780292
+    [email] => carlosmgl934@gmail.com
+    [email_verified] => 1
+    [firebase] => Array
+        (
+            [identities] => Array
+                (
+                    [google.com] => Array
+                        (
+                            [0] => 103639407989508780251
+                        )
+
+                    [email] => Array
+                        (
+                            [0] => carlosmgl934@gmail.com
+                        )
+
+                )
+
+            [sign_in_provider] => google.com
+        )
+
+)
+
+Datos para insertar: uid=ANcajDPKBSXdt4nWgsK6TkB72FL2, email=carlosmgl934@gmail.com, username=Carlos Montero
+Intentando cargar db_conexion.php...
+db_conexion.php cargado OK
+DBConexion instanciada OK
+Query preparada OK
+Insertado nuevo ID: 16
+2026-03-17 23:11:28 ── Nueva petición recibida ──
+RAW INPUT: {"id_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2FybG9zIE1vbnRlcm8iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSk93UjlKNzFuNGQ2bG15WV81UlIwdW5fNGVzaktFYXIxaF9CQlQteTBmS2dNamQyVXo9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc4NTQ4OCwidXNlcl9pZCI6IkFOY2FqRFBLQlNYZHQ0bldnc0s2VGtCNzJGTDIiLCJzdWIiOiJBTmNhakRQS0JTWGR0NG5XZ3NLNlRrQjcyRkwyIiwiaWF0IjoxNzczNzg1NDg4LCJleHAiOjE3NzM3ODkwODgsImVtYWlsIjoiY2FybG9zbWdsOTM0QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTAzNjM5NDA3OTg5NTA4NzgwMjUxIl0sImVtYWlsIjpbImNhcmxvc21nbDkzNEBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.ogEcUefSAZyByBUtIFwCMfqX1DqixW8Apn8bnX2A36E73BXiPkwNWZEcGOwvwvxTR6hinEK2wYwD61ZkHCyA7rClzfV1JJslxhJExyI7YBvquVR6nABaRPMU1ml6EBR2W_m7aRZFruWHL_OU6SUVr_zRPwnKRV-T1LBQqQK-XtNp83W6xHUA7lCQh0i6e_zgaHnsKVhJNYlpGnNq7gvxrqcBIOVNER5M7TUBbF-TaXFwNovTKZbQQvbstX2I3EAHEuo2OFFGosvphI7LMUPWioLs32ig-biiZLJyxkZMtQfp6a98wgmnJ0mQ-kcz6miBiJWij1bWDmaqfQ7PuatzJw","username":"Carlos Montero"}
+Input parseado: Array
+(
+    [id_token] => eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2FybG9zIE1vbnRlcm8iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSk93UjlKNzFuNGQ2bG15WV81UlIwdW5fNGVzaktFYXIxaF9CQlQteTBmS2dNamQyVXo9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc4NTQ4OCwidXNlcl9pZCI6IkFOY2FqRFBLQlNYZHQ0bldnc0s2VGtCNzJGTDIiLCJzdWIiOiJBTmNhakRQS0JTWGR0NG5XZ3NLNlRrQjcyRkwyIiwiaWF0IjoxNzczNzg1NDg4LCJleHAiOjE3NzM3ODkwODgsImVtYWlsIjoiY2FybG9zbWdsOTM0QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTAzNjM5NDA3OTg5NTA4NzgwMjUxIl0sImVtYWlsIjpbImNhcmxvc21nbDkzNEBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.ogEcUefSAZyByBUtIFwCMfqX1DqixW8Apn8bnX2A36E73BXiPkwNWZEcGOwvwvxTR6hinEK2wYwD61ZkHCyA7rClzfV1JJslxhJExyI7YBvquVR6nABaRPMU1ml6EBR2W_m7aRZFruWHL_OU6SUVr_zRPwnKRV-T1LBQqQK-XtNp83W6xHUA7lCQh0i6e_zgaHnsKVhJNYlpGnNq7gvxrqcBIOVNER5M7TUBbF-TaXFwNovTKZbQQvbstX2I3EAHEuo2OFFGosvphI7LMUPWioLs32ig-biiZLJyxkZMtQfp6a98wgmnJ0mQ-kcz6miBiJWij1bWDmaqfQ7PuatzJw
+    [username] => Carlos Montero
+)
+
+Payload decodificado: Array
+(
+    [name] => Carlos Montero
+    [picture] => https://lh3.googleusercontent.com/a/ACg8ocJOwR9J71n4d6lmyY_5RR0un_4esjKEar1h_BBT-y0fKgMjd2Uz=s96-c
+    [iss] => https://securetoken.google.com/tfg-roller-coaster-world-auth
+    [aud] => tfg-roller-coaster-world-auth
+    [auth_time] => 1773785488
+    [user_id] => ANcajDPKBSXdt4nWgsK6TkB72FL2
+    [sub] => ANcajDPKBSXdt4nWgsK6TkB72FL2
+    [iat] => 1773785488
+    [exp] => 1773789088
+    [email] => carlosmgl934@gmail.com
+    [email_verified] => 1
+    [firebase] => Array
+        (
+            [identities] => Array
+                (
+                    [google.com] => Array
+                        (
+                            [0] => 103639407989508780251
+                        )
+
+                    [email] => Array
+                        (
+                            [0] => carlosmgl934@gmail.com
+                        )
+
+                )
+
+            [sign_in_provider] => password
+        )
+
+)
+
+Datos para insertar: uid=ANcajDPKBSXdt4nWgsK6TkB72FL2, email=carlosmgl934@gmail.com, username=Carlos Montero
+Intentando cargar db_conexion.php...
+db_conexion.php cargado OK
+DBConexion instanciada OK
+Query preparada OK
+Insertado nuevo ID: 16
+2026-03-17 23:11:40 ── Nueva petición recibida ──
+RAW INPUT: {"id_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2FybG9zIE1vbnRlcm8iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSk93UjlKNzFuNGQ2bG15WV81UlIwdW5fNGVzaktFYXIxaF9CQlQteTBmS2dNamQyVXo9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc4NTQ5OSwidXNlcl9pZCI6IkFOY2FqRFBLQlNYZHQ0bldnc0s2VGtCNzJGTDIiLCJzdWIiOiJBTmNhakRQS0JTWGR0NG5XZ3NLNlRrQjcyRkwyIiwiaWF0IjoxNzczNzg1NDk5LCJleHAiOjE3NzM3ODkwOTksImVtYWlsIjoiY2FybG9zbWdsOTM0QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTAzNjM5NDA3OTg5NTA4NzgwMjUxIl0sImVtYWlsIjpbImNhcmxvc21nbDkzNEBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.0poED19ZALRqv9QpzVoigW_wWYKZOgqAUSuQEf6qmv6dPWRIbpU82WlLCS0aomfz6rkV5QZeMjf_OxfYFf1KBdZ1-h0H7A4pi5Uzpxk9GqRxGOBwOhyTODWJkJ0ppsw18VjvrOFduExgdTGJCa4taHUFCwd8X-7eLgvs_TN7grOp4F6PaV5-SBpzv56tod54koPjRe7bkyR8-0sgPbkbWzWA67Vn6ssy-LuupDgRSqCgxoVJPbM6MQbr1vNZB9W3Fx50QZAPouiPhukjMmIM7luDlb2wKUDzrmbmhlGZiBO1h4ADgMzjR6M2HqIchT8iNAiTGCQrjqct6qhRGSWyAw","username":"Carlos Montero"}
+Input parseado: Array
+(
+    [id_token] => eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2FybG9zIE1vbnRlcm8iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSk93UjlKNzFuNGQ2bG15WV81UlIwdW5fNGVzaktFYXIxaF9CQlQteTBmS2dNamQyVXo9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc4NTQ5OSwidXNlcl9pZCI6IkFOY2FqRFBLQlNYZHQ0bldnc0s2VGtCNzJGTDIiLCJzdWIiOiJBTmNhakRQS0JTWGR0NG5XZ3NLNlRrQjcyRkwyIiwiaWF0IjoxNzczNzg1NDk5LCJleHAiOjE3NzM3ODkwOTksImVtYWlsIjoiY2FybG9zbWdsOTM0QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTAzNjM5NDA3OTg5NTA4NzgwMjUxIl0sImVtYWlsIjpbImNhcmxvc21nbDkzNEBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.0poED19ZALRqv9QpzVoigW_wWYKZOgqAUSuQEf6qmv6dPWRIbpU82WlLCS0aomfz6rkV5QZeMjf_OxfYFf1KBdZ1-h0H7A4pi5Uzpxk9GqRxGOBwOhyTODWJkJ0ppsw18VjvrOFduExgdTGJCa4taHUFCwd8X-7eLgvs_TN7grOp4F6PaV5-SBpzv56tod54koPjRe7bkyR8-0sgPbkbWzWA67Vn6ssy-LuupDgRSqCgxoVJPbM6MQbr1vNZB9W3Fx50QZAPouiPhukjMmIM7luDlb2wKUDzrmbmhlGZiBO1h4ADgMzjR6M2HqIchT8iNAiTGCQrjqct6qhRGSWyAw
+    [username] => Carlos Montero
+)
+
+Payload decodificado: Array
+(
+    [name] => Carlos Montero
+    [picture] => https://lh3.googleusercontent.com/a/ACg8ocJOwR9J71n4d6lmyY_5RR0un_4esjKEar1h_BBT-y0fKgMjd2Uz=s96-c
+    [iss] => https://securetoken.google.com/tfg-roller-coaster-world-auth
+    [aud] => tfg-roller-coaster-world-auth
+    [auth_time] => 1773785499
+    [user_id] => ANcajDPKBSXdt4nWgsK6TkB72FL2
+    [sub] => ANcajDPKBSXdt4nWgsK6TkB72FL2
+    [iat] => 1773785499
+    [exp] => 1773789099
+    [email] => carlosmgl934@gmail.com
+    [email_verified] => 1
+    [firebase] => Array
+        (
+            [identities] => Array
+                (
+                    [google.com] => Array
+                        (
+                            [0] => 103639407989508780251
+                        )
+
+                    [email] => Array
+                        (
+                            [0] => carlosmgl934@gmail.com
+                        )
+
+                )
+
+            [sign_in_provider] => password
+        )
+
+)
+
+Datos para insertar: uid=ANcajDPKBSXdt4nWgsK6TkB72FL2, email=carlosmgl934@gmail.com, username=Carlos Montero
+Intentando cargar db_conexion.php...
+db_conexion.php cargado OK
+DBConexion instanciada OK
+Query preparada OK
+Insertado nuevo ID: 16
+2026-03-17 23:12:26 ── Nueva petición recibida ──
+RAW INPUT: {"id_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2FybG9zIE1vbnRlcm8iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSk93UjlKNzFuNGQ2bG15WV81UlIwdW5fNGVzaktFYXIxaF9CQlQteTBmS2dNamQyVXo9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc4NTU0NiwidXNlcl9pZCI6IkFOY2FqRFBLQlNYZHQ0bldnc0s2VGtCNzJGTDIiLCJzdWIiOiJBTmNhakRQS0JTWGR0NG5XZ3NLNlRrQjcyRkwyIiwiaWF0IjoxNzczNzg1NTQ2LCJleHAiOjE3NzM3ODkxNDYsImVtYWlsIjoiY2FybG9zbWdsOTM0QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTAzNjM5NDA3OTg5NTA4NzgwMjUxIl0sImVtYWlsIjpbImNhcmxvc21nbDkzNEBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.LdiyUfrjYjK-lT51PWn45FioM5DfNgruz-MUEJQmMl-uESz0yTWnT_ysCSI8mDgxawy0BgZO2D84b0GbYH7_NGJb3Y1Sd8a2u3MytElT_5aTloeWIarxLHUb8KwwpuN-Xd1SmSCgyzvos8E-EK_JGsLLSexwFYRlznJD-j8GEVjFcYEE3iZCAQfsISRlBRRww_EHpdASPETIEFIuJxiymxh4W1MS4LoGn6_1UQrtNQ16PdTI3gNLtD7Wf7qdurXWdGqe6vP0KX-3YBAbIqctjvQAWkO3o1bilf2Yzny8NIueUTGpfiK71PhxHrxZn8XasigKI6IqZK7O_q3-rXSJyQ","username":"Carlos Montero"}
+Input parseado: Array
+(
+    [id_token] => eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2FybG9zIE1vbnRlcm8iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSk93UjlKNzFuNGQ2bG15WV81UlIwdW5fNGVzaktFYXIxaF9CQlQteTBmS2dNamQyVXo9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc4NTU0NiwidXNlcl9pZCI6IkFOY2FqRFBLQlNYZHQ0bldnc0s2VGtCNzJGTDIiLCJzdWIiOiJBTmNhakRQS0JTWGR0NG5XZ3NLNlRrQjcyRkwyIiwiaWF0IjoxNzczNzg1NTQ2LCJleHAiOjE3NzM3ODkxNDYsImVtYWlsIjoiY2FybG9zbWdsOTM0QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTAzNjM5NDA3OTg5NTA4NzgwMjUxIl0sImVtYWlsIjpbImNhcmxvc21nbDkzNEBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.LdiyUfrjYjK-lT51PWn45FioM5DfNgruz-MUEJQmMl-uESz0yTWnT_ysCSI8mDgxawy0BgZO2D84b0GbYH7_NGJb3Y1Sd8a2u3MytElT_5aTloeWIarxLHUb8KwwpuN-Xd1SmSCgyzvos8E-EK_JGsLLSexwFYRlznJD-j8GEVjFcYEE3iZCAQfsISRlBRRww_EHpdASPETIEFIuJxiymxh4W1MS4LoGn6_1UQrtNQ16PdTI3gNLtD7Wf7qdurXWdGqe6vP0KX-3YBAbIqctjvQAWkO3o1bilf2Yzny8NIueUTGpfiK71PhxHrxZn8XasigKI6IqZK7O_q3-rXSJyQ
+    [username] => Carlos Montero
+)
+
+Payload decodificado: Array
+(
+    [name] => Carlos Montero
+    [picture] => https://lh3.googleusercontent.com/a/ACg8ocJOwR9J71n4d6lmyY_5RR0un_4esjKEar1h_BBT-y0fKgMjd2Uz=s96-c
+    [iss] => https://securetoken.google.com/tfg-roller-coaster-world-auth
+    [aud] => tfg-roller-coaster-world-auth
+    [auth_time] => 1773785546
+    [user_id] => ANcajDPKBSXdt4nWgsK6TkB72FL2
+    [sub] => ANcajDPKBSXdt4nWgsK6TkB72FL2
+    [iat] => 1773785546
+    [exp] => 1773789146
+    [email] => carlosmgl934@gmail.com
+    [email_verified] => 1
+    [firebase] => Array
+        (
+            [identities] => Array
+                (
+                    [google.com] => Array
+                        (
+                            [0] => 103639407989508780251
+                        )
+
+                    [email] => Array
+                        (
+                            [0] => carlosmgl934@gmail.com
+                        )
+
+                )
+
+            [sign_in_provider] => password
+        )
+
+)
+
+Datos para insertar: uid=ANcajDPKBSXdt4nWgsK6TkB72FL2, email=carlosmgl934@gmail.com, username=Carlos Montero
+Intentando cargar db_conexion.php...
+db_conexion.php cargado OK
+DBConexion instanciada OK
+Query preparada OK
+Insertado nuevo ID: 16
+2026-03-17 23:20:28 ── Nueva petición recibida ──
+RAW INPUT: {"id_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2FybG9zIE1vbnRlcm8iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSk93UjlKNzFuNGQ2bG15WV81UlIwdW5fNGVzaktFYXIxaF9CQlQteTBmS2dNamQyVXo9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc4NjAyNywidXNlcl9pZCI6IkFOY2FqRFBLQlNYZHQ0bldnc0s2VGtCNzJGTDIiLCJzdWIiOiJBTmNhakRQS0JTWGR0NG5XZ3NLNlRrQjcyRkwyIiwiaWF0IjoxNzczNzg2MDI3LCJleHAiOjE3NzM3ODk2MjcsImVtYWlsIjoiY2FybG9zbWdsOTM0QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTAzNjM5NDA3OTg5NTA4NzgwMjUxIl0sImVtYWlsIjpbImNhcmxvc21nbDkzNEBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.ww6u3HJl7a8ZjQa3_wZaFf1ZTDwMa49ZVNotqQ7ootWZra1khpHNbj-PuOP8GznNIQwJqOrMJ5r_a8mhT27l_0eRoLENuPr4EPK0ua6nUkS6E0JScQnTPNnEKOZq7euESQ4nblBwgwwNRus4zc2dz_QoLPiYEdqYgbDmwLnwAoBtKFhWnen2ZpZzQzXItd5JM_6UWCJsYU9h1gjZJMDU-UZZufesH0TXgoqeiuNy2O9x1_UqP6gCu_ajb8cK0L2jDIHBnQUTrNJEZz71HIjuXl2BtQLaSicSZGzIWXN4em-crRWt3bsLXuBYwMnK0rt46hJIgGjBWE7NICUutNlPTA","username":"Carlos Montero"}
+Input parseado: Array
+(
+    [id_token] => eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2FybG9zIE1vbnRlcm8iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSk93UjlKNzFuNGQ2bG15WV81UlIwdW5fNGVzaktFYXIxaF9CQlQteTBmS2dNamQyVXo9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc4NjAyNywidXNlcl9pZCI6IkFOY2FqRFBLQlNYZHQ0bldnc0s2VGtCNzJGTDIiLCJzdWIiOiJBTmNhakRQS0JTWGR0NG5XZ3NLNlRrQjcyRkwyIiwiaWF0IjoxNzczNzg2MDI3LCJleHAiOjE3NzM3ODk2MjcsImVtYWlsIjoiY2FybG9zbWdsOTM0QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTAzNjM5NDA3OTg5NTA4NzgwMjUxIl0sImVtYWlsIjpbImNhcmxvc21nbDkzNEBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.ww6u3HJl7a8ZjQa3_wZaFf1ZTDwMa49ZVNotqQ7ootWZra1khpHNbj-PuOP8GznNIQwJqOrMJ5r_a8mhT27l_0eRoLENuPr4EPK0ua6nUkS6E0JScQnTPNnEKOZq7euESQ4nblBwgwwNRus4zc2dz_QoLPiYEdqYgbDmwLnwAoBtKFhWnen2ZpZzQzXItd5JM_6UWCJsYU9h1gjZJMDU-UZZufesH0TXgoqeiuNy2O9x1_UqP6gCu_ajb8cK0L2jDIHBnQUTrNJEZz71HIjuXl2BtQLaSicSZGzIWXN4em-crRWt3bsLXuBYwMnK0rt46hJIgGjBWE7NICUutNlPTA
+    [username] => Carlos Montero
+)
+
+Payload decodificado: Array
+(
+    [name] => Carlos Montero
+    [picture] => https://lh3.googleusercontent.com/a/ACg8ocJOwR9J71n4d6lmyY_5RR0un_4esjKEar1h_BBT-y0fKgMjd2Uz=s96-c
+    [iss] => https://securetoken.google.com/tfg-roller-coaster-world-auth
+    [aud] => tfg-roller-coaster-world-auth
+    [auth_time] => 1773786027
+    [user_id] => ANcajDPKBSXdt4nWgsK6TkB72FL2
+    [sub] => ANcajDPKBSXdt4nWgsK6TkB72FL2
+    [iat] => 1773786027
+    [exp] => 1773789627
+    [email] => carlosmgl934@gmail.com
+    [email_verified] => 1
+    [firebase] => Array
+        (
+            [identities] => Array
+                (
+                    [google.com] => Array
+                        (
+                            [0] => 103639407989508780251
+                        )
+
+                    [email] => Array
+                        (
+                            [0] => carlosmgl934@gmail.com
+                        )
+
+                )
+
+            [sign_in_provider] => password
+        )
+
+)
+
+Datos para insertar: uid=ANcajDPKBSXdt4nWgsK6TkB72FL2, email=carlosmgl934@gmail.com, username=Carlos Montero
+Intentando cargar db_conexion.php...
+db_conexion.php cargado OK
+DBConexion instanciada OK
+Query preparada OK
+Insertado nuevo ID: 16
+2026-03-17 23:47:34 ── Nueva petición recibida ──
+RAW INPUT: {"id_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2FybG9zIE1vbnRlcm8iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSk93UjlKNzFuNGQ2bG15WV81UlIwdW5fNGVzaktFYXIxaF9CQlQteTBmS2dNamQyVXo9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc4NzY1MywidXNlcl9pZCI6IkFOY2FqRFBLQlNYZHQ0bldnc0s2VGtCNzJGTDIiLCJzdWIiOiJBTmNhakRQS0JTWGR0NG5XZ3NLNlRrQjcyRkwyIiwiaWF0IjoxNzczNzg3NjUzLCJleHAiOjE3NzM3OTEyNTMsImVtYWlsIjoiY2FybG9zbWdsOTM0QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTAzNjM5NDA3OTg5NTA4NzgwMjUxIl0sImVtYWlsIjpbImNhcmxvc21nbDkzNEBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.smMgppiiRMcTa_FIyLBozvmGi-2toKfE5F8zQ55lF-aEzzV8EQdU6r8kwNEGLrpgFsUCrlL4rP9fjsVKbYOAZatAcv-5JHPKmshA985aybtnvp2ce5NeIw2RUvLVMINtD1oNIav_84Lj-5U0yqGwx1NjIKkM1_z23owQKWe7-VzvN2zUKk1gdPp4O1yQQdimBSGTdcN5PYuUaSEzDhRavySYyIhkX4t0JKCcWLSB9a8HemyzQs7JSJ_kuZrkrwPxqYJLcDKqlv33PBRFScyBNpWLg9_-p93si7xZVWlHVJ8BKPNTEpS2cBo33KypdRw6TusrJjNnA_oZallZjQ5a5w","username":"Carlos Montero"}
+Input parseado: Array
+(
+    [id_token] => eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2FybG9zIE1vbnRlcm8iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSk93UjlKNzFuNGQ2bG15WV81UlIwdW5fNGVzaktFYXIxaF9CQlQteTBmS2dNamQyVXo9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc4NzY1MywidXNlcl9pZCI6IkFOY2FqRFBLQlNYZHQ0bldnc0s2VGtCNzJGTDIiLCJzdWIiOiJBTmNhakRQS0JTWGR0NG5XZ3NLNlRrQjcyRkwyIiwiaWF0IjoxNzczNzg3NjUzLCJleHAiOjE3NzM3OTEyNTMsImVtYWlsIjoiY2FybG9zbWdsOTM0QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTAzNjM5NDA3OTg5NTA4NzgwMjUxIl0sImVtYWlsIjpbImNhcmxvc21nbDkzNEBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.smMgppiiRMcTa_FIyLBozvmGi-2toKfE5F8zQ55lF-aEzzV8EQdU6r8kwNEGLrpgFsUCrlL4rP9fjsVKbYOAZatAcv-5JHPKmshA985aybtnvp2ce5NeIw2RUvLVMINtD1oNIav_84Lj-5U0yqGwx1NjIKkM1_z23owQKWe7-VzvN2zUKk1gdPp4O1yQQdimBSGTdcN5PYuUaSEzDhRavySYyIhkX4t0JKCcWLSB9a8HemyzQs7JSJ_kuZrkrwPxqYJLcDKqlv33PBRFScyBNpWLg9_-p93si7xZVWlHVJ8BKPNTEpS2cBo33KypdRw6TusrJjNnA_oZallZjQ5a5w
+    [username] => Carlos Montero
+)
+
+Payload decodificado: Array
+(
+    [name] => Carlos Montero
+    [picture] => https://lh3.googleusercontent.com/a/ACg8ocJOwR9J71n4d6lmyY_5RR0un_4esjKEar1h_BBT-y0fKgMjd2Uz=s96-c
+    [iss] => https://securetoken.google.com/tfg-roller-coaster-world-auth
+    [aud] => tfg-roller-coaster-world-auth
+    [auth_time] => 1773787653
+    [user_id] => ANcajDPKBSXdt4nWgsK6TkB72FL2
+    [sub] => ANcajDPKBSXdt4nWgsK6TkB72FL2
+    [iat] => 1773787653
+    [exp] => 1773791253
+    [email] => carlosmgl934@gmail.com
+    [email_verified] => 1
+    [firebase] => Array
+        (
+            [identities] => Array
+                (
+                    [google.com] => Array
+                        (
+                            [0] => 103639407989508780251
+                        )
+
+                    [email] => Array
+                        (
+                            [0] => carlosmgl934@gmail.com
+                        )
+
+                )
+
+            [sign_in_provider] => password
+        )
+
+)
+
+Datos para insertar: uid=ANcajDPKBSXdt4nWgsK6TkB72FL2, email=carlosmgl934@gmail.com, username=Carlos Montero
+Intentando cargar db_conexion.php...
+db_conexion.php cargado OK
+DBConexion instanciada OK
+Query preparada OK
+Insertado nuevo ID: 16
+2026-03-17 23:48:10 ── Nueva petición recibida ──
+RAW INPUT: {"id_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2FybG9zIE1vbnRlcm8iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSk93UjlKNzFuNGQ2bG15WV81UlIwdW5fNGVzaktFYXIxaF9CQlQteTBmS2dNamQyVXo9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc4NzY4OSwidXNlcl9pZCI6IkFOY2FqRFBLQlNYZHQ0bldnc0s2VGtCNzJGTDIiLCJzdWIiOiJBTmNhakRQS0JTWGR0NG5XZ3NLNlRrQjcyRkwyIiwiaWF0IjoxNzczNzg3Njg5LCJleHAiOjE3NzM3OTEyODksImVtYWlsIjoiY2FybG9zbWdsOTM0QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTAzNjM5NDA3OTg5NTA4NzgwMjUxIl0sImVtYWlsIjpbImNhcmxvc21nbDkzNEBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.Wc72m-TqyRQ8M52n48pbwhI0DIUUqHq7TZdVnd7Zz71z4RCEz9UhRMt11e361Yly1HoCeu3GnHMG5k4rsUK9E62fH6TXOaECYQPmGjVz0gMqVWsuJ6ql-eYEus1P7qY3COVQWtmplrl6drMUtxwpgzYtuYcTMM-thKAFPsCziFDBp7OzdmtDNDX55a4SHQN_uFu-45nJD9FiYhk9s0ehkeIAAaCz640MTV5tZbTQaYrxZzhiCX12aXuM9n_x8jG9o-FhtZQtgRLphSuTEB0weF5E4l2VE4xAdvY1_i6VJsUiJjOaiYP3Scjs8khz8-7wjfLvKG36akLRipV0LQVBRA","username":"Carlos Montero"}
+Input parseado: Array
+(
+    [id_token] => eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMmNhOTY3MTNiMWRkMTcyMzg1MDg0Y2U5ZjQzODFhZDAwY2VjZTQiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2FybG9zIE1vbnRlcm8iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSk93UjlKNzFuNGQ2bG15WV81UlIwdW5fNGVzaktFYXIxaF9CQlQteTBmS2dNamQyVXo9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGZnLXJvbGxlci1jb2FzdGVyLXdvcmxkLWF1dGgiLCJhdWQiOiJ0Zmctcm9sbGVyLWNvYXN0ZXItd29ybGQtYXV0aCIsImF1dGhfdGltZSI6MTc3Mzc4NzY4OSwidXNlcl9pZCI6IkFOY2FqRFBLQlNYZHQ0bldnc0s2VGtCNzJGTDIiLCJzdWIiOiJBTmNhakRQS0JTWGR0NG5XZ3NLNlRrQjcyRkwyIiwiaWF0IjoxNzczNzg3Njg5LCJleHAiOjE3NzM3OTEyODksImVtYWlsIjoiY2FybG9zbWdsOTM0QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTAzNjM5NDA3OTg5NTA4NzgwMjUxIl0sImVtYWlsIjpbImNhcmxvc21nbDkzNEBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.Wc72m-TqyRQ8M52n48pbwhI0DIUUqHq7TZdVnd7Zz71z4RCEz9UhRMt11e361Yly1HoCeu3GnHMG5k4rsUK9E62fH6TXOaECYQPmGjVz0gMqVWsuJ6ql-eYEus1P7qY3COVQWtmplrl6drMUtxwpgzYtuYcTMM-thKAFPsCziFDBp7OzdmtDNDX55a4SHQN_uFu-45nJD9FiYhk9s0ehkeIAAaCz640MTV5tZbTQaYrxZzhiCX12aXuM9n_x8jG9o-FhtZQtgRLphSuTEB0weF5E4l2VE4xAdvY1_i6VJsUiJjOaiYP3Scjs8khz8-7wjfLvKG36akLRipV0LQVBRA
+    [username] => Carlos Montero
+)
+
+Payload decodificado: Array
+(
+    [name] => Carlos Montero
+    [picture] => https://lh3.googleusercontent.com/a/ACg8ocJOwR9J71n4d6lmyY_5RR0un_4esjKEar1h_BBT-y0fKgMjd2Uz=s96-c
+    [iss] => https://securetoken.google.com/tfg-roller-coaster-world-auth
+    [aud] => tfg-roller-coaster-world-auth
+    [auth_time] => 1773787689
+    [user_id] => ANcajDPKBSXdt4nWgsK6TkB72FL2
+    [sub] => ANcajDPKBSXdt4nWgsK6TkB72FL2
+    [iat] => 1773787689
+    [exp] => 1773791289
+    [email] => carlosmgl934@gmail.com
+    [email_verified] => 1
+    [firebase] => Array
+        (
+            [identities] => Array
+                (
+                    [google.com] => Array
+                        (
+                            [0] => 103639407989508780251
+                        )
+
+                    [email] => Array
+                        (
+                            [0] => carlosmgl934@gmail.com
+                        )
+
+                )
+
+            [sign_in_provider] => password
+        )
+
+)
+
+Datos para insertar: uid=ANcajDPKBSXdt4nWgsK6TkB72FL2, email=carlosmgl934@gmail.com, username=Carlos Montero
+Intentando cargar db_conexion.php...
+db_conexion.php cargado OK
+DBConexion instanciada OK
+Query preparada OK
+Insertado nuevo ID: 16

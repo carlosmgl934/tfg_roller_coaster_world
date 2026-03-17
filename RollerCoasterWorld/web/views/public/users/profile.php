@@ -265,7 +265,7 @@ $user_uid = $_SESSION['firebase_uid'];
               <label for="config-user-email" class="form-label"><i class="fa-regular fa-envelope me-2"></i>Correo
                 Electrónico</label>
               <input type="email" id="config-user-email" class="form-control square-box"
-                placeholder="correo@ejemplo.com" disabled>
+                value="<?= htmlspecialchars($user_email) ?>" disabled>
             </div>
             <div class="col-md-6">
               <label for="config-user-birthdate" class="form-label"><i class="fa-regular fa-calendar me-2"></i>Fecha de
@@ -424,7 +424,7 @@ $user_uid = $_SESSION['firebase_uid'];
   </div>
 </main>
 
-<script src="<?= $base_url ?>/web/js/auth-check.js"></script>
+
 <script src="<?= $base_url ?>/web/js/profile.js"></script>
 
 

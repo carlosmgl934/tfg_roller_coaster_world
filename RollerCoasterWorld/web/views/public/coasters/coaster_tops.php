@@ -17,4 +17,3 @@ if (!isset($_SESSION['firebase_uid'])) {
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 <script src="<?= $base_url ?>/web/js/coasters.js"></script>
-<script src="<?= $base_url ?>/web/js/auth-check.js"></script>

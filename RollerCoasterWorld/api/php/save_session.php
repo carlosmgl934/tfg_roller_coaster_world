@@ -11,10 +11,28 @@ if (isset($input['firebase_uid']) && isset($input['email'])) {
   $_SESSION['firebase_uid'] = $input['firebase_uid'];
   $_SESSION['user_email']   = $input['email'];
 
-  // Log de éxito
-  file_put_contents(__DIR__ . '/session_log.txt', date('Y-m-d H:i:s') . " - Sesión guardada: UID=" . $input['firebase_uid'] . "\n", FILE_APPEND);
+  // Buscar el user_id en la BD usando el firebase_uid
+  try {
+    require_once __DIR__ . '/../database/db_conexion.php';
+    $db = new DBConexion();
+    $stmt = $db->prepare("SELECT id FROM users WHERE firebase_uid = :uid LIMIT 1");
+    $stmt->execute([':uid' => $input['firebase_uid']]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-  echo json_encode(['success' => true, 'message' => 'Sesión PHP actualizada']);
+    if ($row) {
+      $_SESSION['user_id'] = (int) $row['id'];
+      file_put_contents(__DIR__ . '/session_log.txt', date('Y-m-d H:i:s') . " - Sesión guardada: UID=" . $input['firebase_uid'] . " | user_id=" . $row['id'] . "\n", FILE_APPEND);
+      echo json_encode(['success' => true, 'message' => 'Sesión PHP actualizada', 'user_id' => $row['id']]);
+    } else {
+      // El usuario aún no existe en BD (registro justo hecho); guardar sin user_id por ahora
+      file_put_contents(__DIR__ . '/session_log.txt', date('Y-m-d H:i:s') . " - Usuario no encontrado en BD para UID=" . $input['firebase_uid'] . "\n", FILE_APPEND);
+      echo json_encode(['success' => true, 'message' => 'Sesión guardada (usuario pendiente de BD)']);
+    }
+  } catch (Throwable $e) {
+    // Si falla la BD, al menos guardamos la sesión Firebase
+    file_put_contents(__DIR__ . '/session_log.txt', date('Y-m-d H:i:s') . " - Error BD: " . $e->getMessage() . "\n", FILE_APPEND);
+    echo json_encode(['success' => true, 'message' => 'Sesión Firebase guardada (BD no disponible)']);
+  }
 } else {
   file_put_contents(__DIR__ . '/session_log.txt', date('Y-m-d H:i:s') . " - Faltan datos\n", FILE_APPEND);
   echo json_encode(['success' => false, 'message' => 'Faltan firebase_uid o email']);

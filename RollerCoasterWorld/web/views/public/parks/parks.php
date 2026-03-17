@@ -90,7 +90,8 @@ require_once __DIR__ . '/../../partials/header.php';
                 <!-- Fotos cargadas dinámicamente -->
             </div>
             <div class="text-center mt-4">
-                <button class="btn btn-success rounded-0" id="btn-upload-photo">
+                <button class="btn btn-success rounded-0" id="btn-upload-photo"
+                  <?= $is_logged ? '' : 'data-requires-login="true"' ?>>
                     <i class="fa-solid fa-camera me-2"></i>Subir foto del parque
                 </button>
             </div>
@@ -108,7 +109,12 @@ require_once __DIR__ . '/../../partials/header.php';
                         <option value="best">Mejor valoración</option>
                         <option value="worst">Peor valoración</option>
                     </select>
-                    <a class="btn btn-success rounded-0 px-4" id="btn-write-review" href="<?= $base_url ?>/web/views/public/parks/form_park_rating.php?id=<?= $id ?>">
+                    <a class="btn btn-success rounded-0 px-4" id="btn-write-review"
+                      <?php if ($is_logged): ?>
+                        href="<?= $base_url ?>/web/views/public/parks/form_park_rating.php?id=<?= $id ?>"
+                      <?php else: ?>
+                        href="#" data-bs-toggle="modal" data-bs-target="#loginModal"
+                      <?php endif; ?>>
                         <i class="fa-solid fa-pen me-2"></i>Escribir reseña
                     </a>
                 </div>
@@ -147,24 +153,14 @@ require_once __DIR__ . '/../../partials/header.php';
     </div>
 </div>
 
-<!-- Modal de Login -->
-<div class="modal fade" id="loginModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-body text-center p-4">
-                <p class="mb-4" style="font-size:1rem;">Para escribir una reseña necesitas estar registrado</p>
-                <div class="d-flex gap-2 justify-content-center">
-                    <button class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
-                    <a href="<?= $base_url ?>/web/views/auth/login.php?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn btn-success px-4">Ir al Login</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<?php
+$login_msg = 'Para subir fotos o escribir reseñas necesitas iniciar sesión.';
+require_once __DIR__ . '/../../partials/login_modal.php';
+?>
 
 <?php require_once __DIR__ . '/..//../partials/footer.php';?>
 
 <script src="<?= $base_url ?>/web/js/parks.js"></script>
-<script src="<?= $base_url ?>/web/js/auth-check.js"></script>
+
 <!-- CropperJS para recortar imágenes -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>

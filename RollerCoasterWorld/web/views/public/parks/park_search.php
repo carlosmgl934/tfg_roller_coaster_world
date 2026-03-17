@@ -110,4 +110,3 @@ require_once __DIR__ . '/../../partials/header.php';
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 
 <script src="<?= $base_url ?>/web/js/parks.js"></script>
-<script src="<?= $base_url ?>/web/js/auth-check.js"></script>

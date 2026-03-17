@@ -39,12 +39,22 @@ $(document).ready(function () {
 
   const btnGuardar = document.getElementById("guardar-config-btn");
 
-  // Capitalizar primera letra del username al perder el foco
+  // Capitalizar primera letra del username y del nombre completo al perder el foco
   const usernameInput = document.getElementById("config-user-username");
   if (usernameInput) {
     usernameInput.addEventListener("blur", function () {
       if (this.value.length > 0) {
         this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1);
+      }
+    });
+  }
+  const nameInput = document.getElementById("config-user-name");
+  if (nameInput) {
+    nameInput.addEventListener("input", function () {
+      const pos = this.selectionStart;
+      if (this.value.length > 0) {
+        this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1);
+        this.setSelectionRange(pos, pos);
       }
     });
   }
@@ -55,7 +65,6 @@ $(document).ready(function () {
 
     let fullName = document.getElementById("config-user-name").value.trim();
     let username = document.getElementById("config-user-username").value.trim();
-    let email = document.getElementById("config-user-email").value.trim();
     let birthday = document.getElementById("config-user-birthdate").value;
     let gender = document.getElementById("config-user-gender").value;
     let city = document.getElementById("config-user-city").value.trim();
@@ -63,8 +72,16 @@ $(document).ready(function () {
     let topCoaster = document.getElementById("top-coaster-user").value.trim();
     let homePark = document.getElementById("home-park-user").value.trim();
 
-    if (!username || !email) {
-      alert("El usuario y correo electrónico son obligatorios.");
+    // Basta con que al menos un campo tenga valor para guardar
+    const msgEl = document.getElementById("msg-guardar-config");
+    const hayAlgoCambiado = fullName || username || birthday || gender || city || country || homePark;
+    if (!hayAlgoCambiado) {
+      if (msgEl) {
+        msgEl.innerHTML = '<i class="fa-solid fa-circle-xmark me-2"></i>Rellena al menos un campo antes de guardar';
+        msgEl.className = "text-danger mb-0 me-4 fw-bold";
+        msgEl.classList.remove("d-none");
+        setTimeout(() => msgEl.classList.add("d-none"), 4000);
+      }
       return;
     }
 
@@ -75,7 +92,7 @@ $(document).ready(function () {
     const formData = new FormData();
     formData.append("fullName", fullName);
     formData.append("username", username);
-    formData.append("email", email);
+    // El email no se envía: está deshabilitado y el backend lo obtiene de la sesión
     formData.append("birthday", birthday);
     formData.append("gender", gender);
     formData.append("city", city);
@@ -92,40 +109,36 @@ $(document).ready(function () {
         },
       );
       const data = await res.json();
-      const msgEl = document.getElementById("msg-guardar-config");
+      const msgEl2 = document.getElementById("msg-guardar-config");
 
       if (data.success) {
-        if (msgEl) {
-          msgEl.classList.remove("d-none");
-          msgEl.innerHTML =
+        if (msgEl2) {
+          msgEl2.classList.remove("d-none");
+          msgEl2.innerHTML =
             '<i class="fa-solid fa-circle-check me-2"></i>Guardado correctamente';
-          msgEl.className = "text-success mb-0 me-4 fw-bold";
-          setTimeout(() => msgEl.classList.add("d-none"), 3000);
-        } else {
-          alert("Configuración guardada correctamente.");
+          msgEl2.className = "text-success mb-0 me-4 fw-bold";
+          setTimeout(() => msgEl2.classList.add("d-none"), 3000);
         }
         cargarDatos();
       } else {
-        if (msgEl) {
-          msgEl.innerHTML =
+        if (msgEl2) {
+          msgEl2.innerHTML =
             '<i class="fa-solid fa-circle-xmark me-2"></i>' +
             (data.error || "Error al guardar");
-          msgEl.className = "text-danger mb-0 me-4 fw-bold";
-          setTimeout(() => msgEl.classList.add("d-none"), 4000);
-        } else {
-          alert("Error: " + (data.error || "Ocurrió un problema"));
+          msgEl2.className = "text-danger mb-0 me-4 fw-bold";
+          msgEl2.classList.remove("d-none");
+          setTimeout(() => msgEl2.classList.add("d-none"), 4000);
         }
       }
     } catch (e) {
       console.error("Error al guardar perfil:", e);
-      const msgEl = document.getElementById("msg-guardar-config");
-      if (msgEl) {
-        msgEl.innerHTML =
+      const msgEl3 = document.getElementById("msg-guardar-config");
+      if (msgEl3) {
+        msgEl3.innerHTML =
           '<i class="fa-solid fa-circle-xmark me-2"></i>Error de conexión';
-        msgEl.className = "text-danger mb-0 me-4 fw-bold";
-        setTimeout(() => msgEl.classList.add("d-none"), 4000);
-      } else {
-        alert("Error de conexión al guardar los datos.");
+        msgEl3.className = "text-danger mb-0 me-4 fw-bold";
+        msgEl3.classList.remove("d-none");
+        setTimeout(() => msgEl3.classList.add("d-none"), 4000);
       }
     } finally {
       btn.disabled = false;

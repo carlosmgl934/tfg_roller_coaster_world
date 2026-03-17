@@ -104,8 +104,8 @@ class RCDBUpdater:
         self.new_coasters: List[Dict]    = []
         self.changed_coasters: List[Dict] = []
 
-        self.db     = None
-        self.cursor = None
+        self.db:     Optional[psycopg2.extensions.connection] = None
+        self.cursor: Optional[psycopg2.extensions.cursor]     = None
 
     # ──────────────────────────────────────────────────────────────────────────
     # BASE DE DATOS

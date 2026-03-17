@@ -103,4 +103,3 @@ if ($id === 0) {
 <!-- CropperJS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script src="<?= $base_url ?>/web/js/parks.js"></script>
-<script src="<?= $base_url ?>/web/js/auth-check.js"></script>

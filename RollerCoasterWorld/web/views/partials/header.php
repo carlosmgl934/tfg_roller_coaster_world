@@ -13,7 +13,23 @@ $public_pages = [
   '/web/views/auth/register.php',
   '/web/views/public/contact.php',
   '/web/views/public/privacy.php',
-  '/web/views/public/notice.php'
+  '/web/views/public/notice.php',
+  // Parques — exploración pública
+  '/web/views/public/parks/park_search.php',
+  '/web/views/public/parks/park_tops.php',
+  '/web/views/public/parks/parks.php',
+  '/web/views/public/parks/park_detail.php',
+  '/web/views/public/parks/park_reviews.php',
+  // Coasters — exploración pública
+  '/web/views/public/coasters/coaster_search.php',
+  '/web/views/public/coasters/coasters.php',
+  '/web/views/public/coasters/coaster_reviews.php',
+  '/web/views/public/coasters/coaster_tops.php',
+  // Foros — lista pública (el detalle de foro no es público)
+  '/web/views/public/forums/forum_search.php',
+  '/web/views/public/forums/forums.php',
+  // Ranking global
+  '/web/views/public/users/ranking.php',
 ];
 
 // Determina si el usuario está logueado
@@ -66,7 +82,7 @@ header("Expires: 0"); // Proxies
   <script src="<?= $base_url ?>/web/js/auth.js"></script>
 
   <!-- Estilos globales y sticky footer -->
-  <link rel="stylesheet" href="<?= $base_url ?>/web/css/header.css">
+  <link rel="stylesheet" href="<?= $base_url ?>/web/css/header.css">  
 
 </head>
 

@@ -15,6 +15,26 @@ $router->register('get_profile', 'getProfile');
 
 $router->dispatch();
 
+// ── Helper: obtiene el user_id de la sesión, con fallback por firebase_uid ──────
+function getUserId(): ?int
+{
+    if (isset($_SESSION['user_id'])) {
+        return (int) $_SESSION['user_id'];
+    }
+    // Fallback: resolver por firebase_uid (sesiones anteriores al fix)
+    if (isset($_SESSION['firebase_uid'])) {
+        global $db;
+        $stmt = $db->prepare("SELECT id FROM users WHERE firebase_uid = :uid LIMIT 1");
+        $stmt->execute([':uid' => $_SESSION['firebase_uid']]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            $_SESSION['user_id'] = (int) $row['id']; // guardar para la próxima vez
+            return (int) $row['id'];
+        }
+    }
+    return null;
+}
+
 // ── Búsqueda de Parques para el Home Park ─────────────────────────────────────
 function searchParks()
 {
@@ -41,16 +61,16 @@ function searchParks()
 // ── Guardar Configuración de Perfil ───────────────────────────────────────────
 function saveProfile()
 {
-    if (!isset($_SESSION['user_id'])) {
+    $user_id = getUserId();
+    if (!$user_id) {
         Response::unauthorized('No estás autenticado');
     }
 
-    $user_id = $_SESSION['user_id'];
-
     // Recoger datos
     $fullName = strlen($_POST['fullName'] ?? '') > 0 ? $_POST['fullName'] : null;
-    $username = $_POST['username'] ?? null;
-    $email = $_POST['email'] ?? null;
+    $username = strlen($_POST['username'] ?? '') > 0 ? $_POST['username'] : null;
+    // El email NO se actualiza desde el formulario (campo disabled en el front)
+    // Se mantiene el valor actual en BD; solo lo usamos para mostrar al usuario
     $birthdate = strlen($_POST['birthday'] ?? '') > 0 ? $_POST['birthday'] : null;
     // Gender: string vacío → null para no violar el check constraint de la BD
     $gender = strlen($_POST['gender'] ?? '') > 0 ? $_POST['gender'] : null;
@@ -59,37 +79,31 @@ function saveProfile()
     $topCoaster = strlen($_POST['topCoaster'] ?? '') > 0 ? $_POST['topCoaster'] : null;
     $homePark = strlen($_POST['homePark'] ?? '') > 0 ? $_POST['homePark'] : null;
 
-    if (!$username || !$email) {
-        Response::error('Usuario y Email son obligatorios');
-    }
-
     global $db;
     $stmt = $db->prepare("
         UPDATE users SET
-            full_name = :full_name,
-            username = :username,
-            email = :email,
-            birthdate = :birthdate,
-            gender = :gender,
-            city = :city,
-            country = :country,
-            favorite_coaster = :favorite_coaster,
-            home_park = :home_park
+            full_name        = COALESCE(:full_name, full_name),
+            username         = COALESCE(:username, username),
+            birthdate        = COALESCE(:birthdate, birthdate),
+            gender           = COALESCE(:gender, gender),
+            city             = COALESCE(:city, city),
+            country          = COALESCE(:country, country),
+            favorite_coaster = COALESCE(:favorite_coaster, favorite_coaster),
+            home_park        = COALESCE(:home_park, home_park)
         WHERE id = :id
     ");
 
     try {
         $stmt->execute([
-            ':full_name' => $fullName,
-            ':username' => $username,
-            ':email' => $email,
-            ':birthdate' => $birthdate,
-            ':gender' => $gender,
-            ':city' => $city,
-            ':country' => $country,
+            ':full_name'        => $fullName,
+            ':username'         => $username,
+            ':birthdate'        => $birthdate,
+            ':gender'           => $gender,
+            ':city'             => $city,
+            ':country'          => $country,
             ':favorite_coaster' => $topCoaster,
-            ':home_park' => $homePark,
-            ':id' => $user_id
+            ':home_park'        => $homePark,
+            ':id'               => $user_id
         ]);
 
         Response::success();
@@ -107,7 +121,8 @@ function saveProfile()
 
 function getProfile()
 {
-    if (!isset($_SESSION['user_id'])) {
+    $user_id = getUserId();
+    if (!$user_id) {
         Response::unauthorized('No estás logueado');
     }
     global $db;
@@ -127,7 +142,7 @@ function getProfile()
         WHERE id = :id
     ");
     try {
-        $stmt->bindParam(':id', $_SESSION['user_id'], PDO::PARAM_INT);
+        $stmt->bindValue(':id', $user_id, PDO::PARAM_INT);
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($user) {
@@ -144,7 +159,8 @@ function getProfile()
 
 function updateAvatar()
 {
-    if (!isset($_SESSION['user_id'])) {
+    $user_id = getUserId();
+    if (!$user_id) {
         Response::unauthorized('No estás logueado');
     }
 
@@ -159,7 +175,7 @@ function updateAvatar()
     try {
         $stmt = $db->prepare("
         UPDATE users SET profile_image = :photoUrl WHERE id = :id");
-        $stmt->bindParam(':id', $_SESSION['user_id'], PDO::PARAM_INT);
+        $stmt->bindValue(':id', $user_id, PDO::PARAM_INT);
         $stmt->bindParam(':photoUrl', $photoUrl, PDO::PARAM_STR);
         $stmt->execute();
         Response::success();
