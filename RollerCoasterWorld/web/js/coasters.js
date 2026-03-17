@@ -62,11 +62,13 @@ $(document).ready(function () {
       }
       searchDebounce = setTimeout(async () => {
         try {
-          const res = await fetch(`${BASE_URL}/api/php/coasters.php?action=search&search=${encodeURIComponent(search)}`);
+          const res = await fetch(
+            `${BASE_URL}/api/php/coasters.php?action=search&search=${encodeURIComponent(search)}`,
+          );
           const data = await res.json();
           let html = "";
           if (data.length > 0) {
-            data.forEach(coaster => {
+            data.forEach((coaster) => {
               html += `
               <a href="${BASE_URL}/web/views/public/coasters/coasters.php?id=${coaster.id}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                 <div>
@@ -110,18 +112,36 @@ $(document).ready(function () {
         let year = document.getElementById("year-select").value;
         let search = document.getElementById("coaster-search").value;
 
-        const params = new URLSearchParams({ action: "apply_filters", page, opened, ridden, height, speed, length, inversions, manufacter, country, year, search });
+        const params = new URLSearchParams({
+          action: "apply_filters",
+          page,
+          opened,
+          ridden,
+          height,
+          speed,
+          length,
+          inversions,
+          manufacter,
+          country,
+          year,
+          search,
+        });
         fetch(`${BASE_URL}/api/php/coasters.php?${params}`)
-          .then(r => r.json())
-          .then(data => {
+          .then((r) => r.json())
+          .then((data) => {
             if (data.success) {
+              let totalMsg = data.total || 0;
+              $("#coaster-count").text(
+                `Mostrando ${totalMsg} montaña${totalMsg !== 1 ? "s" : ""} rusa${totalMsg !== 1 ? "s" : ""}`,
+              );
               displayCoasters(data.coasters);
               displayPagination(data.total, page);
             } else {
-              document.getElementById("coaster-list").innerHTML = "<p style='color:red;'>Error cargando montañas rusas</p>";
+              document.getElementById("coaster-list").innerHTML =
+                "<p style='color:red;'>Error cargando montañas rusas</p>";
             }
           })
-          .catch(e => console.warn("Error apply_filters:", e));
+          .catch((e) => console.warn("Error apply_filters:", e));
         return;
       }
 
@@ -137,16 +157,21 @@ $(document).ready(function () {
 
       const params = new URLSearchParams(ajaxData);
       fetch(`${BASE_URL}/api/php/coasters.php?${params}`)
-        .then(r => r.json())
-        .then(data => {
+        .then((r) => r.json())
+        .then((data) => {
           if (data.success) {
+            let totalMsg = data.total || 0;
+            $("#coaster-count").text(
+              `Mostrando ${totalMsg} montaña${totalMsg !== 1 ? "s" : ""} rusa${totalMsg !== 1 ? "s" : ""}`,
+            );
             displayCoasters(data.coasters);
             displayPagination(data.total, page);
           } else {
-            document.getElementById("coaster-list").innerHTML = "<p style='color:red;'>Error cargando montañas rusas</p>";
+            document.getElementById("coaster-list").innerHTML =
+              "<p style='color:red;'>Error cargando montañas rusas</p>";
           }
         })
-        .catch(e => console.warn("Error loadCoasters:", e));
+        .catch((e) => console.warn("Error loadCoasters:", e));
     }
 
     async function loadFilters() {
@@ -154,13 +179,13 @@ $(document).ready(function () {
         // Cargar fabricantes y países en paralelo
         const [mRes, cRes] = await Promise.all([
           fetch(`${BASE_URL}/api/php/coasters.php?action=manufacter`),
-          fetch(`${BASE_URL}/api/php/coasters.php?action=country`)
+          fetch(`${BASE_URL}/api/php/coasters.php?action=country`),
         ]);
         const mData = await mRes.json();
         const cData = await cRes.json();
 
         if (mData.success) {
-          mData.manufacters.forEach(m => {
+          mData.manufacters.forEach((m) => {
             const option = document.createElement("option");
             option.value = m.coaster_manufacter;
             option.textContent = m.coaster_manufacter;
@@ -168,7 +193,7 @@ $(document).ready(function () {
           });
         }
         if (cData.success) {
-          cData.countries.forEach(c => {
+          cData.countries.forEach((c) => {
             const option = document.createElement("option");
             option.value = c.park_country;
             option.textContent = c.park_country;
@@ -428,7 +453,9 @@ $(document).ready(function () {
 
     async function loadCoastersData(id) {
       try {
-        const res = await fetch(`${BASE_URL}/api/php/coasters.php?action=coaster&id=${id}`);
+        const res = await fetch(
+          `${BASE_URL}/api/php/coasters.php?action=coaster&id=${id}`,
+        );
         const data = await res.json();
         if (data.success) {
           let coaster = data.coaster;
@@ -565,18 +592,22 @@ $(document).ready(function () {
     // --- LÓGICA PARA EL FORMULARIO DE FOTOS ---
     async function loadPhotos(id) {
       try {
-        const res = await fetch(`${BASE_URL}/api/php/coasters.php?action=photos&id=${id}`);
+        const res = await fetch(
+          `${BASE_URL}/api/php/coasters.php?action=photos&id=${id}`,
+        );
         const data = await res.json();
         if (data.success) {
           $("#photos-count").text(data.total);
           if (data.photos.length === 0) {
-            $("#photos-grid").html('<p class="text-muted text-center py-3">Aún no hay fotos</p>');
+            $("#photos-grid").html(
+              '<p class="text-muted text-center py-3">Aún no hay fotos</p>',
+            );
             return;
           }
-          data.photos.forEach(photo => {
+          data.photos.forEach((photo) => {
             const col = document.createElement("div");
             col.className = "col-6 col-md-3";
-            col.innerHTML = `<img src="${photo.photo_url}" alt="${photo.caption || 'Foto'}" class="photo-thumb w-100" title="${photo.username}">`;
+            col.innerHTML = `<img src="${photo.photo_url}" alt="${photo.caption || "Foto"}" class="photo-thumb w-100" title="${photo.username}">`;
             document.querySelector("#photos-grid").appendChild(col);
           });
         }
@@ -587,22 +618,28 @@ $(document).ready(function () {
 
     async function loadReviews(order) {
       order = order || "default";
-      $("#reviews-list").html('<div class="text-center text-muted py-4"><i class="fa-solid fa-spinner fa-spin fs-3"></i></div>');
+      $("#reviews-list").html(
+        '<div class="text-center text-muted py-4"><i class="fa-solid fa-spinner fa-spin fs-3"></i></div>',
+      );
       try {
-        const res = await fetch(`${BASE_URL}/api/php/coasters.php?action=reviews&id=${coasterId}&order=${order}`);
+        const res = await fetch(
+          `${BASE_URL}/api/php/coasters.php?action=reviews&id=${coasterId}&order=${order}`,
+        );
         const data = await res.json();
         if (data.success) {
           $("#reviews-count").text(data.total);
           if (data.reviews.length === 0) {
-            $("#reviews-list").html('<p class="text-muted text-center py-4">Aún no hay reseñas para esta montaña rusa.</p>');
+            $("#reviews-list").html(
+              '<p class="text-muted text-center py-4">Aún no hay reseñas para esta montaña rusa.</p>',
+            );
             return;
           }
           $("#reviews-list").empty();
-          data.reviews.forEach(review => {
+          data.reviews.forEach((review) => {
             let tagsHtml = "";
             if (review.tags && review.tags.length > 0) {
               tagsHtml = '<div class="d-flex flex-wrap gap-2 mt-2 mb-2">';
-              review.tags.forEach(t => {
+              review.tags.forEach((t) => {
                 const cls = t.type === "pro" ? "success" : "danger";
                 tagsHtml += `<span class="badge bg-${cls} bg-opacity-10 text-${cls} border border-${cls} border-opacity-25 rounded-pill px-3 py-1" style="font-weight:600;font-size:0.75rem;">${t.tag.replace(/_/g, " ").toUpperCase()}</span>`;
               });
@@ -611,14 +648,14 @@ $(document).ready(function () {
             $("#reviews-list").append(
               `<div class="border-bottom pb-3 mb-3">
               <div class="d-flex align-items-center gap-2 mb-1">
-                <img src="${review.profile_image || 'https://placehold.co/40x40'}" alt="${review.username}" class="review-avatar" style="width:40px;height:40px;object-fit:cover;border-radius:50%;">
+                <img src="${review.profile_image || "https://placehold.co/40x40"}" alt="${review.username}" class="review-avatar" style="width:40px;height:40px;object-fit:cover;border-radius:50%;">
                 <strong>${review.username}</strong>
                 <span class="stars-display ms-2">${renderStars(review.note)}</span>
                 <span class="text-muted small ms-2">• ${timeAgo(review.created_at)}</span>
               </div>
               ${tagsHtml}
               <p class="mb-0 mt-2">${review.review || ""}</p>
-            </div>`
+            </div>`,
             );
           });
         }
@@ -640,10 +677,13 @@ $(document).ready(function () {
     const btnWriteReview = document.getElementById("btn-write-review");
     if (btnWriteReview) {
       btnWriteReview.addEventListener("click", function (e) {
-        const isLogged = document.querySelector("main").getAttribute("data-logged") === "true";
+        const isLogged =
+          document.querySelector("main").getAttribute("data-logged") === "true";
         if (!isLogged) {
           e.preventDefault();
-          const loginModal = new bootstrap.Modal(document.getElementById("loginModal"));
+          const loginModal = new bootstrap.Modal(
+            document.getElementById("loginModal"),
+          );
           loginModal.show();
         }
       });
@@ -757,16 +797,20 @@ $(document).ready(function () {
 
             // 2. Subir a Supabase Storage via PHP proxy
             const uploadForm = new FormData();
-            uploadForm.append('file', blob, filename);
-            uploadForm.append('bucket', 'coasters');
-            uploadForm.append('path', coasterId);
+            uploadForm.append("file", blob, filename);
+            uploadForm.append("bucket", "coasters");
+            uploadForm.append("path", coasterId);
 
-            const uploadRes = await fetch(`${window.BASE_URL}/api/php/upload.php`, {
-              method: 'POST',
-              body: uploadForm,
-            });
+            const uploadRes = await fetch(
+              `${window.BASE_URL}/api/php/upload.php`,
+              {
+                method: "POST",
+                body: uploadForm,
+              },
+            );
             const uploadData = await uploadRes.json();
-            if (!uploadData.success) throw new Error(uploadData.error || 'Error al subir la foto');
+            if (!uploadData.success)
+              throw new Error(uploadData.error || "Error al subir la foto");
             const url = uploadData.url;
 
             // 3. Guardar en PostgreSQL vía API PHP
@@ -778,27 +822,37 @@ $(document).ready(function () {
             photoForm.append("caption", captionVal);
 
             try {
-              const saveRes = await fetch(`${window.BASE_URL}/api/php/coasters.php?action=save_photo`, {
-                method: "POST",
-                body: photoForm,
-              });
+              const saveRes = await fetch(
+                `${window.BASE_URL}/api/php/coasters.php?action=save_photo`,
+                {
+                  method: "POST",
+                  body: photoForm,
+                },
+              );
               const saveData = await saveRes.json();
               if (saveData.success) {
                 const modalEl = document.getElementById("upload-photo-modal");
                 bootstrap.Modal.getInstance(modalEl).hide();
                 document.getElementById("upload-photo-form").reset();
                 cropContainer.style.display = "none";
-                if (cropper) { cropper.destroy(); cropper = null; }
+                if (cropper) {
+                  cropper.destroy();
+                  cropper = null;
+                }
                 alert("¡Foto enviada! Esperando aprobación del administrador");
               } else {
-                alert("Error al guardar la foto: " + (saveData.error || "Desconocido"));
+                alert(
+                  "Error al guardar la foto: " +
+                    (saveData.error || "Desconocido"),
+                );
               }
             } catch (saveErr) {
               alert("Error en la conexión con la API.");
               console.error(saveErr);
             } finally {
               uploadBtn.disabled = false;
-              uploadBtn.innerHTML = 'Subir foto <i class="fa-solid fa-upload ms-1"></i>';
+              uploadBtn.innerHTML =
+                'Subir foto <i class="fa-solid fa-upload ms-1"></i>';
             }
           },
           "image/jpeg",

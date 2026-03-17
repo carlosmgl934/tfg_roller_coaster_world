@@ -45,7 +45,7 @@ require_once __DIR__ . '/../../partials/header.php';
           <!-- Número de montañas rusas mínimo -->
           <div class="mb-4">
               <label for="num-coaster-min" class="form-label d-flex justify-content-between">
-                  Nº montañas rusas mín. <span class="badge bg-success" id="coasters-val">0</span>
+                  Nº montañas rusas mínimo <span class="badge bg-success" id="coasters-val">0</span>
               </label>
               <input type="range" class="form-range" id="num-coaster-min" min="0" max="50" value="0">
           </div>

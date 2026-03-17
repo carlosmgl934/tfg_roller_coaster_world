@@ -147,7 +147,7 @@ $(document).ready(function () {
               <div class="flex-grow-1">
                 <h5 class="mb-1 fw-bold text-success" style="font-size: 1.25rem;">${park.park_name || "Sin nombre"}</h5>
                 <p class="mb-1 text-muted"><i class="fa-solid fa-map-pin me-1"></i>${park.park_location || "N/A"}, ${park.park_country || ""}</p>
-                <small class="text-secondary">${park.opening_year || "N/A"} • ${park.num_coasters || 0} montañas rusas • ${park.stars || "0.00"} ★</small>
+                <small class="text-secondary">${park.opening_year || "N/A"} • ${park.operating_coasters || 0} montañas rusas • ${park.stars || "0.00"} ★</small>
               </div>
               <i class="fa-solid fa-chevron-right text-muted ms-3"></i>
             </a>

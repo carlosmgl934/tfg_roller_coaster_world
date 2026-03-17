@@ -95,15 +95,13 @@ for park in parks:
         if m:
             opening_year = int(m.group(1))
 
-    # ── Contar coasters desde BD ──────────────────────────────────────────────
-    cursor.execute("SELECT COUNT(*) FROM coasters WHERE park_id = %s", (park_id,))
-    num_coasters = cursor.fetchone()[0]
-
+    # ── Contar coasters desde BD (SOLO OPERATIVAS) ─────────────────────────
     cursor.execute("""
         SELECT COUNT(*) FROM coasters
         WHERE park_id = %s AND coaster_status IN ('Operating', 'Operativa', 'Abierta')
     """, (park_id,))
     num_operating = cursor.fetchone()[0]
+    num_coasters = num_operating
 
     img_status = "SI" if image_url != "" else "NO"
     year_status = opening_year if opening_year else "NO"
