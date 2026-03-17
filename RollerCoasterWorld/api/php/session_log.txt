@@ -1,6 +1,0 @@
-2026-03-15 18:58:21 - POST recibido: {"firebase_uid":"ANcajDPKBSXdt4nWgsK6TkB72FL2","email":"carlosmgl934@gmail.com"}
-2026-03-15 18:58:21 - Sesión guardada: UID=ANcajDPKBSXdt4nWgsK6TkB72FL2
-2026-03-16 17:56:57 - POST recibido: {"firebase_uid":"ppgiOBSRzIcN3KDfZZjRoxoBuAc2","email":"usuario@gmail.com"}
-2026-03-16 17:56:57 - Sesión guardada: UID=ppgiOBSRzIcN3KDfZZjRoxoBuAc2
-2026-03-16 18:02:19 - POST recibido: {"firebase_uid":"ppgiOBSRzIcN3KDfZZjRoxoBuAc2","email":"usuario@gmail.com"}
-2026-03-16 18:02:19 - Sesión guardada: UID=ppgiOBSRzIcN3KDfZZjRoxoBuAc2

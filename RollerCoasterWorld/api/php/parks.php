@@ -117,7 +117,7 @@ function searchParks() {
            OR park_location ILIKE :query 
            OR park_country ILIKE :query
         ORDER BY park_name ASC
-        LIMIT 20
+        LIMIT 5
     ");
     $stmt->execute([':query' => $query]);
 

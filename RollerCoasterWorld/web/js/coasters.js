@@ -232,7 +232,7 @@ $(document).ready(function () {
         );
 
         const img = coaster.imagen_url
-          ? `<img src="${coaster.imagen_url}" alt="${coaster.coaster_name}" class="rounded-0 shadow-sm" style="width: 100px; height: 100px; object-fit: cover; margin-right: 20px;">`
+          ? `<img src="${coaster.imagen_url}" alt="${coaster.coaster_name}" class="rounded-0 shadow-sm" referrerpolicy="no-referrer" style="width: 100px; height: 100px; object-fit: cover; margin-right: 20px;">`
           : `<img src="https://www.hussrides.com/fileadmin/_processed_/5/e/csm_giant-frisbee-cedarpoint-01_0697df513a.jpg" alt="Sin imagen" class="rounded-0 shadow-sm" style="width: 100px; height: 100px; object-fit: cover; margin-right: 20px;">`;
 
         const manufacter = coaster.manufacter || "Desconocido";

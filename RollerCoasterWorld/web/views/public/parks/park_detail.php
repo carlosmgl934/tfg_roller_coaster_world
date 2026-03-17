@@ -18,7 +18,7 @@ require_once __DIR__ . '/../../partials/header.php';
         <!-- Hero imagen -->
         <div class="col-12 col-lg-7">
             <div class="hero-img-wrapper position-relative">
-                <img src="https://placehold.co/1200x600" alt="Parque" id="park-hero-img" class="img-fluid rounded">
+                <img src="https://placehold.co/1200x600" alt="Parque" id="park-hero-img" class="img-fluid rounded" referrerpolicy="no-referrer">
                 <div class="img-overlay"></div>
             </div>
         </div>

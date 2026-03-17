@@ -31,7 +31,7 @@ require_once __DIR__ . '/../../partials/header.php';
 
           <!-- Ubicación / Ciudad -->
           <div class="mb-3">
-            <input type="text" id="location-filter" class="form-control shadow-sm rounded-0" placeholder="Ubicación / Ciudad">
+            <input type="text" id="location-filter" class="form-control shadow-sm rounded-0" placeholder="Ciudad">
           </div>
 
           <!-- Año de apertura mínima -->
