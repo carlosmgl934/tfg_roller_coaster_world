@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/../../routes/routes.php'; ?>
+<?php require_once __DIR__ . '/../../routes/Router.php'; ?>
 <footer class="bg-dark text-white pt-5 pb-4 mt-auto">
   <div class="container text-center text-md-start">
     <div class="row text-center text-md-start">
@@ -7,11 +7,11 @@
       <div class="col-md-4 col-lg-4 col-xl-4 mx-auto mb-4">
         <h5 class="text-uppercase fw-bold text-success mb-4">Comunidad & Legal</h5>
         <p>
-          <a href="<?= $routes['contact'] ?>" class="text-white text-decoration-none" style="transition: color 0.3s;"
+          <a href="<?= Router::url('contact') ?>" class="text-white text-decoration-none" style="transition: color 0.3s;"
             onmouseover="this.style.color='#198754'" onmouseout="this.style.color='white'">Contácta con nosotros</a>
         </p>
         <p>
-          <a href="<?= $routes['privacy'] ?>" class="text-white text-decoration-none" style="transition: color 0.3s;"
+          <a href="<?= Router::url('privacy') ?>" class="text-white text-decoration-none" style="transition: color 0.3s;"
             onmouseover="this.style.color='#198754'" onmouseout="this.style.color='white'">Privacidad</a>
         </p>
       </div>

@@ -38,13 +38,11 @@ function listParks() {
     $where = ["1=1"];
     $bind = [];
 
-    // Búsqueda general
     if (!empty($_GET['q'])) {
         $where[] = "(park_name ILIKE :q OR park_location ILIKE :q OR park_country ILIKE :q)";
         $bind[':q'] = '%' . trim($_GET['q']) . '%';
     }
 
-    // Filtros
     if (!empty($_GET['country'])) {
         $where[] = "park_country = :country";
         $bind[':country'] = $_GET['country'];
@@ -74,6 +72,15 @@ function listParks() {
         $bind[':min_stars'] = (float)$_GET['min_stars'];
     }
 
+    $validSorts = [
+        'name'     => 'park_name ASC',
+        'coasters' => 'operating_coasters DESC',
+        'stars'    => 'stars DESC',
+        'year'     => 'NULLIF(opening_year, 0) ASC NULLS LAST',
+    ];
+    $sort = $_GET['sort'] ?? 'coasters';
+    $orderBy = $validSorts[$sort] ?? 'operating_coasters DESC';
+
     $whereClause = implode(" AND ", $where);
 
     $sql = "SELECT id, park_name, park_location, park_country, imagen_url, 
@@ -81,7 +88,7 @@ function listParks() {
                    latitude, longitude
             FROM parks
             WHERE $whereClause
-            ORDER BY park_name ASC
+            ORDER BY $orderBy
             LIMIT :limit OFFSET :offset";
 
     $sqlCount = "SELECT COUNT(*) FROM parks WHERE $whereClause";
@@ -103,57 +110,6 @@ function listParks() {
     $total = $stmtCount->fetchColumn();
 
     Response::success(['data' => $parks, 'total' => $total]);
-}
-
-// Buscar parques por nombre, ubicación o país (público)
-function searchParks() {
-    global $db;
-    $query = '%' . trim($_GET['q'] ?? '') . '%';
-
-    $stmt = $db->prepare("
-        SELECT id, park_name, park_location, park_country, imagen_url, stars
-        FROM parks
-        WHERE park_name ILIKE :query 
-           OR park_location ILIKE :query 
-           OR park_country ILIKE :query
-        ORDER BY park_name ASC
-        LIMIT 5
-    ");
-    $stmt->execute([':query' => $query]);
-
-    Response::success(['data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
-}
-
-// Filtrar parques (público) - por país, estrellas, num_coasters, etc.
-function filterParks() {
-    global $db;
-
-    $where = [];
-    $bind = [];
-
-    if (!empty($_GET['country'])) {
-        $where[] = "park_country = :country";
-        $bind[':country'] = $_GET['country'];
-    }
-    if (!empty($_GET['min_stars'])) {
-        $where[] = "stars >= :min_stars";
-        $bind[':min_stars'] = (float)$_GET['min_stars'];
-    }
-    if (!empty($_GET['max_coasters'])) {
-        $where[] = "operating_coasters <= :max_coasters";
-        $bind[':max_coasters'] = (int)$_GET['max_coasters'];
-    }
-
-    $sql = "SELECT * FROM parks";
-    if (!empty($where)) {
-        $sql .= " WHERE " . implode(" AND ", $where);
-    }
-    $sql .= " ORDER BY park_name ASC LIMIT 50";
-
-    $stmt = $db->prepare($sql);
-    $stmt->execute($bind);
-
-    Response::success(['data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
 }
 
 // Obtener lista de países únicos (público)

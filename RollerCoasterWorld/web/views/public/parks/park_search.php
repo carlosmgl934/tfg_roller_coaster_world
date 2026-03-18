@@ -36,36 +36,36 @@ require_once __DIR__ . '/../../partials/header.php';
 
           <!-- Año de apertura mínima -->
           <div class="mb-3">
-              <label for="opening-year-min" class="form-label d-flex justify-content-between">
-                  Año de apertura (Desde) <span class="badge bg-success" id="year-val">1800</span>
-              </label>
-              <input type="range" class="form-range" id="opening-year-min" min="1800" max="<?= date('Y') + 5 ?>" value="1800">
+            <label for="opening-year-min" class="form-label d-flex justify-content-between">
+              Año de apertura (Desde) <span class="badge bg-success" id="year-val">1800</span>
+            </label>
+            <input type="range" class="form-range" id="opening-year-min" min="1800" max="<?= date('Y') + 5 ?>" value="1800">
           </div>
 
           <!-- Número de montañas rusas mínimo -->
           <div class="mb-4">
-              <label for="num-coaster-min" class="form-label d-flex justify-content-between">
-                  Nº montañas rusas mínimo <span class="badge bg-success" id="coasters-val">0</span>
-              </label>
-              <input type="range" class="form-range" id="num-coaster-min" min="0" max="50" value="0">
+            <label for="num-coaster-min" class="form-label d-flex justify-content-between">
+              Nº montañas rusas mínimo <span class="badge bg-success" id="coasters-val">0</span>
+            </label>
+            <input type="range" class="form-range" id="num-coaster-min" min="0" max="50" value="0">
           </div>
 
           <!-- Rating mínimo -->
           <div class="mb-4">
-              <label for="rating-filter" class="form-label d-flex justify-content-between">
-                  Rating mínimo <span class="badge bg-success" id="rating-val">0★</span>
-              </label>
-              <input type="range" class="form-range" id="rating-filter" min="0" max="5" step="0.1" value="0">
+            <label for="rating-filter" class="form-label d-flex justify-content-between">
+              Rating mínimo <span class="badge bg-success" id="rating-val">0★</span>
+            </label>
+            <input type="range" class="form-range" id="rating-filter" min="0" max="5" step="0.1" value="0">
           </div>
 
           <!-- Botones limpiar y filtrar -->
           <div class="d-grid gap-2">
-              <button type="button" class="btn btn-success fw-bold shadow-sm rounded-0" id="btn-filtrar">
-                  <i class="fa-solid fa-filter me-2"></i>Filtrar
-              </button>
-              <button type="button" class="btn btn-outline-secondary shadow-sm rounded-0" id="clear-filters">
-                  <i class="fa-solid fa-eraser me-2"></i>Limpiar filtros
-              </button>
+            <button type="button" class="btn btn-success fw-bold shadow-sm rounded-0" id="btn-filtrar">
+              <i class="fa-solid fa-filter me-2"></i>Filtrar
+            </button>
+            <button type="button" class="btn btn-outline-secondary shadow-sm rounded-0" id="clear-filters">
+              <i class="fa-solid fa-eraser me-2"></i>Limpiar filtros
+            </button>
           </div>
         </div>
       </div>
@@ -73,8 +73,16 @@ require_once __DIR__ . '/../../partials/header.php';
 
     <!-- CENTRO: Lista -->
     <div class="col-12 col-lg-6">
-      <div id="park-count" class="mb-3 text-muted fw-bold"></div>
-      
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div id="park-count" class="text-muted fw-bold"></div>
+        <select id="sort-filter" class="form-select shadow-sm rounded-0 w-auto border-success" style="cursor: pointer; font-weight: 500;">
+          <option value="coasters" selected>Más montañas rusas</option>
+          <option value="name">Nombre A-Z</option>
+          <option value="stars">Mejor valorados</option>
+          <option value="year">Año de apertura</option>
+        </select>
+      </div>
+
       <div id="park-list" class="list-group shadow-sm rounded-0" style="border-radius: 0;">
         <div class="list-group-item text-center py-5 border-0">
           <div class="spinner-border text-success" role="status">
@@ -83,7 +91,7 @@ require_once __DIR__ . '/../../partials/header.php';
           <p class="mt-3 text-muted">Cargando parques...</p>
         </div>
       </div>
-      
+
       <div id="park-pagination" class="pagination mt-4 justify-content-center"></div>
     </div>
 

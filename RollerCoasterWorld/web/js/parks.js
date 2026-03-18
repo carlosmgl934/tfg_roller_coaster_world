@@ -52,6 +52,14 @@ $(document).ready(function () {
     loadParks(getFilters(), 1);
   });
 
+  // Listener para el selector de ordenación
+  const sortFilter = document.getElementById("sort-filter");
+  if (sortFilter) {
+    sortFilter.addEventListener("change", function () {
+      loadParks(getFilters(), 1);
+    });
+  }
+
   let currentPage = 1;
   const itemsPerPage = 15;
 
@@ -86,7 +94,7 @@ $(document).ready(function () {
       url.searchParams.append("max_coasters", params.max_coasters);
     if (params.min_rating && params.min_rating !== "Todos")
       url.searchParams.append("min_stars", params.min_rating);
-
+    if (params.sort) url.searchParams.append("sort", params.sort);
     console.log("Llamando a API:", url.toString());
 
     fetch(url)
@@ -176,6 +184,7 @@ $(document).ready(function () {
       min_year: minYear > 1800 ? minYear : "",
       min_coasters: minCoast > 0 ? minCoast : "",
       min_rating: minRating > 0 ? minRating : "",
+      sort: $("#sort-filter").val() || "name",
     };
   }
 

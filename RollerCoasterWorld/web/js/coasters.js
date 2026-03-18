@@ -52,6 +52,14 @@ $(document).ready(function () {
       .getElementById("btn-borrar")
       .addEventListener("click", clearFilters);
 
+    // Listener para el selector de ordenación
+    const sortFilter = document.getElementById("sort-filter");
+    if (sortFilter) {
+      sortFilter.addEventListener("change", function () {
+        loadCoasters(1);
+      });
+    }
+
     let searchDebounce = null;
     $("#coaster-search").on("keyup", function () {
       const search = this.value.trim();
@@ -99,6 +107,7 @@ $(document).ready(function () {
 
     function loadCoasters(page) {
       currentPage = page;
+      const sort = document.getElementById("sort-filter")?.value || "name";
 
       if (isAdvancedFiltering) {
         let opened = document.getElementById("status-filter").checked;
@@ -114,31 +123,19 @@ $(document).ready(function () {
 
         const params = new URLSearchParams({
           action: "apply_filters",
-          page,
-          opened,
-          ridden,
-          height,
-          speed,
-          length,
-          inversions,
-          manufacter,
-          country,
-          year,
-          search,
+          page, opened, ridden, height, speed, length,
+          inversions, manufacter, country, year, search, sort,
         });
         fetch(`${BASE_URL}/api/php/coasters.php?${params}`)
           .then((r) => r.json())
           .then((data) => {
             if (data.success) {
               let totalMsg = data.total || 0;
-              $("#coaster-count").text(
-                `Mostrando ${totalMsg} montaña${totalMsg !== 1 ? "s" : ""} rusa${totalMsg !== 1 ? "s" : ""}`,
-              );
+              $("#coaster-count").text(`Mostrando ${totalMsg} montaña${totalMsg !== 1 ? "s" : ""} rusa${totalMsg !== 1 ? "s" : ""}`);
               displayCoasters(data.coasters);
               displayPagination(data.total, page);
             } else {
-              document.getElementById("coaster-list").innerHTML =
-                "<p style='color:red;'>Error cargando montañas rusas</p>";
+              document.getElementById("coaster-list").innerHTML = "<p style='color:red;'>Error cargando montañas rusas</p>";
             }
           })
           .catch((e) => console.warn("Error apply_filters:", e));
@@ -146,10 +143,7 @@ $(document).ready(function () {
       }
 
       let actionName = isFiltering ? "filter" : "list";
-      let ajaxData = {
-        action: actionName,
-        page: page,
-      };
+      let ajaxData = { action: actionName, page, sort };
 
       if (isFiltering) {
         ajaxData.search = currentSearchQuery;
@@ -161,14 +155,11 @@ $(document).ready(function () {
         .then((data) => {
           if (data.success) {
             let totalMsg = data.total || 0;
-            $("#coaster-count").text(
-              `Mostrando ${totalMsg} montaña${totalMsg !== 1 ? "s" : ""} rusa${totalMsg !== 1 ? "s" : ""}`,
-            );
+            $("#coaster-count").text(`Mostrando ${totalMsg} montaña${totalMsg !== 1 ? "s" : ""} rusa${totalMsg !== 1 ? "s" : ""}`);
             displayCoasters(data.coasters);
             displayPagination(data.total, page);
           } else {
-            document.getElementById("coaster-list").innerHTML =
-              "<p style='color:red;'>Error cargando montañas rusas</p>";
+            document.getElementById("coaster-list").innerHTML = "<p style='color:red;'>Error cargando montañas rusas</p>";
           }
         })
         .catch((e) => console.warn("Error loadCoasters:", e));

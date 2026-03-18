@@ -33,7 +33,6 @@ function getManufacturers()
         $stmt->execute();
         $manufacturers = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Response::success(['manufacters' => $manufacturers]);
-
     } catch (PDOException $e) {
         Response::error('Error obteniendo fabricantes');
     }
@@ -48,7 +47,6 @@ function getCountries()
         $stmt->execute();
         $countries = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Response::success(['countries' => $countries]);
-
     } catch (PDOException $e) {
         Response::error('Error obteniendo países');
     }
@@ -68,7 +66,6 @@ function getRidden()
         $stmt->execute();
         $ridden = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Response::success(['ridden' => $ridden]);
-
     } catch (PDOException $e) {
         Response::error('Error obteniendo montañas rusas');
     }
@@ -99,7 +96,6 @@ function searchCoasters()
         header('Content-Type: application/json');
         echo json_encode($result);
         exit;
-
     } catch (PDOException $e) {
         Response::error('Error buscando montaña rusa');
     }
@@ -111,15 +107,27 @@ function listCoasters()
     $limit = 15;
     $offset = ($page - 1) * $limit;
 
+    $validSorts = [
+        'name'   => 'coasters.coaster_name ASC',
+        'stars'  => '(SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = coasters.id) DESC NULLS LAST',
+        'height' => 'coasters.height DESC NULLS LAST',
+        'speed'  => 'coasters.speed DESC NULLS LAST',
+        'year'   => 'NULLIF(coasters.opening_year, 0) ASC NULLS LAST',
+        'id'     => 'coasters.id ASC',
+    ];
+    $sort = $_GET['sort'] ?? 'id';
+    $orderBy = $validSorts[$sort] ?? 'coasters.id ASC';
+
     try {
         global $db;
         $sql = "SELECT
-        coasters.id, coasters.coaster_name, coasters.imagen_url, parks.park_name, coasters.coaster_manufacter AS manufacter,
-        coasters.coaster_model AS modelo,
-        coasters.opening_year
-        FROM coasters
-        INNER JOIN parks ON coasters.park_id = parks.id
-        LIMIT :limit OFFSET :offset";
+    coasters.id, coasters.coaster_name, coasters.imagen_url, parks.park_name, coasters.coaster_manufacter AS manufacter,
+    coasters.coaster_model AS modelo,
+    coasters.opening_year, coasters.stars
+    FROM coasters
+    INNER JOIN parks ON coasters.park_id = parks.id
+    ORDER BY $orderBy
+    LIMIT :limit OFFSET :offset";
 
         $sql_2 = "SELECT COUNT(*) as total FROM coasters";
 
@@ -137,11 +145,9 @@ function listCoasters()
             'coasters' => $coasters,
             'total' => $total
         ]);
-
     } catch (PDOException $e) {
         Response::error('Error mostrando montañas rusas: ' . $e->getMessage());
     }
-
 }
 
 function filterCoasters()
@@ -185,7 +191,6 @@ function filterCoasters()
             'coasters' => $result,
             'total' => $total
         ]);
-
     } catch (PDOException $e) {
         Response::error('Error mostrando montañas rusas');
     }
@@ -245,6 +250,17 @@ function applyFilters()
         $params[':year'] = intval($_GET['year']);
     }
 
+    $validSorts = [
+        'name'   => 'coasters.coaster_name ASC',
+        'stars'  => '(SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = coasters.id) DESC NULLS LAST',
+        'height' => 'coasters.height DESC NULLS LAST',
+        'speed'  => 'coasters.speed DESC NULLS LAST',
+        'year'   => 'NULLIF(coasters.opening_year, 0) ASC NULLS LAST',
+        'id'     => 'coasters.id ASC',
+    ];
+    $sort = $_GET['sort'] ?? 'id';
+    $orderBy = $validSorts[$sort] ?? 'coasters.id ASC';
+
     $page = intval($_GET['page'] ?? 1);
     $limit = 15;
     $offset = ($page - 1) * $limit;
@@ -254,10 +270,11 @@ function applyFilters()
         global $db;
         $sql = "SELECT coasters.id, coasters.coaster_name, coasters.imagen_url, 
                 parks.park_name, coasters.coaster_manufacter AS manufacter,
-                coasters.coaster_model AS modelo, coasters.opening_year
+                coasters.coaster_model AS modelo, coasters.opening_year, coasters.stars
                 FROM coasters
                 INNER JOIN parks ON coasters.park_id = parks.id
                 WHERE $where
+                ORDER BY $orderBy
                 LIMIT :limit OFFSET :offset";
 
         $sql_2 = "SELECT COUNT(*) as total FROM coasters
@@ -281,7 +298,6 @@ function applyFilters()
         $total = $stmt_2->fetchColumn();
 
         Response::success(['coasters' => $result, 'total' => $total]);
-
     } catch (PDOException $e) {
         Response::error($e->getMessage());
     }
@@ -321,7 +337,6 @@ function getCoasters()
         } else {
             Response::notFound('Montaña rusa no encontrada');
         }
-
     } catch (PDOException $e) {
         Response::error('Error en la base de datos');
     }
@@ -371,7 +386,6 @@ function getCoasterReviews()
         $total = $stmt_count->fetchColumn();
 
         Response::success(['reviews' => $reviews, 'total' => $total]);
-
     } catch (PDOException $e) {
         Response::error($e->getMessage());
     }
@@ -403,7 +417,6 @@ function getCoasterPhotos()
             'photos' => $photos,
             'total' => count($photos)
         ]);
-
     } catch (PDOException $e) {
         Response::error('Error al cargar fotos');
     }

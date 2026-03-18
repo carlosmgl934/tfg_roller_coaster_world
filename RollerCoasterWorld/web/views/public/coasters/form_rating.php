@@ -3,12 +3,13 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_SERVER['SCRIPT_NAME']);
+require_once __DIR__ . '/../../routes/Router.php';
+$base_url = Router::getBaseUrl();
 
 if (!isset($_SESSION['user_id'])) {
     $id = intval($_GET['id'] ?? 0);
-    $redirect_url = urlencode($base_url . '/web/views/public/coasters/form_rating.php?id=' . $id);
-    header('Location: ' . $base_url . '/web/views/auth/login.php?redirect=' . $redirect_url . '&msg=review');
+    $redirect_url = urlencode(Router::url('form_rating') . '?id=' . $id);
+    header('Location: ' . Router::url('login') . '?redirect=' . $redirect_url . '&msg=review');
     exit;
 } else {
     $user_id = $_SESSION['user_id'];
@@ -16,17 +17,15 @@ if (!isset($_SESSION['user_id'])) {
 
 $id = intval($_GET['id'] ?? 0);
 if ($id === 0) {
-    header('Location: ' . $base_url . '/web/views/public/coasters/coaster_search.php');
-    exit;
+    Router::redirect('coaster_search');
 }
 
 require_once __DIR__ . '/../../partials/header.php';
-/** @var string $base_url */
 ?>
 <!-- Librerias para poder usar select múltiples-->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/coasters.css">
+<link rel="stylesheet" href="<?= Router::asset('web/css/coasters.css') ?>">
 
 <main class="container my-5">
     <div class="row justify-content-center">
@@ -117,4 +116,4 @@ require_once __DIR__ . '/../../partials/header.php';
 </main>
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
-<script src="<?= $base_url ?>/web/js/coasters.js"></script>
+<script src="<?= Router::asset('web/js/coasters.js') ?>"></script>

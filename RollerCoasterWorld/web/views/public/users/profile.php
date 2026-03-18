@@ -376,6 +376,10 @@ $user_uid = $_SESSION['firebase_uid'];
           <div id="form-password" class="bg-light p-4 square-box mb-3"
             style="display: none; border: 2px solid #e2e8f0; background-color: #f8fafc !important;">
             <div class="row g-4 mt-1">
+              <div class="col-12 mt-0">
+                <label for="old-password" class="form-label"><i class="fa-solid fa-key me-2"></i>Contraseña actual</label>
+                <input type="password" id="old-password" class="form-control square-box" placeholder="Tu contraseña actual">
+              </div>
               <div class="col-md-6">
                 <label for="nueva-password" class="form-label"><i class="fa-solid fa-lock me-2"></i>Nueva
                   contraseña</label>

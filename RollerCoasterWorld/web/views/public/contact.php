@@ -1,10 +1,8 @@
 <?php
 require_once __DIR__ . '/../partials/header.php';
-/** @var string $base_url */
-require_once __DIR__ . '/../../routes/routes.php';
 ?>
 
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/contact.css">
+<link rel="stylesheet" href="<?= Router::asset('web/css/contact.css') ?>">
 
 <main>
 
@@ -21,7 +19,7 @@ require_once __DIR__ . '/../../routes/routes.php';
         <div class="row justify-content-center">
             <div class="col-12 col-md-8 col-lg-7">
                 <div class="contact-card">
-                    <form action="<?= $base_url ?>/api/php/contact.php" method="post" id="contact-form">
+                    <form action="<?= Router::getBaseUrl() ?>/api/php/contact.php" method="post" id="contact-form">
 
                         <div class="mb-4">
                             <label for="name" class="contact-label">
@@ -133,5 +131,5 @@ require_once __DIR__ . '/../../routes/routes.php';
 
 </main>
 
-<script src="<?= $base_url ?>/web/js/contact.js"></script>
+<script src="<?= Router::asset('web/js/contact.js') ?>"></script>
 <?php require_once __DIR__ . '/../partials/footer.php'; ?>

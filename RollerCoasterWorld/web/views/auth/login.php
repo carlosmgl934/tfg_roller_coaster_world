@@ -51,8 +51,11 @@ require_once __DIR__ . '/../partials/header.php';
           <label for="email"><i class="fa-regular fa-envelope me-2"></i>Correo electrónico</label>
           <input type="email" id="email" placeholder="tu@email.com" required autocomplete="email">
         </div>
-        <div class="form-group">
-          <label for="password"><i class="fa-solid fa-lock me-2"></i>Contraseña</label>
+        <div class="form-group mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <label for="password" class="mb-0"><i class="fa-solid fa-lock me-2"></i>Contraseña</label>
+            <a href="#" id="forgotPasswordBtn" class="text-success small fw-medium text-decoration-none">¿Olvidaste tu contraseña?</a>
+          </div>
           <div class="password-wrapper">
             <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
             <button type="button" class="toggle-password" onclick="togglePass()">

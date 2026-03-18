@@ -98,10 +98,20 @@ require_once __DIR__ . '/../../partials/header.php';
 
         <!-- CENTRO: Lista -->
         <div class="col-12 col-lg-6">
-            <p class="mb-3 text-muted fw-bold" id="coaster-count"></p>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <p class="mb-0 text-muted fw-bold" id="coaster-count"></p>
+                <select class="form-select shadow-sm rounded-0 w-auto border-success" id="sort-filter" style="cursor: pointer; font-weight: 500;">
+                    <option value="id" selected>Por defecto</option>
+                    <option value="name">Nombre A-Z</option>
+                    <option value="stars">Mejor valoradas</option>
+                    <option value="height">Mayor altura</option>
+                    <option value="speed">Mayor velocidad</option>
+                    <option value="year">Año de apertura</option>
+                </select>
+            </div>
+            
             <div class="list-group shadow-sm rounded-0" id="coaster-list" style="border-radius: 0;"></div>
-            <div class="list-group shadow-sm rounded-0" id="coaster-list" style="border-radius: 0;"></div>
-
+           
             <div class="pagination mt-4 justify-content-center" id="pagination"></div>
         </div>
 

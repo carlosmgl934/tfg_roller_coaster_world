@@ -13,7 +13,7 @@ if (isset($input['firebase_uid']) && isset($input['email'])) {
 
   // Buscar el user_id en la BD usando el firebase_uid
   try {
-    require_once __DIR__ . '/../database/db_conexion.php';
+    require_once __DIR__ . '/../../database/db_conexion.php';
     $db = new DBConexion();
     $stmt = $db->prepare("SELECT id FROM users WHERE firebase_uid = :uid LIMIT 1");
     $stmt->execute([':uid' => $input['firebase_uid']]);

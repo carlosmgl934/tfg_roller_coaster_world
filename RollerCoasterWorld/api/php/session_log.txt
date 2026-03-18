@@ -30,3 +30,5 @@
 2026-03-17 23:47:35 - Sesión guardada: UID=ANcajDPKBSXdt4nWgsK6TkB72FL2 | user_id=16
 2026-03-17 23:48:10 - POST recibido: {"firebase_uid":"ANcajDPKBSXdt4nWgsK6TkB72FL2","email":"carlosmgl934@gmail.com"}
 2026-03-17 23:48:10 - Sesión guardada: UID=ANcajDPKBSXdt4nWgsK6TkB72FL2 | user_id=16
+2026-03-18 20:00:09 - POST recibido: {"firebase_uid":"ANcajDPKBSXdt4nWgsK6TkB72FL2","email":"carlosmgl934@gmail.com"}
+2026-03-18 20:00:10 - Sesión guardada: UID=ANcajDPKBSXdt4nWgsK6TkB72FL2 | user_id=16

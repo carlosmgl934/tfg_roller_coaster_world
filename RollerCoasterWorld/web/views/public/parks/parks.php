@@ -1,18 +1,15 @@
 <?php
-// Calcular $base_url aquí (igual que header.php) para poder redirigir antes de emitir HTML
-$base_url = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_SERVER['SCRIPT_NAME']);
+require_once __DIR__ . '/../../routes/Router.php';
 
 $id = intval($_GET['id'] ?? 0);
 if ($id === 0) {
-    header('Location: ' . $base_url . '/web/views/public/parks/park_search.php');
-    exit;
+    Router::redirect('park_search');
 }
 
 require_once __DIR__ . '/../../partials/header.php';
-/** @var string $base_url */
 ?>
 
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/coasters.css"> <!-- Reutilizamos el mismo CSS -->
+<link rel="stylesheet" href="<?= Router::asset('web/css/coasters.css') ?>"> <!-- Reutilizamos el mismo CSS -->
 <!-- CropperJS para recortar imágenes al subir fotos -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 
@@ -111,7 +108,7 @@ require_once __DIR__ . '/../../partials/header.php';
                     </select>
                     <a class="btn btn-success rounded-0 px-4" id="btn-write-review"
                       <?php if ($is_logged): ?>
-                        href="<?= $base_url ?>/web/views/public/parks/form_park_rating.php?id=<?= $id ?>"
+                        href="<?= Router::url('form_park_rating') ?>?id=<?= $id ?>"
                       <?php else: ?>
                         href="#" data-bs-toggle="modal" data-bs-target="#loginModal"
                       <?php endif; ?>>
@@ -158,9 +155,9 @@ $login_msg = 'Para subir fotos o escribir reseñas necesitas iniciar sesión.';
 require_once __DIR__ . '/../../partials/login_modal.php';
 ?>
 
-<?php require_once __DIR__ . '/..//../partials/footer.php';?>
+<?php require_once __DIR__ . '/../../partials/footer.php';?>
 
-<script src="<?= $base_url ?>/web/js/parks.js"></script>
+<script src="<?= Router::asset('web/js/parks.js') ?>"></script>
 
 <!-- CropperJS para recortar imágenes -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
