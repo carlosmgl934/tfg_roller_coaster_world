@@ -54,10 +54,47 @@ $(document).ready(function () {
 
   // Listener para el selector de ordenación
   const sortFilter = document.getElementById("sort-filter");
+  const sortDirectionBtn = document.getElementById("sort-direction-btn");
+  const sortDirectionInput = document.getElementById("sort-direction");
+
   if (sortFilter) {
     sortFilter.addEventListener("change", function () {
-      loadParks(getFilters(), 1);
+       // Reset direction to logical default based on selection
+       const val = this.value;
+       let defaultDir = "ASC"; // Default for Name, Year
+       if (["stars", "coasters"].includes(val)) {
+           defaultDir = "DESC";
+       }
+       
+       sortDirectionInput.value = defaultDir;
+       updateSortIcon(defaultDir);
+       loadParks(getFilters(), 1);
     });
+  } else {
+      console.warn("Elemento #sort-filter no encontrado en parks.js");
+  }
+
+  if (sortDirectionBtn && sortDirectionInput) {
+      sortDirectionBtn.addEventListener("click", function() {
+          const currentDir = sortDirectionInput.value;
+          const newDir = currentDir === "ASC" ? "DESC" : "ASC";
+          console.log("Cambiando dirección orden:", currentDir, "->", newDir);
+          sortDirectionInput.value = newDir;
+          updateSortIcon(newDir);
+          loadParks(getFilters(), 1);
+      });
+  } else {
+      console.warn("Botón de dirección o input oculto no encontrado en parks.js");
+  }
+
+  function updateSortIcon(dir) {
+      const icon = sortDirectionBtn.querySelector("i");
+      if (!icon) return;
+      if (dir === "ASC") {
+          icon.className = "fa-solid fa-arrow-up-wide-short";
+      } else {
+          icon.className = "fa-solid fa-arrow-down-wide-short";
+      }
   }
 
   let currentPage = 1;
@@ -95,6 +132,8 @@ $(document).ready(function () {
     if (params.min_rating && params.min_rating !== "Todos")
       url.searchParams.append("min_stars", params.min_rating);
     if (params.sort) url.searchParams.append("sort", params.sort);
+    if (params.order_dir) url.searchParams.append("order_dir", params.order_dir);
+
     console.log("Llamando a API:", url.toString());
 
     fetch(url)
@@ -185,6 +224,7 @@ $(document).ready(function () {
       min_coasters: minCoast > 0 ? minCoast : "",
       min_rating: minRating > 0 ? minRating : "",
       sort: $("#sort-filter").val() || "name",
+      order_dir: $("#sort-direction").val() || "DESC",
     };
   }
 
@@ -335,14 +375,16 @@ $(document).ready(function () {
     searchDebounce = setTimeout(async () => {
       try {
         const url = new URL(apiBase, window.location.origin);
-        url.searchParams.append("action", "search");
+        url.searchParams.append("action", "list");
         url.searchParams.append("q", search);
+        url.searchParams.append("page", "1");
+        url.searchParams.append("limit", "5");
 
         const res = await fetch(url);
         const data = await res.json();
 
-        // Verifica si viene 'data' o 'data.data' por la estructura de tu api
-        let parksData = data.data || data;
+        // listParks devuelve { success: true, data: [...], total: N }
+        let parksData = Array.isArray(data.data) ? data.data : [];
 
         let html = "";
         if (parksData.length > 0) {

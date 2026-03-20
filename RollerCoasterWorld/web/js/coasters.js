@@ -54,10 +54,41 @@ $(document).ready(function () {
 
     // Listener para el selector de ordenación
     const sortFilter = document.getElementById("sort-filter");
+    const sortDirectionBtn = document.getElementById("sort-direction-btn");
+    const sortDirectionInput = document.getElementById("sort-direction");
+    
     if (sortFilter) {
       sortFilter.addEventListener("change", function () {
-        loadCoasters(1);
+         // Reset direction to logical default based on selection
+         const val = this.value;
+         let defaultDir = "ASC"; // Default for ID, Name, Year
+         if (["stars", "height", "speed"].includes(val)) {
+             defaultDir = "DESC";
+         }
+         
+         sortDirectionInput.value = defaultDir;
+         updateSortIcon(defaultDir);
+         loadCoasters(1);
       });
+    }
+
+    if (sortDirectionBtn && sortDirectionInput) {
+        sortDirectionBtn.addEventListener("click", function() {
+            const currentDir = sortDirectionInput.value;
+            const newDir = currentDir === "ASC" ? "DESC" : "ASC";
+            sortDirectionInput.value = newDir;
+            updateSortIcon(newDir);
+            loadCoasters(1);
+        });
+    }
+
+    function updateSortIcon(dir) {
+        const icon = sortDirectionBtn.querySelector("i");
+        if (dir === "ASC") {
+            icon.className = "fa-solid fa-arrow-up-wide-short";
+        } else {
+            icon.className = "fa-solid fa-arrow-down-wide-short";
+        }
     }
 
     let searchDebounce = null;
@@ -108,6 +139,7 @@ $(document).ready(function () {
     function loadCoasters(page) {
       currentPage = page;
       const sort = document.getElementById("sort-filter")?.value || "name";
+      const orderDir = document.getElementById("sort-direction")?.value || "ASC";
 
       if (isAdvancedFiltering) {
         let opened = document.getElementById("status-filter").checked;
@@ -124,7 +156,7 @@ $(document).ready(function () {
         const params = new URLSearchParams({
           action: "apply_filters",
           page, opened, ridden, height, speed, length,
-          inversions, manufacter, country, year, search, sort,
+          inversions, manufacter, country, year, search, sort, order_dir: orderDir
         });
         fetch(`${BASE_URL}/api/php/coasters.php?${params}`)
           .then((r) => r.json())
@@ -143,7 +175,7 @@ $(document).ready(function () {
       }
 
       let actionName = isFiltering ? "filter" : "list";
-      let ajaxData = { action: actionName, page, sort };
+      let ajaxData = { action: actionName, page, sort, order_dir: orderDir };
 
       if (isFiltering) {
         ajaxData.search = currentSearchQuery;

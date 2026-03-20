@@ -41,8 +41,8 @@
 
 /* ── CARD ───────────────────────────────────────────────── */
 .contact-card {
-  background: #fff;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  background: var(--rcw-bg-card);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
   border-top: 4px solid #198754;
   padding: 36px;
 }
@@ -52,16 +52,20 @@
   display: block;
   font-weight: 600;
   font-size: 0.88rem;
-  color: #1e293b;
+  color: var(--rcw-text-primary);
   margin-bottom: 6px;
 }
 .contact-input {
   border-radius: 0 !important;
-  border-color: #d1d5db;
+  border-color: var(--rcw-border);
+  background: var(--rcw-bg-input);
+  color: var(--rcw-text-primary);
   font-size: 0.95rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, color 0.2s, background 0.2s;
 }
 .contact-input:focus {
+  background: var(--rcw-bg-input);
+  color: var(--rcw-text-primary);
   border-color: #198754;
   box-shadow: 0 0 0 3px rgba(25,135,84,0.15);
 }
@@ -77,12 +81,12 @@
   align-items: center;
   gap: 8px;
   padding: 9px 16px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--rcw-border);
   cursor: pointer;
   font-size: 0.88rem;
   font-weight: 600;
-  color: #64748b;
-  background: #f8fafc;
+  color: var(--rcw-text-secondary);
+  background: var(--rcw-bg-card-alt);
   transition: border-color 0.2s, background 0.2s, color 0.2s;
   user-select: none;
 }
@@ -91,12 +95,12 @@
 }
 .contact-radio:has(input:checked) {
   border-color: #198754;
-  background: #f0faf5;
+  background: rgba(25,135,84,0.1);
   color: #198754;
 }
 .contact-radio:hover {
   border-color: #6dab8a;
-  background: #f5fbf7;
+  background: rgba(25,135,84,0.05);
 }
 
 /* ── CHECKBOX ───────────────────────────────────────────── */
@@ -106,7 +110,7 @@
   gap: 10px;
   cursor: pointer;
   font-size: 0.9rem;
-  color: #374151;
+  color: var(--rcw-text-primary);
   font-weight: 500;
 }
 .contact-checkbox input[type="checkbox"] {
@@ -120,7 +124,7 @@
 /* ── CHAR COUNT ─────────────────────────────────────────── */
 .contact-char-count {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: var(--rcw-text-muted);
 }
 
 /* ── FIELD ERRORS ───────────────────────────────────────── */

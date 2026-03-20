@@ -1,81 +1,103 @@
-/* layout.css - Estilos base para el layout de la página */
-html {
-  height: 100%;
+/* ============================================================
+   header.css — Navbar premium dark mode · RollerCoaster World
+   ============================================================ */
+
+/* ── NAVBAR BASE ────────────────────────────────────────────── */
+.custom-navbar {
+  background-color: var(--rcw-nav-bg);
+  border-bottom: 1px solid var(--rcw-nav-border);
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-body {
-  min-height: 100vh;
-  margin: 0;
+/* ── BRAND / LOGO ───────────────────────────────────────────── */
+.rcw-brand {
   display: flex;
-  flex-direction: column;
-}
-
-main {
-  flex: 1 0 auto;
-}
-
-footer {
+  align-items: center;
+  gap: 0.55rem;
+  text-decoration: none;
   flex-shrink: 0;
 }
 
-/* header.css - Estilos personalizados para la barra de navegación */
-
-/* Color principal verde para la barra */
-.custom-navbar {
-  background-color: #2e7d32; /* Un verde bosque agradable */
+.rcw-brand-icon {
+  font-size: 1.4rem;
+  color: var(--rcw-green-neon);
+  filter: drop-shadow(0 0 6px rgba(0, 200, 83, 0.5));
+  transition: var(--rcw-transition);
+}
+.rcw-brand:hover .rcw-brand-icon {
+  filter: drop-shadow(0 0 10px rgba(0, 230, 118, 0.7));
 }
 
-/* Efecto hover suave para los enlaces principales */
+.rcw-brand-text {
+  font-family: var(--rcw-font-title);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--rcw-text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.rcw-brand-accent {
+  color: var(--rcw-green-neon);
+}
+
+/* ── NAV LINKS ──────────────────────────────────────────────── */
 .custom-navbar .nav-link {
-  transition: all 0.2s ease;
+  font-family: var(--rcw-font-body);
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--rcw-text-secondary) !important;
+  border-radius: 0;
+  padding: 0.45rem 0.8rem !important;
+  transition: var(--rcw-transition);
+  position: relative;
 }
 
 .custom-navbar .nav-link:hover,
 .custom-navbar .nav-link:focus {
-  background-color: rgba(255, 255, 255, 0.15);
-  transform: translateY(-1px);
+  color: var(--rcw-text-primary) !important;
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
-/* Separadores entre los elementos principales del menú */
-.custom-navbar .navbar-nav > .nav-item {
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-}
-/* Quitamos el borde derecho del último elemento (antes de Perfil/Login) para que quede limpio */
-.custom-navbar .navbar-nav > .nav-item:last-of-type,
-.custom-navbar .navbar-nav > .nav-item.d-none /* los separadores manuales */ {
-  border-right: none;
+.custom-navbar .nav-link.active {
+  color: var(--rcw-green-neon) !important;
+  background-color: rgba(0, 200, 83, 0.12);
 }
 
-/* 
- * Hacer que los dropdowns se abran al pasar el ratón (hover)
- * en lugar de tener que hacer clic, que es el comportamiento por defecto de Bootstrap.
- */
+/* ── DROPDOWN TOGGLE ARROW ──────────────────────────────────── */
+.custom-navbar .dropdown-toggle::after {
+  border-color: rgba(232, 245, 233, 0.5) transparent transparent transparent;
+  transition: var(--rcw-transition);
+}
+.custom-navbar .dropdown-toggle:hover::after {
+  border-color: var(--rcw-green-neon) transparent transparent transparent;
+}
+
+/* ── DROPDOWN MENU ──────────────────────────────────────────── */
+.custom-navbar .dropdown-menu {
+  background-color: var(--rcw-bg-card) !important;
+  border: 1px solid var(--rcw-border) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+  min-width: 240px;
+  padding: 0;
+  animation: rcwFadeIn 0.18s ease;
+  overflow: hidden;
+}
+
+/* Hover con blur en pantallas grandes */
 @media all and (min-width: 992px) {
   .custom-dropdown:hover .dropdown-menu {
     display: block;
-    animation: fadeIn 0.2s ease-in;
   }
-}
-
-/* Estilos para los elementos dentro de los dropdowns */
-.dropdown-item {
-  transition: all 0.15s ease;
-  font-weight: 500;
-  color: #495057;
-}
-
-.dropdown-item:hover {
-  background-color: #f8f9fa;
-  color: #2e7d32;
-  padding-left: 1.5rem; /* Pequeño desplazamiento a la derecha al hacer hover */
-}
-
-/* Crear un puente invisible para que el hover no se pierda al bajar el ratón */
-@media all and (min-width: 992px) {
+  /* Puente invisible para que el hover no se pierda */
   .custom-dropdown .dropdown-menu::before {
     content: "";
     position: absolute;
-    top: -10px; /* Cubre los pixeles de separación si hay margen */
+    top: -10px;
     left: 0;
     right: 0;
     height: 10px;
@@ -83,31 +105,105 @@ footer {
   }
 }
 
-/* Hacer los desplegables más anchos y con más espacio interior */
-.custom-navbar .dropdown-menu {
-  min-width: 250px; /* Ancho del recuadro blanco */
-  padding: 0.5rem 0; /* Un poco de aire por arriba y abajo */
+/* ── DROPDOWN ITEMS ─────────────────────────────────────────── */
+.custom-navbar .dropdown-item {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--rcw-text-secondary) !important;
+  border-radius: 0;
+  padding: 0.75rem 1rem !important;
+  transition: var(--rcw-transition);
+  border-left: 3px solid transparent;
+  margin-bottom: 0px;
 }
 
-/* Hacer la letra de las opciones y los iconos de los desplegables un pelín más grandes */
-.custom-navbar .dropdown-item {
-  font-size: 1.05rem;
-  padding-top: 0.6rem;
-  padding-bottom: 0.6rem;
+.custom-navbar .dropdown-item:hover,
+.custom-navbar .dropdown-item:focus {
+  background-color: var(--rcw-bg-hover) !important;
+  color: var(--rcw-text-primary) !important;
+  border-left-color: var(--rcw-green-neon);
+  padding-left: 1.25rem !important;
 }
 
 .custom-navbar .dropdown-item i {
-  font-size: 1.1rem;
+  font-size: 0.95rem;
+  width: 18px;
+  text-align: center;
+  margin-right: 0.5rem;
 }
 
-/* Animación suave al abrir el dropdown */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
+.custom-navbar .dropdown-divider {
+  border-color: var(--rcw-border) !important;
+  margin: 0.25rem 0;
+}
+
+/* Logout en rojo */
+.custom-navbar .dropdown-item.text-danger {
+  color: rgba(255, 107, 107, 0.85) !important;
+}
+.custom-navbar .dropdown-item.text-danger:hover {
+  color: #ff6b6b !important;
+  background-color: rgba(255, 107, 107, 0.1) !important;
+  border-left-color: #ff6b6b;
+}
+
+/* ── LOGIN / REGISTER BUTTONS (LOGGED OUT) ──────────────────── */
+.rcw-btn-login {
+  padding: 0.45rem 1.2rem !important;
+  border-radius: 0 !important;
+  border: 1px solid var(--rcw-text-secondary) !important;
+  color: var(--rcw-text-primary) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  transition: var(--rcw-transition) !important;
+  background: transparent !important;
+}
+.rcw-btn-login:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border-color: var(--rcw-text-primary) !important;
+  color: #fff !important;
+}
+
+.rcw-btn-register {
+  padding: 0.45rem 1.4rem !important;
+  border-radius: 0 !important;
+  background: var(--rcw-green-neon) !important;
+  color: #000 !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+  border: none !important;
+  transition: var(--rcw-transition) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
+}
+.rcw-btn-register:hover {
+  background: var(--rcw-green-bright) !important;
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4) !important;
+  transform: translateY(-1px);
+  color: #000 !important;
+}
+
+/* ── MOBILE TOGGLER ─────────────────────────────────────────── */
+.navbar-toggler {
+  padding: 0.3rem 0.5rem !important;
+  border-radius: 6px !important;
+}
+.navbar-toggler:focus {
+  box-shadow: 0 0 0 2px rgba(0, 200, 83, 0.3) !important;
+}
+.navbar-toggler i {
+  color: var(--rcw-text-primary);
+}
+
+/* ── COLLAPSED MENU (móvil) ─────────────────────────────────── */
+@media (max-width: 991.98px) {
+  .custom-navbar .dropdown-menu {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding-left: 1rem;
+    border-radius: 0 !important;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  .custom-navbar .nav-link {
+    padding: 0.55rem 0.5rem !important;
   }
 }

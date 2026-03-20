@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../routes/Router.php';
+require_once __DIR__ . '/../../../routes/Router.php';
 
 $id = intval($_GET['id'] ?? 0);
 if ($id === 0) {
@@ -9,7 +9,6 @@ if ($id === 0) {
 require_once __DIR__ . '/../../partials/header.php';
 ?>
 
-<link rel="stylesheet" href="<?= Router::asset('web/css/coasters.css') ?>"> <!-- Reutilizamos el mismo CSS -->
 <!-- CropperJS para recortar imágenes al subir fotos -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 
@@ -35,33 +34,38 @@ require_once __DIR__ . '/../../partials/header.php';
 
             <div class="row g-3 mb-4">
                 <div class="col-6 col-md-4">
-                    <div class="p-3 bg-dark rounded text-center">
-                        <small class="text-muted d-block">Apertura</small>
-                        <strong class="fs-4" id="opening-year">Cargando...</strong>
+                    <div class="premium-stat-box d-flex flex-column align-items-center text-center">
+                        <i class="fa-regular fa-calendar-days premium-stat-icon"></i>
+                        <div class="premium-stat-label">Apertura</div>
+                        <div class="premium-stat-value" id="opening-year">...</div>
                     </div>
                 </div>
                 <div class="col-6 col-md-4">
-                    <div class="p-3 bg-dark rounded text-center">
-                        <small class="text-muted d-block">País</small>
-                        <strong class="fs-4" id="park-country">Cargando...</strong>
+                    <div class="premium-stat-box d-flex flex-column align-items-center text-center">
+                        <i class="fa-solid fa-earth-americas premium-stat-icon"></i>
+                        <div class="premium-stat-label">País</div>
+                        <div class="premium-stat-value fs-5" id="park-country">...</div>
                     </div>
                 </div>
                 <div class="col-6 col-md-4">
-                    <div class="p-3 bg-dark rounded text-center">
-                        <small class="text-muted d-block">Coasters</small>
-                        <strong class="fs-4" id="num-coaster">Cargando...</strong>
+                    <div class="premium-stat-box d-flex flex-column align-items-center text-center">
+                        <i class="fa-solid fa-train-tram premium-stat-icon"></i>
+                        <div class="premium-stat-label">Coasters</div>
+                        <div class="premium-stat-value" id="num-coaster">...</div>
                     </div>
                 </div>
-                <div class="col-6 col-md-4">
-                    <div class="p-3 bg-dark rounded text-center">
-                        <small class="text-muted d-block">Operativas</small>
-                        <strong class="fs-4" id="operating-coasters">Cargando...</strong>
+                <div class="col-6 col-md-6">
+                    <div class="premium-stat-box d-flex flex-column align-items-center text-center">
+                        <i class="fa-solid fa-check-circle premium-stat-icon"></i>
+                        <div class="premium-stat-label">Operativas</div>
+                        <div class="premium-stat-value" id="operating-coasters">...</div>
                     </div>
                 </div>
-                <div class="col-6 col-md-4">
-                    <div class="p-3 bg-dark rounded text-center">
-                        <small class="text-muted d-block">Entrada</small>
-                        <strong class="fs-4" id="precio-entrada">Cargando...</strong>
+                <div class="col-12 col-md-6">
+                    <div class="premium-stat-box d-flex flex-column align-items-center text-center">
+                        <i class="fa-solid fa-ticket premium-stat-icon"></i>
+                        <div class="premium-stat-label">Entrada</div>
+                        <div class="premium-stat-value fs-5 text-truncate w-100" id="precio-entrada">...</div>
                     </div>
                 </div>
             </div>

@@ -75,12 +75,18 @@ require_once __DIR__ . '/../../partials/header.php';
     <div class="col-12 col-lg-6">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div id="park-count" class="text-muted fw-bold"></div>
-        <select id="sort-filter" class="form-select shadow-sm rounded-0 w-auto border-success" style="cursor: pointer; font-weight: 500;">
-          <option value="coasters" selected>Más montañas rusas</option>
-          <option value="name">Nombre A-Z</option>
-          <option value="stars">Mejor valorados</option>
-          <option value="year">Año de apertura</option>
-        </select>
+        <div class="d-flex align-items-center">
+            <select id="sort-filter" class="form-select shadow-sm rounded-0 w-auto border-success me-2" style="cursor: pointer; font-weight: 500;">
+              <option value="coasters" selected>Cantidad de montañas rusas</option>
+              <option value="name">Nombre</option>
+              <option value="stars">Valoración</option>
+              <option value="year">Año de apertura</option>
+            </select>
+            <button id="sort-direction-btn" class="btn btn-outline-success shadow-sm rounded-0" type="button" title="Cambiar orden">
+                 <i class="fa-solid fa-arrow-down-wide-short"></i>
+            </button>
+            <input type="hidden" id="sort-direction" value="DESC">
+        </div>
       </div>
 
       <div id="park-list" class="list-group shadow-sm rounded-0" style="border-radius: 0;">

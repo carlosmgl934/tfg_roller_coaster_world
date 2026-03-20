@@ -1,158 +1,148 @@
-body {
-  background-color: #f0fdf4;
-  background-image: radial-gradient(#d1fae5 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
 /* ============================================================
-   PERFIL — Estilos unificados (estilo coasters)
+   profile.css — Dark mode premium · RollerCoaster World
    ============================================================ */
+
+/* ── AVATAR ──────────────────────────────────────────────────── */
 .avatar-circle {
   width: 140px;
   height: 140px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--rcw-green-neon) 0%, #00952a 100%);
+  color: #000;
   font-size: 64px;
   font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 4px solid #fff;
-  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+  border: 3px solid rgba(0, 200, 83, 0.3);
+  box-shadow: 0 0 30px rgba(0, 200, 83, 0.25), var(--rcw-shadow-md);
   margin: 0 auto;
+  border-radius: 50%;
 }
 
-/* Cartas estilo "section-card" */
+/* ── PROFILE CARD ────────────────────────────────────────────── */
 .profile-card {
-  border-radius: 0 !important;
-  border: none !important;
-  border-top: 4px solid #10b981 !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  background-color: #ffffff;
+  border-radius: 10px !important;
+  border: 1px solid var(--rcw-border) !important;
+  border-top: 3px solid var(--rcw-green-neon) !important;
+  box-shadow: var(--rcw-shadow-sm);
+  background-color: var(--rcw-bg-card);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-
 .profile-card:hover {
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--rcw-shadow-glow);
 }
-
 .profile-card .card-header {
   border-radius: 0 !important;
   padding: 16px 20px;
   letter-spacing: 0.02em;
-  background: #ffffff;
-  border-bottom: 1px solid #f1f5f9;
+  background-color: var(--rcw-bg-card-alt);
+  border-bottom: 1px solid var(--rcw-border);
 }
 .profile-card .card-header i {
-  color: #10b981 !important;
+  color: var(--rcw-green-neon) !important;
 }
-.profile-card .card-header h4, .profile-card .card-header h5 {
-  color: #064e3b !important;
+.profile-card .card-header h4,
+.profile-card .card-header h5 {
+  color: var(--rcw-text-primary) !important;
   font-weight: 800;
   text-transform: uppercase;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
+  font-family: var(--rcw-font-title);
 }
 
-/* Menú lateral */
+/* ── MENÚ LATERAL ────────────────────────────────────────────── */
 .profile-menu .list-group-item {
-  border-radius: 0 !important;
+  border-radius: 6px !important;
   border: none;
   font-weight: 500;
-  color: #4b5563;
+  color: var(--rcw-text-secondary);
+  background-color: var(--rcw-bg-card);
   transition: background-color 0.2s, color 0.2s, padding-left 0.2s;
-  padding: 1rem 1.25rem;
-  border-left: 4px solid transparent !important;
+  padding: 0.9rem 1.1rem;
+  border-left: 3px solid transparent !important;
+  margin-bottom: 2px;
 }
 .profile-menu .list-group-item:hover {
-  background-color: #f0fdf4;
-  color: #059669;
-  padding-left: 1.5rem;
+  background-color: var(--rcw-bg-hover);
+  color: var(--rcw-green-bright);
+  padding-left: 1.4rem;
 }
 .profile-menu .list-group-item.active {
-  background-color: #ecfdf5;
-  color: #10b981;
-  border-left: 4px solid #10b981 !important;
+  background-color: rgba(0, 200, 83, 0.1);
+  color: var(--rcw-green-neon);
+  border-left: 3px solid var(--rcw-green-neon) !important;
 }
 
-/* Formularios Premium */
+/* ── FORMULARIO ──────────────────────────────────────────────── */
 .form-label {
-  color: #064e3b;
+  color: var(--rcw-text-muted);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
 }
-
 .form-label i {
-  color: #10b981;
+  color: var(--rcw-green-neon);
   font-size: 0.9rem;
 }
 
-.form-control.square-box, .form-select.square-box {
-  background-color: #f8fafc;
-  border: 2px solid #e2e8f0;
-  color: #1e293b;
+.form-control.square-box,
+.form-select.square-box {
+  background-color: var(--rcw-bg-input);
+  border: 1px solid var(--rcw-border-strong);
+  color: var(--rcw-text-primary);
   font-weight: 500;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+  transition: all 0.25s ease;
+  border-radius: 6px;
   padding: 0.75rem 1rem;
 }
-
-.form-control.square-box:focus, .form-select.square-box:focus {
-  background-color: #ffffff;
-  border-color: #10b981;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15), inset 0 2px 4px rgba(0,0,0,0.02);
-  transform: translateY(-2px);
-  outline: none;
+.form-control.square-box:focus,
+.form-select.square-box:focus {
+  background-color: var(--rcw-bg-card);
+  border-color: var(--rcw-green-neon);
+  box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.2);
+  color: var(--rcw-text-primary);
 }
-
-.form-control.square-box:disabled, .form-control.square-box[readonly] {
-  background-color: #f1f5f9;
-  border-color: #cbd5e1;
-  color: #64748b;
+.form-control.square-box:disabled,
+.form-control.square-box[readonly] {
+  background-color: var(--rcw-bg);
+  border-color: var(--rcw-border);
+  color: var(--rcw-text-muted);
   opacity: 1;
 }
-
-/* Botón Guardar */
-.btn-success {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  border: none;
-  transition: all 0.3s ease;
-}
-.btn-success:hover {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4);
+.form-control.square-box::placeholder {
+  color: var(--rcw-text-muted);
 }
 
-/* Badges */
+/* ── BADGE PERFIL ────────────────────────────────────────────── */
 .badge-profile {
-  background-color: #10b981;
-  color: white;
-  border-radius: 0 !important;
+  background-color: var(--rcw-green-neon);
+  color: #000;
+  border-radius: 4px !important;
   padding: 6px 12px !important;
   font-weight: 700;
 }
 
-/* Favoritos */
+/* ── DATA/FAV BOXES ──────────────────────────────────────────── */
 .data-box {
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background-color: var(--rcw-bg-card-alt);
+  border: 1px solid var(--rcw-border);
+  border-radius: 8px;
   padding: 1rem;
   transition: all 0.2s ease;
 }
 .data-box:hover {
-  background-color: #ffffff;
-  border-color: #cbd5e1;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  background-color: var(--rcw-bg-hover);
+  border-color: var(--rcw-border-strong);
+  box-shadow: var(--rcw-shadow-glow);
   transform: translateY(-2px);
 }
 .data-box .data-label {
-  color: #64748b;
-  font-size: 0.7rem;
+  color: var(--rcw-text-muted);
+  font-size: 0.68rem;
   text-transform: uppercase;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -161,28 +151,29 @@ body {
   align-items: center;
 }
 .data-box .data-label i {
-  color: #10b981;
+  color: var(--rcw-green-neon);
   font-size: 0.85rem;
   margin-right: 0.4rem;
 }
 .data-box .data-value {
-  color: #0f172a;
-  font-weight: 600;
+  color: var(--rcw-text-primary);
+  font-weight: 700;
   font-size: 1rem;
   margin-bottom: 0;
 }
 
 .fav-box {
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-top: 3px solid #10b981 !important;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  background-color: var(--rcw-bg-card);
+  border: 1px solid var(--rcw-border);
+  border-top: 3px solid var(--rcw-green-neon) !important;
+  transition: all 0.25s ease;
+  box-shadow: var(--rcw-shadow-sm);
+  border-radius: 8px;
 }
 .fav-box:hover {
-  background-color: #f0fdf4;
-  border-color: #10b981;
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.08);
+  background-color: var(--rcw-bg-hover);
+  border-color: var(--rcw-green-neon);
+  box-shadow: var(--rcw-shadow-glow);
   transform: translateY(-3px);
 }
 .fav-box .fav-icon {
@@ -191,13 +182,12 @@ body {
   justify-content: center;
   width: 48px;
   height: 48px;
-  background-color: #ecfdf5;
-  color: #10b981;
+  background-color: rgba(0, 200, 83, 0.12);
+  color: var(--rcw-green-neon);
   border-radius: 50%;
   margin-bottom: 0.75rem;
   font-size: 1.25rem;
+  border: 1px solid rgba(0, 200, 83, 0.2);
 }
 
-.square-box {
-  border-radius: 0 !important;
-}
+.square-box { border-radius: 6px !important; }

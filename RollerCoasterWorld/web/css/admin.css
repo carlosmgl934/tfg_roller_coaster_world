@@ -1,1 +1,13 @@
 /* admin.css — Estilos del panel de administrador */
+
+/* ============================================================
+   ADMIN PHOTOS - ESTILOS EXTRA
+   ============================================================ */
+.hover-elevate {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-elevate:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3) !important;
+    border-color: #198754 !important;
+}

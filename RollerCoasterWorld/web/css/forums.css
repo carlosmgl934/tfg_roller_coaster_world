@@ -1,50 +1,60 @@
-/* ── PAGE ICON HEADER ────────────────────────────────────── */
+/* ============================================================
+   forums.css — Dark mode · RollerCoaster World
+   ============================================================ */
+
+/* ── PAGE ICON HEADER ────────────────────────────────────────── */
 .forum-page-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 64px;
   height: 64px;
-  border-radius: 0;
-  background: linear-gradient(135deg, #198754 0%, #146c43 100%);
-  color: #fff;
+  border-radius: 10px;
+  background: var(--rcw-bg-card-alt);
+  color: var(--rcw-green-neon);
   font-size: 1.6rem;
-  box-shadow: 0 4px 16px rgba(25,135,84,0.3);
+  box-shadow: 0 4px 20px rgba(0, 200, 83, 0.25);
+  border: 1px solid var(--rcw-border-strong);
 }
 .fw-800 { font-weight: 800; }
 
-/* ── FORM CARD ───────────────────────────────────────────── */
+/* ── FORM CARD ────────────────────────────────────────────────── */
 .forum-form-card {
-  border: none;
-  border-radius: 0;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  border: 1px solid var(--rcw-border) !important;
+  border-radius: 10px !important;
+  box-shadow: var(--rcw-shadow-md);
   overflow: hidden;
+  background-color: var(--rcw-bg-card);
 }
 
-/* ── SECTION HEADERS inside the card ───────────────────────*/
+/* ── SECTION HEADERS inside the card ─────────────────────────── */
 .form-section-title {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #198754;
-  border-bottom: 2px solid #d1fae5;
+  color: var(--rcw-green-neon);
+  border-bottom: 1px solid var(--rcw-border);
   padding-bottom: 6px;
   margin-bottom: 14px;
 }
 
-/* ── INPUTS ─────────────────────────────────────────────── */
+/* ── INPUTS ─────────────────────────────────────────────────── */
 .forum-form-card .form-control,
 .forum-form-card .form-select {
-  border-radius: 0;
-  border-color: #d1d5db;
+  border-radius: 6px;
+  border-color: var(--rcw-border-strong);
   font-size: 0.95rem;
+  background-color: var(--rcw-bg-input);
+  color: var(--rcw-text-primary);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .forum-form-card .form-control:focus,
 .forum-form-card .form-select:focus {
-  border-color: #198754;
-  box-shadow: 0 0 0 3px rgba(25,135,84,0.15);
+  border-color: var(--rcw-green-neon);
+  box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.2);
+  background-color: var(--rcw-bg-card);
+  color: var(--rcw-text-primary);
 }
 .forum-form-card textarea.form-control {
   resize: vertical;
@@ -52,22 +62,24 @@
 }
 .forum-form-card .form-label {
   font-weight: 600;
-  font-size: 0.88rem;
-  color: #1e293b;
+  font-size: 0.85rem;
+  color: var(--rcw-text-secondary);
   margin-bottom: 5px;
 }
+.forum-form-card .form-control::placeholder {
+  color: var(--rcw-text-muted);
+}
 
-/* ── PRIVACY TOGGLE BUTTONS ─────────────────────────────── */
+/* ── PRIVACY TOGGLE ──────────────────────────────────────────── */
 .privacy-toggle {
   display: flex;
   gap: 0;
-  border: 2px solid #d1fae5;
+  border: 1px solid var(--rcw-border-strong);
+  border-radius: 8px;
   overflow: hidden;
   width: 100%;
 }
-.privacy-radio {
-  display: none;
-}
+.privacy-radio { display: none; }
 .privacy-btn {
   flex: 1;
   text-align: center;
@@ -75,32 +87,34 @@
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
-  color: #64748b;
-  background: #f8fafc;
+  color: var(--rcw-text-secondary);
+  background: var(--rcw-bg-input);
   border: none;
   transition: background 0.2s, color 0.2s;
   margin: 0;
   user-select: none;
 }
 .privacy-btn:hover {
-  background: #f0faf5;
-  color: #198754;
+  background: var(--rcw-bg-hover);
+  color: var(--rcw-green-bright);
 }
 .privacy-radio:checked + .privacy-btn {
-  background: #198754;
-  color: #fff;
+  background: var(--rcw-green-neon);
+  color: #000;
+  font-weight: 700;
 }
 .privacy-hint {
   font-size: 0.82rem;
-  color: #64748b;
+  color: var(--rcw-text-muted);
   margin-top: 8px;
   margin-bottom: 0;
   padding: 8px 12px;
-  background: #f8fafc;
-  border-left: 3px solid #198754;
+  background: var(--rcw-bg-card-alt);
+  border-left: 3px solid var(--rcw-green-neon);
+  border-radius: 0 4px 4px 0;
 }
 
-/* ── COLLABORATORS SECTION ──────────────────────────────── */
+/* ── COLLABORATORS SECTION ────────────────────────────────────── */
 #collaborators-section {
   transition: opacity 0.3s ease, max-height 0.3s ease;
 }
@@ -108,24 +122,24 @@
   min-height: 120px;
 }
 
-/* ── SUBMIT BUTTON ───────────────────────────────────────── */
+/* ── SUBMIT BUTTON ────────────────────────────────────────────── */
 .btn-forum-submit {
-  background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+  background: linear-gradient(135deg, var(--rcw-green-neon) 0%, #00952a 100%);
   border: none;
-  border-radius: 0;
-  color: #fff;
+  border-radius: 8px;
+  color: #000;
   font-weight: 700;
   font-size: 1rem;
   padding: 14px;
   letter-spacing: 0.02em;
   transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
-  box-shadow: 0 4px 14px rgba(25,135,84,0.35);
+  box-shadow: 0 4px 18px rgba(0, 200, 83, 0.35);
 }
 .btn-forum-submit:hover {
   opacity: 0.92;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(25,135,84,0.45);
-  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 200, 83, 0.5);
+  color: #000;
 }
 .btn-forum-submit:active {
   transform: translateY(0);

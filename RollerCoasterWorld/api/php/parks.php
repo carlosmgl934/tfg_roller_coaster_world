@@ -11,8 +11,6 @@ $router = new ApiRouter('list');
 
 // ── Endpoints públicos ──────────────────────────────────────────────────────────
 $router->register('list',      'listParks');
-$router->register('search',    'searchParks');
-$router->register('filter',    'filterParks');
 $router->register('country',   'getCountries');
 $router->register('details',   'getParkDetails');
 
@@ -32,7 +30,7 @@ function listParks() {
     global $db;
     
     $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-    $limit = 15;
+    $limit = isset($_GET['limit']) ? min(50, max(1, (int)$_GET['limit'])) : 15;
     $offset = ($page - 1) * $limit;
 
     $where = ["1=1"];
@@ -72,14 +70,21 @@ function listParks() {
         $bind[':min_stars'] = (float)$_GET['min_stars'];
     }
 
-    $validSorts = [
-        'name'     => 'park_name ASC',
-        'coasters' => 'operating_coasters DESC',
-        'stars'    => 'stars DESC',
-        'year'     => 'NULLIF(opening_year, 0) ASC NULLS LAST',
-    ];
     $sort = $_GET['sort'] ?? 'coasters';
-    $orderBy = $validSorts[$sort] ?? 'operating_coasters DESC';
+    $reqDir = strtoupper($_GET['order_dir'] ?? '');
+
+    $sortMap = [
+        'name'     => ['col' => 'park_name', 'default' => 'ASC'],
+        'coasters' => ['col' => 'operating_coasters', 'default' => 'DESC'],
+        'stars'    => ['col' => 'stars', 'default' => 'DESC'],
+        'year'     => ['col' => 'NULLIF(opening_year, 0)', 'default' => 'ASC'],
+    ];
+
+    $config = $sortMap[$sort] ?? $sortMap['coasters'];
+    $column = $config['col'];
+    $direction = in_array($reqDir, ['ASC', 'DESC']) ? $reqDir : $config['default'];
+
+    $orderBy = "$column $direction NULLS LAST";
 
     $whereClause = implode(" AND ", $where);
 

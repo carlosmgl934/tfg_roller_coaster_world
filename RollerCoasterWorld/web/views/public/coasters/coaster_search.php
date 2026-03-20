@@ -100,14 +100,20 @@ require_once __DIR__ . '/../../partials/header.php';
         <div class="col-12 col-lg-6">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <p class="mb-0 text-muted fw-bold" id="coaster-count"></p>
-                <select class="form-select shadow-sm rounded-0 w-auto border-success" id="sort-filter" style="cursor: pointer; font-weight: 500;">
-                    <option value="id" selected>Por defecto</option>
-                    <option value="name">Nombre A-Z</option>
-                    <option value="stars">Mejor valoradas</option>
-                    <option value="height">Mayor altura</option>
-                    <option value="speed">Mayor velocidad</option>
-                    <option value="year">Año de apertura</option>
-                </select>
+                <div class="d-flex align-items-center">
+                    <select class="form-select shadow-sm rounded-0 w-auto border-success me-2" id="sort-filter" style="cursor: pointer; font-weight: 500;">
+                        <option value="id" selected>Por defecto</option>
+                        <option value="name">Nombre</option>
+                        <option value="stars">Valoración</option>
+                        <option value="height">Altura</option>
+                        <option value="speed">Velocidad</option>
+                        <option value="year">Año de apertura</option>
+                    </select>
+                    <button id="sort-direction-btn" class="btn btn-outline-success shadow-sm rounded-0" type="button" title="Cambiar orden">
+                         <i class="fa-solid fa-arrow-down-wide-short"></i>
+                    </button>
+                    <input type="hidden" id="sort-direction" value="DESC">
+                </div>
             </div>
             
             <div class="list-group shadow-sm rounded-0" id="coaster-list" style="border-radius: 0;"></div>

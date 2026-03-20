@@ -6,7 +6,11 @@ header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
 // Archivo de log
-$log = __DIR__ . '/auth_debug.log';
+$logDir = __DIR__ . '/../../../logs';
+if (!is_dir($logDir)) {
+    mkdir($logDir, 0777, true);
+}
+$log = $logDir . '/auth_debug.log';
 file_put_contents($log, date('Y-m-d H:i:s') . " ── Nueva petición recibida ──\n", FILE_APPEND);
 
 // Raw input

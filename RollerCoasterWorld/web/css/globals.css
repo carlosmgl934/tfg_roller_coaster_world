@@ -1,0 +1,328 @@
+/* ============================================================
+   globals.css — Design System · RollerCoaster World
+   ============================================================ */
+
+/* ── GOOGLE FONTS ───────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700;800;900&display=swap');
+
+/* ── DESIGN TOKENS ──────────────────────────────────────────── */
+:root {
+  /* Backgrounds (Dark Slate/Navy neutro) */
+  --rcw-bg:           #0f172a;   /* body base — slate-900 */
+  --rcw-bg-card:      #1e293b;   /* cards — slate-800 */
+  --rcw-bg-card-alt:  #334155;   /* alternada — slate-700 */
+  --rcw-bg-input:     #020617;   /* inputs — slate-950 */
+  --rcw-bg-hover:     #334155;   /* hover state — slate-700 */
+
+  /* Navbar */
+  --rcw-nav-bg:       #020617;   /* casi negro — slate-950 */
+  --rcw-nav-border:   rgba(255, 255, 255, 0.08);
+
+  /* Greens (Solo para CTAs, glows y highlights) */
+  --rcw-green-neon:   #10b981;   /* acento principal emerald-500 */
+  --rcw-green-bright: #34d399;   /* hover / glow emerald-400 */
+  --rcw-green-dim:    #059669;   /* secundario emerald-600 */
+  --rcw-green-muted:  #047857;   /* borders suaves emerald-700 */
+  --rcw-green-glow:   rgba(16, 185, 129, 0.25);
+
+  /* Text (Blanco y gris claro para máxima legibilidad) */
+  --rcw-text-primary:   #ffffff;   /* blanco puro */
+  --rcw-text-secondary: #e2e8f0;   /* slate-200 (muy claro) */
+  --rcw-text-muted:     #cbd5e1;   /* slate-300 (claro) */
+
+  /* Borders neutros */
+  --rcw-border:       rgba(255, 255, 255, 0.1);
+  --rcw-border-strong: rgba(255, 255, 255, 0.2);
+
+  /* Shadows */
+  --rcw-shadow-sm:  0 2px 12px rgba(0, 0, 0, 0.4);
+  --rcw-shadow-md:  0 4px 24px rgba(0, 0, 0, 0.5);
+  --rcw-shadow-glow: 0 0 20px rgba(16, 185, 129, 0.15);
+
+  /* Typography */
+  --rcw-font-body:  'Inter', sans-serif;
+  --rcw-font-title: 'Outfit', sans-serif;
+
+  /* Transitions */
+  --rcw-transition: all 0.2s ease;
+}
+
+/* ── BASE STYLES ────────────────────────────────────────────── */
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--rcw-bg);
+  background-image: url('../img/bg-coaster.svg');
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: 100% auto;
+  background-attachment: fixed;
+  color: var(--rcw-text-primary);
+  font-family: var(--rcw-font-body);
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+footer {
+  flex-shrink: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--rcw-font-title);
+  color: var(--rcw-text-primary);
+}
+
+/* ── BOOTSTRAP OVERRIDES GLOBALES ───────────────────────────── */
+
+/* Inputs y selects oscuros */
+.form-control,
+.form-select {
+  background-color: var(--rcw-bg-input) !important;
+  border-color: var(--rcw-border) !important;
+  color: var(--rcw-text-primary) !important;
+}
+.form-control::placeholder {
+  color: var(--rcw-text-muted) !important;
+}
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--rcw-bg-card) !important;
+  border-color: var(--rcw-green-neon) !important;
+  box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.2) !important;
+  color: var(--rcw-text-primary) !important;
+}
+.form-select option {
+  background-color: var(--rcw-bg-card);
+  color: var(--rcw-text-primary);
+}
+
+/* Labels */
+.form-label {
+  color: var(--rcw-text-secondary);
+}
+
+/* Tables */
+.table {
+  color: var(--rcw-text-primary);
+}
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  background-color: var(--rcw-bg-card-alt);
+  color: var(--rcw-text-primary);
+}
+.table-hover > tbody > tr:hover > * {
+  background-color: var(--rcw-bg-hover);
+  color: var(--rcw-text-primary);
+}
+
+/* Cards Bootstrap base */
+.card {
+  background-color: var(--rcw-bg-card);
+  border-color: var(--rcw-border);
+  color: var(--rcw-text-primary);
+}
+.card-header {
+  background-color: var(--rcw-bg-card-alt);
+  border-color: var(--rcw-border);
+}
+.card-footer {
+  background-color: var(--rcw-bg-card-alt);
+  border-color: var(--rcw-border);
+}
+
+/* Badges */
+.badge.bg-secondary {
+  background-color: var(--rcw-green-dim) !important;
+}
+
+/* List groups */
+.list-group-item {
+  background-color: var(--rcw-bg-card);
+  border-color: var(--rcw-border);
+  color: var(--rcw-text-primary);
+}
+.list-group-item:hover {
+  background-color: var(--rcw-bg-hover);
+  color: var(--rcw-text-primary);
+}
+
+/* Modals */
+.modal-content {
+  background-color: var(--rcw-bg-card);
+  border-color: var(--rcw-border);
+  color: var(--rcw-text-primary);
+}
+.modal-header {
+  border-color: var(--rcw-border);
+}
+.modal-footer {
+  border-color: var(--rcw-border);
+}
+
+/* Dropdowns */
+.dropdown-menu {
+  background-color: var(--rcw-bg-card) !important;
+  border: 1px solid var(--rcw-border) !important;
+}
+.dropdown-item {
+  color: var(--rcw-text-primary) !important;
+}
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: var(--rcw-bg-hover) !important;
+  color: var(--rcw-green-bright) !important;
+}
+.dropdown-divider {
+  border-color: var(--rcw-border) !important;
+}
+
+/* Pagination */
+.page-link {
+  background-color: var(--rcw-bg-card);
+  border-color: var(--rcw-border);
+  color: var(--rcw-green-neon);
+}
+.page-link:hover {
+  background-color: var(--rcw-bg-hover);
+  border-color: var(--rcw-green-neon);
+  color: var(--rcw-green-bright);
+}
+.page-item.active .page-link {
+  background-color: var(--rcw-green-neon);
+  border-color: var(--rcw-green-neon);
+  color: #000;
+}
+.page-item.disabled .page-link {
+  background-color: var(--rcw-bg-card);
+  border-color: var(--rcw-border);
+  color: var(--rcw-text-muted);
+}
+
+/* Alerts */
+.alert-success {
+  background-color: rgba(0, 200, 83, 0.15);
+  border-color: rgba(0, 200, 83, 0.3);
+  color: var(--rcw-green-bright);
+}
+.alert-danger {
+  background-color: rgba(220, 53, 69, 0.15);
+  border-color: rgba(220, 53, 69, 0.3);
+  color: #ff6b6b;
+}
+.alert-warning {
+  background-color: rgba(255, 193, 7, 0.12);
+  border-color: rgba(255, 193, 7, 0.3);
+  color: #ffd54f;
+}
+.alert-info {
+  background-color: rgba(13, 202, 240, 0.12);
+  border-color: rgba(13, 202, 240, 0.3);
+  color: #4dd0e1;
+}
+
+/* Botones primarios/success */
+.btn-success {
+  background: linear-gradient(135deg, var(--rcw-green-neon) 0%, #00952a 100%) !important;
+  border: none !important;
+  color: #000 !important;
+  font-weight: 700;
+}
+.btn-success:hover {
+  background: linear-gradient(135deg, var(--rcw-green-bright) 0%, var(--rcw-green-neon) 100%) !important;
+  box-shadow: 0 4px 16px rgba(0, 200, 83, 0.4) !important;
+  transform: translateY(-1px);
+  color: #000 !important;
+}
+.btn-outline-success {
+  border-color: var(--rcw-green-neon) !important;
+  color: var(--rcw-green-neon) !important;
+}
+.btn-outline-success:hover {
+  background-color: var(--rcw-green-neon) !important;
+  color: #000 !important;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #1976d2, #0d47a1) !important;
+  border: none !important;
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--rcw-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--rcw-green-dim);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--rcw-green-neon);
+}
+
+/* ── UTILIDADES CUSTOM ─────────────────────────────────────── */
+.text-neon       { color: var(--rcw-green-neon) !important; }
+.text-rcw        { color: var(--rcw-text-secondary) !important; }
+.bg-rcw-card     { background-color: var(--rcw-bg-card) !important; }
+.border-rcw      { border-color: var(--rcw-border) !important; }
+.glow-neon       { box-shadow: var(--rcw-shadow-glow) !important; }
+.font-title      { font-family: var(--rcw-font-title) !important; }
+
+/* ── ANIMACIÓN FADEINDROP ───────────────────────────────────── */
+@keyframes rcwFadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── OVERRIDES DE TEXTO — LEGIBILIDAD MÁXIMA ─────────────────
+   Garantiza que absolutamente ningún texto quede ilegible
+   sobre fondos oscuros, incluyendo el generado por JS.
+   ─────────────────────────────────────────────────────────── */
+body,
+body *:not(script):not(style) {
+  --bs-body-color: #f8fafc;
+}
+
+/* Bootstrap text utilities */
+.text-muted    { color: #94a3b8 !important; }
+.text-secondary { color: #cbd5e1 !important; }
+.text-body     { color: #f8fafc !important; }
+.text-dark     { color: #e2e8f0 !important; }
+.text-black    { color: #f8fafc !important; }
+
+/* Tags genéricos que se quedan oscuros */
+p, span, small, label, li, td, th, dt, dd, blockquote {
+  color: inherit;
+}
+
+/* Elementos que Bootstrap pone grises/negros por defecto */
+.small, small { color: #94a3b8 !important; }
+small.text-muted,
+p.text-muted,
+span.text-muted,
+div.text-muted { color: #94a3b8 !important; }
+
+/* Inputs con clase Bootstrap (dark mode) — solo dentro de cards/forms oscuros.
+   NO se aplica a inputs del login/register que tienen fondo blanco. */
+.form-control,
+.form-select {
+  color: #ffffff !important;
+}
+
+/* Links sin clase heredan color primario */
+a:not([class]) {
+  color: var(--rcw-green-neon);
+}
+
+/* Bootstrap card-title, card-text neutros */
+.card-title  { color: #ffffff !important; }
+.card-text   { color: #e2e8f0 !important; }
+.card-subtitle { color: #94a3b8 !important; }

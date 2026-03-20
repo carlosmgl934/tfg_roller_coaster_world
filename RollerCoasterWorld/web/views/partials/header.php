@@ -66,6 +66,10 @@ header("Expires: 0"); // Proxies
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Google Fonts: Inter + Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <!-- Bootstrap -->
@@ -85,20 +89,44 @@ header("Expires: 0"); // Proxies
   <!-- Firebase auth init (global) -->
   <script src="<?= Router::asset('web/js/auth.js') ?>"></script>
 
-  <!-- Estilos globales y sticky footer -->
-  <link rel="stylesheet" href="<?= Router::asset('web/css/header.css') ?>">  
+  <!-- Design System globals (dark mode tokens + overrides) -->
+  <link rel="stylesheet" href="<?= Router::asset('web/css/globals.css') ?>">
+  <!-- Navbar + layout -->
+  <link rel="stylesheet" href="<?= Router::asset('web/css/header.css') ?>">
 
 </head>
 
 <body>
 
-  <nav class="navbar navbar-expand-lg custom-navbar sticky-top shadow-sm">
-    <div class="container-fluid px-4">
+  <nav class="navbar navbar-expand-lg custom-navbar sticky-top">
+    <div class="container-fluid px-3 px-lg-4">
+
+      <!-- Brand / Logo -->
+      <a class="navbar-brand rcw-brand me-3 me-lg-4" href="<?= Router::url('home') ?>">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="28" height="28" class="rcw-brand-icon">
+          <!-- Pistas -->
+          <path d="M4 48 C 20 48, 24 16, 40 16 C 52 16, 56 32, 60 48" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+          <path d="M4 56 C 24 56, 28 24, 40 24 C 50 24, 54 38, 60 56" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+          <!-- Soportes -->
+          <line x1="16" y1="42" x2="16" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          <line x1="32" y1="20" x2="32" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          <line x1="48" y1="24" x2="48" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          <line x1="24" y1="28" x2="16" y2="60" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+          <line x1="40" y1="16" x2="32" y2="60" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+          <!-- Vagón -->
+          <rect x="23" y="10" width="10" height="6" rx="2" fill="currentColor"/>
+          <circle cx="25" cy="18" r="2" fill="currentColor"/>
+          <circle cx="31" cy="18" r="2" fill="currentColor"/>
+          <!-- Vagón 2 -->
+          <rect x="11" y="24" width="10" height="6" rx="2" fill="currentColor" transform="rotate(-40 16 27)"/>
+        </svg>
+        <span class="rcw-brand-text">RollerCoaster<span class="rcw-brand-accent">World</span></span>
+      </a>
 
       <!-- Botón hamburguesa para móviles -->
-      <button class="navbar-toggler border-0 text-white" type="button" data-bs-toggle="collapse"
+      <button class="navbar-toggler border-0 text-white ms-auto" type="button" data-bs-toggle="collapse"
         data-bs-target="#mainMenu">
-        <i class="fa-solid fa-bars fs-3"></i>
+        <i class="fa-solid fa-bars fs-4"></i>
       </button>
 
       <!-- Contenido del menú -->
@@ -199,12 +227,14 @@ header("Expires: 0"); // Proxies
             </li>
           <?php else: ?>
             <li class="nav-item">
-              <a class="nav-link px-3 rounded text-white" href="<?= Router::url('login') ?>"><i
-                  class="fa-solid fa-right-to-bracket me-1"></i> Login</a>
+              <a class="nav-link rcw-btn-login" href="<?= Router::url('login') ?>">
+                <i class="fa-solid fa-right-to-bracket me-1"></i> Login
+              </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link px-3 rounded bg-white text-success fw-bold ms-lg-2"
-                href="<?= Router::url('register') ?>">Registro</a>
+            <li class="nav-item ms-lg-2">
+              <a class="nav-link rcw-btn-register" href="<?= Router::url('register') ?>">
+                Registro
+              </a>
             </li>
           <?php endif; ?>
 

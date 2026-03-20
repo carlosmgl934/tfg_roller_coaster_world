@@ -96,23 +96,35 @@ if ($id === 0) {
                     <i class="fa-solid fa-gauge-high"></i>
                     <span class="fw-semibold">Estadísticas</span>
                 </div>
-                <div class="card-body p-0 d-flex flex-column">
-                    <div class="row g-0 text-center flex-grow-1">
-                        <div class="col-6 stat-block border-end border-bottom border-success border-opacity-25">
-                            <div class="stat-label">Altura</div>
-                            <div class="stat-value" id="coaster-height">N/A</div>
+                <div class="card-body p-3">
+                    <div class="row g-3 h-100">
+                        <div class="col-6">
+                            <div class="premium-stat-box d-flex flex-column align-items-center justify-content-center text-center">
+                                <i class="fa-solid fa-arrows-up-to-line premium-stat-icon"></i>
+                                <div class="premium-stat-label">Altura</div>
+                                <div class="premium-stat-value" id="coaster-height">N/A</div>
+                            </div>
                         </div>
-                        <div class="col-6 stat-block border-bottom border-success border-opacity-25">
-                            <div class="stat-label">Velocidad</div>
-                            <div class="stat-value" id="coaster-speed">N/A</div>
+                        <div class="col-6">
+                            <div class="premium-stat-box d-flex flex-column align-items-center justify-content-center text-center">
+                                <i class="fa-solid fa-gauge-simple-high premium-stat-icon"></i>
+                                <div class="premium-stat-label">Velocidad</div>
+                                <div class="premium-stat-value" id="coaster-speed">N/A</div>
+                            </div>
                         </div>
-                        <div class="col-6 stat-block border-end border-success border-opacity-25">
-                            <div class="stat-label">Longitud</div>
-                            <div class="stat-value" id="coaster-length">N/A</div>
+                        <div class="col-6">
+                            <div class="premium-stat-box d-flex flex-column align-items-center justify-content-center text-center">
+                                <i class="fa-solid fa-ruler-horizontal premium-stat-icon"></i>
+                                <div class="premium-stat-label">Longitud</div>
+                                <div class="premium-stat-value" id="coaster-length">N/A</div>
+                            </div>
                         </div>
-                        <div class="col-6 stat-block">
-                            <div class="stat-label">Inversiones</div>
-                            <div class="stat-value" id="coaster-inversions">0</div>
+                        <div class="col-6">
+                            <div class="premium-stat-box d-flex flex-column align-items-center justify-content-center text-center">
+                                <i class="fa-solid fa-rotate-right premium-stat-icon"></i>
+                                <div class="premium-stat-label">Inversiones</div>
+                                <div class="premium-stat-value" id="coaster-inversions">0</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -120,35 +132,35 @@ if ($id === 0) {
         </div>
 
         <div class="col-12 col-lg-6">
-            <div class="section-card card h-100">
+            <div class="section-card card h-100 border-0 ficha-card-bg">
                 <div class="card-header bg-success text-white d-flex align-items-center gap-2">
                     <i class="fa-solid fa-clipboard-list"></i>
                     <span class="fw-semibold">Ficha Técnica</span>
                 </div>
                 <div class="card-body p-0">
-                    <table class="table table-borderless mb-0">
+                    <table class="table table-borderless mb-0 ficha-table-premium text-white">
                         <tbody>
-                            <tr class="ficha-row">
-                                <td class="ficha-label">Fabricante</td>
-                                <td class="ficha-value" id="coaster-manufacter">—</td>
+                            <tr>
+                                <td class="text-uppercase align-middle ficha-table-label w-45"><i class="fa-solid fa-industry me-2 opacity-50"></i>Fabricante</td>
+                                <td class="fw-semibold text-end align-middle text-white" id="coaster-manufacter">—</td>
                             </tr>
-                            <tr class="ficha-row ficha-row-alt">
-                                <td class="ficha-label">Modelo</td>
-                                <td class="ficha-value" id="coaster-model">—</td>
+                            <tr>
+                                <td class="text-uppercase align-middle ficha-table-label"><i class="fa-solid fa-puzzle-piece me-2 opacity-50"></i>Modelo</td>
+                                <td class="fw-semibold text-end align-middle text-white" id="coaster-model">—</td>
                             </tr>
-                            <tr class="ficha-row">
-                                <td class="ficha-label">Año apertura</td>
-                                <td class="ficha-value" id="coaster-year">—</td>
+                            <tr>
+                                <td class="text-uppercase align-middle ficha-table-label"><i class="fa-regular fa-calendar-days me-2 opacity-50"></i>Año apertura</td>
+                                <td class="fw-semibold text-end align-middle text-white" id="coaster-year">—</td>
                             </tr>
-                            <tr class="ficha-row ficha-row-alt">
-                                <td class="ficha-label">Estado</td>
-                                <td class="ficha-value" id="current-state-table">—</td>
+                            <tr>
+                                <td class="text-uppercase align-middle ficha-table-label"><i class="fa-solid fa-traffic-light me-2 opacity-50"></i>Estado</td>
+                                <td class="fw-semibold text-end align-middle text-white" id="current-state-table">—</td>
                             </tr>
-                            <tr class="ficha-row">
-                                <td class="ficha-label">Parque</td>
-                                <td class="ficha-value">
+                            <tr>
+                                <td class="text-uppercase text-muted align-middle ficha-table-label"><i class="fa-solid fa-tree-city me-2 opacity-50"></i>Parque</td>
+                                <td class="fw-bold text-end align-middle">
                                     <a href="<?= $base_url ?>/web/views/public/parks/park_detail.php?id=<?= $id ?>"
-                                        class="text-success fw-bold text-decoration-none" id="park-name-table">—</a>
+                                        class="text-success text-decoration-none border-bottom border-success border-2 pb-1 hover-fx" id="park-name-table">—</a>
                                 </td>
                             </tr>
                         </tbody>
@@ -163,10 +175,12 @@ if ($id === 0) {
         <div class="col-12">
             <div class="section-card card">
                 <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="fa-solid fa-images"></i>
-                        <span class="fw-semibold">Fotos</span>
-                        <span class="badge bg-white text-success" id="photos-count">0</span>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-images"></i>
+                            <span class="fw-semibold">Fotos</span>
+                        </div>
+                        <span class="badge badge-dark-green rounded-pill px-2 py-1 shadow-sm fs-6" id="photos-count">0</span>
                     </div>
                     <button class="btn btn-sm btn-outline-light rounded-0 px-3"
                         <?php if ($is_logged): ?>
@@ -229,10 +243,12 @@ if ($id === 0) {
             <div class="section-card card">
                 <div
                     class="card-header bg-success text-white d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="fa-solid fa-star"></i>
-                        <span class="fw-semibold">Reseñas</span>
-                        <span class="badge bg-white text-success" id="reviews-count">0</span>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-star"></i>
+                            <span class="fw-semibold">Reseñas</span>
+                        </div>
+                        <span class="badge badge-dark-green rounded-pill px-2 py-1 shadow-sm fs-6" id="reviews-count">0</span>
                     </div>
                     <div class="d-flex gap-2 align-items-center">
                         <select class="form-select form-select-sm rounded-0" id="reviews-order" style="width:auto;">

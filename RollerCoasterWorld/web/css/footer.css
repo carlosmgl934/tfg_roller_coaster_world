@@ -1,0 +1,72 @@
+/* ============================================================
+   footer.css — Dark mode · RollerCoaster World
+   ============================================================ */
+
+footer {
+  background-color: var(--rcw-nav-bg);
+  border-top: 1px solid var(--rcw-border);
+  color: var(--rcw-text-secondary);
+  font-family: var(--rcw-font-body);
+}
+
+footer h5,
+footer h6 {
+  color: var(--rcw-text-primary);
+  font-family: var(--rcw-font-title);
+  font-weight: 700;
+}
+
+footer a {
+  color: var(--rcw-text-secondary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+footer a:hover {
+  color: var(--rcw-green-neon);
+}
+
+footer .text-muted {
+  color: var(--rcw-text-muted) !important;
+}
+
+footer hr {
+  border-color: var(--rcw-border);
+  opacity: 1;
+}
+
+/* Logo en el footer */
+footer .rcw-footer-brand {
+  font-family: var(--rcw-font-title);
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--rcw-text-primary);
+}
+footer .rcw-footer-brand span {
+  color: var(--rcw-green-neon);
+}
+
+/* Iconos sociales */
+footer .footer-social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--rcw-border);
+  color: var(--rcw-text-secondary);
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+footer .footer-social-icon:hover {
+  border-color: var(--rcw-green-neon);
+  color: var(--rcw-green-neon);
+  background-color: rgba(0, 200, 83, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Copyright strip */
+footer .footer-copy {
+  font-size: 0.78rem;
+  color: var(--rcw-text-muted);
+}

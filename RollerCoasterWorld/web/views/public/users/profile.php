@@ -213,7 +213,7 @@ $user_uid = $_SESSION['firebase_uid'];
                   class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 border-top mt-2 pt-3">
                   <span class="text-muted">Altura total superada</span>
                   <span class="fw-bold text-dark fs-5"><span id="total-height">0</span><small
-                      class="text-muted fs-6">m</small></span>
+                      class="text-muted fs-6"> m</small></span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
                   <span class="text-muted">Inversiones totales</span>
@@ -373,8 +373,7 @@ $user_uid = $_SESSION['firebase_uid'];
             <i class="fa-solid fa-key me-2"></i>Cambiar contraseña
           </button>
 
-          <div id="form-password" class="bg-light p-4 square-box mb-3"
-            style="display: none; border: 2px solid #e2e8f0; background-color: #f8fafc !important;">
+          <div id="form-password" class="bg-rcw-card p-4 square-box mb-3 border-rcw" style="display: none; border-width: 2px;">
             <div class="row g-4 mt-1">
               <div class="col-12 mt-0">
                 <label for="old-password" class="form-label"><i class="fa-solid fa-key me-2"></i>Contraseña actual</label>
@@ -397,8 +396,7 @@ $user_uid = $_SESSION['firebase_uid'];
               <div class="col-12 mt-4 d-flex align-items-center">
                 <button id="cambiarPassword" class="btn btn-success me-2 px-4 fw-bold shadow-sm square-box"><i
                     class="fa-solid fa-check me-2"></i>Guardar cambios</button>
-                <button id="btn-cancelar-password" class="btn btn-light border px-4 fw-bold square-box"
-                  style="background: white; color: #4b5563;">Cancelar</button>
+                <button id="btn-cancelar-password" class="btn btn-outline-secondary px-4 fw-bold square-box border-rcw text-rcw">Cancelar</button>
               </div>
               <div class="col-12 mt-2">
                 <p id="msg-password" class="mb-0 fw-medium small"></p>

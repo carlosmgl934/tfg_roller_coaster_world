@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" width="200" height="100" preserveAspectRatio="none">
+  <!-- Track rails -->
+  <path d="M0,80 C50,80 60,20 100,20 S150,80 200,80" fill="none" stroke="#1e293b" stroke-width="4" opacity="0.4"/>
+  <path d="M0,88 C50,88 60,28 100,28 S150,88 200,88" fill="none" stroke="#1e293b" stroke-width="4" opacity="0.4"/>
+  
+  <!-- Supports -->
+  <line x1="20" y1="84" x2="20" y2="100" stroke="#1e293b" stroke-width="2" opacity="0.3"/>
+  <line x1="60" y1="50" x2="60" y2="100" stroke="#1e293b" stroke-width="2" opacity="0.3"/>
+  <line x1="100" y1="24" x2="100" y2="100" stroke="#1e293b" stroke-width="2" opacity="0.3"/>
+  <line x1="140" y1="50" x2="140" y2="100" stroke="#1e293b" stroke-width="2" opacity="0.3"/>
+  <line x1="180" y1="84" x2="180" y2="100" stroke="#1e293b" stroke-width="2" opacity="0.3"/>
+</svg>

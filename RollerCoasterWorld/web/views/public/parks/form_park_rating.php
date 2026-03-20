@@ -4,8 +4,9 @@ require_once __DIR__ . '/../../../../partials/header.php';
 
 if (!isset($_SESSION['firebase_uid'])) {
     $id = intval($_GET['id'] ?? 0);
-    $redirect_url = urlencode($base_url . '/web/views/public/parks/form_park_rating.php?id=' . $id);
-    header('Location: ' . $base_url . '/web/views/auth/login.php?redirect=' . $redirect_url . '&msg=review');
+    $redirect_url = urlencode(Router::url('form_park_rating') . '?id=' . $id);
+    Router::redirect('login'); // Though this doesn't pass the redirect_url, we will use header
+    header('Location: ' . Router::url('login') . '?redirect=' . $redirect_url . '&msg=review');
     exit;
 } else {
     $user_id = $_SESSION['firebase_uid'];
@@ -13,7 +14,7 @@ if (!isset($_SESSION['firebase_uid'])) {
 
 $id = intval($_GET['id'] ?? 0);
 if ($id === 0) {
-    header('Location: ' . $base_url . '/web/views/public/parks/park_search.php');
+    Router::redirect('park_search');
     exit;
 }
 ?>

@@ -42,15 +42,15 @@
 
 /* ── CARD ───────────────────────────────────────────────── */
 .privacy-card {
-  background: #fff;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+  background: var(--rcw-bg-card);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
   border-top: 4px solid #198754;
 }
 
 /* ── SECTIONS ───────────────────────────────────────────── */
 .privacy-section {
   padding: 28px 36px;
-  border-bottom: 1px solid #f0f4f2;
+  border-bottom: 1px solid var(--rcw-border);
 }
 .privacy-section--last {
   border-bottom: none;
@@ -58,12 +58,12 @@
 .privacy-section h2 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #0f2d1a;
+  color: var(--rcw-text-primary);
   margin-bottom: 12px;
   letter-spacing: -0.01em;
 }
 .privacy-section p {
-  color: #374151;
+  color: var(--rcw-text-secondary);
   line-height: 1.7;
   margin-bottom: 10px;
   font-size: 0.95rem;
@@ -76,7 +76,7 @@
 .privacy-list {
   padding-left: 20px;
   margin: 0;
-  color: #374151;
+  color: var(--rcw-text-secondary);
   font-size: 0.95rem;
   line-height: 1.7;
 }
@@ -93,8 +93,8 @@
   align-items: center;
   margin-top: 8px;
   padding: 10px 20px;
-  background: #f0faf5;
-  border: 1px solid #d1fae5;
+  background: rgba(25,135,84,0.1);
+  border: 1px solid rgba(25,135,84,0.2);
   border-left: 3px solid #198754;
   color: #198754;
   font-weight: 600;

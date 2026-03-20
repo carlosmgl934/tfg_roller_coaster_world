@@ -107,16 +107,23 @@ function listCoasters()
     $limit = 15;
     $offset = ($page - 1) * $limit;
 
-    $validSorts = [
-        'name'   => 'coasters.coaster_name ASC',
-        'stars'  => '(SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = coasters.id) DESC NULLS LAST',
-        'height' => 'coasters.height DESC NULLS LAST',
-        'speed'  => 'coasters.speed DESC NULLS LAST',
-        'year'   => 'NULLIF(coasters.opening_year, 0) ASC NULLS LAST',
-        'id'     => 'coasters.id ASC',
-    ];
     $sort = $_GET['sort'] ?? 'id';
-    $orderBy = $validSorts[$sort] ?? 'coasters.id ASC';
+    $reqDir = strtoupper($_GET['order_dir'] ?? '');
+
+    $sortMap = [
+        'name'   => ['col' => 'coasters.coaster_name', 'default' => 'ASC'],
+        'stars'  => ['col' => '(SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = coasters.id)', 'default' => 'DESC'],
+        'height' => ['col' => 'coasters.height', 'default' => 'DESC'],
+        'speed'  => ['col' => 'coasters.speed', 'default' => 'DESC'],
+        'year'   => ['col' => 'NULLIF(coasters.opening_year, 0)', 'default' => 'ASC'],
+        'id'     => ['col' => 'coasters.id', 'default' => 'ASC'],
+    ];
+
+    $config = $sortMap[$sort] ?? $sortMap['id'];
+    $column = $config['col'];
+    $direction = in_array($reqDir, ['ASC', 'DESC']) ? $reqDir : $config['default'];
+
+    $orderBy = "$column $direction NULLS LAST";
 
     try {
         global $db;
@@ -250,16 +257,23 @@ function applyFilters()
         $params[':year'] = intval($_GET['year']);
     }
 
-    $validSorts = [
-        'name'   => 'coasters.coaster_name ASC',
-        'stars'  => '(SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = coasters.id) DESC NULLS LAST',
-        'height' => 'coasters.height DESC NULLS LAST',
-        'speed'  => 'coasters.speed DESC NULLS LAST',
-        'year'   => 'NULLIF(coasters.opening_year, 0) ASC NULLS LAST',
-        'id'     => 'coasters.id ASC',
-    ];
     $sort = $_GET['sort'] ?? 'id';
-    $orderBy = $validSorts[$sort] ?? 'coasters.id ASC';
+    $reqDir = strtoupper($_GET['order_dir'] ?? '');
+
+    $sortMap = [
+        'name'   => ['col' => 'coasters.coaster_name', 'default' => 'ASC'],
+        'stars'  => ['col' => '(SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = coasters.id)', 'default' => 'DESC'],
+        'height' => ['col' => 'coasters.height', 'default' => 'DESC'],
+        'speed'  => ['col' => 'coasters.speed', 'default' => 'DESC'],
+        'year'   => ['col' => 'NULLIF(coasters.opening_year, 0)', 'default' => 'ASC'],
+        'id'     => ['col' => 'coasters.id', 'default' => 'ASC'],
+    ];
+
+    $config = $sortMap[$sort] ?? $sortMap['id'];
+    $column = $config['col'];
+    $direction = in_array($reqDir, ['ASC', 'DESC']) ? $reqDir : $config['default'];
+
+    $orderBy = "$column $direction NULLS LAST";
 
     $page = intval($_GET['page'] ?? 1);
     $limit = 15;

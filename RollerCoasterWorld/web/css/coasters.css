@@ -1,27 +1,25 @@
 /* ============================================================
-   coasters.css — Estilos de búsqueda y ficha de montañas rusas
+   coasters.css — Estilos dark mode · búsqueda y ficha de montañas rusas
    ============================================================ */
 
 /* --- RANGOS (coaster_search) --- */
 input[type="range"].form-range::-webkit-slider-thumb {
-  background-color: #198754;
+  background-color: var(--rcw-green-neon);
 }
 input[type="range"].form-range::-webkit-slider-thumb:active {
-  background-color: #146c43;
+  background-color: var(--rcw-green-bright);
 }
 input[type="range"].form-range:focus::-webkit-slider-thumb {
-  box-shadow:
-    0 0 0 1px #fff,
-    0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+  box-shadow: 0 0 0 1px var(--rcw-bg), 0 0 0 0.25rem rgba(0, 200, 83, 0.25);
 }
 input[type="range"].form-range::-moz-range-thumb {
-  background-color: #198754;
+  background-color: var(--rcw-green-neon);
 }
 input[type="range"].form-range::-moz-range-thumb:active {
-  background-color: #146c43;
+  background-color: var(--rcw-green-bright);
 }
 input[type="range"].form-range::-webkit-slider-runnable-track {
-  background-color: #7ad6ad;
+  background-color: var(--rcw-green-dim);
 }
 
 /* ============================================================
@@ -30,10 +28,10 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
 .hero-img-wrapper {
   position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  background: #0f2d1a;
+  box-shadow: var(--rcw-shadow-md);
+  background: var(--rcw-bg-input);
   height: 420px;
-  border-top: 4px solid #198754;
+  border-top: 3px solid var(--rcw-green-neon);
 }
 .hero-img-wrapper img {
   width: 100%;
@@ -41,18 +39,20 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
   object-fit: contain;
   object-position: center;
   display: block;
-  transition: transform 0.5s ease;
+  transition: transform 0.6s ease;
+  filter: brightness(0.9);
 }
 .hero-img-wrapper:hover img {
-  transform: scale(1.03);
+  transform: scale(1.04);
+  filter: brightness(1);
 }
 .hero-img-wrapper .img-overlay {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 120px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent);
+  height: 140px;
+  background: linear-gradient(to top, var(--rcw-bg), transparent);
   pointer-events: none;
 }
 
@@ -60,37 +60,28 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
    STAT CARDS (ranking/score/estado)
    ============================================================ */
 .stat-card {
-  border-radius: 0 !important;
-  border: 1px solid #d1fae5;
+  border-radius: 8px !important;
+  border: 1px solid var(--rcw-border) !important;
   border-top-width: 3px;
-  background: #f0faf5;
-  box-shadow: 0 2px 8px rgba(25, 135, 84, 0.06);
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s,
-    background 0.2s;
+  background: var(--rcw-bg-card);
+  box-shadow: var(--rcw-shadow-sm);
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 .stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(25, 135, 84, 0.13);
-  background: #ffffff;
+  transform: translateY(-3px);
+  box-shadow: var(--rcw-shadow-glow);
+  border-color: var(--rcw-green-neon) !important;
 }
-.col-6:nth-child(1) .stat-card {
-  border-top-color: #20c997;
-}
-.col-6:nth-child(2) .stat-card {
-  border-top-color: #198754;
-}
-.col-6:nth-child(3) .stat-card {
-  border-top-color: #146c43;
-}
-.col-6:nth-child(4) .stat-card {
-  border-top-color: #0f5132;
-}
+.col-6:nth-child(1) .stat-card { border-top-color: #00e676 !important; }
+.col-6:nth-child(2) .stat-card { border-top-color: #00c853 !important; }
+.col-6:nth-child(3) .stat-card { border-top-color: #00952a !important; }
+.col-6:nth-child(4) .stat-card { border-top-color: #1b6935 !important; }
 
 .ranking-num {
   font-size: 1.6rem;
   font-weight: 800;
+  color: var(--rcw-green-neon);
+  font-family: var(--rcw-font-title);
 }
 
 /* ============================================================
@@ -98,52 +89,68 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
    ============================================================ */
 .status-badge {
   display: inline-block;
-  padding: 2px 10px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  border-radius: 0 !important;
+  padding: 3px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  border-radius: 4px;
 }
 .status-operating {
-  background: #d1fae5;
-  color: #065f46;
+  background: rgba(0, 200, 83, 0.15);
+  color: #00e676;
+  border: 1px solid rgba(0, 200, 83, 0.3);
 }
 .status-closed {
-  background: #fee2e2;
-  color: #991b1b;
+  background: rgba(255, 107, 107, 0.12);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.25);
 }
 .status-sbno {
-  background: #fef9c3;
-  color: #854d0e;
+  background: rgba(255, 213, 79, 0.12);
+  color: #ffd54f;
+  border: 1px solid rgba(255, 213, 79, 0.25);
 }
 .status-default {
-  background: #e8f5ee;
-  color: #475569;
+  background: rgba(129, 199, 132, 0.1);
+  color: var(--rcw-text-secondary);
+  border: 1px solid var(--rcw-border);
 }
 
 /* ============================================================
    BOTÓN MONTADA
    ============================================================ */
 .btn-ridden-active {
-  background-color: #198754 !important;
-  color: white !important;
-  border-color: #198754 !important;
+  background-color: var(--rcw-green-neon) !important;
+  color: #000 !important;
+  border-color: var(--rcw-green-neon) !important;
+  font-weight: 700;
 }
 
 /* ============================================================
    SECTION CARDS (Estadísticas, Ficha, Fotos, Reseñas)
    ============================================================ */
 .section-card {
-  border-radius: 0 !important;
-  border: none !important;
-  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.07);
+  border-radius: 10px !important;
+  border: 1px solid var(--rcw-border) !important;
+  box-shadow: var(--rcw-shadow-sm);
   overflow: hidden;
+  background: var(--rcw-bg-card);
+  transition: box-shadow 0.25s;
+}
+.section-card:hover {
+  box-shadow: var(--rcw-shadow-glow);
 }
 .section-card .card-header {
   border-radius: 0 !important;
   padding: 13px 20px;
   letter-spacing: 0.01em;
-  background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+  background: var(--rcw-bg-card-alt);
+  border-bottom: 1px solid var(--rcw-border);
+}
+.section-card .card-header .fw-bold,
+.section-card .card-header span,
+.section-card .card-header i {
+  color: var(--rcw-text-primary) !important;
 }
 
 /* ============================================================
@@ -154,44 +161,44 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background-color: #f7fbf9;
+  background-color: var(--rcw-bg-card);
+  border-right: 1px solid var(--rcw-border);
   transition: background-color 0.2s ease;
 }
+.stat-block:last-child { border-right: none; }
 .stat-block:hover {
-  background-color: #dcf5ea;
+  background-color: var(--rcw-bg-hover);
 }
 .stat-block .stat-label {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #6dab8a;
+  color: var(--rcw-text-muted);
   font-weight: 700;
   margin-bottom: 6px;
 }
 .stat-block .stat-value {
   font-size: 1.4rem;
   font-weight: 800;
-  color: #0f2d1a;
+  color: var(--rcw-green-neon);
   letter-spacing: -0.02em;
+  font-family: var(--rcw-font-title);
 }
 
 /* Ficha Técnica table rows */
 .ficha-row {
   transition: background 0.15s;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--rcw-border);
 }
-.ficha-row:last-child {
-  border-bottom: none;
-}
-.ficha-row:hover {
-  background-color: #f1f8f4 !important;
-}
+.ficha-row:last-child { border-bottom: none; }
+.ficha-row:hover { background-color: var(--rcw-bg-hover) !important; }
+
 .ficha-label {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 700;
-  color: #64748b;
+  color: var(--rcw-text-muted);
   padding: 12px 20px !important;
   width: 45%;
   vertical-align: middle;
@@ -199,13 +206,11 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
 .ficha-value {
   font-size: 1rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--rcw-text-primary);
   padding: 12px 12px !important;
   vertical-align: middle;
 }
-.ficha-row-alt {
-  background-color: #f8fafc;
-}
+.ficha-row-alt { background-color: var(--rcw-bg-card-alt); }
 
 /* ============================================================
    FOTOS
@@ -213,15 +218,16 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
 .photo-thumb {
   height: 140px;
   object-fit: cover;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
   cursor: pointer;
+  border-radius: 6px;
 }
 .photo-thumb:hover {
-  transform: scale(1.04);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 2px var(--rcw-green-neon);
+  filter: brightness(1.1);
 }
+
 /* ============================================================
    RESEÑAS
    ============================================================ */
@@ -230,10 +236,10 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #d1fae5;
+  border: 2px solid var(--rcw-green-dim);
 }
 .stars-display {
-  color: #f59e0b;
+  color: #ffd54f;
   font-size: 1rem;
   letter-spacing: 1px;
 }
@@ -245,49 +251,142 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
   --star-width: 1.1em;
   font-size: 2.5rem;
 }
-
-.star-rating input {
-  display: none;
-}
-
+.star-rating input { display: none; }
 .star-rating label {
   cursor: pointer;
   width: var(--star-width);
   text-align: center;
-  color: #e4e4e7;
+  color: var(--rcw-bg-hover);
   line-height: 1;
   margin: 0 !important;
   padding: 0;
   display: inline-block;
   position: relative;
-  transition:
-    color 0.2s ease,
-    text-shadow 0.2s ease;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
   font-family: "Font Awesome 6 Free";
   font-weight: 900;
 }
-
-.star-rating label::before {
-  content: "\f005";
-}
-
-/* The half star lies completely on top of the next full star */
+.star-rating label::before { content: "\f005"; }
 .star-rating label.half {
   margin-right: calc(-1 * var(--star-width)) !important;
   clip-path: inset(0 50% 0 0);
   z-index: 2;
 }
-
-/* Base styles for hover and selection */
 .star-rating label:hover,
 .star-rating label:hover ~ label,
 .star-rating input:checked ~ label {
-  color: #f59e0b;
+  color: #ffd54f;
+  text-shadow: 0 0 14px rgba(255, 213, 79, 0.5);
 }
 
-/* Adding a glow effect for the selected rating */
-.star-rating label:hover,
-.star-rating label:hover ~ label,
-.star-rating input:checked ~ label {
-  text-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+/* ============================================================
+   CHOICES.JS DARK MODE ESTILOS
+   ============================================================ */
+.choices__inner {
+  background-color: var(--rcw-bg-input) !important;
+  border-color: var(--rcw-border) !important;
+}
+.choices__input {
+  color: var(--rcw-text-primary) !important;
+  background-color: transparent !important;
+}
+.choices__list--dropdown, .choices__list[aria-expanded] {
+  background-color: var(--rcw-bg-card-alt) !important;
+  border-color: var(--rcw-border) !important;
+  color: var(--rcw-text-primary) !important;
+}
+.choices__list--dropdown .choices__item, .choices__list[aria-expanded] .choices__item {
+  color: var(--rcw-text-primary) !important;
+}
+.choices__list--dropdown .choices__item--selectable.is-highlighted,
+.choices__list[aria-expanded] .choices__item--selectable.is-highlighted {
+  background-color: var(--rcw-bg-hover) !important;
+  color: var(--rcw-green-neon) !important;
+}
+.choices__list--multiple .choices__item {
+  background-color: var(--rcw-green-neon) !important;
+  border-color: var(--rcw-green-bright) !important;
+  color: #000 !important;
+  font-weight: bold;
+}
+.choices__list--multiple .choices__button {
+  border-left-color: rgba(0,0,0,0.2) !important;
+}
+
+/* ============================================================
+   PREMIUM STAT BOXES & FICHA
+   ============================================================ */
+.premium-stat-box {
+    background: linear-gradient(145deg, rgba(30,35,40,0.4), rgba(20,25,30,0.7));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s;
+    height: 100%;
+}
+.premium-stat-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    border-color: rgba(25, 135, 84, 0.5);
+}
+.premium-stat-icon {
+    font-size: 1.5rem;
+    color: var(--bs-success);
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
+    filter: drop-shadow(0 2px 4px rgba(25,135,84,0.4));
+}
+.premium-stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--bs-gray-400);
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+.premium-stat-value {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+
+.ficha-card-bg {
+    background: linear-gradient(145deg, rgba(30,35,40,0.6), rgba(20,25,30,0.9)) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+.ficha-table-premium {
+    background: transparent !important;
+}
+.ficha-table-premium td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+    padding: 1rem 1.25rem !important;
+    background: transparent !important;
+}
+.ficha-table-premium tr:last-child td {
+    border-bottom: none !important;
+}
+.ficha-table-label {
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    color: var(--rcw-text-muted) !important;
+}
+.w-45 {
+    width: 45%;
+}
+.hover-fx {
+    transition: color 0.2s;
+}
+.hover-fx:hover {
+    color: #fff !important;
+    border-color: #fff !important;
+}
+
+/* ============================================================
+   BADGE DARK GREEN
+   ============================================================ */
+.badge-dark-green {
+    background-color: #144f27 !important;
+    color: #ffffff !important;
+    border: 1px solid #1e7038;
 }
