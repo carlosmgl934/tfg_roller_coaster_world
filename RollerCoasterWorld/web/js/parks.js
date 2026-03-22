@@ -475,4 +475,54 @@ $(document).ready(function () {
       });
     }
   }
+
+  // --- LÓGICA PARA EL FORMULARIO DE RESEÑAS DE PARQUES ---
+  if (document.getElementById("review-form")) {
+    new Choices("#pros-select", {
+      removeItemButton: true,
+      placeholderValue: "Selecciona las ventajas...",
+    });
+    new Choices("#contras-select", {
+      removeItemButton: true,
+      placeholderValue: "Selecciona las contras...",
+    });
+
+    document.getElementById("review-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const parkId = formData.get("park_id");
+      const note = formData.get("note");
+
+      if (!note) {
+        alert("Por favor, califica con estrellas el parque.");
+        return;
+      }
+
+      const submitBtn = this.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'Publicando... <i class="fa-solid fa-spinner fa-spin ms-2"></i>';
+
+      fetch(window.BASE_URL + "/api/php/parks.php?action=save_review", {
+        method: "POST",
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            window.location.href =
+              window.BASE_URL + "/web/views/public/parks/parks.php?id=" + parkId;
+          } else {
+            alert("Error: " + data.error);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Publicar Reseña <i class="fa-solid fa-paper-plane ms-2"></i>';
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          alert("Error de conexión");
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'Publicar Reseña <i class="fa-solid fa-paper-plane ms-2"></i>';
+        });
+    });
+  }
 });

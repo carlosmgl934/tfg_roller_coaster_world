@@ -207,7 +207,7 @@ require_once __DIR__ . '/../../partials/header.php';
                         </select>
                         <a class="btn btn-sm btn-outline-light rounded-0 px-3" id="btn-write-review"
                             <?php if ($is_logged): ?>
-                              href="<?= $base_url ?>/web/views/public/parks/form_park_rating.php?id=<?= $id ?>"
+                              href="<?= Router::url('form_park_rating') ?>?id=<?= $id ?>"
                             <?php else: ?>
                               href="#" data-bs-toggle="modal" data-bs-target="#loginModal"
                             <?php endif; ?>>

@@ -16,6 +16,28 @@ $public_pages = [
   Router::getRoutePath('register'),
   Router::getRoutePath('home'),
   Router::getRoutePath('index'),
+
+  // Coasters — acceso público (sin login)
+  Router::getRoutePath('coasters'),
+  Router::getRoutePath('coaster_search'),
+  Router::getRoutePath('coaster_detail'),
+  Router::getRoutePath('coaster_reviews'),
+  Router::getRoutePath('coaster_tops'),
+
+  // Parques — acceso público (sin login)
+  Router::getRoutePath('parks'),
+  Router::getRoutePath('park_search'),
+  Router::getRoutePath('park_detail'),
+  Router::getRoutePath('park_tops'),
+  Router::getRoutePath('park_reviews'),
+
+  // Foros — solo búsqueda/listado público (sin login)
+  Router::getRoutePath('forum_search'),
+
+  // Páginas legales/info
+  Router::getRoutePath('contact'),
+  Router::getRoutePath('privacy'),
+  Router::getRoutePath('notice'),
 ];
 
 // Determina si el usuario está logueado
