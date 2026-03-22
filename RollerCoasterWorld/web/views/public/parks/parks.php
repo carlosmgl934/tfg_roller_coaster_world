@@ -46,27 +46,27 @@ require_once __DIR__ . '/../../partials/header.php';
             <!-- Stats cards 2x2 (Consistency with coasters) -->
             <div class="row g-2 mb-3">
                 <div class="col-6">
-                    <div class="stat-card card text-center p-2">
+                    <div class="stat-card card text-center p-2 h-100 d-flex flex-column justify-content-center">
                         <div class="text-muted small mb-1">Ranking Parques</div>
                         <div class="ranking-num text-success" id="global-ranking">—</div>
                     </div>
                 </div>
                 <div class="col-6">
-                    <div class="stat-card card text-center p-2">
+                    <div class="stat-card card text-center p-2 h-100 d-flex flex-column justify-content-center">
                         <div class="text-muted small mb-1">Puntuación</div>
                         <div class="ranking-num text-success" id="park-score">—</div>
                     </div>
                 </div>
                 <div class="col-6">
-                    <div class="stat-card card text-center p-2">
-                        <div class="text-muted small mb-1">Nº Coasters</div>
-                        <div class="ranking-num text-success" id="stat-num-coasters">—</div>
+                    <div class="stat-card card text-center p-2 h-100 d-flex flex-column justify-content-center">
+                        <div class="text-muted small mb-1">Coasters Operativas</div>
+                        <div class="ranking-num badge badge-dark-green text-white" id="operating-coasters-val">—</div>
                     </div>
                 </div>
                 <div class="col-6">
-                    <div class="stat-card card text-center p-2">
+                    <div class="stat-card card text-center p-2 h-100 d-flex flex-column justify-content-center">
                         <div class="text-muted small mb-1">Estado</div>
-                        <div class="ranking-num text-success" id="current-state" style="font-size: 1.2rem; display: flex; align-items: center; justify-content: center; height: 1.6rem;">Abierto</div>
+                        <div class="ranking-num text-success" id="current-state" style="font-size: 1.2rem;">Abierto</div>
                     </div>
                 </div>
             </div>
@@ -105,8 +105,8 @@ require_once __DIR__ . '/../../partials/header.php';
                         </div>
                         <div class="col-6">
                             <div class="stat-block text-center border-bottom">
-                                <span class="stat-label">Coasters Operativas</span>
-                                <span class="stat-value text-success" id="operating-coasters-val">0</span>
+                                <span class="stat-label">Nº Coasters</span>
+                                <span class="stat-value fw-bold" id="stat-num-coasters" style="color: #059669;">—</span>
                             </div>
                         </div>
                         <div class="col-6">
@@ -166,12 +166,12 @@ require_once __DIR__ . '/../../partials/header.php';
     <div class="row mb-4">
         <div class="col-12">
             <div class="section-card card">
-                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <div class="card-header bg-success text-white d-flex align-items-center gap-3">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fa-solid fa-train-tram"></i>
-                        <span class="fw-semibold text-white">Montañas Rusas Operativas</span>
+                        <span class="fw-semibold text-white">Montañas Rusas del Parque</span>
                     </div>
-                    <span class="badge bg-white text-success rounded-pill px-3 py-1 fw-bold fs-6" id="operating-count-badge">0</span>
+                    <span class="badge badge-dark-green rounded-pill px-3 py-1 shadow-sm fs-6" id="operating-count-badge">0</span>
                 </div>
                 <div class="card-body p-3">
                     <div class="row g-3" id="park-coasters-grid">
@@ -186,37 +186,18 @@ require_once __DIR__ . '/../../partials/header.php';
         </div>
     </div>
 
-    <!-- FOTOS -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="section-card card">
-                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="fa-solid fa-images"></i>
-                        <span class="fw-semibold text-white">Fotos de visitantes</span>
-                    </div>
-                    <button class="btn btn-sm btn-outline-light rounded-0 px-3"
-                        id="btn-upload-photo" <?= $is_logged ? '' : 'data-requires-login="true"' ?>>
-                        <i class="fa-solid fa-upload me-1"></i>Añadir foto
-                    </button>
-                </div>
-                <div class="card-body p-3">
-                    <div class="row g-2" id="park-gallery">
-                        <!-- Fotos dinámicas -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- RESEÑAS -->
     <div class="row mb-5">
         <div class="col-12">
             <div class="section-card card">
                 <div class="card-header bg-success text-white d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="fa-solid fa-star"></i>
-                        <span class="fw-semibold text-white">Experiencias y Opiniones</span>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-star"></i>
+                            <span class="fw-semibold text-white">Experiencias y Opiniones</span>
+                        </div>
+                        <span class="badge badge-dark-green rounded-pill px-2 py-1 shadow-sm fs-6" id="reviews-header-count">0</span>
                     </div>
                     <div class="d-flex gap-2 align-items-center">
                         <select class="form-select form-select-sm rounded-0 bg-dark text-white border-secondary" id="reviews-sort" style="width:auto;">
@@ -226,7 +207,7 @@ require_once __DIR__ . '/../../partials/header.php';
                         </select>
                         <a class="btn btn-sm btn-outline-light rounded-0 px-3" id="btn-write-review"
                             <?php if ($is_logged): ?>
-                              href="<?= Router::url('form_park_rating') ?>?id=<?= $id ?>"
+                              href="<?= $base_url ?>/web/views/public/parks/form_park_rating.php?id=<?= $id ?>"
                             <?php else: ?>
                               href="#" data-bs-toggle="modal" data-bs-target="#loginModal"
                             <?php endif; ?>>
@@ -246,26 +227,6 @@ require_once __DIR__ . '/../../partials/header.php';
 
 </main>
 
-<!-- Modal para subir foto -->
-<div class="modal fade" id="uploadPhotoModal" tabindex="-1" aria-labelledby="uploadPhotoModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content bg-dark text-white border-0">
-            <div class="modal-header border-0">
-                <h5 class="modal-title" id="uploadPhotoModalLabel">Subir foto del parque</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="crop-container mb-3" style="display:none;">
-                    <img id="cropper-image" style="max-width:100%;">
-                </div>
-                <input type="file" id="photo-upload" accept="image/*" class="form-control mb-3">
-                <div class="text-center">
-                    <button class="btn btn-success" id="crop-save-btn" style="display:none;">Guardar foto recortada</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <?php
 $login_msg = 'Para subir fotos o escribir reseñas necesitas iniciar sesión.';
@@ -279,37 +240,3 @@ require_once __DIR__ . '/../../partials/login_modal.php';
 <!-- CropperJS para recortar imágenes -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 </main>
-</main>
-
-<!-- Modal para subir foto -->
-<div class="modal fade" id="uploadPhotoModal" tabindex="-1" aria-labelledby="uploadPhotoModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content bg-dark text-white border-0">
-            <div class="modal-header border-0">
-                <h5 class="modal-title" id="uploadPhotoModalLabel">Subir foto del parque</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="crop-container mb-3" style="display:none;">
-                    <img id="cropper-image" style="max-width:100%;">
-                </div>
-                <input type="file" id="photo-upload" accept="image/*" class="form-control mb-3">
-                <div class="text-center">
-                    <button class="btn btn-success" id="crop-save-btn" style="display:none;">Guardar foto recortada</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<?php
-$login_msg = 'Para subir fotos o escribir reseñas necesitas iniciar sesión.';
-require_once __DIR__ . '/../../partials/login_modal.php';
-?>
-
-<?php require_once __DIR__ . '/../../partials/footer.php';?>
-
-<script src="<?= Router::asset('web/js/parks.js') ?>"></script>
-
-<!-- CropperJS para recortar imágenes -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>

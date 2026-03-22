@@ -25,7 +25,7 @@ require_once __DIR__ . '/../../partials/header.php';
 
                     <div class="form-check form-switch mb-2">
                         <input class="form-check-input" type="checkbox" id="status-filter">
-                        <label class="form-check-label" for="status-filter">Abiertas</label>
+                        <label class="form-check-label" for="status-filter">Sólo Abiertas</label>
                     </div>
 
                     <div class="form-check form-switch mb-4">

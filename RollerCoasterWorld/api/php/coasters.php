@@ -291,7 +291,9 @@ function applyFilters()
     $orderBy = "$column $direction NULLS LAST";
 
     $page = intval($_GET['page'] ?? 1);
-    $limit = 15;
+    $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 15;
+    if ($limit > 100) $limit = 100;
+    if ($limit <= 0) $limit = 15;
     $offset = ($page - 1) * $limit;
     $where = implode(" AND ", $conditions);
 
@@ -299,7 +301,8 @@ function applyFilters()
         global $db;
         $sql = "SELECT coasters.id, coasters.coaster_name, coasters.imagen_url, 
                 parks.park_name, coasters.coaster_manufacter AS manufacter,
-                coasters.coaster_model AS modelo, coasters.opening_year, coasters.stars
+                coasters.coaster_model AS modelo, coasters.opening_year, coasters.stars,
+                coasters.coaster_status
                 FROM coasters
                 INNER JOIN parks ON coasters.park_id = parks.id
                 WHERE $where

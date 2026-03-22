@@ -13,7 +13,7 @@ $router = new ApiRouter('list');
 $router->register('list',      'listParks');
 $router->register('country',   'getCountries');
 $router->register('details',   'getParkDetails');
-
+$router->register('reviews',   'getParkReviews');
 // ── Endpoints protegidos (requieren login y rol admin) ─────────────────────────
 $router->register('add',           'addPark',           'POST');
 $router->register('update',        'updatePark',        'POST');
@@ -148,6 +148,35 @@ function getParkDetails() {
     }
 
     Response::success($park);
+}
+
+
+// Obtener reseñas de un parque (público)
+function getParkReviews() {
+    global $db;
+    $id = (int)($_GET['id'] ?? 0);
+    $order = $_GET['order'] ?? 'newest';
+
+    if ($id <= 0) {
+        Response::error("ID de parque inválido", 400);
+    }
+
+    $orderBy = 'pr.created_at DESC';
+    if ($order === 'best') $orderBy = 'pr.note DESC, pr.created_at DESC';
+    if ($order === 'worst') $orderBy = 'pr.note ASC, pr.created_at DESC';
+
+    $stmt = $db->prepare("
+        SELECT pr.review, pr.note, pr.created_at, u.username 
+        FROM park_ratings pr
+        JOIN users u ON pr.user_id = u.id
+        WHERE pr.park_id = :id AND pr.review IS NOT NULL AND pr.review != ''
+        ORDER BY $orderBy
+        LIMIT 50
+    ");
+    $stmt->execute([':id' => $id]);
+    $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    Response::success(['reviews' => $reviews]);
 }
 
 // ── Endpoints protegidos (admin) ───────────────────────────────────────────────

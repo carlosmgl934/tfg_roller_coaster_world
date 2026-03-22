@@ -562,10 +562,27 @@ $(document).ready(function () {
               ? "#" + coaster.personal_ranking
               : "—";
 
-          if (currentState)
-            currentState.textContent = coaster.status || "Operativa";
-          if (currentStateTable)
-            currentStateTable.textContent = coaster.status || "Operativa";
+          if (currentState) {
+              let statusText = coaster.coaster_status || "Operativa";
+              $(currentState).removeClass('text-success text-danger text-warning text-info text-secondary');
+              if (statusText === 'Operating' || statusText === 'Operativa') {
+                  currentState.textContent = 'Operativa';
+                  $(currentState).addClass('text-success');
+              } else if (statusText === 'Defunct') {
+                  currentState.textContent = 'Cerrada';
+                  $(currentState).addClass('text-danger');
+              } else if (statusText === 'SBNO') {
+                  currentState.textContent = 'SBNO';
+                  $(currentState).addClass('text-warning');
+              } else {
+                  currentState.textContent = statusText.toUpperCase();
+                  $(currentState).addClass('text-info');
+              }
+          }
+          if (currentStateTable) {
+              let statusText = coaster.coaster_status || "Operativa";
+              currentStateTable.textContent = statusText === 'Operating' || statusText === 'Operativa' ? 'Operativa' : statusText === 'Defunct' ? 'Cerrada' : statusText;
+          }
 
           // --- Multimedia ---
           if (coaster.imagen_url) {
