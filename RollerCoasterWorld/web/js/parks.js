@@ -189,7 +189,7 @@ $(document).ready(function () {
             onerror="this.onerror=null;this.src='${fallbackImg}';">`;
 
           html += `
-            <a href="${window.BASE_URL || ""}/web/views/public/parks/park_detail.php?id=${park.id}" class="list-group-item list-group-item-action d-flex align-items-center p-3">
+            <a href="${window.BASE_URL || ""}/web/views/public/parks/parks.php?id=${park.id}" class="list-group-item list-group-item-action d-flex align-items-center p-3">
               ${img}
               <div class="flex-grow-1">
                 <h5 class="mb-1 fw-bold text-success" style="font-size: 1.25rem;">${park.park_name || "Sin nombre"}</h5>
@@ -390,7 +390,7 @@ $(document).ready(function () {
         if (parksData.length > 0) {
           parksData.forEach((p) => {
             html += `
-            <a href="${window.BASE_URL || ""}/web/views/public/parks/park_detail.php?id=${p.id}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            <a href="${window.BASE_URL || ""}/web/views/public/parks/parks.php?id=${p.id}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
               <div>
                 <h6 class="mb-0 fw-bold">${p.park_name}</h6>
                 <small class="text-muted"><i class="fa-solid fa-location-dot me-1"></i>${p.park_location}, ${p.park_country}</small>

@@ -39,7 +39,8 @@ for park in parks:
     park_id, name, country = park
     print(f"\n[{park_id}] {name} ({country}): ", end="")
 
-    search_url = f"https://rcdb.com/qs.htm?qs={requests.utils.quote(name)}"
+    import urllib.parse
+    search_url = f"https://rcdb.com/qs.htm?qs={urllib.parse.quote_plus(name)}"
     res_search = get_html(search_url)
 
     park_html = ""
@@ -52,11 +53,22 @@ for park in parks:
         print(f"Redirección directa a {park_url} ... ", end="")
     else:
         # Página de resultados — buscar el primer link que coincida con el nombre
-        matches = re.findall(r'<a href="(/(\d+)\.htm)">(.*?)</a>', str(res_search["html"]))
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(res_search["html"], "html.parser")
+        matches = []
+        for a in soup.find_all('a', href=True):
+            m = re.match(r'^/(\d+)\.htm$', a['href'])
+            if m:
+                matches.append((a['href'], m.group(1), a.text))
         found = False
+        
+        name_normalized = str(name).lower().replace(' ', '').replace('-', '')
+        
         for match in matches:
             link_path, _, link_text = str(match[0]), str(match[1]), str(match[2])
-            if str(name).lower() in link_text.lower():
+            link_text_normalized = link_text.lower().replace(' ', '').replace('-', '')
+            
+            if name_normalized in link_text_normalized:
                 park_url = "https://rcdb.com" + link_path
                 print(f"Encontrado en resultados {park_url} ... ", end="")
                 res_park = get_html(park_url)

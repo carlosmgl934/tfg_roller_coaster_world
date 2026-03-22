@@ -1,0 +1,8 @@
+2026-03-21 11:53:10 - POST recibido: {"firebase_uid":"ANcajDPKBSXdt4nWgsK6TkB72FL2","email":"carlosmgl934@gmail.com"}
+2026-03-21 11:53:10 - Sesión guardada: UID=ANcajDPKBSXdt4nWgsK6TkB72FL2 | user_id=16 | rol=admin
+2026-03-21 11:58:56 - POST recibido: {"firebase_uid":"ANcajDPKBSXdt4nWgsK6TkB72FL2","email":"carlosmgl934@gmail.com"}
+2026-03-21 11:58:57 - Sesión guardada: UID=ANcajDPKBSXdt4nWgsK6TkB72FL2 | user_id=16 | rol=admin
+2026-03-21 11:59:34 - POST recibido: {"firebase_uid":"ANcajDPKBSXdt4nWgsK6TkB72FL2","email":"carlosmgl934@gmail.com"}
+2026-03-21 11:59:34 - Sesión guardada: UID=ANcajDPKBSXdt4nWgsK6TkB72FL2 | user_id=16 | rol=admin
+2026-03-21 12:05:58 - POST recibido: {"firebase_uid":"ANcajDPKBSXdt4nWgsK6TkB72FL2","email":"carlosmgl934@gmail.com"}
+2026-03-21 12:05:58 - Sesión guardada: UID=ANcajDPKBSXdt4nWgsK6TkB72FL2 | user_id=16

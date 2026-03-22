@@ -21,6 +21,7 @@ $router->register('photos',        'getCoasterPhotos');
 $router->register('reviews',       'getCoasterReviews');
 $router->register('save_review',   'saveReview', 'POST');
 $router->register('save_photo',    'savePhoto', 'POST');
+$router->register('like_photo',    'likePhoto', 'POST');
 
 $router->dispatch();
 
@@ -81,12 +82,21 @@ function searchCoasters()
 
     try {
         global $db;
+        // Límite por defecto para el buscador del menú
+        $limitClause = "LIMIT 5";
+
+        // Si el usuario envía un límite numérico por GET (via profile.js) 
+        if (isset($_GET['limit']) && is_numeric($_GET['limit'])) {
+            $limitNum = (int)$_GET['limit'];
+            $limitClause = "LIMIT " . $limitNum;
+        }
+
         $sql = "SELECT 
     coasters.id, coasters.coaster_name, parks.park_name
     FROM coasters
     INNER JOIN parks ON coasters.park_id = parks.id
-    WHERE coasters.coaster_name ILIKE :name 
-    LIMIT 5";
+    WHERE coasters.coaster_name ILIKE :name " . $limitClause;
+
         $stmt = $db->prepare($sql);
 
         $stmt->bindValue(':name', "%" . trim($_GET['search']) . "%", PDO::PARAM_STR);
@@ -415,11 +425,11 @@ function getCoasterPhotos()
 
     try {
         global $db;
-        $sql = "SELECT cp.*, u.username 
-                FROM coaster_photos cp
-                INNER JOIN users u ON cp.user_id = u.id
-                WHERE cp.coaster_id = :id AND cp.status = 'approved'
-                ORDER BY cp.created_at DESC";
+        $sql = "SELECT coaster_photos.*, users.username, users.profile_image 
+                FROM coaster_photos
+                INNER JOIN users ON coaster_photos.user_id = users.id
+                WHERE coaster_photos.coaster_id = :id AND coaster_photos.status = 'approved'
+                ORDER BY coaster_photos.created_at DESC";
 
         $stmt = $db->prepare($sql);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
@@ -542,5 +552,42 @@ function savePhoto()
         // Log the actual error internally
         error_log("Error guardando foto: " . $e->getMessage());
         Response::error('Error al guardar la foto en la base de datos');
+    }
+}
+
+function likePhoto()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        echo json_encode(['success' => false, 'error' => 'Método no permitido']);
+        exit;
+    }
+
+    $photo_id = intval($_POST['photo_id'] ?? 0);
+    $unlike = isset($_POST['unlike']) && $_POST['unlike'] === 'true';
+
+    if ($photo_id <= 0) {
+        Response::error('ID de foto no válido');
+        return;
+    }
+
+    try {
+        global $db;
+        if ($unlike) {
+            $stmt = $db->prepare("UPDATE coaster_photos SET likes = GREATEST(COALESCE(likes, 0) - 1, 0) WHERE id = :id");
+        } else {
+            $stmt = $db->prepare("UPDATE coaster_photos SET likes = COALESCE(likes, 0) + 1 WHERE id = :id");
+        }
+        $stmt->bindValue(':id', $photo_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        // Devolver los likes actualizados
+        $stmt_likes = $db->prepare("SELECT likes FROM coaster_photos WHERE id = :id");
+        $stmt_likes->bindValue(':id', $photo_id, PDO::PARAM_INT);
+        $stmt_likes->execute();
+        $likes = $stmt_likes->fetchColumn();
+
+        Response::success(['likes' => $likes]);
+    } catch (PDOException $e) {
+        Response::error('Error al modificar like de la foto');
     }
 }

@@ -170,23 +170,24 @@ class RCDBUpdater:
         return {int(row['rcdb_id']): dict(row) for row in rows}
 
     def get_or_create_park(self, park_name: str, city: Optional[str], country: Optional[str]) -> int:
-        """Busca el parque por nombre; si no existe, lo inserta y devuelve su id."""
+        """Busca el parque por nombre y localización; si no existe, lo inserta y devuelve su id."""
+        location = city or ''
+        park_country = country or ''
         self.cursor.execute(
-            "SELECT id FROM parks WHERE park_name = %s LIMIT 1",
-            (park_name,)
+            "SELECT id FROM parks WHERE park_name = %s AND park_location = %s LIMIT 1",
+            (park_name, location)
         )
         row = self.cursor.fetchone()
         if row:
             return int(row['id'])
 
-        location = city or ''
         self.cursor.execute(
             """INSERT INTO parks (park_name, park_location, park_country,
                                   num_coasters, operating_coasters, stars)
                VALUES (%s, %s, %s, 0, 0, 0)
-               ON CONFLICT (park_name) DO NOTHING
+               ON CONFLICT (park_name, park_location) DO NOTHING
                RETURNING id""",
-            (park_name, location, country or '')
+            (park_name, location, park_country)
         )
         result = self.cursor.fetchone()
         if result:
@@ -195,7 +196,7 @@ class RCDBUpdater:
             return int(result['id'])
 
         # Si llegamos aquí fue un race-condition — buscar de nuevo
-        self.cursor.execute("SELECT id FROM parks WHERE park_name = %s LIMIT 1", (park_name,))
+        self.cursor.execute("SELECT id FROM parks WHERE park_name = %s AND park_location = %s LIMIT 1", (park_name, location))
         row = self.cursor.fetchone()
         self.db.commit()
         return int(row['id'])

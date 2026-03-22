@@ -57,17 +57,30 @@ $(document).ready(function () {
     const sortDirectionBtn = document.getElementById("sort-direction-btn");
     const sortDirectionInput = document.getElementById("sort-direction");
     
-    if (sortFilter) {
+    // Cargar orden guardado o usar ASC por defecto
+    if (sortFilter && sortDirectionInput) {
+      const savedSort = localStorage.getItem("coasters_sort");
+      const savedDir = localStorage.getItem("coasters_sort_dir") || "ASC";
+      
+      if (savedSort) {
+        sortFilter.value = savedSort;
+      }
+      sortDirectionInput.value = savedDir;
+      if (sortDirectionBtn) updateSortIcon(savedDir);
+      
       sortFilter.addEventListener("change", function () {
-         // Reset direction to logical default based on selection
          const val = this.value;
-         let defaultDir = "ASC"; // Default for ID, Name, Year
+         let defaultDir = "ASC"; // Cambiado a ascendente por defecto general
          if (["stars", "height", "speed"].includes(val)) {
              defaultDir = "DESC";
          }
          
          sortDirectionInput.value = defaultDir;
-         updateSortIcon(defaultDir);
+         if (sortDirectionBtn) updateSortIcon(defaultDir);
+         
+         localStorage.setItem("coasters_sort", val);
+         localStorage.setItem("coasters_sort_dir", defaultDir);
+         
          loadCoasters(1);
       });
     }
@@ -78,6 +91,9 @@ $(document).ready(function () {
             const newDir = currentDir === "ASC" ? "DESC" : "ASC";
             sortDirectionInput.value = newDir;
             updateSortIcon(newDir);
+            
+            localStorage.setItem("coasters_sort_dir", newDir);
+            
             loadCoasters(1);
         });
     }
@@ -138,8 +154,8 @@ $(document).ready(function () {
 
     function loadCoasters(page) {
       currentPage = page;
-      const sort = document.getElementById("sort-filter")?.value || "name";
-      const orderDir = document.getElementById("sort-direction")?.value || "ASC";
+      const sort = document.getElementById("sort-filter")?.value || localStorage.getItem("coasters_sort") || "id";
+      const orderDir = document.getElementById("sort-direction")?.value || localStorage.getItem("coasters_sort_dir") || "ASC";
 
       if (isAdvancedFiltering) {
         let opened = document.getElementById("status-filter").checked;
@@ -497,14 +513,14 @@ $(document).ready(function () {
           if (parkLink)
             parkLink.href =
               BASE_URL +
-              `/web/views/public/parks/park_detail.php?id=${coaster.park_id}`;
+              `/web/views/public/parks/parks.php?id=${coaster.park_id}`;
 
           // --- Ficha técnica (Tabla) ---
           if (parkNameTable) {
             parkNameTable.textContent = coaster.park_name;
             parkNameTable.href =
               BASE_URL +
-              `/web/views/public/parks/park_detail.php?id=${coaster.park_id}`;
+              `/web/views/public/parks/parks.php?id=${coaster.park_id}`;
           }
 
           // Estadísticas técnicas
@@ -627,10 +643,35 @@ $(document).ready(function () {
             );
             return;
           }
+          const coasterNameEl = document.getElementById("coaster-name");
+          const coasterName = coasterNameEl ? coasterNameEl.textContent : "";
+
           data.photos.forEach((photo) => {
+            const hasLiked = localStorage.getItem("liked_photo_" + photo.id) === "true";
+            const heartClass = hasLiked ? "fa-solid text-danger" : "fa-regular";
+            
             const col = document.createElement("div");
-            col.className = "col-6 col-md-3";
-            col.innerHTML = `<img src="${photo.photo_url}" alt="${photo.caption || "Foto"}" class="photo-thumb w-100" title="${photo.username}">`;
+            col.className = "col-6 col-sm-4 col-md-3 col-lg-2 mb-4";
+            col.innerHTML = `
+              <div class="h-100 d-flex flex-column">
+                  <div class="photo-square-container position-relative overflow-hidden w-100" 
+                       style="padding-bottom: 100%; border-radius: 8px; cursor: pointer;"
+                       data-id="${photo.id}"
+                       data-url="${photo.photo_url}"
+                       data-username="${photo.username}"
+                       data-avatar="${photo.profile_image || 'https://placehold.co/40x40'}"
+                       data-caption="${photo.caption || ''}"
+                       data-likes="${photo.likes || 0}">
+                      <img src="${photo.photo_url}" alt="${photo.caption || "Foto"}" class="position-absolute w-100 h-100" style="object-fit: cover; top:0; left:0; transition: transform 0.3s ease;">
+                  </div>
+                  <div class="mt-2 text-muted d-flex align-items-center" style="font-size: 0.9rem;">
+                      <button class="btn btn-link p-0 text-decoration-none text-muted me-2 grid-like-btn" data-id="${photo.id}" title="Me gusta">
+                          <i class="${heartClass} fa-heart"></i> <span class="grid-likes-count">${photo.likes || 0}</span>
+                      </button>
+                      <span class="text-truncate"><i class="fa-solid fa-user fa-sm me-1"></i>${photo.username}</span>
+                  </div>
+              </div>
+            `;
             document.querySelector("#photos-grid").appendChild(col);
           });
         }
@@ -638,6 +679,119 @@ $(document).ready(function () {
         console.error("Error cargando fotos:", e);
       }
     }
+
+    // Handlers para Lightbox IG y Likes
+    $("#photos-grid").on("click", ".photo-square-container", function() {
+      const id = $(this).data("id");
+      const url = $(this).data("url");
+      const username = $(this).data("username");
+      const avatar = $(this).data("avatar");
+      const caption = $(this).data("caption");
+      const likes = $(this).data("likes");
+      const hasLiked = localStorage.getItem("liked_photo_" + id) === "true";
+
+      $("#ig-modal-img").attr("src", url);
+      $("#ig-modal-avatar").attr("src", avatar);
+      $("#ig-modal-username").text(username);
+      
+      if (caption) {
+        $("#ig-modal-caption-user").text(username);
+        $("#ig-modal-caption").html(`<span class="text-muted opacity-50 mx-1">&bull;</span> ${caption}`);
+      } else {
+        $("#ig-modal-caption-user").text("");
+        $("#ig-modal-caption").text("");
+      }
+
+      $("#ig-modal-likes").text(likes + " me gusta");
+      
+      const btn = $("#ig-modal-like-btn");
+      btn.data("id", id);
+      if (hasLiked) {
+        btn.html('<i class="fa-solid fa-heart text-danger"></i>');
+      } else {
+        btn.html('<i class="fa-regular fa-heart"></i>');
+      }
+
+      new bootstrap.Modal(document.getElementById("ig-lightbox-modal")).show();
+    });
+
+    $("#ig-modal-like-btn").on("click", async function() {
+      const id = $(this).data("id");
+      if (!id) return;
+      const hasLiked = localStorage.getItem("liked_photo_" + id) === "true";
+      
+      try {
+        const formData = new FormData();
+        formData.append("photo_id", id);
+        formData.append("unlike", hasLiked);
+        
+        const res = await fetch(`${BASE_URL}/api/php/coasters.php?action=like_photo`, {
+          method: "POST",
+          body: formData
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (hasLiked) {
+            localStorage.removeItem("liked_photo_" + id);
+            $(this).html('<i class="fa-regular fa-heart"></i>');
+          } else {
+            localStorage.setItem("liked_photo_" + id, "true");
+            $(this).html('<i class="fa-solid fa-heart text-danger"></i>');
+          }
+          $("#ig-modal-likes").text(data.likes + " me gusta");
+          
+          // Actualizar el data attribute en el DOM
+          const sqContainer = $(`.photo-square-container[data-id='${id}']`);
+          sqContainer.data("likes", data.likes);
+          
+          // Actualizar el DOM visible del grid si existe
+          const gridBtn = sqContainer.closest(".h-100").find(".grid-like-btn");
+          if (hasLiked) {
+             gridBtn.find("i").removeClass("fa-solid text-danger").addClass("fa-regular");
+          } else {
+             gridBtn.find("i").removeClass("fa-regular").addClass("fa-solid text-danger");
+          }
+          gridBtn.find(".grid-likes-count").text(data.likes);
+        }
+      } catch (err) {
+        console.error("Error al modificar like:", err);
+      }
+    });
+
+    // Lógica para dar a like directamente desde el grid
+    $("#photos-grid").on("click", ".grid-like-btn", async function() {
+      const id = $(this).data("id");
+      if (!id) return;
+      
+      const hasLiked = localStorage.getItem("liked_photo_" + id) === "true";
+      
+      try {
+        const formData = new FormData();
+        formData.append("photo_id", id);
+        formData.append("unlike", hasLiked);
+        
+        const res = await fetch(`${BASE_URL}/api/php/coasters.php?action=like_photo`, {
+          method: "POST",
+          body: formData
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (hasLiked) {
+            localStorage.removeItem("liked_photo_" + id);
+            $(this).find("i").removeClass("fa-solid text-danger").addClass("fa-regular");
+          } else {
+            localStorage.setItem("liked_photo_" + id, "true");
+            $(this).find("i").removeClass("fa-regular").addClass("fa-solid text-danger");
+          }
+          $(this).find(".grid-likes-count").text(data.likes);
+          
+          // Actualizar los datos del contenedor para que el lightbox también se actualice si se abre después
+          $(this).closest(".h-100").find(".photo-square-container").data("likes", data.likes);
+        }
+      } catch (err) {
+        console.error("Error al modificar like:", err);
+      }
+    });
 
     async function loadReviews(order) {
       order = order || "default";
@@ -757,6 +911,7 @@ $(document).ready(function () {
 
   // --- LÓGICA PARA EL MODAL DE FOTOS (Firebase + Cropper) ---
   if (document.getElementById("upload-photo-modal")) {
+    const coasterId = new URLSearchParams(window.location.search).get("id");
     let cropper = null;
     const photoInput = document.getElementById("photo");
     const cropPreview = document.getElementById("crop-preview");
@@ -775,17 +930,28 @@ $(document).ready(function () {
 
         if (cropper) cropper.destroy();
         cropper = new Cropper(cropPreview, {
-          aspectRatio: 16 / 9,
+          aspectRatio: 1,
           viewMode: 1,
         });
       };
       reader.readAsDataURL(file);
     });
 
+    // Helper: muestra el modal de notificación
+    function showNotify(title, message, isError = false) {
+      document.getElementById("notify-modal-title").textContent = title;
+      document.getElementById("notify-modal-body").textContent = message;
+      const header = document.getElementById("notify-modal-header");
+      header.className = isError
+        ? "modal-header border-secondary pb-0 bg-danger"
+        : "modal-header border-secondary pb-0 bg-success";
+      new bootstrap.Modal(document.getElementById("notify-modal")).show();
+    }
+
     // Al pulsar subir
     uploadBtn.addEventListener("click", async function () {
       if (!cropper) {
-        alert("Por favor selecciona una foto primero.");
+        showNotify("Selecciona una foto", "Por favor selecciona y recorta una foto primero.", true);
         return;
       }
 
@@ -796,7 +962,7 @@ $(document).ready(function () {
 
       try {
         // 1. Obtener imagen recortada como Blob
-        cropper.getCroppedCanvas({ width: 1280, height: 720 }).toBlob(
+        cropper.getCroppedCanvas({ width: 1080, height: 1080 }).toBlob(
           async function (blob) {
             if (!blob) throw new Error("Error al recortar la imagen");
 
@@ -847,15 +1013,12 @@ $(document).ready(function () {
                   cropper.destroy();
                   cropper = null;
                 }
-                alert("¡Foto enviada! Esperando aprobación del administrador");
+                showNotify("¡Foto enviada!", "Tu foto está esperando aprobación del administrador. La verás publicada pronto.");
               } else {
-                alert(
-                  "Error al guardar la foto: " +
-                    (saveData.error || "Desconocido"),
-                );
+                showNotify("Error al guardar", "Error al guardar la foto: " + (saveData.error || "Desconocido"), true);
               }
             } catch (saveErr) {
-              alert("Error en la conexión con la API.");
+              showNotify("Error de conexión", "Error en la conexión con la API.", true);
               console.error(saveErr);
             } finally {
               uploadBtn.disabled = false;
@@ -868,7 +1031,7 @@ $(document).ready(function () {
         ); // Exportar en JPG con calidad 85%
       } catch (err) {
         console.error("Error subiendo foto:", err);
-        alert("Ocurrió un error al subir la foto.");
+        showNotify("Error inesperado", "Ocurrió un error al subir la foto.", true);
         uploadBtn.disabled = false;
         uploadBtn.innerHTML =
           'Subir foto <i class="fa-solid fa-upload ms-1"></i>';
