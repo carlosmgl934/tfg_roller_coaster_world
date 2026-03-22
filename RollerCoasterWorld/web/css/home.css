@@ -1,1 +1,84 @@
-/* home.css — Estilos de la página de inicio */
+/* ============================================================
+   home.css — Estilos de la landing page (vista guest)
+   RollerCoaster World
+   ============================================================ */
+
+.index-container { overflow-x: hidden; }
+
+/* ── Tipografía hero ─────────────────────────────────────── */
+.landing-title {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -2px;
+    line-height: 1.05;
+}
+.landing-subtitle {
+    color: var(--rcw-text-muted);
+}
+
+/* ── Badge pill hero ─────────────────────────────────────── */
+.landing-badge {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: .85rem;
+    padding: .4rem .9rem;
+    border-radius: 999px;
+    font-weight: 500;
+    letter-spacing: .02em;
+}
+
+/* ── Stats bar en el hero ────────────────────────────────── */
+.landing-stats-bar {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.landing-stat-sep {
+    width: 1px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.15);
+    align-self: center;
+}
+
+/* ── Sección CTA final ───────────────────────────────────── */
+.landing-cta-section {
+    background: linear-gradient(135deg, var(--rcw-bg) 0%, #071a10 100%);
+    border-top: 1px solid var(--rcw-border);
+}
+.landing-sell-point {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: .6rem 1rem;
+    border: 1px solid var(--rcw-border);
+    background: rgba(16, 185, 129, 0.04);
+}
+
+
+.landing-feature-card {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--rcw-border);
+    transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+.landing-feature-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow: 0 12px 32px rgba(16, 185, 129, 0.08);
+}
+
+/* ── General hover utilities ─────────────────────────────── */
+.hover-scale {
+    transition: transform 0.2s ease;
+}
+.hover-scale:hover {
+    transform: scale(1.05);
+}
+.transition-all {
+    transition: all 0.3s ease;
+}
+
+/* ── CTA final ───────────────────────────────────────────── */
+.landing-cta-glow {
+    width: 160px;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--rcw-green-neon), transparent);
+    border-radius: 999px;
+}
