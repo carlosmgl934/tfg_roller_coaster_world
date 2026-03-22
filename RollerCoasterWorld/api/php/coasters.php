@@ -267,6 +267,11 @@ function applyFilters()
         $params[':year'] = intval($_GET['year']);
     }
 
+    if (!empty($_GET['park_id'])) {
+        $conditions[] = "coasters.park_id = :park_id";
+        $params[':park_id'] = intval($_GET['park_id']);
+    }
+
     $sort = $_GET['sort'] ?? 'id';
     $reqDir = strtoupper($_GET['order_dir'] ?? '');
 
