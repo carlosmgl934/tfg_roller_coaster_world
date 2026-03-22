@@ -159,7 +159,7 @@ if ($id === 0) {
                             <tr>
                                 <td class="text-uppercase text-muted align-middle ficha-table-label"><i class="fa-solid fa-tree-city me-2 opacity-50"></i>Parque</td>
                                 <td class="fw-bold text-end align-middle">
-                                    <a href="<?= $base_url ?>/web/views/public/parks/park_detail.php?id=<?= $id ?>"
+                                    <a href="<?= $base_url ?>/web/views/public/parks/parks.php?id=<?= $id ?>"
                                         class="text-success text-decoration-none border-bottom border-success border-2 pb-1 hover-fx" id="park-name-table">—</a>
                                 </td>
                             </tr>
@@ -232,6 +232,51 @@ if ($id === 0) {
                             Subir foto <i class="fa-solid fa-upload ms-1"></i>
                         </button>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL DE NOTIFICACIÓN -->
+    <div class="modal fade" id="notify-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content bg-dark border-secondary">
+                <div class="modal-header border-secondary pb-0" id="notify-modal-header">
+                    <h6 class="modal-title fw-bold" id="notify-modal-title"></h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pt-2">
+                    <p class="text-muted mb-0 small" id="notify-modal-body"></p>
+                </div>
+                <div class="modal-footer border-secondary pt-0">
+                    <button type="button" class="btn btn-success btn-sm rounded-0 px-4" data-bs-dismiss="modal">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- IG LIGHTBOX MODAL -->
+    <div class="modal fade" id="ig-lightbox-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+            <div class="modal-content bg-dark text-white border-secondary rounded-0 overflow-hidden">
+                <div class="modal-header border-secondary d-flex align-items-center py-2 px-3">
+                    <img id="ig-modal-avatar" src="" alt="Avatar" class="rounded-circle me-2" style="width:32px; height:32px; object-fit:cover;">
+                    <span id="ig-modal-username" class="fw-bold fs-6"></span>
+                    <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <img id="ig-modal-img" src="" alt="Foto" class="w-100" style="aspect-ratio: 1/1; object-fit:cover;">
+                </div>
+                <div class="modal-footer border-secondary flex-column align-items-start py-3 px-3">
+                    <div class="d-flex align-items-center w-100 mb-2">
+                        <button id="ig-modal-like-btn" class="btn btn-link text-white p-0 me-3 fs-3 text-decoration-none" style="transition: transform 0.2s;" title="Me gusta">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="fw-bold mb-2 pb-2 w-100 border-bottom border-secondary" id="ig-modal-likes" style="font-size: 0.95rem;">0 me gusta</div>
+                    <div class="w-100 mt-1" style="font-size: 0.95rem;">
+                        <span id="ig-modal-caption-user" class="fw-bold text-success me-2"></span>
+                        <span id="ig-modal-caption" class="text-light"></span>
+                    </div>
                 </div>
             </div>
         </div>

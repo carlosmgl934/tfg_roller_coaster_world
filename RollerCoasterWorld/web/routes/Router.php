@@ -25,7 +25,7 @@ class Router {
             // Públicas - Coasters
             'coasters' => '/web/views/public/coasters/coasters.php',
             'coaster_search' => '/web/views/public/coasters/coaster_search.php',
-            'coaster_detail' => '/web/views/public/coasters/coaster_detail.php', // Check if this file exists, likely logic handled in coasters.php? No, routes.php had it.
+            'coaster_detail' => '/web/views/public/coasters/coasters.php',
             'coaster_reviews' => '/web/views/public/coasters/coaster_reviews.php',
             'coaster_tops' => '/web/views/public/coasters/coaster_tops.php',
             'form_rating' => '/web/views/public/coasters/form_rating.php',
@@ -33,7 +33,7 @@ class Router {
             // Públicas - Parques
             'parks' => '/web/views/public/parks/parks.php',
             'park_search' => '/web/views/public/parks/park_search.php',
-            'park_detail' => '/web/views/public/parks/park_detail.php',
+            'park_detail' => '/web/views/public/parks/parks.php',
             'park_tops' => '/web/views/public/parks/park_tops.php',
             'park_reviews' => '/web/views/public/parks/park_reviews.php',
             'form_park_rating' => '/web/views/public/parks/form_park_rating.php',

@@ -60,7 +60,7 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
    STAT CARDS (ranking/score/estado)
    ============================================================ */
 .stat-card {
-  border-radius: 8px !important;
+  border-radius: 0 !important;
   border: 1px solid var(--rcw-border) !important;
   border-top-width: 3px;
   background: var(--rcw-bg-card);
@@ -93,7 +93,7 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  border-radius: 4px;
+  border-radius: 0;
 }
 .status-operating {
   background: rgba(0, 200, 83, 0.15);
@@ -130,7 +130,7 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
    SECTION CARDS (Estadísticas, Ficha, Fotos, Reseñas)
    ============================================================ */
 .section-card {
-  border-radius: 10px !important;
+  border-radius: 0 !important;
   border: 1px solid var(--rcw-border) !important;
   box-shadow: var(--rcw-shadow-sm);
   overflow: hidden;
@@ -220,7 +220,7 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
   object-fit: cover;
   transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 0;
 }
 .photo-thumb:hover {
   transform: scale(1.05);
@@ -319,7 +319,7 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
 .premium-stat-box {
     background: linear-gradient(145deg, rgba(30,35,40,0.4), rgba(20,25,30,0.7));
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
+    border-radius: 0;
     padding: 1.25rem;
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s;
     height: 100%;
@@ -389,4 +389,21 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
     background-color: #144f27 !important;
     color: #ffffff !important;
     border: 1px solid #1e7038;
+}
+
+/* ============================================================
+   FILE INPUT — Botón "Seleccionar archivo" del modal de foto
+   ============================================================ */
+#photo::file-selector-button {
+    background-color: var(--rcw-green-neon);
+    color: #000;
+    border: none;
+    border-radius: 0;
+    padding: 0.375rem 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+#photo::file-selector-button:hover {
+    background-color: var(--rcw-green-bright);
 }

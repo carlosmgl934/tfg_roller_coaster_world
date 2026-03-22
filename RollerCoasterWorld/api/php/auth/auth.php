@@ -107,8 +107,7 @@ try {
       INSERT INTO users (username, email, firebase_uid, rol)
       VALUES (:username, :email, :firebase_uid, 'user')
       ON CONFLICT (firebase_uid) DO UPDATE SET 
-          email = EXCLUDED.email,
-          username = EXCLUDED.username
+          email = EXCLUDED.email
       RETURNING id
   ");
 

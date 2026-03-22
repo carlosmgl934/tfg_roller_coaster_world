@@ -15,7 +15,7 @@ $user_uid = $_SESSION['firebase_uid'];
 <main class="container-fluid px-4 px-xl-5 my-5" style="max-width: 1400px;">
   <div class="row g-4">
     <!-- Columna Izquierda: Perfil y Menú Lateral -->
-    <div class="col-lg-3 col-md-4">
+    <div class="col-lg-4 col-md-5">
       <!-- Tarjeta de Perfil Principal -->
       <div class="card profile-card text-center mb-4">
         <div class="card-body p-4">
@@ -29,7 +29,7 @@ $user_uid = $_SESSION['firebase_uid'];
               }
               $initial = strtoupper(substr($display_name, 0, 1) ?: '?');
               ?>
-              <div class="avatar-circle rounded-circle shadow-sm" style="width: 80px; height: 80px; font-size: 36px;">
+              <div class="avatar-circle shadow-sm" style="width: 80px; height: 80px; font-size: 36px;">
                 <?php echo $initial; ?>
               </div>
             </div>
@@ -66,7 +66,7 @@ $user_uid = $_SESSION['firebase_uid'];
     </div>
 
     <!-- Columna Derecha: Contenido Dinámico - Mi perfil -->
-    <div class="col-lg-9 col-md-8" id="section-profile-content">
+    <div class="col-lg-8 col-md-7" id="section-profile-content">
 
       <!-- Sección: Información del Usuario -->
       <div class="card profile-card mb-4 content-section" id="section-info">
@@ -226,6 +226,9 @@ $user_uid = $_SESSION['firebase_uid'];
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
                   <span class="text-muted">Más larga</span>
+                  <span class="fw-bold text-end text-truncate ms-3 text-dark" id="longest-coaster" style="max-width: 150px;">—</span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -233,7 +236,7 @@ $user_uid = $_SESSION['firebase_uid'];
     </div>
 
     <!-- Columna Derecha: Contenido Dinámico - Configuración -->
-    <div class="col-lg-9 col-md-8 d-none" id="section-config-content">
+    <div class="col-lg-8 col-md-7 d-none" id="section-config-content">
 
       <!-- Card: Datos Personales -->
       <div class="card profile-card mb-4 content-section" id="section-config-personal">
@@ -270,7 +273,10 @@ $user_uid = $_SESSION['firebase_uid'];
             <div class="col-md-6">
               <label for="config-user-birthdate" class="form-label"><i class="fa-regular fa-calendar me-2"></i>Fecha de
                 nacimiento</label>
-              <input type="date" id="config-user-birthdate" class="form-control square-box">
+              <div class="position-relative">
+                <input type="text" id="config-user-birthdate" class="form-control square-box" placeholder="DD/MM/AAAA" autocomplete="off" readonly>
+                <i class="fa-regular fa-calendar position-absolute top-50 end-0 translate-middle-y me-3 text-muted" style="pointer-events:none;"></i>
+              </div>
             </div>
             <div class="col-md-4">
               <label for="config-user-gender" class="form-label"><i
@@ -423,10 +429,257 @@ $user_uid = $_SESSION['firebase_uid'];
       </div>
 
     </div>
+
+    <!-- Columna Derecha: Contenido Dinámico - Mis Tops -->
+    <div class="col-lg-8 col-md-7 d-none" id="section-tops-content">
+
+      <!-- ── Card principal de tops (anchura completa) ─── -->
+      <div class="card profile-card mb-4 content-section" id="section-tops">
+
+        <!-- Card Header -->
+        <div class="card-header pt-3 pb-3 d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-list-ol fs-5"></i>
+            <h5 class="fw-bold mb-0">Mis Tops</h5>
+          </div>
+          <div class="d-flex gap-2" id="tops-header-actions">
+            <button id="btn-tops-full-view" class="btn btn-sm btn-outline-success square-box px-3 fw-bold shadow-sm">
+              <i class="fa-solid fa-expand me-1"></i>Ver Top Completo
+            </button>
+            <button id="btn-tops-edit" class="btn btn-sm btn-outline-success square-box px-3 fw-bold shadow-sm">
+              <i class="fa-solid fa-pen-to-square me-1"></i>Editar Top
+            </button>
+          </div>
+          <div class="d-none" id="tops-back-btn-wrap">
+            <button id="btn-tops-back" class="btn btn-sm btn-outline-success square-box px-3 fw-bold shadow-sm">
+              <i class="fa-solid fa-arrow-left me-1"></i>Volver
+            </button>
+          </div>
+        </div>
+
+        <div class="card-body p-4">
+
+          <!-- Tabs -->
+          <ul class="nav nav-pills nav-fill mb-4 gap-2" id="tops-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active square-box fw-bold" id="top-coasters-tab"
+                data-bs-toggle="pill" data-bs-target="#top-coasters-pane" type="button" role="tab"
+                aria-controls="top-coasters-pane" aria-selected="true" style="color:#fff;">
+                <i class="fa-solid fa-ticket me-2"></i>Top Coasters <span id="tab-coasters-count" class="badge bg-success text-dark ms-1 d-none">0</span>
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link square-box fw-bold" id="top-parks-tab"
+                data-bs-toggle="pill" data-bs-target="#top-parks-pane" type="button" role="tab"
+                aria-controls="top-parks-pane" aria-selected="false" style="color:#fff;">
+                <i class="fa-solid fa-map-location-dot me-2"></i>Top Parques <span id="tab-parks-count" class="badge bg-success text-dark ms-1 d-none">0</span>
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content" id="tops-tabContent">
+
+            <!-- PESTAÑA COASTERS -->
+            <div class="tab-pane fade show active" id="top-coasters-pane" role="tabpanel" tabindex="0">
+
+              <!-- MODO PREVIEW -->
+              <div id="coasters-mode-preview">
+                <div id="top-coasters-preview-list" class="tops-preview-scroll">
+                  <div class="text-center text-muted py-4"><i class="fa-solid fa-spinner fa-spin fs-4"></i></div>
+                </div>
+              </div>
+
+              <!-- MODO VISTA COMPLETA -->
+              <div id="coasters-mode-full" class="d-none">
+                <div class="tops-filters-bar mb-3">
+                  <div class="tops-filters-grid">
+                    <div class="tops-filter-item">
+                      <label class="tops-filter-label"><i class="fa-solid fa-sort me-1"></i>Ordenar</label>
+                      <select id="coasters-sort" class="tops-filter-select">
+                        <option value="rank">Mi Ranking</option>
+                        <option value="name">Nombre A-Z</option>
+                        <option value="height">Altura ↓</option>
+                        <option value="speed">Velocidad ↓</option>
+                      </select>
+                    </div>
+                    <div class="tops-filter-item">
+                      <label class="tops-filter-label"><i class="fa-solid fa-map-pin me-1"></i>Parque</label>
+                      <select id="coasters-filter-park" class="tops-filter-select">
+                        <option value="">Todos los parques</option>
+                      </select>
+                    </div>
+                    <div class="tops-filter-item">
+                      <label class="tops-filter-label"><i class="fa-solid fa-earth-europe me-1"></i>País</label>
+                      <select id="coasters-filter-country" class="tops-filter-select">
+                        <option value="">Todos los países</option>
+                      </select>
+                    </div>
+                    <div class="tops-filter-item">
+                      <label class="tops-filter-label"><i class="fa-solid fa-industry me-1"></i>Fabricante</label>
+                      <select id="coasters-filter-manufacter" class="tops-filter-select">
+                        <option value="">Todos los fabricantes</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="tops-filters-footer">
+                    <span class="tops-counter-pill">
+                      <i class="fa-solid fa-ticket me-1"></i><span id="coasters-full-count">0</span> coasters
+                    </span>
+                    <div class="btn-group btn-group-sm ms-auto">
+                      <button id="coasters-view-list" class="btn btn-success square-box" title="Lista"><i class="fa-solid fa-list"></i></button>
+                      <button id="coasters-view-grid" class="btn btn-outline-secondary square-box" title="Cuadrícula"><i class="fa-solid fa-grip"></i></button>
+                    </div>
+                  </div>
+                </div>
+                <div id="top-coasters-full-container" class="row g-3"></div>
+              </div>
+
+              <!-- MODO EDICIÓN -->
+              <div id="coasters-mode-edit" class="d-none">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h6 class="fw-bold mb-0"><i class="fa-solid fa-pen me-2"></i>Editar Top Coasters</h6>
+                  <button class="btn btn-sm btn-success fw-bold square-box shadow-sm" id="btn-save-coasters-top">
+                    <i class="fa-solid fa-floppy-disk me-2"></i>Guardar Cambios
+                  </button>
+                </div>
+                <div class="mb-3">
+                  <label for="top-coasters-search" class="form-label fw-medium text-uppercase small text-muted">
+                    <i class="fa-solid fa-magnifying-glass me-2"></i>Añadir montaña rusa
+                  </label>
+                  <div class="position-relative">
+                    <input type="text" id="top-coasters-search" class="form-control bg-dark text-white border-secondary square-box pe-5"
+                      placeholder="Escribe el nombre..." autocomplete="off">
+                    <i class="fa-solid fa-magnifying-glass text-muted position-absolute top-50 end-0 translate-middle-y me-3"
+                      id="top-coasters-search-icon" style="transition:color .2s;"></i>
+                    <ul id="top-coasters-dropdown" class="list-group position-absolute w-100 shadow-sm d-none"
+                      style="max-height:250px;overflow-y:auto;z-index:1050;border-top:none;top:100%;left:0;"></ul>
+                  </div>
+                </div>
+                <div class="alert alert-success bg-success bg-opacity-10 border-success text-success fw-medium small square-box mb-2">
+                  <i class="fa-solid fa-grip-lines me-2"></i>Arrastra para reordenar · <i class="fa-solid fa-trash ms-2 me-1 text-danger"></i>para eliminar
+                </div>
+                <div id="top-coasters-list-edit" style="min-height:80px;"></div>
+              </div>
+
+            </div><!-- /top-coasters-pane -->
+
+            <!-- PESTAÑA PARQUES -->
+            <div class="tab-pane fade" id="top-parks-pane" role="tabpanel" tabindex="0">
+
+              <!-- MODO PREVIEW -->
+              <div id="parks-mode-preview">
+                <div id="top-parks-preview-list" class="tops-preview-scroll">
+                  <div class="text-center text-muted py-4"><i class="fa-solid fa-spinner fa-spin fs-4"></i></div>
+                </div>
+              </div>
+
+              <!-- MODO VISTA COMPLETA -->
+              <div id="parks-mode-full" class="d-none">
+                <div class="tops-filters-bar mb-3">
+                  <div class="tops-filters-grid tops-filters-grid--2col">
+                    <div class="tops-filter-item">
+                      <label class="tops-filter-label"><i class="fa-solid fa-sort me-1"></i>Ordenar</label>
+                      <select id="parks-sort" class="tops-filter-select">
+                        <option value="rank">Mi Ranking</option>
+                        <option value="name">Nombre A-Z</option>
+                        <option value="coasters">Nº Coasters ↓</option>
+                      </select>
+                    </div>
+                    <div class="tops-filter-item">
+                      <label class="tops-filter-label"><i class="fa-solid fa-earth-europe me-1"></i>País</label>
+                      <select id="parks-filter-country" class="tops-filter-select">
+                        <option value="">Todos los países</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="tops-filters-footer">
+                    <span class="tops-counter-pill">
+                      <i class="fa-solid fa-map-location-dot me-1"></i><span id="parks-full-count">0</span> parques
+                    </span>
+                    <div class="btn-group btn-group-sm ms-auto">
+                      <button id="parks-view-list" class="btn btn-success square-box" title="Lista"><i class="fa-solid fa-list"></i></button>
+                      <button id="parks-view-grid" class="btn btn-outline-secondary square-box" title="Cuadrícula"><i class="fa-solid fa-grip"></i></button>
+                    </div>
+                  </div>
+                </div>
+                <div id="top-parks-full-container" class="row g-3"></div>
+              </div>
+
+              <!-- MODO EDICIÓN -->
+              <div id="parks-mode-edit" class="d-none">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h6 class="fw-bold mb-0"><i class="fa-solid fa-pen me-2"></i>Editar Top Parques</h6>
+                  <button class="btn btn-sm btn-success fw-bold square-box shadow-sm" id="btn-save-parks-top">
+                    <i class="fa-solid fa-floppy-disk me-2"></i>Guardar Cambios
+                  </button>
+                </div>
+                <div class="mb-3">
+                  <label for="top-parks-search" class="form-label fw-medium text-uppercase small text-muted">
+                    <i class="fa-solid fa-magnifying-glass me-2"></i>Añadir parque
+                  </label>
+                  <div class="position-relative">
+                    <input type="text" id="top-parks-search" class="form-control bg-dark text-white border-secondary square-box pe-5"
+                      placeholder="Escribe el nombre del parque..." autocomplete="off">
+                    <i class="fa-solid fa-magnifying-glass text-muted position-absolute top-50 end-0 translate-middle-y me-3"
+                      id="top-parks-search-icon" style="transition:color .2s;"></i>
+                    <ul id="top-parks-dropdown" class="list-group position-absolute w-100 shadow-sm d-none"
+                      style="max-height:250px;overflow-y:auto;z-index:1050;border-top:none;top:100%;left:0;"></ul>
+                  </div>
+                </div>
+                <div class="alert alert-success bg-success bg-opacity-10 border-success text-success fw-medium small square-box mb-2">
+                  <i class="fa-solid fa-grip-lines me-2"></i>Arrastra para reordenar · <i class="fa-solid fa-trash ms-2 me-1 text-danger"></i>para eliminar
+                </div>
+                <div id="top-parks-list-edit" style="min-height:80px;"></div>
+              </div>
+
+            </div><!-- /top-parks-pane -->
+
+          </div><!-- /tab-content -->
+        </div><!-- /card-body -->
+      </div><!-- /card principal tops -->
+
+      <!-- ── Leyenda de estadísticas (debajo, 2 columnas dentro) ─ -->
+      <div class="card profile-card mb-4" id="tops-stats-sidebar">
+        <div class="card-header pt-3 pb-3 d-flex align-items-center gap-2">
+          <i class="fa-solid fa-chart-bar fs-5"></i>
+          <h5 class="fw-bold mb-0">Mis Estadísticas</h5>
+        </div>
+        <div class="card-body p-3">
+          <div class="row g-4">
+            <!-- Países -->
+            <div class="col-md-6">
+              <div class="tops-legend-title">
+                <i class="fa-solid fa-earth-europe"></i>
+                Coasters por País
+              </div>
+              <div id="tops-legend-countries" class="tops-legend-list">
+                <div class="text-center text-muted small py-3"><i class="fa-solid fa-spinner fa-spin"></i></div>
+              </div>
+            </div>
+            <!-- Fabricantes -->
+            <div class="col-md-6">
+              <div class="tops-legend-title">
+                <i class="fa-solid fa-industry"></i>
+                Coasters por Fabricante
+              </div>
+              <div id="tops-legend-manufacturers" class="tops-legend-list">
+                <div class="text-center text-muted small py-3"><i class="fa-solid fa-spinner fa-spin"></i></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /stats sidebar -->
+
+    </div><!-- /section-tops-content -->
+
   </div>
 </main>
 
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script src="<?= $base_url ?>/web/js/profile.js"></script>
 
 

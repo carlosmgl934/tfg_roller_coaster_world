@@ -20,6 +20,24 @@ $public_pages = [
 
 // Determina si el usuario está logueado
 $is_logged = isset($_SESSION['firebase_uid']);
+$is_admin  = $is_logged && isset($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
+
+// Obtener iniciales del nombre de usuario para el avatar
+$user_display = '';
+$user_initials = '?';
+if ($is_logged) {
+  // Intentar obtener el username desde la sesión o BD
+  if (isset($_SESSION['username'])) {
+    $user_display  = $_SESSION['username'];
+  } elseif (isset($_SESSION['user_email'])) {
+    $user_display  = explode('@', $_SESSION['user_email'])[0];
+  }
+  if ($user_display) {
+    $parts = preg_split('/[\s_\-]+/', trim($user_display));
+    $user_initials = strtoupper(substr($parts[0], 0, 1));
+    if (count($parts) > 1) $user_initials .= strtoupper(substr($parts[1], 0, 1));
+  }
+}
 
 // Comprobar si la página actual es pública o privada
 $current_script = $_SERVER['SCRIPT_NAME'];
@@ -81,7 +99,7 @@ header("Expires: 0"); // Proxies
 <body>
 
   <nav class="navbar navbar-expand-lg custom-navbar sticky-top">
-    <div class="container-fluid px-3 px-lg-4">
+    <div class="container-fluid px-3 px-lg-4 pe-3 pe-lg-4">
 
       <!-- Brand / Logo -->
       <a class="navbar-brand rcw-brand me-3 me-lg-4" href="<?= Router::url('home') ?>">
@@ -113,19 +131,20 @@ header("Expires: 0"); // Proxies
 
       <!-- Contenido del menú -->
       <div class="collapse navbar-collapse" id="mainMenu">
-        <!-- mx-auto centra el menú, nav-pills da un estilo de botones interactivos -->
-        <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-2 gap-lg-4 fw-semibold">
+
+        <!-- Nav central -->
+        <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-1 gap-lg-2 fw-semibold align-items-lg-center">
 
           <!-- Home  -->
           <li class="nav-item">
-            <a class="nav-link px-3 rounded text-white" href="<?= Router::url('home') ?>">
+            <a class="nav-link rcw-nav-pill" href="<?= Router::url('home') ?>">
               <i class="fa-solid fa-house me-1"></i> Home
             </a>
           </li>
 
           <!-- Coasters -->
           <li class="nav-item dropdown custom-dropdown">
-            <a class="nav-link px-3 rounded text-white dropdown-toggle" href="#" role="button"
+            <a class="nav-link rcw-nav-pill dropdown-toggle" href="#" role="button"
               data-bs-toggle="dropdown">
               Coasters
             </a>
@@ -143,7 +162,7 @@ header("Expires: 0"); // Proxies
 
           <!-- Parques -->
           <li class="nav-item dropdown custom-dropdown">
-            <a class="nav-link px-3 rounded text-white dropdown-toggle" href="#" role="button"
+            <a class="nav-link rcw-nav-pill dropdown-toggle" href="#" role="button"
               data-bs-toggle="dropdown">
               Parques
             </a>
@@ -157,7 +176,7 @@ header("Expires: 0"); // Proxies
 
           <!-- Foros -->
           <li class="nav-item dropdown custom-dropdown">
-            <a class="nav-link px-3 rounded text-white dropdown-toggle" href="#" role="button"
+            <a class="nav-link rcw-nav-pill dropdown-toggle" href="#" role="button"
               data-bs-toggle="dropdown">
               <i class="fa-solid fa-comments me-1"></i> Foros
             </a>
@@ -170,7 +189,7 @@ header("Expires: 0"); // Proxies
           <!-- Viajes -->
           <?php if ($is_logged): ?>
             <li class="nav-item dropdown custom-dropdown">
-              <a class="nav-link px-3 rounded text-white dropdown-toggle" href="#" role="button"
+              <a class="nav-link rcw-nav-pill dropdown-toggle" href="#" role="button"
                 data-bs-toggle="dropdown">
                 <i class="fa-solid fa-suitcase-rolling me-1"></i> Viajes
               </a>
@@ -178,20 +197,82 @@ header("Expires: 0"); // Proxies
                 <li><a class="dropdown-item py-2" href="<?= Router::url('trips') ?>"><i
                       class="fa-solid fa-suitcase w-20px text-center me-2 text-warning"></i> Mis viajes</a></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('trip_generator') ?>"><i
-                      class="fa-solid fa-wand-magic-sparkles w-20px text-center me-2 text-danger"></i> Generador de
-                    viajes</a></li>
+                      class="fa-solid fa-wand-magic-sparkles w-20px text-center me-2 text-danger"></i> Generador de viajes</a></li>
               </ul>
             </li>
           <?php endif; ?>
 
-          <!-- Perfil / Login -->
+          <!-- Botón CTA: Mi agenda de Parques (solo logueados) -->
           <?php if ($is_logged): ?>
-            <li class="nav-item dropdown custom-dropdown">
-              <a class="nav-link px-3 rounded text-white dropdown-toggle" href="#" role="button"
-                data-bs-toggle="dropdown">
-                <i class="fa-solid fa-user me-1"></i> Perfil
+            <li class="nav-item">
+              <a class="nav-link rcw-btn-agenda" href="<?= Router::url('trips') ?>">
+                <i class="fa-solid fa-calendar-days me-1"></i> Mi agenda de Parques
+              </a>
+            </li>
+          <?php endif; ?>
+
+        </ul>
+        <!-- / Nav central -->
+
+        <!-- Zona derecha: Login/Registro o Avatar de perfil -->
+        <div class="d-flex align-items-center gap-2 ms-lg-3">
+
+          <?php if ($is_logged): ?>
+
+            <!-- Admin (solo admins) -->
+            <?php if ($is_admin): ?>
+              <div class="nav-item dropdown custom-dropdown">
+                <a class="nav-link rcw-nav-pill rcw-nav-admin dropdown-toggle" href="#" role="button"
+                  data-bs-toggle="dropdown">
+                  <i class="fa-solid fa-gear me-1"></i> Admin
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                  <li><a class="dropdown-item py-2" href="<?= Router::url('admin_dashboard') ?>"><i
+                        class="fa-solid fa-chart-line w-20px text-center me-2 text-primary"></i> Dashboard</a></li>
+                  <li><a class="dropdown-item py-2" href="<?= Router::url('admin_users') ?>"><i
+                        class="fa-solid fa-users w-20px text-center me-2 text-primary"></i> Usuarios</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item py-2" href="<?= Router::url('admin_coasters') ?>"><i
+                        class="fa-solid fa-train-tram w-20px text-center me-2 text-success"></i> Coasters</a></li>
+                  <li><a class="dropdown-item py-2" href="<?= Router::url('admin_parks') ?>"><i
+                        class="fa-solid fa-tree-city w-20px text-center me-2 text-success"></i> Parques</a></li>
+                  <li><a class="dropdown-item py-2" href="<?= Router::url('admin_forums') ?>"><i
+                        class="fa-solid fa-comments w-20px text-center me-2 text-success"></i> Foros</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item py-2" href="<?= Router::url('admin_messages') ?>"><i
+                        class="fa-solid fa-envelope w-20px text-center me-2 text-warning"></i> Mensajes</a></li>
+                  <li><a class="dropdown-item py-2" href="<?= Router::url('admin_photos') ?>"><i
+                        class="fa-solid fa-image w-20px text-center me-2 text-info"></i> Fotos</a></li>
+                  <li><a class="dropdown-item py-2" href="<?= Router::url('admin_comments') ?>"><i
+                        class="fa-solid fa-comment w-20px text-center me-2 text-secondary"></i> Comentarios</a></li>
+                  <li><a class="dropdown-item py-2" href="<?= Router::url('admin_orders') ?>"><i
+                        class="fa-solid fa-box w-20px text-center me-2 text-info"></i> Pedidos</a></li>
+                </ul>
+              </div>
+            <?php endif; ?>
+
+            <!-- Avatar + Perfil dropdown -->
+            <div class="nav-item dropdown custom-dropdown">
+              <a class="d-flex align-items-center gap-2 rcw-user-trigger text-decoration-none dropdown-toggle"
+                href="#" role="button" data-bs-toggle="dropdown">
+                <div class="rcw-user-avatar" id="header-avatar">
+                  <?php if (!empty($_SESSION['profile_image'])): ?>
+                    <img src="<?= htmlspecialchars($_SESSION['profile_image']) ?>" alt="Avatar"
+                      style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                  <?php else: ?>
+                    <span><?= htmlspecialchars($user_initials) ?></span>
+                  <?php endif; ?>
+                </div>
+                <span class="rcw-user-name d-none d-lg-inline" id="header-username-display"><?= htmlspecialchars(ucfirst($user_display)) ?></span>
               </a>
               <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                <li>
+                  <div class="rcw-dropdown-header px-3 py-2">
+                    <div class="fw-semibold" id="header-dropdown-name" style="color: var(--rcw-text-primary);"><?= htmlspecialchars(ucfirst($user_display)) ?></div>
+                    <div class="small" style="color: var(--rcw-text-muted);"><?= htmlspecialchars($_SESSION['user_email'] ?? '') ?></div>
+                  </div>
+                </li>
+                <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('profile') ?>"><i
                       class="fa-solid fa-id-card w-20px text-center me-2 text-secondary"></i> Mi perfil</a></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('friends') ?>"><i
@@ -200,61 +281,27 @@ header("Expires: 0"); // Proxies
                       class="fa-solid fa-cart-shopping w-20px text-center me-2 text-success"></i> Carrito</a></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('orders') ?>"><i
                       class="fa-solid fa-box w-20px text-center me-2 text-info"></i> Mis pedidos</a></li>
-                <li>
-                  <hr class="dropdown-divider">
-                </li>
+                <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item py-2 text-danger signOutBtn" href="#"><i
                       class="fa-solid fa-arrow-right-from-bracket w-20px text-center me-2"></i> Cerrar sesión</a></li>
               </ul>
-            </li>
+            </div>
+
           <?php else: ?>
-            <li class="nav-item">
-              <a class="nav-link rcw-btn-login" href="<?= Router::url('login') ?>">
-                <i class="fa-solid fa-right-to-bracket me-1"></i> Login
-              </a>
-            </li>
-            <li class="nav-item ms-lg-2">
-              <a class="nav-link rcw-btn-register" href="<?= Router::url('register') ?>">
-                Registro
-              </a>
-            </li>
+
+            <!-- Login / Registro -->
+            <a class="nav-link rcw-btn-login" href="<?= Router::url('login') ?>">
+              <i class="fa-solid fa-right-to-bracket me-1"></i> Login
+            </a>
+            <a class="nav-link rcw-btn-register" href="<?= Router::url('register') ?>">
+              Registro
+            </a>
+
           <?php endif; ?>
 
-          <!-- Admin -->
-          <li class="nav-item dropdown custom-dropdown">
-            <a class="nav-link px-3 rounded text-white dropdown-toggle" href="#" role="button"
-              data-bs-toggle="dropdown">
-              <i class="fa-solid fa-gear me-1"></i> Admin
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-              <li><a class="dropdown-item py-2" href="<?= Router::url('admin_dashboard') ?>"><i
-                    class="fa-solid fa-chart-line w-20px text-center me-2 text-primary"></i> Dashboard</a></li>
-              <li><a class="dropdown-item py-2" href="<?= Router::url('admin_users') ?>"><i
-                    class="fa-solid fa-users w-20px text-center me-2 text-primary"></i> Usuarios</a></li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li><a class="dropdown-item py-2" href="<?= Router::url('admin_coasters') ?>"><i
-                    class="fa-solid fa-train-tram w-20px text-center me-2 text-success"></i> Coasters</a></li>
-              <li><a class="dropdown-item py-2" href="<?= Router::url('admin_parks') ?>"><i
-                    class="fa-solid fa-tree-city w-20px text-center me-2 text-success"></i> Parques</a></li>
-              <li><a class="dropdown-item py-2" href="<?= Router::url('admin_forums') ?>"><i
-                    class="fa-solid fa-comments w-20px text-center me-2 text-success"></i> Foros</a></li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li><a class="dropdown-item py-2" href="<?= Router::url('admin_messages') ?>"><i
-                    class="fa-solid fa-envelope w-20px text-center me-2 text-warning"></i> Mensajes</a></li>
-              <li><a class="dropdown-item py-2" href="<?= Router::url('admin_photos') ?>"><i
-                    class="fa-solid fa-image w-20px text-center me-2 text-info"></i> Fotos</a></li>
-              <li><a class="dropdown-item py-2" href="<?= Router::url('admin_comments') ?>"><i
-                    class="fa-solid fa-comment w-20px text-center me-2 text-secondary"></i> Comentarios</a></li>
-              <li><a class="dropdown-item py-2" href="<?= Router::url('admin_orders') ?>"><i
-                    class="fa-solid fa-box w-20px text-center me-2 text-info"></i> Pedidos</a></li>
-            </ul>
-          </li>
+        </div>
+        <!-- / Zona derecha -->
 
-        </ul>
       </div>
     </div>
   </nav>

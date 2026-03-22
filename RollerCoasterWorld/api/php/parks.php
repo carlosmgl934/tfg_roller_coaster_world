@@ -15,11 +15,11 @@ $router->register('country',   'getCountries');
 $router->register('details',   'getParkDetails');
 
 // ── Endpoints protegidos (requieren login y rol admin) ─────────────────────────
-$router->register('add',           'addPark',           true, 'admin');
-$router->register('update',        'updatePark',        true, 'admin');
-$router->register('delete',        'deletePark',        true, 'admin');
-$router->register('add_photo',     'addParkPhoto',      true, 'admin');
-$router->register('update_stats',  'updateParkStats',   true, 'admin');
+$router->register('add',           'addPark',           'POST');
+$router->register('update',        'updatePark',        'POST');
+$router->register('delete',        'deletePark',        'POST');
+$router->register('add_photo',     'addParkPhoto',      'POST');
+$router->register('update_stats',  'updateParkStats',   'POST');
 
 $router->dispatch();
 
@@ -33,7 +33,7 @@ function listParks() {
     $limit = isset($_GET['limit']) ? min(50, max(1, (int)$_GET['limit'])) : 15;
     $offset = ($page - 1) * $limit;
 
-    $where = ["1=1"];
+    $where = ["park_name NOT IN ('Desconocido', 'Unknown')"];
     $bind = [];
 
     if (!empty($_GET['q'])) {

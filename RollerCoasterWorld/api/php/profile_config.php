@@ -12,6 +12,10 @@ $router->register('search', 'searchParks');
 $router->register('save_profile', 'saveProfile', 'POST');
 $router->register('update_avatar', 'updateAvatar', 'POST');
 $router->register('get_profile', 'getProfile');
+$router->register('get_top_coasters', 'getTopCoasters');
+$router->register('get_top_parks', 'getTopParks');
+$router->register('save_top_coasters', 'saveTopCoasters', 'POST');
+$router->register('save_top_parks', 'saveTopParks', 'POST');
 
 $router->dispatch();
 
@@ -19,7 +23,7 @@ $router->dispatch();
 function getUserId(): ?int
 {
     if (isset($_SESSION['user_id'])) {
-        return (int) $_SESSION['user_id'];
+        return (int)$_SESSION['user_id'];
     }
     // Fallback: resolver por firebase_uid (sesiones anteriores al fix)
     if (isset($_SESSION['firebase_uid'])) {
@@ -28,8 +32,8 @@ function getUserId(): ?int
         $stmt->execute([':uid' => $_SESSION['firebase_uid']]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
-            $_SESSION['user_id'] = (int) $row['id']; // guardar para la próxima vez
-            return (int) $row['id'];
+            $_SESSION['user_id'] = (int)$row['id']; // guardar para la próxima vez
+            return (int)$row['id'];
         }
     }
     return null;
@@ -47,7 +51,7 @@ function searchParks()
     }
 
     try {
-        $stmt = $db->prepare("SELECT id AS park_id, park_name FROM parks WHERE park_name ILIKE :search LIMIT 10");
+        $stmt = $db->prepare("SELECT id AS park_id, park_name, park_country AS country_name FROM parks WHERE park_name ILIKE :search AND park_name NOT IN ('Desconocido', 'Unknown') LIMIT 10");
         $stmt->execute([':search' => '%' . $search . '%']);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         exit;
@@ -95,16 +99,21 @@ function saveProfile()
 
     try {
         $stmt->execute([
-            ':full_name'        => $fullName,
-            ':username'         => $username,
-            ':birthdate'        => $birthdate,
-            ':gender'           => $gender,
-            ':city'             => $city,
-            ':country'          => $country,
+            ':full_name' => $fullName,
+            ':username' => $username,
+            ':birthdate' => $birthdate,
+            ':gender' => $gender,
+            ':city' => $city,
+            ':country' => $country,
             ':favorite_coaster' => $topCoaster,
-            ':home_park'        => $homePark,
-            ':id'               => $user_id
+            ':home_park' => $homePark,
+            ':id' => $user_id
         ]);
+
+        // Actualizar username en la sesión para que el header lo refleje sin relogin
+        if ($username !== null) {
+            $_SESSION['username'] = $username;
+        }
 
         Response::success();
     }
@@ -145,8 +154,118 @@ function getProfile()
         $stmt->bindValue(':id', $user_id, PDO::PARAM_INT);
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
         if ($user) {
-            Response::success(['user' => $user]);
+            // Extraer estadísticas adicionales
+            $stats = [
+                'coasters_count' => 0,
+                'parks_count' => 0,
+                'countries_count' => 0,
+                'reviews_count' => 0,
+                'ranking' => '—',
+                'top_coaster' => '—',
+                'top_park' => '—'
+            ];
+
+            // --- Ranking Global ---
+            // Calcula la posición global del usuario ordenando a todos por cantidad de coasters en user_credits
+            $stmtRanking = $db->prepare("
+                WITH RankedUsers AS (
+                    SELECT u.id, RANK() OVER (ORDER BY COUNT(uc.id) DESC) as rank_pos
+                    FROM users u
+                    LEFT JOIN user_credits uc ON u.id = uc.user_id
+                    GROUP BY u.id
+                )
+                SELECT rank_pos FROM RankedUsers WHERE id = :id
+            ");
+            $stmtRanking->execute([':id' => $user_id]);
+            $userRank = $stmtRanking->fetchColumn();
+            if ($userRank) {
+                $stats['ranking'] = '#' . $userRank;
+            }
+
+            // Montañas rusas count
+            $stmtC = $db->prepare("SELECT COUNT(*) FROM user_credits WHERE user_id = :id");
+            $stmtC->execute([':id' => $user_id]);
+            $stats['coasters_count'] = $stmtC->fetchColumn();
+
+            // Parques count (Parques distintos deducidos de las coasters montadas)
+            $stmtP = $db->prepare("SELECT COUNT(DISTINCT c.park_id) FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :id");
+            $stmtP->execute([':id' => $user_id]);
+            $stats['parks_count'] = $stmtP->fetchColumn();
+
+            // Paises count (Países distintos deducidos de los parques de las coasters)
+            $stmtCountry = $db->prepare("SELECT COUNT(DISTINCT p.park_country) FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id JOIN parks p ON c.park_id = p.id WHERE uc.user_id = :id");
+            $stmtCountry->execute([':id' => $user_id]);
+            $stats['countries_count'] = $stmtCountry->fetchColumn();
+
+            // Reviews count
+            // Dependiendo de cómo se llamen las tablas
+            $c_reviews = 0;
+            $p_reviews = 0;
+            try {
+                $stR1 = $db->prepare("SELECT COUNT(*) FROM coaster_ratings WHERE user_id = :id");
+                if ($stR1->execute([':id' => $user_id]))
+                    $c_reviews = $stR1->fetchColumn();
+                $stR2 = $db->prepare("SELECT COUNT(*) FROM park_ratings WHERE user_id = :id");
+                if ($stR2->execute([':id' => $user_id]))
+                    $p_reviews = $stR2->fetchColumn();
+            }
+            catch (Exception $e) {
+            } // Ignorar si las tablas de ratings no existen aún
+            $stats['reviews_count'] = $c_reviews + $p_reviews;
+
+            // Top Coaster (#1 rank)
+            $stmtTC = $db->prepare("SELECT c.coaster_name FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :id ORDER BY uc.rank_position ASC LIMIT 1");
+            $stmtTC->execute([':id' => $user_id]);
+            $tc = $stmtTC->fetchColumn();
+            if ($tc)
+                $stats['top_coaster'] = $tc;
+
+            // Top Park (#1 rank)
+            $stmtTP = $db->prepare("SELECT p.park_name FROM user_park_credits up JOIN parks p ON up.park_id = p.id WHERE up.user_id = :id ORDER BY up.rank_position ASC LIMIT 1");
+            $stmtTP->execute([':id' => $user_id]);
+            $tp = $stmtTP->fetchColumn();
+            if ($tp)
+                $stats['top_park'] = $tp;
+            // --- Estadísticas Técnicas ---
+            
+            // País más visitado (país en el que has visitado más parques diferentes)
+            $stmtMainCountry = $db->prepare("SELECT p.park_country FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id JOIN parks p ON c.park_id = p.id WHERE uc.user_id = :id GROUP BY p.park_country ORDER BY COUNT(DISTINCT p.id) DESC LIMIT 1");
+            $stmtMainCountry->execute([':id' => $user_id]);
+            $stats['main_country'] = $stmtMainCountry->fetchColumn() ?: '—';
+            
+            // Fabricante favorito
+            $stmtMainManuf = $db->prepare("SELECT c.coaster_manufacter FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :id AND c.coaster_manufacter IS NOT NULL GROUP BY c.coaster_manufacter ORDER BY COUNT(*) DESC LIMIT 1");
+            $stmtMainManuf->execute([':id' => $user_id]);
+            $stats['main_manufacturer'] = $stmtMainManuf->fetchColumn() ?: '—';
+            
+            // Fabricantes totales
+            $stmtTotalManuf = $db->prepare("SELECT COUNT(DISTINCT c.coaster_manufacter) FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :id");
+            $stmtTotalManuf->execute([':id' => $user_id]);
+            $stats['total_manufacturers'] = $stmtTotalManuf->fetchColumn() ?: 0;
+            
+            // Altura total superada
+            $stmtHeight = $db->prepare("SELECT SUM(c.height) FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :id");
+            $stmtHeight->execute([':id' => $user_id]);
+            $stats['total_height'] = round((float)$stmtHeight->fetchColumn());
+            
+            // Inversiones totales
+            $stmtInv = $db->prepare("SELECT SUM(c.inversions) FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :id");
+            $stmtInv->execute([':id' => $user_id]);
+            $stats['total_inversions'] = (int)$stmtInv->fetchColumn();
+            
+            // Más rápida
+            $stmtFastest = $db->prepare("SELECT c.coaster_name FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :id AND c.speed IS NOT NULL ORDER BY c.speed DESC LIMIT 1");
+            $stmtFastest->execute([':id' => $user_id]);
+            $stats['fastest_coaster'] = $stmtFastest->fetchColumn() ?: '—';
+            
+            // Más larga
+            $stmtLongest = $db->prepare("SELECT c.coaster_name FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :id AND c.coaster_length IS NOT NULL ORDER BY c.coaster_length DESC LIMIT 1");
+            $stmtLongest->execute([':id' => $user_id]);
+            $stats['longest_coaster'] = $stmtLongest->fetchColumn() ?: '—';
+
+            Response::success(['user' => $user, 'stats' => $stats]);
         }
         else {
             Response::notFound('No se encontró el usuario');
@@ -178,9 +297,174 @@ function updateAvatar()
         $stmt->bindValue(':id', $user_id, PDO::PARAM_INT);
         $stmt->bindParam(':photoUrl', $photoUrl, PDO::PARAM_STR);
         $stmt->execute();
+
+        // Sincronizar con la sesión PHP para que el header lo cargue globalmente
+        $_SESSION['profile_image'] = $photoUrl;
+
         Response::success();
     }
     catch (PDOException $e) {
         Response::error('Error al actualizar el avatar: ' . $e->getMessage());
+    }
+}
+
+// ── Obtener Tops de Coasters ─────────────────────────────────────────────────
+function getTopCoasters()
+{
+    $user_id = getUserId();
+    if (!$user_id) {
+        Response::unauthorized('No estás logueado');
+    }
+
+    global $db;
+    try {
+        $stmt = $db->prepare("
+            SELECT 
+                uc.rank_position, 
+                c.id AS coaster_id, 
+                c.coaster_name, 
+                c.imagen_url,
+                c.height,
+                c.speed,
+                c.coaster_manufacter AS manufacter,
+                p.park_name,
+                p.park_country AS country_name
+            FROM user_credits uc
+            JOIN coasters c ON uc.coaster_id = c.id
+            JOIN parks p ON c.park_id = p.id
+            WHERE uc.user_id = :uid
+            ORDER BY uc.rank_position ASC
+        ");
+        $stmt->bindValue(':uid', $user_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $tops = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        Response::success(['tops' => $tops]);
+    }
+    catch (PDOException $e) {
+        Response::error('Error al obtener el top de coasters: ' . $e->getMessage());
+    }
+}
+
+// ── Obtener Tops de Parques ──────────────────────────────────────────────────
+function getTopParks()
+{
+    $user_id = getUserId();
+    if (!$user_id) {
+        Response::unauthorized('No estás logueado');
+    }
+
+    global $db;
+    try {
+        $stmt = $db->prepare("
+            SELECT 
+                up.rank_position, 
+                p.id AS park_id, 
+                p.park_name,
+                p.park_country AS country_name,
+                p.imagen_url,
+                p.operating_coasters,
+                p.stars
+            FROM user_park_credits up
+            JOIN parks p ON up.park_id = p.id
+            WHERE up.user_id = :uid
+            ORDER BY up.rank_position ASC
+        ");
+        $stmt->bindValue(':uid', $user_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $tops = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        Response::success(['tops' => $tops]);
+    }
+    catch (PDOException $e) {
+        Response::error('Error al obtener el top de parques: ' . $e->getMessage());
+    }
+}
+
+// ── Guardar Top de Coasters ───────────────────────────────────────────────────
+function saveTopCoasters()
+{
+    $user_id = getUserId();
+    if (!$user_id) {
+        Response::unauthorized('No estás logueado');
+    }
+
+    $body = json_decode(file_get_contents('php://input'), true);
+    $items = $body['items'] ?? [];
+
+    if (!is_array($items)) {
+        Response::error('Datos inválidos');
+    }
+
+    global $db;
+    try {
+        $db->beginTransaction();
+
+        // Borrar top actual
+        $del = $db->prepare("DELETE FROM user_credits WHERE user_id = :uid");
+        $del->bindValue(':uid', $user_id, PDO::PARAM_INT);
+        $del->execute();
+
+        // Insertar nuevo orden
+        $ins = $db->prepare("
+            INSERT INTO user_credits (user_id, coaster_id, rank_position)
+            VALUES (:uid, :cid, :rank)
+        ");
+        foreach ($items as $rank => $item) {
+            $ins->bindValue(':uid', $user_id, PDO::PARAM_INT);
+            $ins->bindValue(':cid', (int)$item['coaster_id'], PDO::PARAM_INT);
+            $ins->bindValue(':rank', $rank + 1, PDO::PARAM_INT);
+            $ins->execute();
+        }
+
+        $db->commit();
+        Response::success(['message' => 'Top de coasters guardado']);
+    }
+    catch (PDOException $e) {
+        $db->rollBack();
+        Response::error('Error al guardar el top de coasters: ' . $e->getMessage());
+    }
+}
+
+// ── Guardar Top de Parques ────────────────────────────────────────────────────
+function saveTopParks()
+{
+    $user_id = getUserId();
+    if (!$user_id) {
+        Response::unauthorized('No estás logueado');
+    }
+
+    $body = json_decode(file_get_contents('php://input'), true);
+    $items = $body['items'] ?? [];
+
+    if (!is_array($items)) {
+        Response::error('Datos inválidos');
+    }
+
+    global $db;
+    try {
+        $db->beginTransaction();
+
+        $del = $db->prepare("DELETE FROM user_park_credits WHERE user_id = :uid");
+        $del->bindValue(':uid', $user_id, PDO::PARAM_INT);
+        $del->execute();
+
+        $ins = $db->prepare("
+            INSERT INTO user_park_credits (user_id, park_id, rank_position)
+            VALUES (:uid, :pid, :rank)
+        ");
+        foreach ($items as $rank => $item) {
+            $ins->bindValue(':uid', $user_id, PDO::PARAM_INT);
+            $ins->bindValue(':pid', (int)$item['park_id'], PDO::PARAM_INT);
+            $ins->bindValue(':rank', $rank + 1, PDO::PARAM_INT);
+            $ins->execute();
+        }
+
+        $db->commit();
+        Response::success(['message' => 'Top de parques guardado']);
+    }
+    catch (PDOException $e) {
+        $db->rollBack();
+        Response::error('Error al guardar el top de parques: ' . $e->getMessage());
     }
 }
