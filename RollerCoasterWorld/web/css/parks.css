@@ -1,1 +1,135 @@
-/* parks.css — Estilos de la página de parques y ficha individual */
+/* parks.css — Estilos premium de la página de parques y ficha individual */
+
+:root {
+    --park-accent: #00e676;
+    --park-accent-glow: rgba(0, 230, 118, 0.4);
+    --park-bg-glass: rgba(20, 25, 30, 0.85);
+}
+
+.hero-img-wrapper {
+    position: relative;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    height: 480px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.hero-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+.hero-img-wrapper:hover img {
+    transform: scale(1.05);
+}
+
+.img-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 150px;
+    background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent);
+    pointer-events: none;
+}
+
+.premium-stat-box {
+    background: var(--park-bg-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.premium-stat-box:hover {
+    transform: translateY(-5px);
+    border-color: var(--park-accent);
+    box-shadow: 0 10px 30px var(--park-accent-glow);
+}
+
+.premium-stat-icon {
+    font-size: 1.8rem;
+    color: var(--park-accent);
+    margin-bottom: 0.75rem;
+    filter: drop-shadow(0 0 8px var(--park-accent-glow));
+}
+
+.premium-stat-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #94a3b8;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.premium-stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+}
+
+/* Glass Card */
+.glass-card {
+    background: var(--park-bg-glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 1.5rem;
+}
+
+/* Coaster Horizontal Cards */
+.park-coaster-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 1rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.park-coaster-card:hover {
+    background: rgba(255,255,255,0.07);
+    border-color: var(--park-accent);
+    transform: translateX(10px);
+}
+
+.park-coaster-thumb {
+    width: 80px;
+    height: 80px;
+    border-radius: 0.75rem;
+    object-fit: cover;
+    margin-right: 1.25rem;
+}
+
+.park-coaster-info h5 {
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: #fff;
+}
+
+.park-coaster-info p {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-bottom: 0;
+}
+
+.review-item {
+    border-radius: 1rem;
+    background: rgba(255,255,255,0.02);
+    padding: 1.5rem;
+    border: 1px solid rgba(255,255,255,0.05);
+}

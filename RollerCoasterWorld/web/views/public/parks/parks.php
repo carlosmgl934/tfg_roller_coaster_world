@@ -9,119 +9,231 @@ if ($id === 0) {
 require_once __DIR__ . '/../../partials/header.php';
 ?>
 
+<!-- Estilos base de coasters para consistencia visual -->
+<link rel="stylesheet" href="<?= Router::asset('web/css/coasters.css') ?>">
+<!-- Estilos específicos de parques -->
+<link rel="stylesheet" href="<?= Router::asset('web/css/parks.css') ?>">
 <!-- CropperJS para recortar imágenes al subir fotos -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 
 <main class="container-fluid px-lg-5 my-5" data-logged="<?= $is_logged ? 'true' : 'false' ?>">
-    <!-- HERO -->
+
+    <!-- HERO SECTION (Mirroring Coaster Detail) -->
     <div class="row g-4 mb-4 align-items-start">
-        <!-- Imagen principal del parque -->
+        <!-- Imagen -->
         <div class="col-12 col-lg-7">
             <div class="hero-img-wrapper">
-                <img src="https://placehold.co/900x500" alt="Parque" id="park-hero-img">
+                <img src="https://placehold.co/900x500" alt="Parque" id="park-hero-img" referrerpolicy="no-referrer">
                 <div class="img-overlay"></div>
             </div>
         </div>
 
-        <!-- Info principal del parque -->
+        <!-- Info principal -->
         <div class="col-12 col-lg-5">
-            <h1 class="fw-bold text-success mb-1" id="park-name" style="font-size:2.5rem;">Cargando...</h1>
+            <h1 class="fw-bold text-success mb-1" id="park-name" style="font-size:2rem;">Cargando...</h1>
 
-            <div class="d-flex align-items-center gap-3 mb-4">
-                <span class="badge bg-success fs-5" id="park-rating">★ Cargando</span>
-                <span class="text-muted fs-5" id="park-location">Cargando...</span>
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <span class="text-muted d-flex align-items-center gap-1">
+                    <i class="fa-solid fa-map-pin text-success" style="font-size:.85rem;"></i>
+                    <span id="park-location-header" style="font-size:.95rem;">Cargando...</span>
+                </span>
+                <span class="text-muted">•</span>
+                <span id="park-country-header" class="fw-semibold text-dark" style="font-size:.95rem;">País</span>
             </div>
 
-            <div class="row g-3 mb-4">
-                <div class="col-6 col-md-4">
-                    <div class="premium-stat-box d-flex flex-column align-items-center text-center">
-                        <i class="fa-regular fa-calendar-days premium-stat-icon"></i>
-                        <div class="premium-stat-label">Apertura</div>
-                        <div class="premium-stat-value" id="opening-year">...</div>
+            <hr class="my-3">
+
+            <!-- Stats cards 2x2 (Consistency with coasters) -->
+            <div class="row g-2 mb-3">
+                <div class="col-6">
+                    <div class="stat-card card text-center p-2">
+                        <div class="text-muted small mb-1">Ranking Parques</div>
+                        <div class="ranking-num text-success" id="global-ranking">—</div>
                     </div>
                 </div>
-                <div class="col-6 col-md-4">
-                    <div class="premium-stat-box d-flex flex-column align-items-center text-center">
-                        <i class="fa-solid fa-earth-americas premium-stat-icon"></i>
-                        <div class="premium-stat-label">País</div>
-                        <div class="premium-stat-value fs-5" id="park-country">...</div>
+                <div class="col-6">
+                    <div class="stat-card card text-center p-2">
+                        <div class="text-muted small mb-1">Puntuación</div>
+                        <div class="ranking-num text-success" id="park-score">—</div>
                     </div>
                 </div>
-                <div class="col-6 col-md-4">
-                    <div class="premium-stat-box d-flex flex-column align-items-center text-center">
-                        <i class="fa-solid fa-train-tram premium-stat-icon"></i>
-                        <div class="premium-stat-label">Coasters</div>
-                        <div class="premium-stat-value" id="num-coaster">...</div>
+                <div class="col-6">
+                    <div class="stat-card card text-center p-2">
+                        <div class="text-muted small mb-1">Nº Coasters</div>
+                        <div class="ranking-num text-success" id="stat-num-coasters">—</div>
                     </div>
                 </div>
-                <div class="col-6 col-md-6">
-                    <div class="premium-stat-box d-flex flex-column align-items-center text-center">
-                        <i class="fa-solid fa-check-circle premium-stat-icon"></i>
-                        <div class="premium-stat-label">Operativas</div>
-                        <div class="premium-stat-value" id="operating-coasters">...</div>
-                    </div>
-                </div>
-                <div class="col-12 col-md-6">
-                    <div class="premium-stat-box d-flex flex-column align-items-center text-center">
-                        <i class="fa-solid fa-ticket premium-stat-icon"></i>
-                        <div class="premium-stat-label">Entrada</div>
-                        <div class="premium-stat-value fs-5 text-truncate w-100" id="precio-entrada">...</div>
+                <div class="col-6">
+                    <div class="stat-card card text-center p-2">
+                        <div class="text-muted small mb-1">Estado</div>
+                        <div class="ranking-num text-success" id="current-state" style="font-size: 1.2rem; display: flex; align-items: center; justify-content: center; height: 1.6rem;">Abierto</div>
                     </div>
                 </div>
             </div>
 
-            <p class="lead mb-4" id="park-description">Cargando descripción...</p>
-
-            <div class="d-flex gap-3">
-                <a href="#" class="btn btn-outline-light rounded-0 px-4" id="btn-website">
-                    <i class="fa-solid fa-globe me-2"></i>Sitio web oficial
+            <!-- Botones de Acción -->
+            <div class="d-flex gap-2">
+                <a href="#" target="_blank" id="btn-website" class="btn btn-outline-success fw-bold flex-grow-1 d-flex align-items-center justify-content-center gap-2" style="border-radius:0; padding: 10px;">
+                    <i class="fa-solid fa-globe fs-5"></i>
+                    <span>Web Oficial</span>
                 </a>
-                <button class="btn btn-outline-light rounded-0 px-4" id="btn-map">
-                    <i class="fa-solid fa-map-marker-alt me-2"></i>Ver en mapa
+                <button id="btn-map" class="btn btn-outline-secondary" style="border-radius:0; padding:10px 14px;" title="Ver en mapa">
+                    <i class="fa-solid fa-location-arrow fs-5"></i>
+                </button>
+                <button id="btn-share" class="btn btn-outline-secondary" style="border-radius:0; padding:10px 14px;" title="Compartir">
+                    <i class="fa-solid fa-share-nodes fs-5"></i>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Galería de fotos -->
+    <!-- ESTADÍSTICAS + FICHA TÉCNICA -->
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-lg-6">
+            <div class="section-card card h-100">
+                <div class="card-header bg-success text-white d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-chart-simple"></i>
+                    <span class="fw-semibold text-white">Estadísticas Rápidas</span>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row g-3 h-100">
+                        <div class="col-6">
+                            <div class="stat-block text-center border-bottom border-end">
+                                <span class="stat-label">Año Apertura</span>
+                                <span class="stat-value text-success" id="opening-year-val">—</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-block text-center border-bottom">
+                                <span class="stat-label">Coasters Operativas</span>
+                                <span class="stat-value text-success" id="operating-coasters-val">0</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-block text-center border-end">
+                                <span class="stat-label">Reseñas Totales</span>
+                                <span class="stat-value text-success" id="reviews-count-val">0</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-block text-center">
+                                <span class="stat-label">Entrada (Desde)</span>
+                                <span class="stat-value text-success" id="entry-price-val">—</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <div class="section-card card h-100 border-0 ficha-card-bg">
+                <div class="card-header bg-success text-white d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span class="fw-semibold text-white">Ficha del Parque</span>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-borderless mb-0 ficha-table-premium text-white">
+                        <tbody>
+                            <tr>
+                                <td class="text-uppercase align-middle ficha-table-label w-45"><i class="fa-solid fa-location-dot me-2 opacity-50"></i>Localización</td>
+                                <td class="fw-semibold text-end align-middle text-white" id="park-location-table">—</td>
+                            </tr>
+                            <tr>
+                                <td class="text-uppercase align-middle ficha-table-label"><i class="fa-solid fa-flag me-2 opacity-50"></i>País</td>
+                                <td class="fw-semibold text-end align-middle text-white" id="park-country-table">—</td>
+                            </tr>
+                            <tr>
+                                <td class="text-uppercase align-middle ficha-table-label"><i class="fa-solid fa-calendar-check me-2 opacity-50"></i>Inaugurado en</td>
+                                <td class="fw-semibold text-end align-middle text-white" id="park-year-table">—</td>
+                            </tr>
+                            <tr>
+                                <td class="text-uppercase align-middle ficha-table-label"><i class="fa-solid fa-euro-sign me-2 opacity-50"></i>Precio orientativo</td>
+                                <td class="fw-semibold text-end align-middle text-white" id="park-price-table">—</td>
+                            </tr>
+                            <tr>
+                                <td class="text-uppercase align-middle ficha-table-label"><i class="fa-solid fa-compass me-2 opacity-50"></i>Coordenadas</td>
+                                <td class="fw-semibold text-end align-middle text-white" id="park-coords-table">N/A</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN: MONTAÑAS RUSAS OPERATIVAS (Requested) -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="section-card card">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-train-tram"></i>
+                        <span class="fw-semibold text-white">Montañas Rusas Operativas</span>
+                    </div>
+                    <span class="badge bg-white text-success rounded-pill px-3 py-1 fw-bold fs-6" id="operating-count-badge">0</span>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row g-3" id="park-coasters-grid">
+                        <!-- Se cargan aquí -->
+                        <div class="col-12 text-center py-4 text-muted">
+                            <div class="spinner-border spinner-border-sm text-success me-2"></div>
+                            Buscando atracciones operativas...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOTOS -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="section-card card">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-images"></i>
+                        <span class="fw-semibold text-white">Fotos de visitantes</span>
+                    </div>
+                    <button class="btn btn-sm btn-outline-light rounded-0 px-3"
+                        id="btn-upload-photo" <?= $is_logged ? '' : 'data-requires-login="true"' ?>>
+                        <i class="fa-solid fa-upload me-1"></i>Añadir foto
+                    </button>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row g-2" id="park-gallery">
+                        <!-- Fotos dinámicas -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESEÑAS -->
     <div class="row mb-5">
         <div class="col-12">
-            <h3 class="fw-bold mb-3">Fotos del parque</h3>
-            <div class="row g-3" id="park-gallery">
-                <!-- Fotos cargadas dinámicamente -->
-            </div>
-            <div class="text-center mt-4">
-                <button class="btn btn-success rounded-0" id="btn-upload-photo"
-                  <?= $is_logged ? '' : 'data-requires-login="true"' ?>>
-                    <i class="fa-solid fa-camera me-2"></i>Subir foto del parque
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sección reseñas -->
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="fw-bold">Reseñas del parque</h3>
-                <div class="d-flex gap-3">
-                    <select class="form-select w-auto" id="reviews-sort">
-                        <option value="newest">Más recientes</option>
-                        <option value="best">Mejor valoración</option>
-                        <option value="worst">Peor valoración</option>
-                    </select>
-                    <a class="btn btn-success rounded-0 px-4" id="btn-write-review"
-                      <?php if ($is_logged): ?>
-                        href="<?= Router::url('form_park_rating') ?>?id=<?= $id ?>"
-                      <?php else: ?>
-                        href="#" data-bs-toggle="modal" data-bs-target="#loginModal"
-                      <?php endif; ?>>
-                        <i class="fa-solid fa-pen me-2"></i>Escribir reseña
-                    </a>
+            <div class="section-card card">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-star"></i>
+                        <span class="fw-semibold text-white">Experiencias y Opiniones</span>
+                    </div>
+                    <div class="d-flex gap-2 align-items-center">
+                        <select class="form-select form-select-sm rounded-0 bg-dark text-white border-secondary" id="reviews-sort" style="width:auto;">
+                            <option value="newest">Más recientes</option>
+                            <option value="best">Mejor valorados</option>
+                            <option value="worst">Peor valorados</option>
+                        </select>
+                        <a class="btn btn-sm btn-outline-light rounded-0 px-3" id="btn-write-review"
+                            <?php if ($is_logged): ?>
+                              href="<?= Router::url('form_park_rating') ?>?id=<?= $id ?>"
+                            <?php else: ?>
+                              href="#" data-bs-toggle="modal" data-bs-target="#loginModal"
+                            <?php endif; ?>>
+                            <i class="fa-solid fa-pen me-1"></i>Escribir reseña
+                        </a>
+                    </div>
                 </div>
-            </div>
-
-            <div class="card bg-dark border-0 shadow-sm">
                 <div class="card-body" id="reviews-list">
                     <div class="text-center text-muted py-5">
                         <i class="fa-regular fa-comment-dots fa-3x mb-3 d-block"></i>
@@ -131,6 +243,42 @@ require_once __DIR__ . '/../../partials/header.php';
             </div>
         </div>
     </div>
+
+</main>
+
+<!-- Modal para subir foto -->
+<div class="modal fade" id="uploadPhotoModal" tabindex="-1" aria-labelledby="uploadPhotoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark text-white border-0">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="uploadPhotoModalLabel">Subir foto del parque</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="crop-container mb-3" style="display:none;">
+                    <img id="cropper-image" style="max-width:100%;">
+                </div>
+                <input type="file" id="photo-upload" accept="image/*" class="form-control mb-3">
+                <div class="text-center">
+                    <button class="btn btn-success" id="crop-save-btn" style="display:none;">Guardar foto recortada</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php
+$login_msg = 'Para subir fotos o escribir reseñas necesitas iniciar sesión.';
+require_once __DIR__ . '/../../partials/login_modal.php';
+?>
+
+<?php require_once __DIR__ . '/../../partials/footer.php';?>
+
+<script src="<?= Router::asset('web/js/parks.js') ?>"></script>
+
+<!-- CropperJS para recortar imágenes -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+</main>
 </main>
 
 <!-- Modal para subir foto -->
