@@ -60,7 +60,7 @@ require_once __DIR__ . '/../../partials/header.php';
                 <div class="col-6">
                     <div class="stat-card card text-center p-2 h-100 d-flex flex-column justify-content-center">
                         <div class="text-muted small mb-1">Coasters Operativas</div>
-                        <div class="ranking-num badge badge-dark-green text-white" id="operating-coasters-val">—</div>
+                        <div class="ranking-num text-success" id="operating-coasters-val">—</div>
                     </div>
                 </div>
                 <div class="col-6">
@@ -106,7 +106,7 @@ require_once __DIR__ . '/../../partials/header.php';
                         <div class="col-6">
                             <div class="stat-block text-center border-bottom">
                                 <span class="stat-label">Nº Coasters</span>
-                                <span class="stat-value fw-bold" id="stat-num-coasters" style="color: #059669;">—</span>
+                                <span class="stat-value text-success fw-bold" id="stat-num-coasters">—</span>
                             </div>
                         </div>
                         <div class="col-6">
