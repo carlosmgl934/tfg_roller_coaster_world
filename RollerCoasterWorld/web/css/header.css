@@ -326,6 +326,14 @@
     padding-left: 1rem;
     border-radius: 0 !important;
   }
+  /* Fix para dropdowns alineados a la derecha (Admin/User) en móvil */
+  .custom-navbar .dropdown-menu.dropdown-menu-end {
+    position: static !important;
+    float: none !important;
+    right: auto !important;
+    left: auto !important;
+    margin-top: 0;
+  }
   .custom-navbar .nav-link,
   .custom-navbar .rcw-nav-pill {
     padding: 0.55rem 0.75rem !important;

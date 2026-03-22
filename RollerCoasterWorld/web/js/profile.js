@@ -10,6 +10,13 @@ $(document).ready(function () {
     locale: "es",
     maxDate: "today",
     disableMobile: "true",
+    onReady: function(selectedDates, dateStr, instance) {
+      if (instance.altInput) {
+        instance.altInput.id = "config-user-birthdate-alt";
+        const label = document.querySelector('label[for="config-user-birthdate"]');
+        if (label) label.setAttribute("for", "config-user-birthdate-alt");
+      }
+    }
   });
 
   // ── Auto-relleno de país usando Nominatim (OpenStreetMap) ──────────────────
