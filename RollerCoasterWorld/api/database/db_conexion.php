@@ -6,11 +6,16 @@
  */
 function loadEnv()
 {
-    // Desde /api/database/db_conexion.php → subimos 2 niveles hasta RollerCoasterWorld donde está el .env
+    // Intentar encontrar el .env subiendo niveles desde /api/database/
     $envPath = dirname(__FILE__, 3) . DIRECTORY_SEPARATOR . '.env';
+    
+    // Si no está en RollerCoasterWorld, probar un nivel más arriba (tfg_roller_coaster_world)
+    if (!file_exists($envPath)) {
+        $envPath = dirname(__FILE__, 4) . DIRECTORY_SEPARATOR . '.env';
+    }
 
     if (!file_exists($envPath)) {
-        die("Archivo .env no encontrado en: " . $envPath);
+        die("Archivo .env no encontrado. Buscado en: " . dirname(__FILE__, 3) . " y " . dirname(__FILE__, 4));
     }
 
     $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);

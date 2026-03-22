@@ -14,26 +14,8 @@ $base_url = Router::getBaseUrl();
 $public_pages = [
   Router::getRoutePath('login'),
   Router::getRoutePath('register'),
-  Router::getRoutePath('contact'),
-  Router::getRoutePath('privacy'),
-  Router::getRoutePath('notice'),
-  // Parques
-  Router::getRoutePath('park_search'),
-  Router::getRoutePath('park_tops'),
-  Router::getRoutePath('parks'),
-  Router::getRoutePath('park_detail'),
-  Router::getRoutePath('park_reviews'),
-  // Coasters
-  Router::getRoutePath('coaster_search'),
-  Router::getRoutePath('coasters'),
-  Router::getRoutePath('coaster_reviews'),
-  Router::getRoutePath('coaster_tops'),
-  Router::getRoutePath('coaster_detail'),
-  // Foros
-  Router::getRoutePath('forum_search'),
-  Router::getRoutePath('forums'),
-  // Ranking
-  Router::getRoutePath('ranking'),
+  Router::getRoutePath('home'),
+  Router::getRoutePath('index'),
 ];
 
 // Determina si el usuario está logueado
