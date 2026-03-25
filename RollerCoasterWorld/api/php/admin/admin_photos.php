@@ -11,6 +11,7 @@ $router = new ApiRouter();
 $router->register('getPendingPhotos', 'getPendingPhotos', 'GET');
 $router->register('approvePhoto', 'approvePhoto', 'POST');
 $router->register('rejectPhoto', 'rejectPhoto', 'POST');
+$router->register('clearCaption', 'clearCaption', 'POST');
 
 $router->dispatch();
 
@@ -63,4 +64,20 @@ function rejectPhoto()
     $stmt = $db->prepare("UPDATE coaster_photos SET status = 'rejected' WHERE id = :id");
     $stmt->execute(['id' => $id]);
     Response::success(['message' => 'Foto rechazada']);
+}
+
+function clearCaption()
+{
+    if (!isset($_SESSION['firebase_uid']) || !isset($_SESSION['user_rol']) || $_SESSION['user_rol'] !== 'admin') {
+        Response::error("Acceso denegado.", 403);
+        return;
+    }
+    $id = intval($_GET['id'] ?? 0);
+    if (!$id)
+        return Response::error("ID inválido");
+
+    global $db;
+    $stmt = $db->prepare("UPDATE coaster_photos SET caption = NULL WHERE id = :id");
+    $stmt->execute(['id' => $id]);
+    Response::success(['message' => 'Descripción eliminada']);
 }

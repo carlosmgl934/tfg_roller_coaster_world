@@ -108,50 +108,60 @@ class RCDBScraper:
                     num = self.extract_number(value_text)
                 
                 # --- PROCESAMIENTO SEGÚN NOMBRE DEL STAT ---
+                # Helper: extrae el PRIMER número que aparece junto a una unidad concreta
+                # dentro de cell_full_text (evita confundir ft con m en celdas con ambas unidades)
+                def extract_near_unit(text: str, unit: str) -> Optional[float]:
+                    pattern = rf'([\d]+(?:[.,]\d+)?)\s*{re.escape(unit)}'
+                    m = re.search(pattern, text)
+                    return float(m.group(1).replace(',', '.')) if m else None
                 
                 if 'Length' in stat_name or 'Longitud' in stat_name:
-                    if num:
-                        if ' m' in cell_full_text and 'mph' not in cell_full_text:
-                            stats['length_m'] = num
-                            stats['length_ft'] = round(num / 0.3048, 0)
-                            stats['length'] = f"{num} m" # Mantener formato string antiguo por compatibilidad si es necesario
-                        elif ' ft' in cell_full_text:
-                            stats['length_ft'] = int(num)
-                            stats['length_m'] = round(num * 0.3048, 1)
-                            stats['length'] = f"{round(num * 0.3048, 1)} m"
+                    if ' m' in cell_full_text and 'mph' not in cell_full_text:
+                        val_m = extract_near_unit(cell_full_text, 'm')
+                        if val_m:
+                            stats['length_m'] = val_m
+                            stats['length_ft'] = round(val_m / 0.3048, 0)
+                            stats['length'] = f"{val_m} m"
+                    elif ' ft' in cell_full_text and num:
+                        stats['length_ft'] = int(num)
+                        stats['length_m'] = round(num * 0.3048, 1)
+                        stats['length'] = f"{round(num * 0.3048, 1)} m"
 
                 elif 'Height' in stat_name or 'Altura' in stat_name:
-                    if num:
-                        if ' m' in cell_full_text:
-                            stats['height_m'] = num
-                            stats['height_ft'] = round(num / 0.3048, 0)
-                            stats['height'] = f"{num} m"
-                        elif ' ft' in cell_full_text:
-                            stats['height_ft'] = int(num)
-                            stats['height_m'] = round(num * 0.3048, 1)
-                            stats['height'] = f"{round(num * 0.3048, 1)} m"
+                    if ' m' in cell_full_text:
+                        val_m = extract_near_unit(cell_full_text, 'm')
+                        if val_m:
+                            stats['height_m'] = val_m
+                            stats['height_ft'] = round(val_m / 0.3048, 0)
+                            stats['height'] = f"{val_m} m"
+                    elif ' ft' in cell_full_text and num:
+                        stats['height_ft'] = int(num)
+                        stats['height_m'] = round(num * 0.3048, 1)
+                        stats['height'] = f"{round(num * 0.3048, 1)} m"
 
                 elif 'Drop' in stat_name or 'Caída' in stat_name:
-                     if num:
-                        if ' m' in cell_full_text:
-                            stats['drop_m'] = num
-                            stats['drop_ft'] = round(num / 0.3048, 0)
-                            stats['drop'] = f"{num} m"
-                        elif ' ft' in cell_full_text:
-                            stats['drop_ft'] = int(num)
-                            stats['drop_m'] = round(num * 0.3048, 1)
-                            stats['drop'] = f"{round(num * 0.3048, 1)} m"
+                    if ' m' in cell_full_text:
+                        val_m = extract_near_unit(cell_full_text, 'm')
+                        if val_m:
+                            stats['drop_m'] = val_m
+                            stats['drop_ft'] = round(val_m / 0.3048, 0)
+                            stats['drop'] = f"{val_m} m"
+                    elif ' ft' in cell_full_text and num:
+                        stats['drop_ft'] = int(num)
+                        stats['drop_m'] = round(num * 0.3048, 1)
+                        stats['drop'] = f"{round(num * 0.3048, 1)} m"
 
                 elif 'Speed' in stat_name or 'Velocidad' in stat_name:
-                    if num:
-                        if 'km/h' in cell_full_text:
-                            stats['speed_kmh'] = num
-                            stats['speed_mph'] = round(num / 1.60934, 1)
-                            stats['speed'] = f"{num} km/h"
-                        elif 'mph' in cell_full_text:
-                            stats['speed_mph'] = num
-                            stats['speed_kmh'] = round(num * 1.60934, 1)
-                            stats['speed'] = f"{round(num * 1.60934, 1)} km/h"
+                    if 'km/h' in cell_full_text:
+                        val_kmh = extract_near_unit(cell_full_text, 'km/h')
+                        if val_kmh:
+                            stats['speed_kmh'] = val_kmh
+                            stats['speed_mph'] = round(val_kmh / 1.60934, 1)
+                            stats['speed'] = f"{val_kmh} km/h"
+                    elif 'mph' in cell_full_text and num:
+                        stats['speed_mph'] = num
+                        stats['speed_kmh'] = round(num * 1.60934, 1)
+                        stats['speed'] = f"{round(num * 1.60934, 1)} km/h"
 
                 elif 'Inversions' in stat_name or 'Inversiones' in stat_name:
                     if num is not None: 
@@ -222,8 +232,12 @@ class RCDBScraper:
             if h1_parent:
                 # Buscar el primer <a> con href que contenga un número (es el parque)
                 park_link = h1_parent.find('a', href=re.compile(r'/\d+\.htm'))
-                if park_link:
-                    coaster['park'] = park_link.text.strip()
+                
+                # Sin link al parque → esta página ES un parque, persona o fabricante → no es coaster
+                if not park_link:
+                    return None
+                
+                coaster['park'] = park_link.text.strip()
                 
                 # Buscar todos los links de ubicación
                 location_links = h1_parent.find_all('a', href=re.compile(r'/location\.htm'))

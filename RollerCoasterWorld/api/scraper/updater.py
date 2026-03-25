@@ -256,26 +256,37 @@ class RCDBUpdater:
                 value_text = self.clean_text(value_span.text).replace(',', '.') if value_span else cell_full_text
                 num = self.extract_number(value_text)
 
+                # Extraer el número que aparece JUNTO a una unidad específica
+                # (evita confundir ft con m cuando RCDB muestra ambas en la misma celda)
+                def extract_near_unit(text: str, unit: str) -> Optional[float]:
+                    import re as _re
+                    pattern = rf'([\d]+(?:[.,]\d+)?)\s*{_re.escape(unit)}'
+                    m = _re.search(pattern, text)
+                    return float(m.group(1).replace(',', '.')) if m else None
+
                 if 'Length' in stat_name:
-                    if num:
-                        if ' m' in cell_full_text and 'mph' not in cell_full_text:
-                            stats['length_m'] = num
-                        elif ' ft' in cell_full_text:
-                            stats['length_m'] = round(num * 0.3048, 1)
+                    if ' m' in cell_full_text and 'mph' not in cell_full_text:
+                        val_m = extract_near_unit(cell_full_text, 'm')
+                        if val_m:
+                            stats['length_m'] = val_m
+                    elif ' ft' in cell_full_text and num:
+                        stats['length_m'] = round(num * 0.3048, 1)
 
                 elif 'Height' in stat_name:
-                    if num:
-                        if ' m' in cell_full_text:
-                            stats['height_m'] = num
-                        elif ' ft' in cell_full_text:
-                            stats['height_m'] = round(num * 0.3048, 1)
+                    if ' m' in cell_full_text:
+                        val_m = extract_near_unit(cell_full_text, 'm')
+                        if val_m:
+                            stats['height_m'] = val_m
+                    elif ' ft' in cell_full_text and num:
+                        stats['height_m'] = round(num * 0.3048, 1)
 
                 elif 'Speed' in stat_name:
-                    if num:
-                        if 'km/h' in cell_full_text:
-                            stats['speed_kmh'] = num
-                        elif 'mph' in cell_full_text:
-                            stats['speed_kmh'] = round(num * 1.60934, 1)
+                    if 'km/h' in cell_full_text:
+                        val_kmh = extract_near_unit(cell_full_text, 'km/h')
+                        if val_kmh:
+                            stats['speed_kmh'] = val_kmh
+                    elif 'mph' in cell_full_text and num:
+                        stats['speed_kmh'] = round(num * 1.60934, 1)
 
                 elif 'Inversions' in stat_name:
                     if num is not None:

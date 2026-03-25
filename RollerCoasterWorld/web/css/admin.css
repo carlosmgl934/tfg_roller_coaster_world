@@ -4,10 +4,115 @@
    ADMIN PHOTOS - ESTILOS EXTRA
    ============================================================ */
 .hover-elevate {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 .hover-elevate:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.3) !important;
-    border-color: #198754 !important;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3) !important;
+  border-color: #198754 !important;
+}
+
+/* ============================================================
+   ADMIN COASTERS / INPUTS
+   ============================================================ */
+
+/* Ocultar flechas de los inputs numéricos para diseño más limpio */
+.no-spinners::-webkit-outer-spin-button,
+.no-spinners::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+.no-spinners {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Toggle switch estilo verde para los campos "Desconocido" */
+.admin-toggle {
+  width: 2.4em;
+  height: 1.25em;
+  cursor: pointer;
+  background-color: #30363d;
+  border-color: #30363d;
+  box-shadow: none !important;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+.admin-toggle:checked {
+  background-color: #198754;
+  border-color: #198754;
+}
+.admin-toggle:focus {
+  border-color: #198754;
+  box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25) !important;
+}
+
+/* ============================================================
+   CUSTOM AUTOCOMPLETE DROPDOWN
+   ============================================================ */
+.ac-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: #1c2128;
+  border: 1px solid #198754;
+  border-top: none;
+  max-height: 220px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #198754 #0d1117;
+}
+.ac-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+.ac-dropdown::-webkit-scrollbar-track {
+  background: #0d1117;
+}
+.ac-dropdown::-webkit-scrollbar-thumb {
+  background: #198754;
+  border-radius: 0;
+}
+
+.ac-item {
+  padding: 0.55rem 1rem;
+  color: #e6edf3;
+  cursor: pointer;
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.15s;
+}
+.ac-item:hover,
+.ac-item.ac-active {
+  background: rgba(25, 135, 84, 0.18);
+  color: #fff;
+}
+.ac-item-unknown {
+  color: #6ea97f;
+  font-style: italic;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.ac-empty {
+  padding: 0.6rem 1rem;
+  color: #6e7681;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+.ac-sublabel {
+  display: block;
+  font-size: 0.72rem;
+  color: #6e7681;
+  margin-top: 1px;
+}
+/* ============================================================
+   VALIDACIÓN DE ERRORES
+   ============================================================ */
+.field-error,
+.field-error .input-group-text {
+  border-color: #dc3545 !important;
 }

@@ -244,11 +244,20 @@ $(document).ready(function () {
         const data = await res.json();
         const parksData = data.data || [];
         let html = "";
-        parksData.forEach((p) => {
+        const MAX_PREVIEW = 5;
+        parksData.slice(0, MAX_PREVIEW).forEach((p) => {
           html += `<a href="${window.BASE_URL || ""}/web/views/public/parks/parks.php?id=${p.id}" class="list-group-item list-group-item-action d-flex justify-content-between">
             <div><h6 class="mb-0">${p.park_name}</h6><small>${p.park_location}</small></div>
             <i class="fa-solid fa-chevron-right"></i></a>`;
         });
+        if (parksData.length > MAX_PREVIEW) {
+          html += `<a href="#" class="list-group-item list-group-item-action text-center text-primary fw-bold" id="view-all-park-results">
+            Ver todos los resultados para "${search}" <i class="fa-solid fa-arrow-right ms-1"></i>
+          </a>`;
+        }
+        if (parksData.length === 0) {
+          html = `<div class="list-group-item text-muted text-center py-3">No se encontraron parques.</div>`;
+        }
         $("#search-results").html(html).show();
       }, 300);
     });
@@ -258,7 +267,68 @@ $(document).ready(function () {
       $("#opening-year-min").val(1800);
       $("#num-coaster-min").val(0);
       $("#rating-filter").val(0);
-      loadParks({}, 1);
+      $("#year-val").text("1800");
+      $("#coasters-val").text("0");
+      $("#rating-val").text("0★");
+      isFiltering = false;
+      $("h1").text("Buscar Parques");
+      loadParks(getFilters(), 1);
+    });
+
+    // "Ver todos los resultados" para parques
+    $(document).on("click", "#view-all-park-results", function (e) {
+      e.preventDefault();
+      isFiltering = true;
+      $("#search-results").html("").hide();
+      const q = $("#park-search").val().trim();
+      $("h1").text('Resultados para: "' + q + '"');
+      loadParks(getFilters(), 1);
+    });
+
+    // Ocultar dropdown al hacer click fuera
+    $(document).on("click", function (e) {
+      if (!$(e.target).closest("#park-search, #search-results").length) {
+        $("#search-results").hide();
+      }
+    });
+
+    // Reabrir dropdown al enfocar el input
+    searchInput.on("focus", function () {
+      if (
+        $(this).val().length >= 3 &&
+        $("#search-results").children().length > 0
+      ) {
+        $("#search-results").show();
+      }
+    });
+
+    // Icono de búsqueda ↔ X
+    const searchIcon = $("#search-icon");
+    searchInput.on("input", function () {
+      if ($(this).val().length > 0) {
+        searchIcon
+          .removeClass("fa-magnifying-glass text-muted")
+          .addClass("fa-xmark text-danger")
+          .css("cursor", "pointer");
+      } else {
+        searchIcon
+          .removeClass("fa-xmark text-danger")
+          .addClass("fa-magnifying-glass text-muted")
+          .css("cursor", "text");
+      }
+    });
+    searchIcon.on("click", function () {
+      if ($(this).hasClass("fa-xmark")) {
+        searchInput.val("").focus();
+        $("#search-results").html("").hide();
+        $(this)
+          .removeClass("fa-xmark text-danger")
+          .addClass("fa-magnifying-glass text-muted")
+          .css("cursor", "text");
+        isFiltering = false;
+        $("h1").text("Buscar Parques");
+        loadParks(getFilters(), 1);
+      }
     });
   }
 
@@ -361,28 +431,36 @@ $(document).ready(function () {
         grid.empty();
 
         if (data.success && data.coasters && data.coasters.length > 0) {
-          const operating = data.coasters.filter(c => !c.coaster_status || c.coaster_status === 'Operating' || c.coaster_status === 'Operativa');
-          
+          const operating = data.coasters.filter(
+            (c) =>
+              !c.coaster_status ||
+              c.coaster_status === "Operating" ||
+              c.coaster_status === "Operativa",
+          );
+
           $("#operating-count-badge").text(data.coasters.length); // Total coasters in the park
           $("#operating-coasters-val").text(operating.length); // Only operating for the stat block
 
           if (data.coasters.length > 0) {
-            data.coasters.forEach(c => {
+            data.coasters.forEach((c) => {
               const fallback = "https://placehold.co/400x300?text=Coaster";
               const img = c.imagen_url || fallback;
-              
-              let badgeHtml = '';
-              let statusText = c.coaster_status || 'Operativa';
-              if (statusText === 'Operating' || statusText === 'Operativa') {
-                  badgeHtml = `<span class="badge bg-success-subtle text-success border border-success px-2 py-1" style="font-size:0.7rem;">OPERATIVA</span>`;
-              } else if (statusText === 'Defunct') {
-                  badgeHtml = `<span class="badge bg-danger-subtle text-danger border border-danger px-2 py-1" style="font-size:0.7rem;">CERRADA</span>`;
-              } else if (statusText === 'SBNO') {
-                  badgeHtml = `<span class="badge bg-warning-subtle text-warning border border-warning px-2 py-1" style="font-size:0.7rem;">SBNO</span>`;
-              } else if (statusText === 'Under Construction' || statusText === 'Under construction') {
-                  badgeHtml = `<span class="badge bg-info-subtle text-info border border-info px-2 py-1" style="font-size:0.7rem;">EN CONSTRUCCIÓN</span>`;
+
+              let badgeHtml = "";
+              let statusText = c.coaster_status || "Operativa";
+              if (statusText === "Operating" || statusText === "Operativa") {
+                badgeHtml = `<span class="badge bg-success-subtle text-success border border-success px-2 py-1" style="font-size:0.7rem;">OPERATIVA</span>`;
+              } else if (statusText === "Defunct") {
+                badgeHtml = `<span class="badge bg-danger-subtle text-danger border border-danger px-2 py-1" style="font-size:0.7rem;">CERRADA</span>`;
+              } else if (statusText === "SBNO") {
+                badgeHtml = `<span class="badge bg-warning-subtle text-warning border border-warning px-2 py-1" style="font-size:0.7rem;">SBNO</span>`;
+              } else if (
+                statusText === "Under Construction" ||
+                statusText === "Under construction"
+              ) {
+                badgeHtml = `<span class="badge bg-info-subtle text-info border border-info px-2 py-1" style="font-size:0.7rem;">EN CONSTRUCCIÓN</span>`;
               } else {
-                  badgeHtml = `<span class="badge bg-secondary-subtle text-secondary border border-secondary px-2 py-1" style="font-size:0.7rem;">${statusText.toUpperCase()}</span>`;
+                badgeHtml = `<span class="badge bg-secondary-subtle text-secondary border border-secondary px-2 py-1" style="font-size:0.7rem;">${statusText.toUpperCase()}</span>`;
               }
 
               grid.append(`
@@ -395,7 +473,7 @@ $(document).ready(function () {
                           <div class="p-3 border-top border-secondary">
                               <h6 class="text-white mb-1 text-truncate fw-bold">${c.coaster_name}</h6>
                               <div class="d-flex justify-content-between align-items-center">
-                                  <small class="text-success fw-bold">${c.manufacter || 'Fabricante'}</small>
+                                  <small class="text-success fw-bold">${c.manufacter || "Fabricante"}</small>
                                   ${badgeHtml}
                               </div>
                           </div>
@@ -421,7 +499,6 @@ $(document).ready(function () {
         );
       }
     }
-
 
     async function loadReviews(order = "newest") {
       try {
@@ -487,42 +564,49 @@ $(document).ready(function () {
       placeholderValue: "Selecciona las contras...",
     });
 
-    document.getElementById("review-form").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const formData = new FormData(this);
-      const parkId = formData.get("park_id");
-      const note = formData.get("note");
+    document
+      .getElementById("review-form")
+      .addEventListener("submit", function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const parkId = formData.get("park_id");
+        const note = formData.get("note");
 
-      if (!note) {
-        alert("Por favor, califica con estrellas el parque.");
-        return;
-      }
+        if (!note) {
+          alert("Por favor, califica con estrellas el parque.");
+          return;
+        }
 
-      const submitBtn = this.querySelector('button[type="submit"]');
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = 'Publicando... <i class="fa-solid fa-spinner fa-spin ms-2"></i>';
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML =
+          'Publicando... <i class="fa-solid fa-spinner fa-spin ms-2"></i>';
 
-      fetch(window.BASE_URL + "/api/php/parks.php?action=save_review", {
-        method: "POST",
-        body: formData,
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            window.location.href =
-              window.BASE_URL + "/web/views/public/parks/parks.php?id=" + parkId;
-          } else {
-            alert("Error: " + data.error);
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Publicar Reseña <i class="fa-solid fa-paper-plane ms-2"></i>';
-          }
+        fetch(window.BASE_URL + "/api/php/parks.php?action=save_review", {
+          method: "POST",
+          body: formData,
         })
-        .catch((err) => {
-          console.error(err);
-          alert("Error de conexión");
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = 'Publicar Reseña <i class="fa-solid fa-paper-plane ms-2"></i>';
-        });
-    });
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.success) {
+              window.location.href =
+                window.BASE_URL +
+                "/web/views/public/parks/parks.php?id=" +
+                parkId;
+            } else {
+              alert("Error: " + data.error);
+              submitBtn.disabled = false;
+              submitBtn.innerHTML =
+                'Publicar Reseña <i class="fa-solid fa-paper-plane ms-2"></i>';
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+            alert("Error de conexión");
+            submitBtn.disabled = false;
+            submitBtn.innerHTML =
+              'Publicar Reseña <i class="fa-solid fa-paper-plane ms-2"></i>';
+          });
+      });
   }
 });

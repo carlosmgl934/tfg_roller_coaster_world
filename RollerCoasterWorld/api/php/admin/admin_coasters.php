@@ -11,6 +11,10 @@ $db = new DBConexion();
 $router = new ApiRouter();
 $router->register('searchCoasters', 'searchCoasters', 'GET');
 $router->register('filterCoasters', 'filterCoasters', 'GET');
+$router->register('listModels', 'listModels', 'GET');
+$router->register('addCoaster', 'addCoaster', 'POST');
+$router->register('deleteCoaster', 'deleteCoaster', 'POST');
+$router->register('updateCoaster', 'updateCoaster', 'POST');
 $router->dispatch();
 
 function requireAdmin(): void
@@ -52,23 +56,23 @@ function searchCoasters(): void
                     c.coaster_manufacter,
                     c.coaster_status,
                     c.opening_year,
+                    c.height,
+                    c.speed,
+                    c.coaster_length,
+                    c.inversions,
+                    c.coaster_model,
+                    c.imagen_url,
                     COALESCE(p.park_name, 'Desconocido') AS park_name,
                     p.park_country
                 FROM coasters c
                 LEFT JOIN parks p ON c.park_id = p.id
-                WHERE
-                    c.coaster_name       ILIKE :like
-                    OR c.coaster_manufacter ILIKE :like
-                    OR p.park_name          ILIKE :like
+                WHERE c.coaster_name ILIKE :like
                 ORDER BY c.coaster_name ASC
                 LIMIT :limit OFFSET :offset";
 
         $sql_count = "SELECT COUNT(*) FROM coasters c
                       LEFT JOIN parks p ON c.park_id = p.id
-                      WHERE
-                          c.coaster_name       ILIKE :like
-                          OR c.coaster_manufacter ILIKE :like
-                          OR p.park_name          ILIKE :like";
+                      WHERE c.coaster_name ILIKE :like";
 
         $stmt = $db->prepare($sql);
         $stmt->bindValue(':like', $like, PDO::PARAM_STR);
@@ -170,6 +174,12 @@ function filterCoasters(): void
                     c.coaster_manufacter,
                     c.coaster_status,
                     c.opening_year,
+                    c.height,
+                    c.speed,
+                    c.coaster_length,
+                    c.inversions,
+                    c.coaster_model,
+                    c.imagen_url,
                     COALESCE(p.park_name, 'Desconocido') AS park_name,
                     p.park_country
                 FROM coasters c
@@ -203,5 +213,292 @@ function filterCoasters(): void
     }
     catch (PDOException $e) {
         Response::error('Error filtrando coasters: ' . $e->getMessage());
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// listModels — modelos únicos para el autocomplete del formulario
+// ─────────────────────────────────────────────────────────────
+function listModels(): void
+{
+    requireAdmin();
+
+    $q = trim($_GET['q'] ?? '');
+    $limit = isset($_GET['limit']) ? min(50, max(1, (int)$_GET['limit'])) : 50;
+
+    $where = "coaster_model IS NOT NULL AND coaster_model <> ''";
+    $bind = [];
+
+    if ($q !== '') {
+        $where .= ' AND coaster_model ILIKE :q';
+        $bind[':q'] = '%' . $q . '%';
+    }
+
+    try {
+        global $db;
+        $sql = "SELECT DISTINCT coaster_model
+                FROM coasters
+                WHERE $where
+                ORDER BY coaster_model ASC
+                LIMIT :limit";
+
+        $stmt = $db->prepare($sql);
+        foreach ($bind as $k => $v) {
+            $stmt->bindValue($k, $v);
+        }
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $models = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        Response::success(['models' => array_map(fn($m) => ['coaster_model' => $m], $models)]);
+    }
+    catch (PDOException $e) {
+        Response::error('Error obteniendo modelos: ' . $e->getMessage());
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// deleteCoaster — eliminar una coaster por ID
+// ─────────────────────────────────────────────────────────────
+function deleteCoaster(): void
+{
+    requireAdmin();
+
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true);
+    $id = isset($data['coasterId']) ? intval($data['coasterId']) : 0;
+    if ($id <= 0) {
+        Response::error('ID de coaster inválido.');
+        return;
+    }
+
+    try {
+        global $db;
+
+        // Opcional: obtener nombre antes de borrar para el mensaje de éxito
+        $stmt = $db->prepare("SELECT coaster_name FROM coasters WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        $coasterName = $stmt->fetchColumn() ?: 'esa coaster';
+
+        // Eliminar
+        $stmt = $db->prepare("DELETE FROM coasters WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+
+        Response::success(['coaster_name' => $coasterName]);
+    }
+    catch (PDOException $e) {
+        Response::error('Error eliminando coaster: ' . $e->getMessage());
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// addCoaster — añadir una coaster 
+// ─────────────────────────────────────────────────────────────
+function addCoaster(): void
+{
+    requireAdmin();
+
+    $data = $_POST;
+
+    $name = trim($data['name'] ?? '');
+    // Replace "Desconocido" with null for manufacturer and model
+    $model = trim($data['model'] ?? '');
+    $model = ($model === 'Desconocido' || $model === '') ? null : $model;
+
+    $manufacter = trim($data['manufacturer'] ?? '');
+    $manufacter = ($manufacter === 'Desconocido' || $manufacter === '') ? null : $manufacter;
+
+    // Park comes from hidden ID input or autocomplete
+    $parkId = (isset($data['parkId']) && $data['parkId'] !== '') ? intval($data['parkId']) : null;
+
+    $status = trim($data['status'] ?? '') ?: null;
+    $height = trim($data['height'] ?? '') ?: null;
+    $speed = trim($data['speed'] ?? '') ?: null;
+    $year = (isset($data['year']) && $data['year'] !== '') ? intval($data['year']) : null;
+    $length = trim($data['length'] ?? '') ?: null;
+    $inversions = (isset($data['inversions']) && $data['inversions'] !== '') ? intval($data['inversions']) : null;
+    $rcdbId = (isset($data['rcdbId']) && $data['rcdbId'] !== '') ? intval($data['rcdbId']) : null;
+
+    $imagenUrl = null;
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = __DIR__ . '/../../../web/img/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+        $fileName = uniqid('coaster_') . '-' . basename($_FILES['image']['name']);
+        if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileName)) {
+            $imagenUrl = '/web/img/' . $fileName;
+        }
+    }
+
+    if ($name === '') {
+        Response::error('El nombre es obligatorio.');
+        return;
+    }
+
+    try {
+        global $db;
+
+        // Coasters agregadas con ID >= 100000 para no interferir con las de RCDB
+        $stmt_id = $db->query("SELECT COALESCE(MAX(id), 99999) + 1 FROM coasters WHERE id >= 100000");
+        $nextId = (int)$stmt_id->fetchColumn();
+
+        $sql = "INSERT INTO coasters (
+                    id, coaster_name, coaster_model, coaster_manufacter,
+                    park_id, coaster_status, height, speed,
+                    opening_year, coaster_length, inversions,
+                    rcdb_id, imagen_url
+                ) VALUES (
+                    :id, :name, :model, :manufacter,
+                    :parkId, :status, :height, :speed,
+                    :year, :length, :inversions,
+                    :rcdbId, :imagenUrl
+                )";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute([
+            ':id' => $nextId,
+            ':name' => $name,
+            ':model' => $model,
+            ':manufacter' => $manufacter,
+            ':parkId' => $parkId,
+            ':status' => $status,
+            ':height' => $height,
+            ':speed' => $speed,
+            ':year' => $year,
+            ':length' => $length,
+            ':inversions' => $inversions,
+            ':rcdbId' => $rcdbId,
+            ':imagenUrl' => $imagenUrl,
+        ]);
+
+        $newId = $nextId;
+
+        $stmt = $db->prepare("
+            SELECT c.*, p.park_name, p.park_country
+            FROM coasters c
+            LEFT JOIN parks p ON c.park_id = p.id
+            WHERE c.id = :id
+        ");
+        $stmt->execute([':id' => $newId]);
+        $newCoaster = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        Response::success(['coaster' => $newCoaster]);
+    }
+    catch (PDOException $e) {
+        Response::error('Error añadiendo coaster: ' . $e->getMessage());
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// updateCoaster — editar una coaster existente
+// ─────────────────────────────────────────────────────────────
+function updateCoaster(): void
+{
+    requireAdmin();
+
+    $data = $_POST;
+
+    $id = isset($data['id']) ? intval($data['id']) : 0;
+    if ($id <= 0) {
+        Response::error('ID de coaster inválido.');
+        return;
+    }
+
+    $name = trim($data['name'] ?? '');
+    $model = trim($data['model'] ?? '');
+    $model = ($model === 'Desconocido' || $model === '') ? null : $model;
+
+    $manufacter = trim($data['manufacturer'] ?? '');
+    $manufacter = ($manufacter === 'Desconocido' || $manufacter === '') ? null : $manufacter;
+
+    $parkId = (isset($data['parkId']) && $data['parkId'] !== '') ? intval($data['parkId']) : null;
+    if ($parkId === null) {
+        Response::error('El parque es obligatorio.');
+        return;
+    }
+
+    $status = trim($data['status'] ?? '') ?: null;
+    $height = trim($data['height'] ?? '') ?: null;
+    $speed = trim($data['speed'] ?? '') ?: null;
+    $length = trim($data['length'] ?? '') ?: null;
+    $year = (isset($data['year']) && $data['year'] !== '') ? intval($data['year']) : null;
+    $inversions = (isset($data['inversions']) && $data['inversions'] !== '') ? intval($data['inversions']) : null;
+    $rcdbId = (isset($data['rcdbId']) && $data['rcdbId'] !== '') ? intval($data['rcdbId']) : null;
+
+    $imagenUrl = null;
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = __DIR__ . '/../../../web/img/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+        $fileName = uniqid('coaster_') . '-' . basename($_FILES['image']['name']);
+        if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileName)) {
+            $imagenUrl = '/web/img/' . $fileName;
+        }
+    }
+
+    if ($name === '') {
+        Response::error('El nombre es obligatorio.');
+        return;
+    }
+
+    try {
+        global $db;
+
+        // Si no hay nueva imagen, no tocamos imagen_url
+        $updateImagenSql = '';
+        $params = [
+            ':id' => $id,
+            ':name' => $name,
+            ':model' => $model,
+            ':manufacter' => $manufacter,
+            ':parkId' => $parkId,
+            ':status' => $status,
+            ':height' => $height,
+            ':speed' => $speed,
+            ':year' => $year,
+            ':length' => $length,
+            ':inversions' => $inversions,
+            ':rcdbId' => $rcdbId,
+        ];
+
+        if ($imagenUrl !== null) {
+            $updateImagenSql = ', imagen_url = :imagenUrl';
+            $params[':imagenUrl'] = $imagenUrl;
+        }
+
+        $sql = "UPDATE coasters
+                SET coaster_name = :name,
+                    coaster_model = :model,
+                    coaster_manufacter = :manufacter,
+                    park_id = :parkId,
+                    coaster_status = :status,
+                    height = :height,
+                    speed = :speed,
+                    opening_year = :year,
+                    coaster_length = :length,
+                    inversions = :inversions,
+                    rcdb_id = :rcdbId
+                    $updateImagenSql
+                WHERE id = :id";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+
+        // Devolver la coaster actualizada
+        $stmt = $db->prepare("
+            SELECT c.*, p.park_name, p.park_country
+            FROM coasters c
+            LEFT JOIN parks p ON c.park_id = p.id
+            WHERE c.id = :id
+        ");
+        $stmt->execute([':id' => $id]);
+        $updatedCoaster = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        Response::success(['coaster' => $updatedCoaster]);
+    }
+    catch (PDOException $e) {
+        Response::error('Error actualizando coaster: ' . $e->getMessage());
     }
 }
