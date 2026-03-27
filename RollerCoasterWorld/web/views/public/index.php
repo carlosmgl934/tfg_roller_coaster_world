@@ -11,20 +11,33 @@ if ($user_email !== 'Invitado' && $user_email !== 'Desconocido') {
     $parts = explode('@', $user_email);
     $display_name = $parts[0];
 }
+
+// ── Estadísticas Globales para todas las vistas ──────────────────────────────
+require_once __DIR__ . '/../../../api/database/db_conexion.php';
+$stat_users    = '—';
+$stat_coasters = '—';
+$stat_reviews  = '—';
+$stat_photos   = '—';
+$stat_parks    = '—';
+
+try {
+    $db = new DBConexion();
+    $stat_users    = $db->query("SELECT COUNT(*) FROM users")->fetchColumn();
+    $stat_coasters = $db->query("SELECT COUNT(*) FROM coasters")->fetchColumn();
+    $cr            = $db->query("SELECT COUNT(*) FROM coaster_ratings")->fetchColumn();
+    $pr            = $db->query("SELECT COUNT(*) FROM park_ratings")->fetchColumn();
+    $stat_reviews  = $cr + $pr;
+    $stat_photos   = $db->query("SELECT COUNT(*) FROM coaster_photos")->fetchColumn();
+    $stat_parks    = $db->query("SELECT COUNT(*) FROM parks")->fetchColumn();
+} catch (Exception $e) {
+    error_log("Error cargando stats en index.php: " . $e->getMessage());
+}
 ?>
 
 <main class="index-container">
     <?php if ($is_logged): ?>
         <!-- COMIENZO VISTAS MOCKUP (DASHBOARD) -->
         <?php
-        require_once __DIR__ . '/../../../api/database/db_conexion.php';
-        
-        $stat_users = '—';
-        $stat_coasters = '—';
-        $stat_reviews = '—';
-        $stat_photos = '—';
-        $stat_parks = '—';
-
         $user_credits = 0;
         $user_reviews = 0;
         $user_tops = 0;
@@ -35,17 +48,6 @@ if ($user_email !== 'Invitado' && $user_email !== 'Desconocido') {
         $fav_coaster = 'Ninguna configurada';
         
         try {
-            $db = new DBConexion();
-            
-            // ── Global Stats ──────────────────────────────────────────────
-            $stat_users    = $db->query("SELECT COUNT(*) FROM users")->fetchColumn();
-            $stat_coasters = $db->query("SELECT COUNT(*) FROM coasters")->fetchColumn();
-            $cr            = $db->query("SELECT COUNT(*) FROM coaster_ratings")->fetchColumn();
-            $pr            = $db->query("SELECT COUNT(*) FROM park_ratings")->fetchColumn();
-            $stat_reviews  = $cr + $pr;
-            $stat_photos   = $db->query("SELECT COUNT(*) FROM coaster_photos")->fetchColumn();
-            $stat_parks    = $db->query("SELECT COUNT(*) FROM parks")->fetchColumn();
-
             // ── Fetch the user's integer id from firebase_uid ─────────────
             $stmt = $db->prepare(
                 "SELECT id, username, city, country, favorite_coaster, profile_image FROM users WHERE firebase_uid = ?"
@@ -383,12 +385,12 @@ if ($user_email !== 'Invitado' && $user_email !== 'Desconocido') {
                 <!-- Mini stats -->
                 <div class="d-flex flex-wrap justify-content-center gap-5 mt-5 pt-4 landing-stats-bar">
                     <div>
-                        <div class="fw-bold fs-3 text-neon">+10.000</div>
+                        <div class="fw-bold fs-3 text-neon">+<?= is_numeric($stat_coasters) ? number_format((float)$stat_coasters) : '10.000' ?></div>
                         <div class="small text-light opacity-75">Montañas rusas</div>
                     </div>
                     <div class="landing-stat-sep"></div>
                     <div>
-                        <div class="fw-bold fs-3 text-neon">+2.500</div>
+                        <div class="fw-bold fs-3 text-neon">+<?= is_numeric($stat_parks) ? number_format((float)$stat_parks) : '2.500' ?></div>
                         <div class="small text-light opacity-75">Parques</div>
                     </div>
                     <div class="landing-stat-sep"></div>
@@ -410,7 +412,7 @@ if ($user_email !== 'Invitado' && $user_email !== 'Desconocido') {
                 <div class="row g-4 justify-content-center">
                     <?php
                     $features = [
-                        ['icon'=>'fa-database',         'title'=>'Base de datos completa',   'desc'=>'Más de 10.000 coasters indexados de todo el mundo con datos técnicos completos.'],
+                        ['icon'=>'fa-database',         'title'=>'Base de datos completa',   'desc'=>'Más de ' . (is_numeric($stat_coasters) ? number_format((float)$stat_coasters) : '10.000') . ' coasters indexados de todo el mundo con datos técnicos completos.'],
                         ['icon'=>'fa-list-ol',          'title'=>'Tops personalizados',      'desc'=>'Crea y ordena tu ranking personal. Compáralo con el de la comunidad.'],
                         ['icon'=>'fa-suitcase-rolling', 'title'=>'Gestor de viajes',         'desc'=>'Planifica tus rutas por parques, calcula distancias y gestiona tus trips.'],
                         ['icon'=>'fa-camera',           'title'=>'Galería de fotos',         'desc'=>'Sube fotos de tus visitas y descubre las de otros usuarios.'],

@@ -523,8 +523,27 @@ $(document).ready(function () {
           const container = $("#reviews-list");
           container.empty();
           data.reviews.forEach((review) => {
+            let tagsHtml = "";
+            if (review.tags && review.tags.length > 0) {
+              tagsHtml = '<div class="review-tags mt-2 d-flex flex-wrap gap-1">';
+              review.tags.forEach((tag) => {
+                const icon =
+                  tag.type === "pro"
+                    ? "fa-plus-circle text-success"
+                    : "fa-minus-circle text-danger";
+                const badgeClass =
+                  tag.type === "pro"
+                    ? "bg-success-subtle text-success border-success"
+                    : "bg-danger-subtle text-danger border-danger";
+                tagsHtml += `<span class="badge ${badgeClass} border d-flex align-items-center gap-1" style="font-size:0.7rem;">
+                            <i class="fa-solid ${icon}"></i> ${tag.tag}
+                        </span>`;
+              });
+              tagsHtml += "</div>";
+            }
+
             container.append(`
-                  <div class="border-bottom border-secondary pb-3 mb-3">
+                  <div class="border-bottom border-secondary pb-3 mb-3 animate__animated animate__fadeIn">
                      <div class="d-flex justify-content-between align-items-center mb-2">
                         <div class="d-flex align-items-center gap-2">
                            <div class="bg-success rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width:32px; height:32px; font-size:12px;">
@@ -535,6 +554,10 @@ $(document).ready(function () {
                         <span class="badge bg-success">${review.note || 0} ★</span>
                      </div>
                      <p class="mb-0 text-white-50" style="font-size:0.9rem;">${review.review || "Sin comentarios."}</p>
+                     ${tagsHtml}
+                     <div class="mt-2 text-muted" style="font-size:0.75rem;">
+                        <i class="fa-regular fa-clock me-1"></i>${new Date(review.created_at).toLocaleDateString("es-ES")}
+                     </div>
                   </div>
                `);
           });

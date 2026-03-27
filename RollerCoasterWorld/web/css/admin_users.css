@@ -1,0 +1,225 @@
+/* Admin Users Management CSS */
+:root {
+  --rcw-bg-card: #1e293b;
+  --rcw-border-color: rgba(255, 255, 255, 0.1);
+  --rcw-text-muted: #94a3b8;
+  --rcw-accent: #3b82f6;
+}
+
+.admin-users-container {
+  padding: 2rem 0;
+  color: #fff;
+  min-height: 80vh;
+}
+
+.admin-card {
+  background: var(--rcw-bg-card);
+  border: 1px solid var(--rcw-border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+.admin-card-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--rcw-border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.search-wrapper {
+  position: relative;
+  min-width: 300px;
+}
+
+.search-wrapper i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--rcw-text-muted);
+}
+
+.search-wrapper input {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--rcw-border-color);
+  color: #fff;
+  padding-left: 35px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.search-wrapper input:focus {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: var(--rcw-accent);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* User Table Stylings */
+.table-responsive {
+  margin: 0;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.user-table th {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  color: var(--rcw-text-muted);
+  font-weight: 600;
+  text-align: left;
+}
+
+.user-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--rcw-border-color);
+  vertical-align: middle;
+}
+
+.user-row:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.user-info-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar-small {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--rcw-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #fff;
+  font-size: 14px;
+}
+
+.user-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-username {
+  font-weight: 600;
+  color: #fff;
+}
+
+.user-email {
+  font-size: 0.85rem;
+  color: var(--rcw-text-muted);
+}
+
+.badge-role {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-role-admin {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge-role-user {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* Actions */
+.btn-action {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s;
+  background: transparent;
+  border: 1px solid var(--rcw-border-color);
+  color: var(--rcw-text-muted);
+}
+
+.btn-edit:hover {
+  color: var(--rcw-accent);
+  border-color: var(--rcw-accent);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.btn-delete:hover {
+  color: #ef4444;
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Modal Styling Overrides */
+.modal-content.custom-admin-modal {
+  background: var(--rcw-bg-card);
+  border: 1px solid var(--rcw-border-color);
+  color: #fff;
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--rcw-border-color);
+}
+
+.modal-footer {
+  border-top: 1px solid var(--rcw-border-color);
+}
+
+.custom-form-label {
+  color: var(--rcw-text-muted);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.custom-form-input {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--rcw-border-color);
+  color: #fff;
+  border-radius: 8px;
+}
+
+.custom-form-input:focus {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: var(--rcw-accent);
+  color: #fff;
+  box-shadow: none;
+}
+
+/* Pagination */
+.admin-pagination {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.pagination .page-link {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--rcw-border-color);
+  color: var(--rcw-text-muted);
+}
+
+.pagination .page-item.active .page-link {
+  background: var(--rcw-accent);
+  border-color: var(--rcw-accent);
+  color: #fff;
+}

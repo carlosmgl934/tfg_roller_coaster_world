@@ -6,6 +6,7 @@ header('Content-Type: application/json');
 
 $db = new DBConexion();
 require_once __DIR__ . '/utils/ApiRouter.php';
+require_once __DIR__ . '/utils/StatsHelper.php';
 
 $router = new ApiRouter('list');
 
@@ -353,7 +354,8 @@ function getCoasters()
         (SELECT COUNT(*) + 1 FROM coasters AS c2 
             WHERE (SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = c2.id) 
                 > (SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = coasters.id)) AS global_rank,
-        (SELECT rank_position FROM user_credits WHERE coaster_id = coasters.id AND user_id = :user_id LIMIT 1) AS personal_ranking
+        (SELECT rank_position FROM user_credits WHERE coaster_id = coasters.id AND user_id = :user_id LIMIT 1) AS personal_ranking,
+        coasters.reviews_count
     FROM coasters
     INNER JOIN parks ON coasters.park_id = parks.id
     WHERE coasters.id = :id";
@@ -516,6 +518,10 @@ function saveReview()
         }
 
         $db->commit();
+        
+        // Actualizar estadísticas de la montaña rusa (estrellas)
+        StatsHelper::updateCoasterStats($coasterId);
+        
         Response::success();
     } catch (PDOException $e) {
         $db->rollBack();

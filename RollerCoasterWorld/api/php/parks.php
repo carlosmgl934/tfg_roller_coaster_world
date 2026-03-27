@@ -6,6 +6,7 @@ header('Content-Type: application/json');
 
 $db = new DBConexion();
 require_once __DIR__ . '/utils/ApiRouter.php';
+require_once __DIR__ . '/utils/StatsHelper.php';
 
 $router = new ApiRouter('list');
 
@@ -14,6 +15,7 @@ $router->register('list',      'listParks');
 $router->register('country',   'getCountries');
 $router->register('details',   'getParkDetails');
 $router->register('reviews',   'getParkReviews');
+$router->register('save_review', 'saveReview', 'POST');
 // ── Endpoints protegidos (requieren login y rol admin) ─────────────────────────
 $router->register('add',           'addPark',           'POST');
 $router->register('update',        'updatePark',        'POST');
@@ -166,7 +168,9 @@ function getParkReviews() {
     if ($order === 'worst') $orderBy = 'pr.note ASC, pr.created_at DESC';
 
     $stmt = $db->prepare("
-        SELECT pr.review, pr.note, pr.created_at, u.username 
+        SELECT pr.id, pr.review, pr.note, pr.created_at, u.username,
+               (SELECT json_agg(json_build_object('tag', pt.tag, 'type', pt.type))
+                FROM park_review_tags pt WHERE pt.review_id = pr.id) AS tags
         FROM park_ratings pr
         JOIN users u ON pr.user_id = u.id
         WHERE pr.park_id = :id AND pr.review IS NOT NULL AND pr.review != ''
@@ -175,6 +179,10 @@ function getParkReviews() {
     ");
     $stmt->execute([':id' => $id]);
     $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($reviews as &$r) {
+        $r['tags'] = $r['tags'] ? json_decode($r['tags'], true) : [];
+    }
 
     Response::success(['reviews' => $reviews]);
 }
@@ -357,4 +365,66 @@ function updateParkStats() {
     ]);
 
     Response::success(['message' => 'Estadísticas actualizadas']);
+}
+
+// Guardar una nueva reseña (público, requiere login)
+function saveReview() {
+    global $db;
+
+    if (!isset($_SESSION['user_id'])) {
+        Response::error("Debe iniciar sesión para dejar una reseña", 401);
+    }
+
+    $userId = $_SESSION['user_id'];
+    $parkId = (int)($_POST['park_id'] ?? 0);
+    $note = (float)($_POST['note'] ?? 0);
+    $reviewText = trim($_POST['review'] ?? '');
+    $pros = $_POST['pros'] ?? [];
+    $contras = $_POST['contras'] ?? [];
+
+    if ($parkId <= 0 || $note <= 0) {
+        Response::error("Datos de reseña inválidos", 400);
+    }
+
+    try {
+        $db->beginTransaction();
+
+        $stmt = $db->prepare("
+            INSERT INTO park_ratings (user_id, park_id, review, note)
+            VALUES (:user_id, :park_id, :review, :note)
+            RETURNING id
+        ");
+        $stmt->execute([
+            ':user_id' => $userId,
+            ':park_id' => $parkId,
+            ':review'  => !empty($reviewText) ? $reviewText : null,
+            ':note'    => $note
+        ]);
+        $reviewId = $stmt->fetchColumn();
+
+        if ($reviewId) {
+            $tagStmt = $db->prepare("INSERT INTO park_review_tags (review_id, tag, type) VALUES (:review_id, :tag, :type)");
+            
+            if (is_array($pros)) {
+                foreach ($pros as $tag) {
+                    $tagStmt->execute([':review_id' => $reviewId, ':tag' => $tag, ':type' => 'pro']);
+                }
+            }
+            if (is_array($contras)) {
+                foreach ($contras as $tag) {
+                    $tagStmt->execute([':review_id' => $reviewId, ':tag' => $tag, ':type' => 'con']);
+                }
+            }
+        }
+
+        $db->commit();
+        
+        // Actualizar estadísticas del parque (estrellas)
+        StatsHelper::updateParkStats($parkId);
+        
+        Response::success(['message' => 'Reseña guardada correctamente']);
+    } catch (Exception $e) {
+        if ($db->inTransaction()) $db->rollBack();
+        Response::error("Error al guardar la reseña: " . $e->getMessage(), 500);
+    }
 }

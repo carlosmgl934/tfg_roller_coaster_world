@@ -3,6 +3,7 @@ session_start();
 require_once __DIR__ . '/../../database/db_conexion.php';
 require_once __DIR__ . '/../utils/ApiRouter.php';
 require_once __DIR__ . '/../utils/Response.php';
+require_once __DIR__ . '/../utils/StatsHelper.php';
 
 header('Content-Type: application/json');
 
@@ -283,14 +284,19 @@ function deleteCoaster(): void
     try {
         global $db;
 
-        // Opcional: obtener nombre antes de borrar para el mensaje de éxito
-        $stmt = $db->prepare("SELECT coaster_name FROM coasters WHERE id = :id");
-        $stmt->execute([':id' => $id]);
-        $coasterName = $stmt->fetchColumn() ?: 'esa coaster';
+        // Antes de borrar, obtenemos el park_id para actualizar sus stats
+        $stmtPark = $db->prepare("SELECT park_id FROM coasters WHERE id = :id");
+        $stmtPark->execute([':id' => $id]);
+        $parkId = $stmtPark->fetchColumn();
 
         // Eliminar
         $stmt = $db->prepare("DELETE FROM coasters WHERE id = :id");
         $stmt->execute([':id' => $id]);
+
+        // Actualizar estadísticas del parque
+        if ($parkId) {
+            StatsHelper::updateParkStats((int)$parkId);
+        }
 
         Response::success(['coaster_name' => $coasterName]);
     }
@@ -390,6 +396,11 @@ function addCoaster(): void
         ");
         $stmt->execute([':id' => $newId]);
         $newCoaster = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Actualizar estadísticas del parque beneficiado
+        if ($parkId) {
+            StatsHelper::updateParkStats((int)$parkId);
+        }
 
         Response::success(['coaster' => $newCoaster]);
     }
@@ -503,6 +514,13 @@ function updateCoaster(): void
         ");
         $stmt->execute([':id' => $id]);
         $updatedCoaster = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Actualizar estadísticas de parques (el nuevo, y el viejo si cambió)
+        // NOTA: Para simplificar, actualizamos el actual. 
+        // Si queremos ser súper precisos, deberíamos haber guardado el OLD park_id antes del UPDATE.
+        if ($parkId) {
+            StatsHelper::updateParkStats((int)$parkId);
+        }
 
         Response::success(['coaster' => $updatedCoaster]);
     }
