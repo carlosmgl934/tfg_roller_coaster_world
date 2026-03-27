@@ -57,11 +57,10 @@ if (!$is_logged || !$is_admin) {
                     </div>
 
                     <!-- Parque -->
-                    <div class="mb-3">
-                        <select class="form-select shadow-sm rounded-0" id="filter-park">
-                            <option value="">Todos los parques</option>
-                            <option value="__null__">Desconocido</option>
-                        </select>
+                    <div class="mb-3 position-relative">
+                        <input type="text" id="filter-park-search" class="form-control shadow-sm rounded-0" placeholder="Buscar parque...">
+                        <input type="hidden" id="filter-park" value="">
+                        <div id="filter-park-results" class="autocomplete-dropdown d-none" style="position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background: #161b22; border: 1px solid #30363d; max-height: 200px; overflow-y: auto;"></div>
                     </div>
 
                     <!-- Año de apertura -->
@@ -167,8 +166,8 @@ if (!$is_logged || !$is_admin) {
 <div class="modal fade" id="modal-add-coaster" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 1400px;">
         <div class="modal-content rounded-0 border-0 shadow-lg" style="background:#161b22;">
- 
-            <div class="modal-header bg-success text-white border-0 py-3 px-4">
+            <form id="add-coaster-form">
+                <div class="modal-header bg-success text-white border-0 py-3 px-4">
                 <div class="d-flex align-items-center gap-2">
                     <h5 class="modal-title fw-bold mb-0">Añadir nueva coaster</h5>
                 </div>
@@ -367,7 +366,7 @@ if (!$is_logged || !$is_admin) {
                             
                             <div class="d-flex align-items-center mb-3">
                                 <i class="fa-solid fa-photo-film text-success fs-5 me-2"></i>
-                                <label class="form-label fw-bold text-uppercase text-white mb-0" style="letter-spacing: 0.5px;">Multimedia Principal</label>
+                                <label class="form-label fw-bold text-uppercase text-white mb-0" style="letter-spacing: 0.5px;">Portada (Imagen Principal)</label>
                             </div>
      
                             <div id="add-coaster-dropzone"
@@ -385,6 +384,7 @@ if (!$is_logged || !$is_admin) {
                                 </div>
                             </div>
                             <input type="file" id="add-coaster-image" accept="image/*,video/*" class="d-none">
+                            <input type="hidden" id="add-coaster-image-url" value="">
      
                             <div id="add-coaster-preview" class="mt-4 flex-grow-1 position-relative"
                                 style="min-height:280px;background:#0d1117;
@@ -421,6 +421,7 @@ if (!$is_logged || !$is_admin) {
                     <i class="fa-solid fa-plus me-2"></i>Añadir coaster
                 </button>
             </div>
+            </form>
  
         </div>
     </div>
@@ -472,7 +473,8 @@ if (!$is_logged || !$is_admin) {
 <div class="modal fade" id="modal-edit-coaster" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 1400px;">
         <div class="modal-content rounded-0 border-0 shadow-lg" style="background:#161b22;">
-            <input type="hidden" id="edit-coaster-id">
+            <form id="edit-coaster-form">
+                <input type="hidden" id="edit-coaster-id">
  
             <div class="modal-header text-white border-0 py-3 px-4" style="background:#10b981;">
                 <div class="d-flex align-items-center gap-3">
@@ -733,6 +735,7 @@ if (!$is_logged || !$is_admin) {
                     <i class="fa-solid fa-arrows-rotate me-2"></i>Actualizar Atracción
                 </button>
             </div>
+            </form>
  
         </div>
     </div>

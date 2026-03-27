@@ -240,24 +240,34 @@ $(document).ready(function () {
         const url = new URL(apiBase, window.location.origin);
         url.searchParams.append("action", "list");
         url.searchParams.append("q", search);
+        url.searchParams.append("limit", "10"); // Pedimos algunos más para saber si hay más de 5
+        
         const res = await fetch(url);
         const data = await res.json();
         const parksData = data.data || [];
         let html = "";
         const MAX_PREVIEW = 5;
-        parksData.slice(0, MAX_PREVIEW).forEach((p) => {
-          html += `<a href="${window.BASE_URL || ""}/web/views/public/parks/parks.php?id=${p.id}" class="list-group-item list-group-item-action d-flex justify-content-between">
-            <div><h6 class="mb-0">${p.park_name}</h6><small>${p.park_location}</small></div>
-            <i class="fa-solid fa-chevron-right"></i></a>`;
-        });
-        if (parksData.length > MAX_PREVIEW) {
-          html += `<a href="#" class="list-group-item list-group-item-action text-center text-primary fw-bold" id="view-all-park-results">
-            Ver todos los resultados para "${search}" <i class="fa-solid fa-arrow-right ms-1"></i>
-          </a>`;
-        }
+
         if (parksData.length === 0) {
-          html = `<div class="list-group-item text-muted text-center py-3">No se encontraron parques.</div>`;
+          html = `<div class="list-group-item text-muted text-center py-3">No se encontraron parques para "${search}".</div>`;
+        } else {
+          parksData.slice(0, MAX_PREVIEW).forEach((p) => {
+            html += `
+              <a href="${window.BASE_URL || ""}/web/views/public/parks/parks.php?id=${p.id}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-0 fw-bold">${p.park_name}</h6>
+                  <small class="text-muted"><i class="fa-solid fa-location-dot me-1"></i>${p.park_location || ""}${p.park_location && p.park_country ? ", " : ""}${p.park_country || ""}</small>
+                </div>
+                <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.8rem;"></i>
+              </a>`;
+          });
+
+          html += `
+            <a href="#" class="list-group-item list-group-item-action text-center text-primary fw-bold" id="view-all-park-results">
+              Ver todos los resultados para "${search}" <i class="fa-solid fa-arrow-right ms-1"></i>
+            </a>`;
         }
+        
         $("#search-results").html(html).show();
       }, 300);
     });
@@ -444,7 +454,9 @@ $(document).ready(function () {
           if (data.coasters.length > 0) {
             data.coasters.forEach((c) => {
               const fallback = "https://placehold.co/400x300?text=Coaster";
-              const img = c.imagen_url || fallback;
+              const img = c.imagen_url
+              ? (c.imagen_url.startsWith('/') ? (window.BASE_URL || '') + c.imagen_url : c.imagen_url)
+              : fallback;
 
               let badgeHtml = "";
               let statusText = c.coaster_status || "Operativa";

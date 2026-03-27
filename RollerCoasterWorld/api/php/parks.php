@@ -30,7 +30,7 @@ function listParks() {
     global $db;
     
     $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-    $limit = isset($_GET['limit']) ? min(50, max(1, (int)$_GET['limit'])) : 15;
+    $limit = isset($_GET['limit']) ? min(2000, max(1, (int)$_GET['limit'])) : 15;
     $offset = ($page - 1) * $limit;
 
     $where = ["park_name NOT IN ('Desconocido', 'Unknown')"];

@@ -264,6 +264,22 @@ $(document).ready(function () {
               data-image="${c.imagen_url || ""}">
               <i class="fa-solid fa-pen"></i> Editar
             </a>
+            <button class="btn btn-sm btn-outline-warning rounded-0 btn-duplicate-coaster"
+              data-name="${c.coaster_name ? c.coaster_name.replace(/"/g, "&quot;") : ""}"
+              data-year="${c.opening_year ?? ""}"
+              data-height="${c.height ?? ""}"
+              data-speed="${c.speed ?? ""}"
+              data-length="${c.coaster_length ?? ""}"
+              data-inversions="${c.inversions ?? ""}"
+              data-status="${c.coaster_status || ""}"
+              data-manufacturer="${c.coaster_manufacter ? c.coaster_manufacter.replace(/"/g, "&quot;") : ""}"
+              data-model="${c.coaster_model ? c.coaster_model.replace(/"/g, "&quot;") : ""}"
+              data-park="${c.park_name ? c.park_name.replace(/"/g, "&quot;") : ""}"
+              data-park-id="${c.park_id ?? ""}"
+              data-country="${c.park_country ? c.park_country.replace(/"/g, "&quot;") : ""}"
+              data-image="${c.imagen_url || ""}">
+              <i class="fa-solid fa-copy"></i> Duplicar
+            </button>
             <button class="btn btn-sm btn-outline-danger rounded-0 btn-delete-coaster"
               data-id="${c.id}" data-name="${c.coaster_name}">
               <i class="fa-solid fa-trash"></i> Eliminar
@@ -377,25 +393,21 @@ $(document).ready(function () {
     );
 
     try {
-      let url;
-      if (useSearch) {
-        url =
-          `${BASE_URL}/api/php/admin/admin_coasters.php?action=searchCoasters` +
-          `&search=${encodeURIComponent(search)}&page=${page}`;
-      } else {
-        const params = new URLSearchParams({
-          action: "filterCoasters",
-          page,
-        });
-        if (filters.opened) params.set("opened", filters.opened);
-        if (filters.manufacter) params.set("manufacter", filters.manufacter);
-        if (filters.country) params.set("country", filters.country);
-        if (filters.park) params.set("park", filters.park);
-        if (filters.year) params.set("year", filters.year);
-        if (parseInt(filters.height) > 0) params.set("height", filters.height);
-        if (parseInt(filters.speed) > 0) params.set("speed", filters.speed);
-        url = `${BASE_URL}/api/php/admin/admin_coasters.php?${params}`;
-      }
+      const params = new URLSearchParams({
+        action: "filterCoasters",
+        page,
+      });
+
+      if (search) params.set("search", search);
+      if (filters.opened) params.set("opened", filters.opened);
+      if (filters.manufacter) params.set("manufacter", filters.manufacter);
+      if (filters.country) params.set("country", filters.country);
+      if (filters.park) params.set("park", filters.park);
+      if (filters.year) params.set("year", filters.year);
+      if (parseInt(filters.height) > 0) params.set("height", filters.height);
+      if (parseInt(filters.speed) > 0) params.set("speed", filters.speed);
+
+      const url = `${BASE_URL}/api/php/admin/admin_coasters.php?${params}`;
 
       const res = await fetch(url, { credentials: "include" });
       const data = await res.json();
@@ -455,19 +467,33 @@ $(document).ready(function () {
       })
       .catch(() => {});
 
-    // Parques
-    fetch(`${BASE_URL}/api/php/parks.php?action=list&limit=500&sort=name`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.success && data.data) {
-          data.data.forEach((p) => {
-            $("#filter-park").append(
-              `<option value="${p.park_name}">${p.park_name}</option>`,
-            );
-          });
-        }
-      })
-      .catch(() => {});
+    // ── Autocompletado del Filtro de Parques ────────────────────────
+    initAutocomplete({
+      inputId: "filter-park-search",
+      dropdownId: "filter-park-results",
+      fetchItems: async (q) => {
+        const url = `${BASE_URL}/api/php/parks.php?action=list&limit=20${q ? "&q=" + encodeURIComponent(q) : "&sort=name"}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (!data.success) return [];
+        const parks = data.data.map((p) => ({
+          label: p.park_name,
+          sublabel: p.park_country || "",
+          value: p.park_name,
+          id: p.id,
+        }));
+        return [
+          { label: "Todos los parques", value: "", id: "", unknown: false },
+          { label: "Desconocido", value: "Desconocido", id: "__null__", unknown: true },
+          ...parks,
+        ];
+      },
+      onSelect: (item) => {
+        document.getElementById("filter-park").value = item.id;
+        // Si el usuario selecciona algo, disparamos la carga automáticamente o esperamos al botón de filtrar
+        // window.loadAdminCoasters(1); 
+      },
+    });
 
     // ── Buscador con debounce ──────────────────────────────────
     $searchInput.on("input", function () {
@@ -512,6 +538,7 @@ $(document).ready(function () {
       $("#filter-manufacter").val("");
       $("#filter-country").val("");
       $("#filter-park").val("");
+      $("#filter-park-search").val("");
       $("#filter-year").val("");
       $("#filter-height").val(0);
       $("#filter-speed").val(0);
@@ -543,11 +570,68 @@ $(document).ready(function () {
         document.getElementById("modal-delete-coaster"),
       ).show();
     });
+
+    // ── Modal duplicar (delegado) ──────────────────────────────
+    $(document).on("click", ".btn-duplicate-coaster", function () {
+      const btn = $(this);
+      
+      // Limpiar errores previos
+      clearErrors();
+      
+      // Poblamos los campos del modal de AÑADIR (modal-add-coaster)
+      document.getElementById("add-coaster-name").value = btn.attr("data-name") + " (Copia)";
+      document.getElementById("add-coaster-manufacturer").value = btn.attr("data-manufacturer") || "Desconocido";
+      document.getElementById("add-coaster-manufacturer").dataset.selected = "true";
+      
+      document.getElementById("add-coaster-model").value = btn.attr("data-model") || "Desconocido";
+      document.getElementById("add-coaster-model").dataset.selected = "true";
+      
+      document.getElementById("add-coaster-park").value = btn.attr("data-park") || "Desconocido";
+      document.getElementById("add-coaster-park").dataset.selected = "true";
+      document.getElementById("add-coaster-park-id").value = btn.attr("data-park-id") || "";
+      
+      document.getElementById("add-coaster-country").value = btn.attr("data-country") || "Desconocido";
+      document.getElementById("add-coaster-country").dataset.selected = "true";
+      
+      document.getElementById("add-coaster-year").value = btn.attr("data-year") || "";
+      document.getElementById("add-coaster-height").value = btn.attr("data-height") || "";
+      document.getElementById("add-coaster-speed").value = btn.attr("data-speed") || "";
+      document.getElementById("add-coaster-length").value = btn.attr("data-length") || "";
+      document.getElementById("add-coaster-inversions").value = btn.attr("data-inversions") || "";
+      document.getElementById("add-coaster-status").value = btn.attr("data-status") || "";
+
+      // Guardar la URL original en el campo oculto
+      const imageUrl = btn.attr("data-image");
+      document.getElementById("add-coaster-image-url").value = imageUrl || "";
+
+      // Mostrar preview de la imagen si existe
+      const preview = document.getElementById("add-coaster-preview");
+      if (preview) {
+        if (imageUrl) {
+          let validImgUrl = imageUrl;
+          if (!validImgUrl.startsWith("http")) {
+            validImgUrl = BASE_URL + (validImgUrl.startsWith("/") ? "" : "/") + validImgUrl;
+          }
+          preview.innerHTML = `<img src="${validImgUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+        } else {
+          preview.innerHTML = '<div class="text-center text-muted"><i class="fa-regular fa-image fa-3x d-block mb-3" style="opacity:0.2;"></i><span style="font-size:0.85rem; letter-spacing:1px; text-transform:uppercase;">Vista previa</span></div>';
+        }
+      }
+
+      // Abrimos el modal de AÑADIR
+      const addModal = new bootstrap.Modal(document.getElementById("modal-add-coaster"));
+      addModal.show();
+    });
   }
   // ── Modal añadir coaster  ─────────────────────────────────────────
   const _btnAddCoaster = document.getElementById("btn-add-coaster");
   if (_btnAddCoaster) {
     _btnAddCoaster.addEventListener("click", function () {
+      // Resetear campos previos al abrir para añadir normal
+      document.getElementById("add-coaster-form").reset();
+      document.getElementById("add-coaster-image-url").value = "";
+      document.getElementById("add-coaster-preview").innerHTML = '<div class="text-center text-muted"><i class="fa-regular fa-image fa-3x d-block mb-3" style="opacity:0.2;"></i><span style="font-size:0.85rem; letter-spacing:1px; text-transform:uppercase;">Vista previa</span></div>';
+      
       const modal = new bootstrap.Modal(
         document.getElementById("modal-add-coaster"),
       );
@@ -718,6 +802,15 @@ $(document).ready(function () {
       input.dataset.selected = "true";
       onSelect(item);
       closeDropdown();
+      // Quitar el foco del input y mover al siguiente campo
+      input.blur();
+      const focusable = Array.from(
+        document.querySelectorAll(
+          'input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled])'
+        )
+      ).filter(el => el.offsetParent !== null);
+      const idx2 = focusable.indexOf(input);
+      if (idx2 >= 0 && focusable[idx2 + 1]) focusable[idx2 + 1].focus();
     }
 
     function closeDropdown() {
@@ -733,11 +826,13 @@ $(document).ready(function () {
       debounce = setTimeout(async () => {
         const q = input.value.trim();
         const list = await fetchItems(q);
-        renderItems(list);
+        // Solo mostrar si el input sigue con foco
+        if (document.activeElement === input) renderItems(list);
       }, 200);
     });
 
-    input.addEventListener("focus", async () => {
+    // Solo abrir el dropdown si el usuario hace click directamente en el input
+    input.addEventListener("click", async () => {
       const list = await fetchItems(input.value.trim());
       renderItems(list);
     });
@@ -767,7 +862,13 @@ $(document).ready(function () {
         else closeDropdown();
       } else if (e.key === "Escape") {
         closeDropdown();
+        input.blur();
       }
+    });
+
+    input.addEventListener("blur", () => {
+      // Cerrar con pequeño delay para permitir el mousedown del item
+      setTimeout(() => closeDropdown(), 150);
     });
 
     document.addEventListener("click", (e) => {
@@ -810,24 +911,31 @@ $(document).ready(function () {
           .value.trim();
         const model = document.getElementById("add-coaster-model").value.trim();
         const park = document.getElementById("add-coaster-park").value.trim();
+        const parkId = document.getElementById("add-coaster-park-id").value;
         const country = document
           .getElementById("add-coaster-country")
           .value.trim();
         const year = document.getElementById("add-coaster-year").value.trim();
-        const height = document
+        let height = document
           .getElementById("add-coaster-height")
           .value.trim();
-        const speed = document.getElementById("add-coaster-speed").value.trim();
-        const length = document
+        let speed = document.getElementById("add-coaster-speed").value.trim();
+        let length = document
           .getElementById("add-coaster-length")
           .value.trim();
-        const inversions = document
+        let inversions = document
           .getElementById("add-coaster-inversions")
           .value.trim();
+          
+        if (height === "") height = "0";
+        if (speed === "") speed = "0";
+        if (length === "") length = "0";
+        if (inversions === "") inversions = "0";
         const status = document
           .getElementById("add-coaster-status")
           .value.trim();
         const image = document.getElementById("add-coaster-image").files[0];
+        const existingImageUrl = document.getElementById("add-coaster-image-url").value;
 
         if (!name) {
           showModalError("El nombre de la coaster es obligatorio.");
@@ -1015,6 +1123,7 @@ $(document).ready(function () {
         formData.append("manufacturer", manufacturer);
         formData.append("model", model);
         formData.append("park", park);
+        formData.append("parkId", parkId);
         formData.append("country", country);
         formData.append("year", year);
         formData.append("height", height);
@@ -1022,8 +1131,30 @@ $(document).ready(function () {
         formData.append("length", length);
         formData.append("inversions", inversions);
         formData.append("status", status);
-        if (image) {
-          formData.append("image", image);
+
+        const imageFile = document.getElementById("add-coaster-image").files[0];
+        const existingImg = document.getElementById("add-coaster-image-url").value;
+
+        if (imageFile) {
+          const uploadForm = new FormData();
+          uploadForm.append("file", imageFile);
+          uploadForm.append("bucket", "coasters");
+          uploadForm.append("path", "admin_uploads");
+
+          const uploadRes = await fetch(`${BASE_URL}/api/php/upload.php`, {
+            method: "POST",
+            body: uploadForm,
+          });
+          const uploadData = await uploadRes.json();
+          if (uploadData.success) {
+            formData.append("imagenUrl", uploadData.url);
+          } else {
+            // Fallback local
+            formData.append("image", imageFile);
+          }
+        } else if (existingImg && existingImg.trim() !== "") {
+          // Caso duplicado: enviamos la URL que ya teníamos
+          formData.append("imagenUrl", existingImg);
         }
 
         const response = await fetch(
@@ -1034,15 +1165,28 @@ $(document).ready(function () {
           },
         );
 
-        if (!response.ok) {
-          throw new Error("Error al añadir coaster");
+        let data = {};
+        const contentType = response.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+          data = await response.json();
         }
 
-        const data = await response.json();
+        if (!response.ok) {
+          showModalError(
+            "Error al añadir coaster: " +
+              (data.error || data.message || "HTTP " + response.status),
+          );
+          return;
+        }
+
         if (data.success) {
           showModalSuccess("Coaster añadida correctamente");
+          if (typeof window.loadAdminCoasters === 'function') window.loadAdminCoasters(1);
+          setTimeout(() => {
+            bootstrap.Modal.getInstance(document.getElementById("modal-add-coaster"))?.hide();
+          }, 2000);
         } else {
-          showModalError("Error al añadir coaster: " + data.message);
+          showModalError("Error al añadir coaster: " + (data.error || data.message || "Error desconocido"));
         }
       } catch (error) {
         console.error("Error al añadir coaster:", error);
@@ -1216,10 +1360,10 @@ $(document).ready(function () {
       // Rellenar los campos autocomplete y marcarlos como seleccionados
       const acMap = {
         "edit-coaster-manufacturer":
-          button.getAttribute("data-manufacturer") ?? "",
-        "edit-coaster-model": button.getAttribute("data-model") ?? "",
-        "edit-coaster-park": button.getAttribute("data-park") ?? "",
-        "edit-coaster-country": button.getAttribute("data-country") ?? "",
+          button.getAttribute("data-manufacturer") || "Desconocido",
+        "edit-coaster-model": button.getAttribute("data-model") || "Desconocido",
+        "edit-coaster-park": button.getAttribute("data-park") || "Desconocido",
+        "edit-coaster-country": button.getAttribute("data-country") || "Desconocido",
       };
       Object.entries(acMap).forEach(([id, val]) => {
         const el = document.getElementById(id);
@@ -1231,11 +1375,54 @@ $(document).ready(function () {
       const imageUrl = button.getAttribute("data-image");
       const preview = document.getElementById("edit-coaster-preview");
       if (preview) {
-        preview.innerHTML = imageUrl
-          ? `<img src="${imageUrl}" style="width:100%;height:100%;object-fit:cover;">`
+        let validImgUrl = imageUrl;
+        if (validImgUrl && !validImgUrl.startsWith("http")) {
+            validImgUrl = BASE_URL + (validImgUrl.startsWith("/") ? "" : "/") + validImgUrl;
+        }
+        preview.innerHTML = validImgUrl
+          ? `<img src="${validImgUrl}" style="width:100%;height:100%;object-fit:cover;">`
           : "";
       }
     });
+
+    // Auto-open modal if URL has ?edit_coaster=ID
+    const editCoasterId = new URLSearchParams(window.location.search).get('edit_coaster');
+    if (editCoasterId) {
+      fetch(`${BASE_URL}/api/php/coasters.php?action=coaster&id=${editCoasterId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.coaster) {
+            const c = data.coaster;
+            const btn = document.createElement('button');
+            btn.setAttribute('data-bs-toggle', 'modal');
+            btn.setAttribute('data-bs-target', '#modal-edit-coaster');
+            btn.setAttribute('data-id', c.id);
+            btn.setAttribute('data-name', c.coaster_name || "");
+            btn.setAttribute('data-year', c.opening_year || "");
+            btn.setAttribute('data-height', c.height || "");
+            btn.setAttribute('data-speed', c.speed || "");
+            btn.setAttribute('data-length', c.coaster_length || "");
+            btn.setAttribute('data-inversions', c.inversions || "");
+            btn.setAttribute('data-status', c.coaster_status || "");
+            btn.setAttribute('data-manufacturer', c.coaster_manufacter || "Desconocido");
+            btn.setAttribute('data-model', c.coaster_model || "Desconocido");
+            btn.setAttribute('data-park', c.park_name || "Desconocido");
+            btn.setAttribute('data-park-id', c.park_id || "");
+            btn.setAttribute('data-country', c.park_country || "Desconocido");
+            btn.setAttribute('data-image', c.imagen_url || "");
+            
+            document.body.appendChild(btn);
+            btn.click();
+            btn.remove();
+            
+            // Clean URL
+            const url = new URL(window.location);
+            url.searchParams.delete('edit_coaster');
+            window.history.replaceState({}, document.title, url);
+          }
+        })
+        .catch(err => console.error("Error fetching coaster for edit:", err));
+    }
   }
 
   /*
@@ -1963,16 +2150,21 @@ if (_confirmEditCoaster) {
       ).checked;
 
       const year = document.getElementById("edit-coaster-year").value.trim();
-      const height = document
+      let height = document
         .getElementById("edit-coaster-height")
         .value.trim();
-      const speed = document.getElementById("edit-coaster-speed").value.trim();
-      const length = document
+      let speed = document.getElementById("edit-coaster-speed").value.trim();
+      let length = document
         .getElementById("edit-coaster-length")
         .value.trim();
-      const inversions = document
+      let inversions = document
         .getElementById("edit-coaster-inversions")
         .value.trim();
+        
+      if (height === "") height = "0";
+      if (speed === "") speed = "0";
+      if (length === "") length = "0";
+      if (inversions === "") inversions = "0";
 
       // Validaciones
       if (!name) {
@@ -2146,7 +2338,24 @@ if (_confirmEditCoaster) {
       formData.append("length", unknownLength ? "" : length);
       formData.append("inversions", unknownInversions ? "" : inversions);
       formData.append("status", status);
-      if (image) formData.append("image", image);
+
+      if (image) {
+        const uploadForm = new FormData();
+        uploadForm.append("file", image);
+        uploadForm.append("bucket", "coasters");
+        uploadForm.append("path", "admin_uploads");
+
+        const uploadRes = await fetch(`${BASE_URL}/api/php/upload.php`, {
+          method: "POST",
+          body: uploadForm,
+        });
+        const uploadData = await uploadRes.json();
+        if (uploadData.success) {
+          formData.append("imagenUrl", uploadData.url);
+        } else {
+          formData.append("image", image);
+        }
+      }
 
       const response = await fetch(
         `${BASE_URL}/api/php/admin/admin_coasters.php?action=updateCoaster`,

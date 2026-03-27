@@ -295,8 +295,13 @@ $(document).ready(function () {
           "p-3",
         );
 
-        const img = coaster.imagen_url
-          ? `<img src="${coaster.imagen_url}" alt="${coaster.coaster_name}" class="rounded-0 shadow-sm" referrerpolicy="no-referrer" style="width: 100px; height: 100px; object-fit: cover; margin-right: 20px;">`
+        let validImgUrl = coaster.imagen_url;
+        if (validImgUrl && !validImgUrl.startsWith("http")) {
+            validImgUrl = BASE_URL + (validImgUrl.startsWith("/") ? "" : "/") + validImgUrl;
+        }
+
+        const img = validImgUrl
+          ? `<img src="${validImgUrl}" alt="${coaster.coaster_name}" class="rounded-0 shadow-sm" referrerpolicy="no-referrer" style="width: 100px; height: 100px; object-fit: cover; margin-right: 20px;">`
           : `<img src="https://www.hussrides.com/fileadmin/_processed_/5/e/csm_giant-frisbee-cedarpoint-01_0697df513a.jpg" alt="Sin imagen" class="rounded-0 shadow-sm" style="width: 100px; height: 100px; object-fit: cover; margin-right: 20px;">`;
 
         const manufacter = coaster.manufacter || "Desconocido";
@@ -586,17 +591,21 @@ $(document).ready(function () {
 
           // --- Multimedia ---
           if (coaster.imagen_url) {
+            let validImgUrl = coaster.imagen_url;
+            if (!validImgUrl.startsWith("http")) {
+                validImgUrl = BASE_URL + (validImgUrl.startsWith("/") ? "" : "/") + validImgUrl;
+            }
             $("#coaster-hero-img")
-              .attr("src", coaster.imagen_url)
+              .attr("src", validImgUrl)
               .attr("alt", coaster.coaster_name);
           }
 
-          // --- Lógica del botón "Montada" (Visual) ---
+          // --- Lógica del botón "Probada" (Visual) ---
           if (coaster.personal_ranking !== null) {
             $("#coaster-ridden")
               .removeClass("fa-regular fa-xmark text-success text-secondary")
               .addClass("fa-solid fa-circle-check text-white");
-            $("#btn-ridden span").text("Montada");
+            $("#btn-ridden span").text("Ya probada");
             $("#btn-ridden")
               .removeClass("btn-outline-secondary btn-outline-success")
               .addClass("btn-success text-white");
@@ -604,7 +613,7 @@ $(document).ready(function () {
             $("#coaster-ridden")
               .removeClass("fa-solid fa-circle-check text-success text-white")
               .addClass("fa-solid fa-xmark text-secondary");
-            $("#btn-ridden span").text("No montada");
+            $("#btn-ridden span").text("No probada todavía");
             $("#btn-ridden")
               .removeClass(
                 "btn-success text-white btn-outline-success btn-ridden-active",

@@ -84,6 +84,11 @@ if ($id === 0) {
                     title="Compartir">
                     <i class="fa-solid fa-share-nodes fs-5"></i>
                 </button>
+                <?php if (isset($is_admin) && $is_admin): ?>
+                <a href="<?= Router::url('admin_coasters') ?>?edit_coaster=<?= $id ?>" class="btn btn-outline-primary" style="border-radius:0; padding:10px 14px;" title="Editar Coaster (Admin)">
+                    <i class="fa-solid fa-pen-to-square fs-5"></i>
+                </a>
+                <?php endif; ?>
             </div>
         </div>
     </div>

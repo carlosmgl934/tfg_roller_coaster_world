@@ -52,6 +52,7 @@ function searchCoasters(): void
 
         $sql = "SELECT
                     c.id,
+                    c.park_id,
                     c.coaster_name,
                     c.coaster_manufacter,
                     c.coaster_status,
@@ -104,6 +105,12 @@ function filterCoasters(): void
     $conditions = ['1=1'];
     $params = [];
 
+    // Búsqueda por nombre (buscador principal)
+    if (isset($_GET['search']) && trim($_GET['search']) !== '') {
+        $conditions[] = "c.coaster_name ILIKE :search";
+        $params[':search'] = '%' . trim($_GET['search']) . '%';
+    }
+
     // Solo operativas
     if (!empty($_GET['opened']) && $_GET['opened'] === 'true') {
         $conditions[] = "c.coaster_status = 'Operating'";
@@ -137,8 +144,8 @@ function filterCoasters(): void
             $conditions[] = "(c.park_id IS NULL OR p.id IS NULL OR c.park_id = 2895)";
         }
         else {
-            $conditions[] = "p.park_name ILIKE :park";
-            $params[':park'] = '%' . $_GET['park'] . '%';
+            $conditions[] = "c.park_id = :park";
+            $params[':park'] = intval($_GET['park']);
         }
     }
 
@@ -170,6 +177,7 @@ function filterCoasters(): void
 
         $sql = "SELECT
                     c.id,
+                    c.park_id,
                     c.coaster_name,
                     c.coaster_manufacter,
                     c.coaster_status,
@@ -319,7 +327,7 @@ function addCoaster(): void
     $inversions = (isset($data['inversions']) && $data['inversions'] !== '') ? intval($data['inversions']) : null;
     $rcdbId = (isset($data['rcdbId']) && $data['rcdbId'] !== '') ? intval($data['rcdbId']) : null;
 
-    $imagenUrl = null;
+    $imagenUrl = $_POST['imagenUrl'] ?? null;
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = __DIR__ . '/../../../web/img/';
         if (!is_dir($uploadDir)) {
@@ -426,7 +434,7 @@ function updateCoaster(): void
     $inversions = (isset($data['inversions']) && $data['inversions'] !== '') ? intval($data['inversions']) : null;
     $rcdbId = (isset($data['rcdbId']) && $data['rcdbId'] !== '') ? intval($data['rcdbId']) : null;
 
-    $imagenUrl = null;
+    $imagenUrl = $_POST['imagenUrl'] ?? null;
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = __DIR__ . '/../../../web/img/';
         if (!is_dir($uploadDir)) {

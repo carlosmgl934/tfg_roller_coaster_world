@@ -120,11 +120,11 @@ header("Expires: 0"); // Proxies
 
 <body>
 
-  <nav class="navbar navbar-expand-lg custom-navbar sticky-top">
-    <div class="container-fluid px-3 px-lg-4 pe-3 pe-lg-4">
+  <nav class="navbar navbar-expand-xl custom-navbar sticky-top">
+    <div class="container-fluid px-3 px-xl-4 pe-3 pe-xl-4">
 
       <!-- Brand / Logo -->
-      <a class="navbar-brand rcw-brand me-3 me-lg-4" href="<?= Router::url('home') ?>">
+      <a class="navbar-brand rcw-brand me-3 me-xl-4" href="<?= Router::url('home') ?>">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="28" height="28" class="rcw-brand-icon">
           <!-- Pistas -->
           <path d="M4 48 C 20 48, 24 16, 40 16 C 52 16, 56 32, 60 48" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
@@ -155,7 +155,7 @@ header("Expires: 0"); // Proxies
       <div class="collapse navbar-collapse" id="mainMenu">
 
         <!-- Nav central -->
-        <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-1 gap-lg-2 fw-semibold align-items-lg-center">
+        <ul class="navbar-nav mx-auto mb-2 mb-xl-0 gap-1 gap-xl-2 fw-semibold align-items-xl-center">
 
           <!-- Home  -->
           <li class="nav-item">
@@ -237,7 +237,7 @@ header("Expires: 0"); // Proxies
         <!-- / Nav central -->
 
         <!-- Zona derecha: Login/Registro o Avatar de perfil -->
-        <div class="d-flex align-items-center gap-2 ms-lg-3">
+        <div class="d-flex align-items-center gap-2 ms-xl-3">
 
           <?php if ($is_logged): ?>
 
@@ -285,7 +285,7 @@ header("Expires: 0"); // Proxies
                     <span><?= htmlspecialchars($user_initials) ?></span>
                   <?php endif; ?>
                 </div>
-                <span class="rcw-user-name d-none d-lg-inline" id="header-username-display"><?= htmlspecialchars(ucfirst($user_display)) ?></span>
+                <span class="rcw-user-name d-none d-xl-inline" id="header-username-display"><?= htmlspecialchars(ucfirst($user_display)) ?></span>
               </a>
               <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                 <li>
@@ -297,6 +297,8 @@ header("Expires: 0"); // Proxies
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('profile') ?>"><i
                       class="fa-solid fa-id-card w-20px text-center me-2 text-secondary"></i> Mi perfil</a></li>
+                <li><a class="dropdown-item py-2" href="<?= Router::url('profile') ?>#tops"><i
+                      class="fa-solid fa-list-ol w-20px text-center me-2 text-warning"></i> Mis tops</a></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('friends') ?>"><i
                       class="fa-solid fa-user-group w-20px text-center me-2 text-primary"></i> Usuarios</a></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('carrito') ?>"><i

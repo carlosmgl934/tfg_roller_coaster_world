@@ -99,7 +99,7 @@
 }
 
 /* Hover con blur en pantallas grandes */
-@media all and (min-width: 992px) {
+@media all and (min-width: 1200px) {
   .custom-dropdown:hover .dropdown-menu {
     display: block;
   }
@@ -112,6 +112,28 @@
     right: 0;
     height: 10px;
     background: transparent;
+  }
+}
+
+/* Squeeze navbar to prevent overflow between 1200px and 1400px */
+@media (min-width: 1200px) and (max-width: 1399.98px) {
+  .custom-navbar .nav-link,
+  .custom-navbar .rcw-nav-pill {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    font-size: 0.9rem !important;
+  }
+  .rcw-btn-agenda {
+    padding-left: 0.65rem !important;
+    padding-right: 0.65rem !important;
+    font-size: 0.85rem !important;
+  }
+  .rcw-user-name {
+    max-width: 100px; /* Slight truncation of very long names to guarantee fit */
+    font-size: 0.85rem !important;
+  }
+  .rcw-brand-text {
+    font-size: 0.95rem;
   }
 }
 
@@ -305,7 +327,7 @@
 }
 
 /* ── COLLAPSED MENU (móvil) ─────────────────────────────────── */
-@media (max-width: 991.98px) {
+@media (max-width: 1199.98px) {
   .navbar-collapse {
     background-color: var(--rcw-nav-bg);
     padding: 1rem;

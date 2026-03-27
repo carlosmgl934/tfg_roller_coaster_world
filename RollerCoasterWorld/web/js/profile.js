@@ -10,13 +10,15 @@ $(document).ready(function () {
     locale: "es",
     maxDate: "today",
     disableMobile: "true",
-    onReady: function(selectedDates, dateStr, instance) {
+    onReady: function (selectedDates, dateStr, instance) {
       if (instance.altInput) {
         instance.altInput.id = "config-user-birthdate-alt";
-        const label = document.querySelector('label[for="config-user-birthdate"]');
+        const label = document.querySelector(
+          'label[for="config-user-birthdate"]',
+        );
         if (label) label.setAttribute("for", "config-user-birthdate-alt");
       }
-    }
+    },
   });
 
   // ── Auto-relleno de país usando Nominatim (OpenStreetMap) ──────────────────
@@ -553,13 +555,14 @@ $(document).ready(function () {
     }
     data.slice(0, 10).forEach((item, i) => {
       el.append(`
-        <div class="tops-preview-item">
+        <a href="${BASE_URL}/web/views/public/coasters/coasters.php?id=${item.coaster_id}" class="tops-preview-item text-decoration-none">
           <span class="tops-preview-rank">#${i + 1}</span>
           <div class="flex-grow-1">
             <div class="fw-bold text-white">${item.coaster_name}</div>
             <small class="text-secondary">${item.park_name} · ${item.country_name || ""}</small>
           </div>
-        </div>`);
+          <i class="fa-solid fa-chevron-right text-muted small ms-2"></i>
+        </a>`);
     });
     if (data.length > 10) {
       el.append(
@@ -576,13 +579,14 @@ $(document).ready(function () {
     }
     data.slice(0, 10).forEach((item, i) => {
       el.append(`
-        <div class="tops-preview-item">
+        <a href="${BASE_URL}/web/views/public/parks/parks.php?id=${item.park_id}" class="tops-preview-item text-decoration-none">
           <span class="tops-preview-rank">#${i + 1}</span>
           <div class="flex-grow-1">
             <div class="fw-bold text-white">${item.park_name}</div>
             <small class="text-secondary">${item.country_name || ""}</small>
           </div>
-        </div>`);
+          <i class="fa-solid fa-chevron-right text-muted small ms-2"></i>
+        </a>`);
     });
     if (data.length > 10) {
       el.append(
@@ -637,25 +641,27 @@ $(document).ready(function () {
 
     data.forEach((item) => {
       const img = item.imagen_url
-        ? `<img src="${item.imagen_url}" alt="${item.coaster_name}" loading="lazy">`
+        ? `<img src="${item.imagen_url.startsWith("/") ? BASE_URL + item.imagen_url : item.imagen_url}" alt="${item.coaster_name}" loading="lazy">`
         : `<div style="height:150px;background:#0d1117;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-image text-secondary fs-3"></i></div>`;
+
+      const detailUrl = `${BASE_URL}/web/views/public/coasters/coasters.php?id=${item.coaster_id}`;
 
       if (isGrid) {
         container.append(`
           <div class="${colClass}">
-            <div class="top-card position-relative">
+            <a href="${detailUrl}" class="top-card position-relative d-block text-decoration-none">
               ${img}
               <span class="rank-badge">#${item.rank_position}</span>
               <div class="p-2">
                 <div class="fw-bold text-white small text-truncate">${item.coaster_name}</div>
                 <div class="text-secondary" style="font-size:.75rem;">${item.park_name}</div>
               </div>
-            </div>
+            </a>
           </div>`);
       } else {
         container.append(`
           <div class="${colClass}">
-            <div class="top-card d-flex align-items-stretch" style="height:120px;">
+            <a href="${detailUrl}" class="top-card d-flex align-items-stretch text-decoration-none" style="height:120px;">
               <div style="width:120px;flex-shrink:0;position:relative;">
                 ${img.replace("height:150px", "height:120px")}
                 <span class="rank-badge">#${item.rank_position}</span>
@@ -671,7 +677,7 @@ $(document).ready(function () {
                   ${item.manufacter ? `<small class="text-secondary"><i class="fa-solid fa-industry me-1"></i>${item.manufacter}</small>` : ""}
                 </div>
               </div>
-            </div>
+            </a>
           </div>`);
       }
     });
@@ -713,7 +719,7 @@ $(document).ready(function () {
 
     data.forEach((item) => {
       const img = item.imagen_url
-        ? `<img src="${item.imagen_url}" alt="${item.park_name}" loading="lazy">`
+        ? `<img src="${item.imagen_url.startsWith("/") ? BASE_URL + item.imagen_url : item.imagen_url}" alt="${item.park_name}" loading="lazy">`
         : `<div style="height:150px;background:#0d1117;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-image text-secondary fs-3"></i></div>`;
 
       if (isGrid) {
@@ -871,18 +877,24 @@ $(document).ready(function () {
   // ── Sidebar: Leyenda de estadísticas de coasters ─────────────────
   function renderTopsStats(coasters) {
     if (!coasters || !coasters.length) {
-      $("#tops-legend-countries").html('<div class="text-center text-muted small py-2">Sin datos</div>');
-      $("#tops-legend-manufacturers").html('<div class="text-center text-muted small py-2">Sin datos</div>');
+      $("#tops-legend-countries").html(
+        '<div class="text-center text-muted small py-2">Sin datos</div>',
+      );
+      $("#tops-legend-manufacturers").html(
+        '<div class="text-center text-muted small py-2">Sin datos</div>',
+      );
       return;
     }
 
     // Count by country
     const countryCounts = {};
-    coasters.forEach(c => {
-      const country = c.country_name || 'Desconocido';
+    coasters.forEach((c) => {
+      const country = c.country_name || "Desconocido";
       countryCounts[country] = (countryCounts[country] || 0) + 1;
     });
-    const sortedCountries = Object.entries(countryCounts).sort((a, b) => b[1] - a[1]);
+    const sortedCountries = Object.entries(countryCounts).sort(
+      (a, b) => b[1] - a[1],
+    );
     const maxCountry = sortedCountries[0][1];
 
     const $countries = $("#tops-legend-countries").empty();
@@ -900,8 +912,8 @@ $(document).ready(function () {
 
     // Count by manufacturer
     const mfrCounts = {};
-    coasters.forEach(c => {
-      const mfr = c.manufacter || 'Desconocido';
+    coasters.forEach((c) => {
+      const mfr = c.manufacter || "Desconocido";
       mfrCounts[mfr] = (mfrCounts[mfr] || 0) + 1;
     });
     const sortedMfrs = Object.entries(mfrCounts).sort((a, b) => b[1] - a[1]);
@@ -1162,32 +1174,68 @@ $(document).ready(function () {
 
   $("#menu-profile").on("click", function (e) {
     e.preventDefault();
+    history.replaceState(null, null, " ");
     showSection("#profile-menu");
   });
 
   $("#menu-config").on("click", function (e) {
     e.preventDefault();
+    history.replaceState(null, null, "#config");
     showSection("#profile-config");
   });
 
   $("#menu-tops").on("click", function (e) {
     e.preventDefault();
+    history.replaceState(null, null, "#tops");
     showSection("#profile-tops");
   });
 
   $("#menu-reviews").on("click", function (e) {
     e.preventDefault();
+    history.replaceState(null, null, "#reviews");
     showSection("#profile-reviews");
   });
 
   $("#menu-friends").on("click", function (e) {
     e.preventDefault();
+    history.replaceState(null, null, "#friends");
     showSection("#profile-friends");
   });
 
   $("#menu-map").on("click", function (e) {
     e.preventDefault();
+    history.replaceState(null, null, "#map");
     showSection("#profile-map");
+  });
+
+  // Al cargar la página con hash en la URL
+  const sectionMap = {
+    "#tops": "#profile-tops",
+    "#config": "#profile-config",
+    "#reviews": "#profile-reviews",
+    "#friends": "#profile-friends",
+    "#map": "#profile-map",
+  };
+
+  if (sectionMap[window.location.hash]) {
+    showSection(sectionMap[window.location.hash]);
+  }
+
+  // Fix: interceptar clics en enlaces del header que apunten a secciones del perfil.
+  // Funciona aunque el hash ya sea el mismo (el hashchange no se dispararía en ese caso).
+  $(document).on("click", 'a[href*="profile.php#"]', function (e) {
+    const hash = "#" + this.href.split("#")[1];
+    if (sectionMap[hash]) {
+      e.preventDefault();
+      history.replaceState(null, null, hash);
+      showSection(sectionMap[hash]);
+    }
+  });
+
+  // hashchange como fallback (por si el hash cambia desde otro sitio)
+  window.addEventListener("hashchange", function () {
+    const target = sectionMap[window.location.hash];
+    if (target) showSection(target);
   });
 
   // === BÚSQUEDA DE MONTAÑAS RUSAS (MIS TOPS) ===
