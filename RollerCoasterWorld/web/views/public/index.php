@@ -37,52 +37,73 @@ if ($user_email !== 'Invitado' && $user_email !== 'Desconocido') {
         try {
             $db = new DBConexion();
             
-            // Global Stats
-            $stat_users = $db->query("SELECT COUNT(*) FROM users")->fetchColumn();
+            // ── Global Stats ──────────────────────────────────────────────
+            $stat_users    = $db->query("SELECT COUNT(*) FROM users")->fetchColumn();
             $stat_coasters = $db->query("SELECT COUNT(*) FROM coasters")->fetchColumn();
-            
-            $cr = $db->query("SELECT COUNT(*) FROM coaster_ratings")->fetchColumn();
-            $pr = $db->query("SELECT COUNT(*) FROM park_ratings")->fetchColumn();
-            $stat_reviews = $cr + $pr;
-            
-            $stat_photos = $db->query("SELECT COUNT(*) FROM coaster_photos")->fetchColumn();
-            $stat_parks = $db->query("SELECT COUNT(*) FROM parks")->fetchColumn();
+            $cr            = $db->query("SELECT COUNT(*) FROM coaster_ratings")->fetchColumn();
+            $pr            = $db->query("SELECT COUNT(*) FROM park_ratings")->fetchColumn();
+            $stat_reviews  = $cr + $pr;
+            $stat_photos   = $db->query("SELECT COUNT(*) FROM coaster_photos")->fetchColumn();
+            $stat_parks    = $db->query("SELECT COUNT(*) FROM parks")->fetchColumn();
 
-            // User Profile Stats
-            $stmt = $db->prepare("SELECT COUNT(*) FROM user_credits WHERE user_guid = ? OR user_idx = ?"); // or similar uid matching
-            // We use simple queries that handle schema safely
-            
-            // Fetch actual username
-            $stmt = $db->prepare("SELECT username FROM users WHERE firebase_uid = ?");
+            // ── Fetch the user's integer id from firebase_uid ─────────────
+            $stmt = $db->prepare(
+                "SELECT id, username, city, country, favorite_coaster FROM users WHERE firebase_uid = ?"
+            );
             $stmt->execute([$user_uid]);
-            $fetched_username = $stmt->fetchColumn();
-            if ($fetched_username) {
-                $display_name = $fetched_username;
-            }
+            $user_row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // Montadas
-            $stmt = $db->prepare("SELECT COUNT(*) FROM user_credits WHERE user_uid = ?");
-            $stmt->execute([$user_uid]);
-            $user_credits = $stmt->fetchColumn();
+            if ($user_row) {
+                $user_db_id    = (int) $user_row['id'];
+                $display_name  = $user_row['username'] ?: $display_name;
 
-            // Reseñas
-            $stmt = $db->prepare("SELECT COUNT(*) FROM coaster_ratings WHERE user_uid = ?");
-            $stmt->execute([$user_uid]);
-            $user_reviews = $stmt->fetchColumn();
+                // Location from users table
+                if ($user_row['city'] && $user_row['country']) {
+                    $user_location = $user_row['city'] . ', ' . $user_row['country'];
+                } elseif ($user_row['country']) {
+                    $user_location = $user_row['country'];
+                } elseif ($user_row['city']) {
+                    $user_location = $user_row['city'];
+                }
 
-            // Viajes
-            $stmt = $db->prepare("SELECT COUNT(*) FROM trips WHERE user_uid = ?");
-            $stmt->execute([$user_uid]);
-            $user_trips = $stmt->fetchColumn();
+                // Favourite coaster from users table
+                if ($user_row['favorite_coaster']) {
+                    $fav_coaster = $user_row['favorite_coaster'];
+                }
 
-            // Ubicación y Config
-            $stmt = $db->prepare("SELECT city, country FROM user_preferences WHERE user_uid = ?");
-            $stmt->execute([$user_uid]);
-            $prefs = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($prefs && $prefs['city'] && $prefs['country']) {
-                $user_location = $prefs['city'] . ', ' . $prefs['country'];
-            } elseif ($prefs && $prefs['country']) {
-                $user_location = $prefs['country'];
+                // ── Per-user stats (all tables use integer user_id) ────────
+
+                // Montadas (entries in user_credits ranked list)
+                $stmt = $db->prepare("SELECT COUNT(*) FROM user_credits WHERE user_id = ?");
+                $stmt->execute([$user_db_id]);
+                $user_credits = (int) $stmt->fetchColumn();
+
+                // Reseñas (coaster reviews)
+                $stmt = $db->prepare("SELECT COUNT(*) FROM coaster_ratings WHERE user_id = ?");
+                $stmt->execute([$user_db_id]);
+                $user_reviews = (int) $stmt->fetchColumn();
+
+                // Tops = entries in user_credits (each entry is a ranked coaster)
+                $user_tops = $user_credits;
+
+                // Viajes
+                $stmt = $db->prepare("SELECT COUNT(*) FROM trips WHERE user_id = ?");
+                $stmt->execute([$user_db_id]);
+                $user_trips = (int) $stmt->fetchColumn();
+
+                // Amigos (accepted friendships where user is either side)
+                $stmt = $db->prepare(
+                    "SELECT COUNT(*) FROM friendship
+                     WHERE estado_solicitud = 'ACEPTADA'
+                       AND (solicitante_id = ? OR solicitada_id = ?)"
+                );
+                $stmt->execute([$user_db_id, $user_db_id]);
+                $user_friends = (int) $stmt->fetchColumn();
+
+                // Fotos subidas
+                $stmt = $db->prepare("SELECT COUNT(*) FROM coaster_photos WHERE user_id = ?");
+                $stmt->execute([$user_db_id]);
+                $user_photos = (int) $stmt->fetchColumn();
             }
 
         } catch (Exception $e) {
@@ -191,7 +212,7 @@ if ($user_email !== 'Invitado' && $user_email !== 'Desconocido') {
                         <div class="home-profile-mini-stats">
                             <div class="home-profile-mini-stat">
                                 <div class="home-profile-mini-stat-num"><?= $user_credits ?: 0 ?></div>
-                                <div class="home-profile-mini-stat-label">Montadas</div>
+                                <div class="home-profile-mini-stat-label">Coaster Count</div>
                             </div>
                             <div class="home-profile-mini-stat">
                                 <div class="home-profile-mini-stat-num"><?= $user_reviews ?: 0 ?></div>
