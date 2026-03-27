@@ -48,7 +48,7 @@ if ($user_email !== 'Invitado' && $user_email !== 'Desconocido') {
 
             // ── Fetch the user's integer id from firebase_uid ─────────────
             $stmt = $db->prepare(
-                "SELECT id, username, city, country, favorite_coaster FROM users WHERE firebase_uid = ?"
+                "SELECT id, username, city, country, favorite_coaster, profile_image FROM users WHERE firebase_uid = ?"
             );
             $stmt->execute([$user_uid]);
             $user_row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -56,6 +56,7 @@ if ($user_email !== 'Invitado' && $user_email !== 'Desconocido') {
             if ($user_row) {
                 $user_db_id    = (int) $user_row['id'];
                 $display_name  = $user_row['username'] ?: $display_name;
+                $profile_image = $user_row['profile_image'] ?? null;
 
                 // Location from users table
                 if ($user_row['city'] && $user_row['country']) {
@@ -83,8 +84,10 @@ if ($user_email !== 'Invitado' && $user_email !== 'Desconocido') {
                 $stmt->execute([$user_db_id]);
                 $user_reviews = (int) $stmt->fetchColumn();
 
-                // Tops = entries in user_credits (each entry is a ranked coaster)
-                $user_tops = $user_credits;
+                // Parques visitados (entries in user_park_credits)
+                $stmt = $db->prepare("SELECT COUNT(*) FROM user_park_credits WHERE user_id = ?");
+                $stmt->execute([$user_db_id]);
+                $user_tops = (int) $stmt->fetchColumn();
 
                 // Viajes
                 $stmt = $db->prepare("SELECT COUNT(*) FROM trips WHERE user_id = ?");
@@ -113,6 +116,7 @@ if ($user_email !== 'Invitado' && $user_email !== 'Desconocido') {
         
         // Avatar Initial
         $initial = strtoupper(substr($display_name, 0, 1) ?: '?');
+        $profile_image = $profile_image ?? null;
         ?>
 
         <!-- HERO CAROUSEL -->
@@ -201,9 +205,13 @@ if ($user_email !== 'Invitado' && $user_email !== 'Desconocido') {
                     <div class="home-section-title" style="margin-bottom:1.2rem;">Tu Perfil</div>
                     <div class="home-profile-mini flex-grow-1">
                         <div class="home-profile-mini-header">
+                            <?php if ($profile_image): ?>
+                            <div class="home-profile-mini-avatar" style="background-image:url('<?= htmlspecialchars($profile_image) ?>');background-size:cover;background-position:center;"></div>
+                            <?php else: ?>
                             <div class="home-profile-mini-avatar d-flex justify-content-center align-items-center fw-bold fs-4 bg-success text-white">
                                 <?= $initial ?>
                             </div>
+                            <?php endif; ?>
                             <div>
                                 <div class="home-profile-mini-name"><?= htmlspecialchars($display_name) ?></div>
                                 <div class="home-profile-mini-role"><i class="fa-solid fa-location-dot me-1"></i><?= htmlspecialchars($user_location) ?></div>
@@ -220,7 +228,7 @@ if ($user_email !== 'Invitado' && $user_email !== 'Desconocido') {
                             </div>
                             <div class="home-profile-mini-stat">
                                 <div class="home-profile-mini-stat-num"><?= $user_tops ?: 0 ?></div>
-                                <div class="home-profile-mini-stat-label">Tops</div>
+                                <div class="home-profile-mini-stat-label">Parques</div>
                             </div>
                             <div class="home-profile-mini-stat" style="border-bottom:none;">
                                 <div class="home-profile-mini-stat-num"><?= $user_trips ?: 0 ?></div>
@@ -246,34 +254,68 @@ if ($user_email !== 'Invitado' && $user_email !== 'Desconocido') {
                     </div>
                 </div>
 
-                <!-- NOTICIAS (Mockup data, if DB not ready for news) -->
+                <!-- SECCIÓN DE NOTICIAS (Dinámica) -->
+                <?php
+                try {
+                $news_stmt = $db->query("SELECT * FROM news ORDER BY is_featured DESC, created_at DESC LIMIT 3");
+                $all_news = $news_stmt->fetchAll(PDO::FETCH_ASSOC);
+                } catch (Exception $e) {
+                $all_news = [];
+                error_log("Error fetching news: " . $e->getMessage());
+                }
+
+                $featured_news = $all_news[0] ?? null;
+                $small_news = array_slice($all_news, 1);
+                ?>
+
                 <div class="col-12 col-lg-8 d-flex flex-column">
                     <div class="home-section-title" style="margin-bottom:1.2rem;">Últimas Novedades</div>
                     <div class="home-news-grid flex-grow-1">
-                        <a href="#" class="home-news-card big">
-                            <img src="<?= $base_url ?>/web/img/taron_phanta.jpeg" class="home-news-img" alt="">
-                            <div class="home-news-body">
-                                <div class="home-news-tag"><i class="fa-solid fa-bolt me-1"></i>Destacado</div>
-                                <div class="home-news-title">Bienvenido a la Beta de RollerCoasterWorld</div>
-                                <div class="home-news-desc">Estamos trabajando en construir la base de datos de coasters más extensa. Explora, sube tus credits y prepárate para un mundo de adrenalina.</div>
-                                <div class="home-news-date"><i class="fa-regular fa-clock me-1"></i>Novedad</div>
-                            </div>
-                        </a>
-                        <div class="d-flex flex-column gap-3 h-100">
-                            <a href="<?= Router::url('forums') ?>" class="home-news-card small flex-grow-1">
-                                <div class="home-news-body d-flex flex-column justify-content-center">
-                                    <div class="home-news-tag">Comunidad</div>
-                                    <div class="home-news-title">¡Únete a la charla en el Foro!</div>
-                                    <div class="home-news-desc">Comparte con miles de entusiastas como tú, consejos, reseñas de parques y más.</div>
+                        <?php if ($featured_news): 
+                            $has_img = !empty($featured_news['image_url']);
+                            $img_src = $has_img ? (str_starts_with($featured_news['image_url'], 'http') ? $featured_news['image_url'] : $base_url . $featured_news['image_url']) : '';
+                        ?>
+                            <a href="<?= $featured_news['external_link'] ?: '#' ?>" class="home-news-card big <?= !$has_img ? 'no-photo' : '' ?>">
+                                <?php if ($has_img): ?>
+                                    <img src="<?= $img_src ?>" class="home-news-img" alt="">
+                                <?php endif; ?>
+                                <div class="home-news-body">
+                                    <div class="home-news-tag">
+                                        <i class="fa-solid <?= $featured_news['tag'] === 'Destacado' ? 'fa-bolt' : 'fa-info-circle' ?> me-1"></i>
+                                        <?= htmlspecialchars($featured_news['tag'] ?: 'Novedad') ?>
+                                    </div>
+                                    <div class="home-news-title"><?= htmlspecialchars($featured_news['title']) ?></div>
+                                    <div class="home-news-desc"><?= htmlspecialchars($featured_news['description']) ?></div>
+                                    <div class="home-news-date"><i class="fa-regular fa-clock me-1"></i><?= date('d/m/Y', strtotime($featured_news['created_at'])) ?></div>
                                 </div>
                             </a>
-                            <a href="<?= Router::url('trips') ?>" class="home-news-card small flex-grow-1">
-                                <div class="home-news-body d-flex flex-column justify-content-center">
-                                    <div class="home-news-tag text-warning">Viajes</div>
-                                    <div class="home-news-title">Planifica tu próxima expedición</div>
-                                    <div class="home-news-desc">Nuestro generador de rutas ya está disponible para planificar tus visitas a parques.</div>
+                        <?php endif; ?>
+
+                        <div class="home-news-small-col">
+                            <?php foreach ($small_news as $news_item): 
+                                $has_img_s = !empty($news_item['image_url']);
+                                $img_src_s = $has_img_s ? (str_starts_with($news_item['image_url'], 'http') ? $news_item['image_url'] : $base_url . $news_item['image_url']) : '';
+                            ?>
+                                <a href="<?= $news_item['external_link'] ?: '#' ?>" class="home-news-card small <?= !$has_img_s ? 'no-photo' : '' ?>">
+                                    <?php if ($has_img_s): ?>
+                                        <img src="<?= $img_src_s ?>" class="home-news-img" alt="">
+                                    <?php endif; ?>
+                                    <div class="home-news-body d-flex flex-column justify-content-center">
+                                        <div class="home-news-tag <?= $news_item['tag'] === 'Viajes' ? 'text-warning' : '' ?>">
+                                            <?= htmlspecialchars($news_item['tag'] ?: 'Info') ?>
+                                        </div>
+                                        <div class="home-news-title"><?= htmlspecialchars($news_item['title']) ?></div>
+                                        <div class="home-news-desc"><?= htmlspecialchars($news_item['description']) ?></div>
+                                    </div>
+                                </a>
+                            <?php endforeach; ?>
+                            
+                            <?php if (count($all_news) === 0): ?>
+                                <div class="text-center text-muted p-5 bg-dark border rounded-0 w-100">
+                                    <i class="fa-solid fa-newspaper fa-3x mb-3 opacity-25"></i>
+                                    <p>No hay novedades publicadas por el momento.</p>
                                 </div>
-                            </a>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

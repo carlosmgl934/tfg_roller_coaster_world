@@ -260,6 +260,8 @@ header("Expires: 0"); // Proxies
                         class="fa-solid fa-tree-city w-20px text-center me-2 text-success"></i> Parques</a></li>
                   <li><a class="dropdown-item py-2" href="<?= Router::url('admin_forums') ?>"><i
                         class="fa-solid fa-comments w-20px text-center me-2 text-success"></i> Foros</a></li>
+                  <li><a class="dropdown-item py-2" href="<?= Router::url('admin_news') ?>"><i
+                        class="fa-solid fa-newspaper w-20px text-center me-2 text-success"></i> Noticias</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item py-2" href="<?= Router::url('admin_messages') ?>"><i
                         class="fa-solid fa-envelope w-20px text-center me-2 text-warning"></i> Mensajes</a></li>

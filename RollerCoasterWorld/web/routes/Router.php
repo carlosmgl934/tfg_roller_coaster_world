@@ -75,6 +75,7 @@ class Router {
             'admin_parks' => '/web/views/admin/parks.php',
             'admin_users' => '/web/views/admin/users.php',
             'admin_forums' => '/web/views/admin/forums.php',
+            'admin_news' => '/web/views/admin/news.php',
             'admin_messages' => '/web/views/admin/messages.php',
             'admin_photos' => '/web/views/admin/photos.php',
             'admin_comments' => '/web/views/admin/comments.php',

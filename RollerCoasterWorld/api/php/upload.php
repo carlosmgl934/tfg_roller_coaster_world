@@ -27,31 +27,11 @@ if (empty($_FILES['file'])) {
     exit;
 }
 
-// ── Leer credenciales de Supabase desde .env ─────────────────────────────────
-$envPath = __DIR__ . '/../../.env';
-$supabaseUrl = null;
-$supabaseKey = null;
+// ── Leer credenciales de Supabase usando el cargador central ─────────────────────────────────
+require_once __DIR__ . '/../database/db_conexion.php';
 
-if (file_exists($envPath)) {
-    foreach (file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
-        if (strpos(trim($line), '#') === 0)
-            continue;
-        if (strpos($line, '=') !== false) {
-            [$k, $v] = explode('=', $line, 2);
-            $k = trim($k);
-            $v = trim($v);
-            if ($k === 'SUPABASE_URL')
-                $supabaseUrl = $v;
-            if ($k === 'SUPABASE_SERVICE_KEY')
-                $supabaseKey = $v;
-        }
-    }
-}
-
-if (!$supabaseUrl || !$supabaseKey) {
-    echo json_encode(['success' => false, 'error' => 'Credenciales de Supabase no configuradas en .env']);
-    exit;
-}
+$supabaseUrl = $_ENV['SUPABASE_URL'] ?? null;
+$supabaseKey = $_ENV['SUPABASE_SERVICE_KEY'] ?? null;
 
 // ── Parámetros de la subida ───────────────────────────────────────────────────
 $file = $_FILES['file'];
@@ -74,40 +54,70 @@ if ($file['size'] > 10 * 1024 * 1024) {
 $filename = time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
 $objectPath = $subpath ? "{$subpath}/{$filename}" : $filename;
 
-// ── Subir a Supabase Storage ──────────────────────────────────────────────────
-$uploadUrl = rtrim($supabaseUrl, '/') . "/storage/v1/object/{$bucket}/{$objectPath}";
-$mimeType = $file['type'] ?: 'application/octet-stream';
-$fileData = file_get_contents($file['tmp_name']);
+// ── Determinar URL y Almacenamiento ──────────────────────────────────────────────────
+$publicUrl = '';
 
-$ch = curl_init($uploadUrl);
-curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_CUSTOMREQUEST => 'POST',
-    CURLOPT_POSTFIELDS => $fileData,
-    CURLOPT_HTTPHEADER => [
-        "Authorization: Bearer {$supabaseKey}",
-        "Content-Type: {$mimeType}",
-        "x-upsert: true",
-    ],
-]);
+if ($supabaseUrl && $supabaseKey) {
+    // ── Subir a Supabase Storage ──────────────────────────────────────────────────
+    $uploadUrl = rtrim($supabaseUrl, '/') . "/storage/v1/object/{$bucket}/{$objectPath}";
+    $mimeType = $file['type'] ?: 'application/octet-stream';
+    $fileData = file_get_contents($file['tmp_name']);
 
-$response = curl_exec($ch);
-$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-$curlError = curl_error($ch);
-curl_close($ch);
+    $ch = curl_init($uploadUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_POSTFIELDS => $fileData,
+        CURLOPT_HTTPHEADER => [
+            "Authorization: Bearer {$supabaseKey}",
+            "Content-Type: {$mimeType}",
+            "x-upsert: true",
+        ],
+    ]);
 
-if ($curlError) {
-    echo json_encode(['success' => false, 'error' => 'Error de red: ' . $curlError]);
-    exit;
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+
+    if ($curlError) {
+        echo json_encode(['success' => false, 'error' => 'Error de red: ' . $curlError]);
+        exit;
+    }
+
+    if ($httpCode < 200 || $httpCode >= 300) {
+        $decoded = json_decode($response, true);
+        $msg = $decoded['message'] ?? $response;
+        echo json_encode(['success' => false, 'error' => "Supabase error {$httpCode}: {$msg}"]);
+        exit;
+    }
+
+    // ── URL pública del archivo ───────────────────────────────────────────────────
+    $publicUrl = rtrim($supabaseUrl, '/') . "/storage/v1/object/public/{$bucket}/{$objectPath}";
+} else {
+    // ── FALLBACK: Subida en local (XAMPP) ─────────────────────────────────────────
+    $uploadDirBase = __DIR__ . '/../../web/img/uploads/' . $bucket;
+    if ($subpath) {
+        $uploadDirBase .= '/' . $subpath;
+    }
+    
+    if (!is_dir($uploadDirBase)) {
+        if (!mkdir($uploadDirBase, 0777, true)) {
+            echo json_encode(['success' => false, 'error' => 'No se pudo crear el directorio de subida local']);
+            exit;
+        }
+    }
+    
+    $localFilePath = $uploadDirBase . '/' . $filename;
+    
+    if (!move_uploaded_file($file['tmp_name'], $localFilePath)) {
+        echo json_encode(['success' => false, 'error' => 'Error al guardar el archivo localmente']);
+        exit;
+    }
+    
+    // Construir la URL relativa para el frontend (ej. /tfg/tfg_roller_coaster_world/RollerCoasterWorld/web/...)
+    $appRootUrl = rtrim(dirname(dirname(dirname($_SERVER['SCRIPT_NAME']))), '\\/'); 
+    $publicUrl = $appRootUrl . '/web/img/uploads/' . $bucket . '/' . $objectPath;
 }
 
-if ($httpCode < 200 || $httpCode >= 300) {
-    $decoded = json_decode($response, true);
-    $msg = $decoded['message'] ?? $response;
-    echo json_encode(['success' => false, 'error' => "Supabase error {$httpCode}: {$msg}"]);
-    exit;
-}
-
-// ── URL pública del archivo ───────────────────────────────────────────────────
-$publicUrl = rtrim($supabaseUrl, '/') . "/storage/v1/object/public/{$bucket}/{$objectPath}";
 echo json_encode(['success' => true, 'url' => $publicUrl]);
