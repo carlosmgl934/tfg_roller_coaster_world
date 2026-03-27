@@ -320,7 +320,7 @@ if ($user_email !== 'Invitado' && $user_email !== 'Desconocido') {
                 <!-- Mini stats -->
                 <div class="d-flex flex-wrap justify-content-center gap-5 mt-5 pt-4 landing-stats-bar">
                     <div>
-                        <div class="fw-bold fs-3 text-neon">+20.000</div>
+                        <div class="fw-bold fs-3 text-neon">+10.000</div>
                         <div class="small text-light opacity-75">Montañas rusas</div>
                     </div>
                     <div class="landing-stat-sep"></div>
