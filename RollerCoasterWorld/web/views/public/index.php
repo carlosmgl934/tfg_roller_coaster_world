@@ -410,7 +410,7 @@ if ($user_email !== 'Invitado' && $user_email !== 'Desconocido') {
                 <div class="row g-4 justify-content-center">
                     <?php
                     $features = [
-                        ['icon'=>'fa-database',         'title'=>'Base de datos completa',   'desc'=>'Más de 20.000 coasters indexados de todo el mundo con datos técnicos completos.'],
+                        ['icon'=>'fa-database',         'title'=>'Base de datos completa',   'desc'=>'Más de 10.000 coasters indexados de todo el mundo con datos técnicos completos.'],
                         ['icon'=>'fa-list-ol',          'title'=>'Tops personalizados',      'desc'=>'Crea y ordena tu ranking personal. Compáralo con el de la comunidad.'],
                         ['icon'=>'fa-suitcase-rolling', 'title'=>'Gestor de viajes',         'desc'=>'Planifica tus rutas por parques, calcula distancias y gestiona tus trips.'],
                         ['icon'=>'fa-camera',           'title'=>'Galería de fotos',         'desc'=>'Sube fotos de tus visitas y descubre las de otros usuarios.'],
