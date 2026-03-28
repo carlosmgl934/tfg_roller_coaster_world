@@ -1,362 +1,231 @@
 <?php
 require_once __DIR__ . '/../partials/header.php';
 /** @var string $base_url */
-/** @var bool $is_logged */
-
-// Obtener datos básicos si está logueado
-$user_email = $_SESSION['user_email'] ?? 'Invitado';
-$user_uid = $_SESSION['firebase_uid'] ?? null;
-$display_name = "Usuario";
-if ($user_email !== 'Invitado' && $user_email !== 'Desconocido') {
-    $parts = explode('@', $user_email);
-    $display_name = $parts[0];
-}
-
-// ── Estadísticas Globales para todas las vistas ──────────────────────────────
-require_once __DIR__ . '/../../../api/database/db_conexion.php';
-$stat_users    = '—';
-$stat_coasters = '—';
-$stat_reviews  = '—';
-$stat_photos   = '—';
-$stat_parks    = '—';
-
-try {
-    $db = new DBConexion();
-    $stat_users    = $db->query("SELECT COUNT(*) FROM users")->fetchColumn();
-    $stat_coasters = $db->query("SELECT COUNT(*) FROM coasters")->fetchColumn();
-    $cr            = $db->query("SELECT COUNT(*) FROM coaster_ratings")->fetchColumn();
-    $pr            = $db->query("SELECT COUNT(*) FROM park_ratings")->fetchColumn();
-    $stat_reviews  = $cr + $pr;
-    $stat_photos   = $db->query("SELECT COUNT(*) FROM coaster_photos")->fetchColumn();
-    $stat_parks    = $db->query("SELECT COUNT(*) FROM parks")->fetchColumn();
-} catch (Exception $e) {
-    error_log("Error cargando stats en index.php: " . $e->getMessage());
-}
+/** @var bool   $is_logged */
 ?>
 
 <main class="index-container">
     <?php if ($is_logged): ?>
-        <!-- COMIENZO VISTAS MOCKUP (DASHBOARD) -->
-        <?php
-        $user_credits = 0;
-        $user_reviews = 0;
-        $user_tops = 0;
-        $user_trips = 0;
-        $user_friends = 0;
-        $user_photos = 0;
-        $user_location = '—';
-        $fav_coaster = 'Ninguna configurada';
-        
-        try {
-            // ── Fetch the user's integer id from firebase_uid ─────────────
-            $stmt = $db->prepare(
-                "SELECT id, username, city, country, favorite_coaster, profile_image FROM users WHERE firebase_uid = ?"
-            );
-            $stmt->execute([$user_uid]);
-            $user_row = $stmt->fetch(PDO::FETCH_ASSOC);
+        <!-- ======================== VISTA DASHBOARD ======================== -->
 
-            if ($user_row) {
-                $user_db_id    = (int) $user_row['id'];
-                $display_name  = $user_row['username'] ?: $display_name;
-                $profile_image = $user_row['profile_image'] ?? null;
+        <!-- HERO CARRUSEL — full-width -->
+        <div class="home-hero" id="home-hero-carousel">
 
-                // Location from users table
-                if ($user_row['city'] && $user_row['country']) {
-                    $user_location = $user_row['city'] . ', ' . $user_row['country'];
-                } elseif ($user_row['country']) {
-                    $user_location = $user_row['country'];
-                } elseif ($user_row['city']) {
-                    $user_location = $user_row['city'];
-                }
+            <!-- Slide 1: Taron (Phantasialand) -->
+            <div class="home-hero-slide active"
+                 style="background-image:url('<?= $base_url ?>/web/img/taron_phanta_opt.jpg'); background-position: center 40%;"
+                 data-title="Bienvenido,&lt;br&gt;&lt;span style='color:var(--rcw-green)' id='hero-username'&gt;…&lt;/span&gt;"
+                 data-sub="Bienvenido de nuevo a la comunidad de amantes de las montañas rusas. Sigue explorando y aumentando tus créditos."
+                 data-tag="Tu Panel Personal"
+                 data-btn1-url="<?= Router::url('coaster_search') ?>" data-btn1-label="Buscar coasters" data-btn1-icon="fa-magnifying-glass"
+                 data-btn2-url="<?= Router::url('forum_search') ?>"   data-btn2-label="Foros" data-btn2-icon="fa-users">
+            </div>
 
-                // Favourite coaster from users table
-                if ($user_row['favorite_coaster']) {
-                    $fav_coaster = $user_row['favorite_coaster'];
-                }
+            <!-- Slide 2: Voltron (Europa-Park) -->
+            <div class="home-hero-slide"
+                 style="background-image:url('<?= $base_url ?>/web/img/voltron_ep_opt.jpg'); background-position: center 35%;"
+                 data-title="Bienvenido,&lt;br&gt;&lt;span style='color:var(--rcw-green)' id='hero-username'&gt;…&lt;/span&gt;"
+                 data-sub="Bienvenido de nuevo a la comunidad de amantes de las montañas rusas. Sigue explorando y aumentando tus créditos."
+                 data-tag="Tu Panel Personal"
+                 data-btn1-url="<?= Router::url('coaster_search') ?>" data-btn1-label="Buscar coasters" data-btn1-icon="fa-magnifying-glass"
+                 data-btn2-url="<?= Router::url('forum_search') ?>"   data-btn2-label="Foros" data-btn2-icon="fa-users">
+            </div>
 
-                // ── Per-user stats (all tables use integer user_id) ────────
+            <!-- Slide 3: Batman BGCE (Warner) -->
+            <div class="home-hero-slide"
+                 style="background-image:url('<?= $base_url ?>/web/img/bgce_warner_opt.jpg'); background-position: center 25%;"
+                 data-title="Bienvenido,&lt;br&gt;&lt;span style='color:var(--rcw-green)' id='hero-username'&gt;…&lt;/span&gt;"
+                 data-sub="Bienvenido de nuevo a la comunidad de amantes de las montañas rusas. Sigue explorando y aumentando tus créditos."
+                 data-tag="Tu Panel Personal"
+                 data-btn1-url="<?= Router::url('coaster_search') ?>" data-btn1-label="Buscar coasters" data-btn1-icon="fa-magnifying-glass"
+                 data-btn2-url="<?= Router::url('forum_search') ?>"   data-btn2-label="Foros" data-btn2-icon="fa-users">
+            </div>
 
-                // Montadas (entries in user_credits ranked list)
-                $stmt = $db->prepare("SELECT COUNT(*) FROM user_credits WHERE user_id = ?");
-                $stmt->execute([$user_db_id]);
-                $user_credits = (int) $stmt->fetchColumn();
-
-                // Reseñas (coaster reviews)
-                $stmt = $db->prepare("SELECT COUNT(*) FROM coaster_ratings WHERE user_id = ?");
-                $stmt->execute([$user_db_id]);
-                $user_reviews = (int) $stmt->fetchColumn();
-
-                // Parques visitados (entries in user_park_credits)
-                $stmt = $db->prepare("SELECT COUNT(*) FROM user_park_credits WHERE user_id = ?");
-                $stmt->execute([$user_db_id]);
-                $user_tops = (int) $stmt->fetchColumn();
-
-                // Viajes
-                $stmt = $db->prepare("SELECT COUNT(*) FROM trips WHERE user_id = ?");
-                $stmt->execute([$user_db_id]);
-                $user_trips = (int) $stmt->fetchColumn();
-
-                // Amigos (accepted friendships where user is either side)
-                $stmt = $db->prepare(
-                    "SELECT COUNT(*) FROM friendship
-                     WHERE estado_solicitud = 'ACEPTADA'
-                       AND (solicitante_id = ? OR solicitada_id = ?)"
-                );
-                $stmt->execute([$user_db_id, $user_db_id]);
-                $user_friends = (int) $stmt->fetchColumn();
-
-                // Fotos subidas
-                $stmt = $db->prepare("SELECT COUNT(*) FROM coaster_photos WHERE user_id = ?");
-                $stmt->execute([$user_db_id]);
-                $user_photos = (int) $stmt->fetchColumn();
-            }
-
-        } catch (Exception $e) {
-            // Silencioso en producción o log errors para debugging
-            error_log("Error fetching stats Dashboard: " . $e->getMessage());
-        }
-        
-        // Avatar Initial
-        $initial = strtoupper(substr($display_name, 0, 1) ?: '?');
-        $profile_image = $profile_image ?? null;
-        ?>
-
-        <!-- HERO CAROUSEL -->
-        <div class="home-hero">
-            <div class="home-hero-slide active" style="background-image:url('<?= $base_url ?>/web/img/taron_phanta.jpeg')"></div>
-            <!-- Add more slides later if needed -->
-
-            <div class="home-hero-content">
-                <div class="home-hero-tag animate d1"><i class="fa-solid fa-circle-notch fa-spin" style="font-size:0.6rem;"></i> Tu Panel Personal</div>
-                <h1 class="home-hero-title animate d2">Bienvenido,<br><span style="color:var(--rcw-green)"><?= htmlspecialchars($display_name) ?></span></h1>
-                <p class="home-hero-sub animate d3">Bienvenido de nuevo a la comunidad de amantes de las montañas rusas. Sigue explorando y aumentando tus créditos.</p>
-                <div class="home-hero-btns animate d3">
-                    <a href="<?= Router::url('coaster_search') ?>" class="btn-green-rcw"><i class="fa-solid fa-magnifying-glass"></i> Buscar coasters</a>
-                    <a href="<?= Router::url('forum_search') ?>" class="btn-ghost-rcw"><i class="fa-solid fa-users"></i> Foros</a>
+            <!-- Contenido dinámico (actualizado por JS) -->
+            <div class="home-hero-content" id="home-hero-content">
+                <div class="home-hero-tag animate d1" id="hero-tag">
+                    <i class="fa-solid fa-circle-notch fa-spin" style="font-size:0.6rem;"></i>
+                    <span id="hero-tag-text">Tu Panel Personal</span>
+                </div>
+                <h1 class="home-hero-title animate d2" id="hero-title">
+                    Bienvenido,<br>
+                    <span style="color:var(--rcw-green)" id="hero-username">…</span>
+                </h1>
+                <p class="home-hero-sub animate d3" id="hero-sub">Bienvenido de nuevo a la comunidad de amantes de las montañas rusas. Sigue explorando y aumentando tus créditos.</p>
+                <div class="home-hero-btns animate d3" id="hero-btns">
+                    <a href="<?= Router::url('coaster_search') ?>" class="btn-green-rcw" id="hero-btn1"><i class="fa-solid fa-magnifying-glass"></i> Buscar coasters</a>
+                    <a href="<?= Router::url('forum_search') ?>"   class="btn-ghost-rcw" id="hero-btn2"><i class="fa-solid fa-users"></i> Foros</a>
                 </div>
             </div>
 
-            <!-- Optional: Carousel dots -->
-            <div class="home-hero-dots">
-                <div class="home-hero-dot active"></div>
+            <!-- Dots -->
+            <div class="home-hero-dots" id="home-hero-dots">
+                <div class="home-hero-dot active" data-idx="0"></div>
+                <div class="home-hero-dot" data-idx="1"></div>
+                <div class="home-hero-dot" data-idx="2"></div>
             </div>
+
+
         </div>
 
-        <!-- STATS BAR -->
+        <!-- STATS BAR — full-width -->
         <div class="home-stats-bar">
-            <div class="home-stat-item">
-                <div class="home-stat-num" id="cnt-users"><?= number_format((float)$stat_users) ?></div>
-                <div class="home-stat-label">Usuarios</div>
-            </div>
-            <div class="home-stat-divider"></div>
-            <div class="home-stat-item">
-                <div class="home-stat-num" id="cnt-coasters"><?= number_format((float)$stat_coasters) ?></div>
-                <div class="home-stat-label">Montañas Rusas</div>
-            </div>
-            <div class="home-stat-divider"></div>
-            <div class="home-stat-item">
-                <div class="home-stat-num" id="cnt-reviews"><?= number_format((float)$stat_reviews) ?></div>
-                <div class="home-stat-label">Reseñas</div>
-            </div>
-            <div class="home-stat-divider"></div>
-            <div class="home-stat-item">
-                <div class="home-stat-num" id="cnt-photos"><?= number_format((float)$stat_photos) ?></div>
-                <div class="home-stat-label">Fotos</div>
-            </div>
-            <div class="home-stat-divider"></div>
-            <div class="home-stat-item">
-                <div class="home-stat-num" id="cnt-parks"><?= number_format((float)$stat_parks) ?></div>
-                <div class="home-stat-label">Parques</div>
-            </div>
-        </div>
-
-        <!-- ACCESOS RÁPIDOS -->
-        <div class="home-section">
-            <div class="home-section-title">Explorar</div>
-            <div class="home-section-sub">Todo lo que necesitas a un clic de distancia</div>
-            <div class="home-qlink-grid">
-                <a href="<?= Router::url('coaster_search') ?>" class="home-qlink">
-                    <i class="fa-solid fa-train-tram home-qlink-icon"></i>
-                    <div class="home-qlink-name">Buscar Coasters</div>
-                    <div class="home-qlink-desc">Explora miles de montañas rusas con nuestros filtros avanzados</div>
-                </a>
-                <a href="<?= Router::url('coaster_tops') ?>" class="home-qlink">
-                    <i class="fa-solid fa-list-ol home-qlink-icon"></i>
-                    <div class="home-qlink-name">Tops Globales</div>
-                    <div class="home-qlink-desc">Descubre las mejores coasters valoradas por nuestra comunidad</div>
-                </a>
-                <a href="<?= Router::url('forums') ?>" class="home-qlink">
-                    <i class="fa-solid fa-comments home-qlink-icon"></i>
-                    <div class="home-qlink-name">Foros</div>
-                    <div class="home-qlink-desc">Unéte a debates, entérate de noticias y novedades</div>
-                </a>
-                <a href="<?= Router::url('trips') ?>" class="home-qlink">
-                    <i class="fa-solid fa-route home-qlink-icon"></i>
-                    <div class="home-qlink-name">Mis Viajes</div>
-                    <div class="home-qlink-desc">Planifica y comparte tus rutas a diferentes parques</div>
-                </a>
-            </div>
-        </div>
-
-        <!-- PERFIL Y NOTICIAS -->
-        <div class="home-section" style="padding-top:0;">
-            <div class="row g-4">
-                
-                <!-- PERFIL MINI -->
-                <div class="col-12 col-lg-4 d-flex flex-column">
-                    <div class="home-section-title" style="margin-bottom:1.2rem;">Tu Perfil</div>
-                    <div class="home-profile-mini flex-grow-1">
-                        <div class="home-profile-mini-header">
-                            <?php if ($profile_image): ?>
-                            <div class="home-profile-mini-avatar" style="background-image:url('<?= htmlspecialchars($profile_image) ?>');background-size:cover;background-position:center;"></div>
-                            <?php else: ?>
-                            <div class="home-profile-mini-avatar d-flex justify-content-center align-items-center fw-bold fs-4 bg-success text-white">
-                                <?= $initial ?>
-                            </div>
-                            <?php endif; ?>
-                            <div>
-                                <div class="home-profile-mini-name"><?= htmlspecialchars($display_name) ?></div>
-                                <div class="home-profile-mini-role"><i class="fa-solid fa-location-dot me-1"></i><?= htmlspecialchars($user_location) ?></div>
-                            </div>
-                        </div>
-                        <div class="home-profile-mini-stats">
-                            <div class="home-profile-mini-stat">
-                                <div class="home-profile-mini-stat-num"><?= $user_credits ?: 0 ?></div>
-                                <div class="home-profile-mini-stat-label">Coaster Count</div>
-                            </div>
-                            <div class="home-profile-mini-stat">
-                                <div class="home-profile-mini-stat-num"><?= $user_reviews ?: 0 ?></div>
-                                <div class="home-profile-mini-stat-label">Reseñas</div>
-                            </div>
-                            <div class="home-profile-mini-stat">
-                                <div class="home-profile-mini-stat-num"><?= $user_tops ?: 0 ?></div>
-                                <div class="home-profile-mini-stat-label">Parques</div>
-                            </div>
-                            <div class="home-profile-mini-stat" style="border-bottom:none;">
-                                <div class="home-profile-mini-stat-num"><?= $user_trips ?: 0 ?></div>
-                                <div class="home-profile-mini-stat-label">Viajes</div>
-                            </div>
-                            <div class="home-profile-mini-stat" style="border-bottom:none;">
-                                <div class="home-profile-mini-stat-num"><?= $user_friends ?: 0 ?></div>
-                                <div class="home-profile-mini-stat-label">Amigos</div>
-                            </div>
-                            <div class="home-profile-mini-stat" style="border-bottom:none;">
-                                <div class="home-profile-mini-stat-num"><?= $user_photos ?: 0 ?></div>
-                                <div class="home-profile-mini-stat-label">Fotos</div>
-                            </div>
-                        </div>
-                        <div class="home-favorite-coaster">
-                            <i class="fa-solid fa-star" style="color:var(--rcw-green);"></i>
-                            <span>Favorita: <strong class="text-truncate ms-1" style="max-width: 140px; display: inline-block; vertical-align: bottom;"><?= htmlspecialchars($fav_coaster) ?></strong></span>
-                        </div>
-                        <div class="home-profile-mini-footer">
-                            <a href="<?= Router::url('profile') ?>" class="home-btn-mini"><i class="fa-solid fa-user me-1"></i>Perfil</a>
-                            <a href="<?= Router::url('profile') ?>#config" class="home-btn-mini"><i class="fa-solid fa-gear me-1"></i>Config</a>
-                        </div>
-                    </div>
+                <div class="home-stat-item">
+                    <div class="home-stat-num" id="cnt-users">—</div>
+                    <div class="home-stat-label">Usuarios</div>
                 </div>
+                <div class="home-stat-divider"></div>
+                <div class="home-stat-item">
+                    <div class="home-stat-num" id="cnt-coasters">—</div>
+                    <div class="home-stat-label">Montañas Rusas</div>
+                </div>
+                <div class="home-stat-divider"></div>
+                <div class="home-stat-item">
+                    <div class="home-stat-num" id="cnt-reviews">—</div>
+                    <div class="home-stat-label">Reseñas</div>
+                </div>
+                <div class="home-stat-divider"></div>
+                <div class="home-stat-item">
+                    <div class="home-stat-num" id="cnt-photos">—</div>
+                    <div class="home-stat-label">Fotos</div>
+                </div>
+                <div class="home-stat-divider"></div>
+                <div class="home-stat-item">
+                    <div class="home-stat-num" id="cnt-parks">—</div>
+                    <div class="home-stat-label">Parques</div>
+                </div>
+            </div>
 
-                <!-- SECCIÓN DE NOTICIAS (Dinámica) -->
-                <?php
-                try {
-                $news_stmt = $db->query("SELECT * FROM news ORDER BY is_featured DESC, created_at DESC LIMIT 3");
-                $all_news = $news_stmt->fetchAll(PDO::FETCH_ASSOC);
-                } catch (Exception $e) {
-                $all_news = [];
-                error_log("Error fetching news: " . $e->getMessage());
-                }
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="home-wrapper">
 
-                $featured_news = $all_news[0] ?? null;
-                $small_news = array_slice($all_news, 1);
-                ?>
+            <!-- ACCESOS RÁPIDOS -->
+            <div class="home-section">
+                <div class="home-section-title">Explorar</div>
+                <div class="home-section-sub">Todo lo que necesitas a un clic de distancia</div>
+                <div class="home-qlink-grid">
+                    <a href="<?= Router::url('coaster_search') ?>" class="home-qlink">
+                        <i class="fa-solid fa-train-tram home-qlink-icon"></i>
+                        <div class="home-qlink-name">Buscar Coasters</div>
+                        <div class="home-qlink-desc">Explora miles de montañas rusas con nuestros filtros avanzados</div>
+                    </a>
+                    <a href="<?= Router::url('coaster_tops') ?>" class="home-qlink">
+                        <i class="fa-solid fa-list-ol home-qlink-icon"></i>
+                        <div class="home-qlink-name">Tops Globales</div>
+                        <div class="home-qlink-desc">Descubre las mejores coasters valoradas por nuestra comunidad</div>
+                    </a>
+                    <a href="<?= Router::url('forums') ?>" class="home-qlink">
+                        <i class="fa-solid fa-comments home-qlink-icon"></i>
+                        <div class="home-qlink-name">Foros</div>
+                        <div class="home-qlink-desc">Unéte a debates, entérate de noticias y novedades</div>
+                    </a>
+                    <a href="<?= Router::url('trips') ?>" class="home-qlink">
+                        <i class="fa-solid fa-route home-qlink-icon"></i>
+                        <div class="home-qlink-name">Mis Viajes</div>
+                        <div class="home-qlink-desc">Planifica y comparte tus rutas a diferentes parques</div>
+                    </a>
+                </div>
+            </div>
 
-                <div class="col-12 col-lg-8 d-flex flex-column">
-                    <div class="home-section-title" style="margin-bottom:1.2rem;">Últimas Novedades</div>
-                    <div class="home-news-grid flex-grow-1">
-                        <?php if ($featured_news): 
-                            $has_img = !empty($featured_news['image_url']);
-                            $img_src = $has_img ? (str_starts_with($featured_news['image_url'], 'http') ? $featured_news['image_url'] : $base_url . $featured_news['image_url']) : '';
-                        ?>
-                            <a href="<?= $featured_news['external_link'] ?: '#' ?>" class="home-news-card big <?= !$has_img ? 'no-photo' : '' ?>">
-                                <?php if ($has_img): ?>
-                                    <img src="<?= $img_src ?>" class="home-news-img" alt="">
-                                <?php endif; ?>
-                                <div class="home-news-body">
-                                    <div class="home-news-tag">
-                                        <i class="fa-solid <?= $featured_news['tag'] === 'Destacado' ? 'fa-bolt' : 'fa-info-circle' ?> me-1"></i>
-                                        <?= htmlspecialchars($featured_news['tag'] ?: 'Novedad') ?>
-                                    </div>
-                                    <div class="home-news-title"><?= htmlspecialchars($featured_news['title']) ?></div>
-                                    <div class="home-news-desc"><?= htmlspecialchars($featured_news['description']) ?></div>
-                                    <div class="home-news-date"><i class="fa-regular fa-clock me-1"></i><?= date('d/m/Y', strtotime($featured_news['created_at'])) ?></div>
+            <!-- PERFIL Y NOTICIAS -->
+            <div class="home-section" style="padding-top:0;">
+                <div class="row g-4">
+
+                    <!-- PERFIL MINI -->
+                    <div class="col-12 col-lg-4 d-flex flex-column">
+                        <div class="home-section-title" style="margin-bottom:1.2rem;">Tu Perfil</div>
+                        <div class="home-profile-mini flex-grow-1">
+                            <div class="home-profile-mini-header">
+                                <!-- Avatar inyectado por JS -->
+                                <div id="profile-avatar-wrap"></div>
+                                <div>
+                                    <div class="home-profile-mini-name"  id="profile-name">—</div>
+                                    <div class="home-profile-mini-role"><i class="fa-solid fa-location-dot me-1"></i><span id="profile-location">—</span></div>
                                 </div>
-                            </a>
-                        <?php endif; ?>
-
-                        <div class="home-news-small-col">
-                            <?php foreach ($small_news as $news_item): 
-                                $has_img_s = !empty($news_item['image_url']);
-                                $img_src_s = $has_img_s ? (str_starts_with($news_item['image_url'], 'http') ? $news_item['image_url'] : $base_url . $news_item['image_url']) : '';
-                            ?>
-                                <a href="<?= $news_item['external_link'] ?: '#' ?>" class="home-news-card small <?= !$has_img_s ? 'no-photo' : '' ?>">
-                                    <?php if ($has_img_s): ?>
-                                        <img src="<?= $img_src_s ?>" class="home-news-img" alt="">
-                                    <?php endif; ?>
-                                    <div class="home-news-body d-flex flex-column justify-content-center">
-                                        <div class="home-news-tag <?= $news_item['tag'] === 'Viajes' ? 'text-warning' : '' ?>">
-                                            <?= htmlspecialchars($news_item['tag'] ?: 'Info') ?>
-                                        </div>
-                                        <div class="home-news-title"><?= htmlspecialchars($news_item['title']) ?></div>
-                                        <div class="home-news-desc"><?= htmlspecialchars($news_item['description']) ?></div>
-                                    </div>
+                            </div>
+                            <div class="home-profile-mini-stats">
+                                <div class="home-profile-mini-stat">
+                                    <div class="home-profile-mini-stat-num"   id="stat-credits">0</div>
+                                    <div class="home-profile-mini-stat-label">Coaster Count</div>
+                                </div>
+                                <div class="home-profile-mini-stat">
+                                    <div class="home-profile-mini-stat-num"   id="stat-reviews">0</div>
+                                    <div class="home-profile-mini-stat-label">Reseñas</div>
+                                </div>
+                                <div class="home-profile-mini-stat">
+                                    <div class="home-profile-mini-stat-num"   id="stat-parks">0</div>
+                                    <div class="home-profile-mini-stat-label">Parques</div>
+                                </div>
+                                <div class="home-profile-mini-stat" style="border-bottom:none;">
+                                    <div class="home-profile-mini-stat-num"   id="stat-trips">0</div>
+                                    <div class="home-profile-mini-stat-label">Viajes</div>
+                                </div>
+                                <div class="home-profile-mini-stat" style="border-bottom:none;">
+                                    <div class="home-profile-mini-stat-num"   id="stat-friends">0</div>
+                                    <div class="home-profile-mini-stat-label">Amigos</div>
+                                </div>
+                                <div class="home-profile-mini-stat" style="border-bottom:none;">
+                                    <div class="home-profile-mini-stat-num"   id="stat-photos">0</div>
+                                    <div class="home-profile-mini-stat-label">Fotos</div>
+                                </div>
+                            </div>
+                            <div class="home-favorite-coaster">
+                                <i class="fa-solid fa-star" style="color:var(--rcw-green);"></i>
+                                <span>Favorita: <strong class="text-truncate ms-1" id="fav-coaster" style="max-width:140px;display:inline-block;vertical-align:bottom;">—</strong></span>
+                            </div>
+                            <div class="home-profile-mini-footer flex-column" style="gap: 0.5rem; padding: 1rem 1.2rem;">
+                                <a href="<?= Router::url('profile') ?>#tops" class="btn btn-success rounded-0 w-100 fw-bold d-flex justify-content-center align-items-center mb-1" style="padding: 0.6rem; letter-spacing:0.5px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);">
+                                    <i class="fa-solid fa-ranking-star me-2"></i> Mis Tops
                                 </a>
-                            <?php endforeach; ?>
-                            
-                            <?php if (count($all_news) === 0): ?>
-                                <div class="text-center text-muted p-5 bg-dark border rounded-0 w-100">
-                                    <i class="fa-solid fa-newspaper fa-3x mb-3 opacity-25"></i>
-                                    <p>No hay novedades publicadas por el momento.</p>
+                                <div class="d-flex w-100" style="gap: 0.5rem;">
+                                    <a href="<?= Router::url('profile') ?>" class="home-btn-mini flex-fill"><i class="fa-solid fa-user me-2"></i>Perfil</a>
+                                    <a href="<?= Router::url('profile') ?>#config" class="home-btn-mini flex-fill"><i class="fa-solid fa-gear me-2"></i>Config</a>
                                 </div>
-                            <?php endif; ?>
+                            </div>
                         </div>
                     </div>
-                </div>
 
+                    <!-- NOTICIAS -->
+                    <div class="col-12 col-lg-8 d-flex flex-column">
+                        <div class="home-section-title" style="margin-bottom:1.2rem;">Últimas Novedades</div>
+                        <div class="home-news-grid flex-grow-1" id="news-grid">
+                            <!-- Skeleton loader -->
+                            <div class="home-news-card big no-photo d-flex align-items-center justify-content-center" style="min-height:180px;">
+                                <div class="spinner-border spinner-border-sm text-success" role="status"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div><!-- /home-wrapper -->
+
+        <!-- Modal Noticias -->
+        <div class="modal fade" id="news-modal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content text-start border-0 rounded-0 shadow-lg" style="background:#161b22; color:#e6edf3;">
+                    <div class="modal-header border-bottom border-success px-4 py-3" style="background:#0d1117;">
+                        <h5 class="modal-title fw-bold" id="news-modal-title">Título de la Noticia</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <img id="news-modal-img" src="" class="img-fluid w-100 d-none" style="max-height: 480px; object-fit: cover;">
+                        <div class="p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <span id="news-modal-tag" class="badge bg-success rounded-0 me-3 text-uppercase shadow-sm"></span>
+                                <span id="news-modal-date" class="text-muted small"><i class="fa-regular fa-clock me-1"></i>...</span>
+                            </div>
+                            <p id="news-modal-desc" class="fs-6" style="line-height: 1.6; white-space: pre-wrap; margin-bottom: 0;"></p>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 px-4 pb-4 pt-0" style="background:#161b22;">
+                        <button type="button" class="btn btn-outline-secondary rounded-0 px-4" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <script>
-            // Animated counters execution if needed, standard feature
-            function animateCount(el, target, suffix = '') {
-                if (!el) return;
-                let start = 0;
-                // Parse the target properly if it has commas from formatting
-                const rawTarget = parseInt(target.toString().replace(/,/g, ''));
-                if (isNaN(rawTarget)) return;
-
-                const duration = 1500;
-                const frames = 30;
-                const step = Math.ceil(rawTarget / frames);
-
-                const timer = setInterval(() => {
-                    start = Math.min(start + step, rawTarget);
-                    el.textContent = start.toLocaleString('es-ES') + suffix;
-                    if (start >= rawTarget) clearInterval(timer);
-                }, duration / frames);
-            }
-            
-            document.addEventListener('DOMContentLoaded', () => {
-                setTimeout(() => {
-                    // Try targeting elements safely
-                    const els = ['cnt-users', 'cnt-coasters', 'cnt-reviews', 'cnt-photos', 'cnt-parks'];
-                    els.forEach(id => {
-                        const el = document.getElementById(id);
-                        if(el && el.textContent.trim() !== '—') animateCount(el, el.textContent.trim());
-                    });
-                }, 300);
-            });
-        </script>
-        <!-- FIN VISTAS MOCKUP (DASHBOARD) -->
+        <!-- FIN VISTA DASHBOARD -->
 
     <?php else: ?>
         <!-- ======================== VISTA GUEST ======================== -->
@@ -364,7 +233,7 @@ try {
         <!-- HERO -->
         <section class="landing-hero d-flex align-items-center" style="
             min-height: 100vh;
-            background: linear-gradient(rgba(2,6,23,0.55), rgba(2,6,23,0.72)), url('<?= $base_url ?>/web/img/taron_phanta.jpeg');
+            background: linear-gradient(rgba(2,6,23,0.55), rgba(2,6,23,0.72)), url('<?= $base_url ?>/web/img/hero-bg.jpg');
             background-size: cover;
             background-position: center 25%;
         ">
@@ -385,12 +254,12 @@ try {
                 <!-- Mini stats -->
                 <div class="d-flex flex-wrap justify-content-center gap-5 mt-5 pt-4 landing-stats-bar">
                     <div>
-                        <div class="fw-bold fs-3 text-neon">+<?= is_numeric($stat_coasters) ? number_format((float)$stat_coasters) : '10.000' ?></div>
+                        <div class="fw-bold fs-3 text-neon" id="landing-cnt-coasters">+…</div>
                         <div class="small text-light opacity-75">Montañas rusas</div>
                     </div>
                     <div class="landing-stat-sep"></div>
                     <div>
-                        <div class="fw-bold fs-3 text-neon">+<?= is_numeric($stat_parks) ? number_format((float)$stat_parks) : '2.500' ?></div>
+                        <div class="fw-bold fs-3 text-neon" id="landing-cnt-parks">+…</div>
                         <div class="small text-light opacity-75">Parques</div>
                     </div>
                     <div class="landing-stat-sep"></div>
@@ -409,25 +278,8 @@ try {
                     <h2 class="display-6 fw-bold text-white">Todo lo que necesitas</h2>
                     <p class="text-muted mt-2">Una plataforma construida por entusiastas, para entusiastas</p>
                 </div>
-                <div class="row g-4 justify-content-center">
-                    <?php
-                    $features = [
-                        ['icon'=>'fa-database',         'title'=>'Base de datos completa',   'desc'=>'Más de ' . (is_numeric($stat_coasters) ? number_format((float)$stat_coasters) : '10.000') . ' coasters indexados de todo el mundo con datos técnicos completos.'],
-                        ['icon'=>'fa-list-ol',          'title'=>'Tops personalizados',      'desc'=>'Crea y ordena tu ranking personal. Compáralo con el de la comunidad.'],
-                        ['icon'=>'fa-suitcase-rolling', 'title'=>'Gestor de viajes',         'desc'=>'Planifica tus rutas por parques, calcula distancias y gestiona tus trips.'],
-                        ['icon'=>'fa-camera',           'title'=>'Galería de fotos',         'desc'=>'Sube fotos de tus visitas y descubre las de otros usuarios.'],
-                        ['icon'=>'fa-comments',         'title'=>'Foros especializados',     'desc'=>'Debate sobre coasters, parques, noticias y novedades del sector.'],
-                        ['icon'=>'fa-trophy',           'title'=>'Ranking global',           'desc'=>'Compite con otros enthusiasts y escala en el ranking de credits.'],
-                    ];
-                    foreach ($features as $f): ?>
-                    <div class="col-sm-6 col-lg-4">
-                        <div class="landing-feature-card h-100 p-4 text-center rounded-0">
-                            <i class="fa-solid <?= $f['icon'] ?> fa-2x text-neon mb-3"></i>
-                            <h5 class="fw-bold mb-2 text-white"><?= $f['title'] ?></h5>
-                            <p class="text-muted small mb-0"><?= $f['desc'] ?></p>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
+                <div class="row g-4 justify-content-center" id="features-grid">
+                    <!-- Renderizado por index.js una vez cargadas las stats -->
                 </div>
             </div>
         </section>
@@ -440,41 +292,21 @@ try {
                 <p class="text-muted lead mb-5 mx-auto" style="max-width: 560px;">
                     Una cuenta. Acceso a toda la base de datos de coasters del mundo, tus tops, tus viajes y la comunidad.
                 </p>
-
                 <!-- Puntos de venta -->
                 <div class="row g-3 justify-content-center mb-5">
+                    <?php
+                    $sellPoints = [
+                        'Acceso gratuito', 'Sin tarjeta de crédito', 'Datos actualizados',
+                        'Comunidad activa', 'Rankings en tiempo real', 'Planificador de viajes',
+                    ];
+                    foreach ($sellPoints as $sp): ?>
                     <div class="col-sm-4 col-lg-3">
                         <div class="landing-sell-point">
-                            <i class="fa-solid fa-check text-neon me-2"></i><span class="text-light">Acceso gratuito</span>
+                            <i class="fa-solid fa-check text-neon me-2"></i><span class="text-light"><?= $sp ?></span>
                         </div>
                     </div>
-                    <div class="col-sm-4 col-lg-3">
-                        <div class="landing-sell-point">
-                            <i class="fa-solid fa-check text-neon me-2"></i><span class="text-light">Sin tarjeta de crédito</span>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 col-lg-3">
-                        <div class="landing-sell-point">
-                            <i class="fa-solid fa-check text-neon me-2"></i><span class="text-light">Datos actualizados</span>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 col-lg-3">
-                        <div class="landing-sell-point">
-                            <i class="fa-solid fa-check text-neon me-2"></i><span class="text-light">Comunidad activa</span>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 col-lg-3">
-                        <div class="landing-sell-point">
-                            <i class="fa-solid fa-check text-neon me-2"></i><span class="text-light">Rankings en tiempo real</span>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 col-lg-3">
-                        <div class="landing-sell-point">
-                            <i class="fa-solid fa-check text-neon me-2"></i><span class="text-light">Planificador de viajes</span>
-                        </div>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
-
                 <div class="d-flex flex-wrap justify-content-center gap-3">
                     <a href="<?= Router::url('register') ?>" class="btn btn-success btn-lg px-5 py-3 rounded-0 fw-bold shadow">
                         <i class="fa-solid fa-rocket me-2"></i>Crear cuenta gratis
@@ -491,6 +323,7 @@ try {
 </main>
 
 <link rel="stylesheet" href="<?= $base_url ?>/web/css/home.css">
+<script src="<?= Router::asset('web/js/index.js') ?>" defer></script>
 
 <?php
 require_once __DIR__ . '/../partials/footer.php';

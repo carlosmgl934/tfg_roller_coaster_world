@@ -116,6 +116,11 @@ class DBConexion
         return $this->conn->rollBack();
     }
 
+    public function inTransaction()
+    {
+        return $this->conn->inTransaction();
+    }
+
     public function close()
     {
         $this->conn = null;

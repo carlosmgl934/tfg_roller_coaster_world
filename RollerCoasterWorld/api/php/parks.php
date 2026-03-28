@@ -11,28 +11,30 @@ require_once __DIR__ . '/utils/StatsHelper.php';
 $router = new ApiRouter('list');
 
 // ── Endpoints públicos ──────────────────────────────────────────────────────────
-$router->register('list',      'listParks');
-$router->register('country',   'getCountries');
-$router->register('details',   'getParkDetails');
-$router->register('reviews',   'getParkReviews');
+$router->register('list', 'listParks');
+$router->register('country', 'getCountries');
+$router->register('details', 'getParkDetails');
+$router->register('reviews', 'getParkReviews');
 $router->register('save_review', 'saveReview', 'POST');
+$router->register('check_review', 'checkReview');
 // ── Endpoints protegidos (requieren login y rol admin) ─────────────────────────
-$router->register('add',           'addPark',           'POST');
-$router->register('update',        'updatePark',        'POST');
-$router->register('delete',        'deletePark',        'POST');
-$router->register('add_photo',     'addParkPhoto',      'POST');
-$router->register('update_stats',  'updateParkStats',   'POST');
+$router->register('add', 'addPark', 'POST');
+$router->register('update', 'updatePark', 'POST');
+$router->register('delete', 'deletePark', 'POST');
+$router->register('add_photo', 'addParkPhoto', 'POST');
+$router->register('update_stats', 'updateParkStats', 'POST');
 
 $router->dispatch();
 
 // ── Funciones ───────────────────────────────────────────────────────────────────
 
 // Listar todos los parques (público)
-function listParks() {
+function listParks()
+{
     global $db;
-    
-    $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-    $limit = isset($_GET['limit']) ? min(2000, max(1, (int)$_GET['limit'])) : 15;
+
+    $page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
+    $limit = isset($_GET['limit']) ? min(2000, max(1, (int) $_GET['limit'])) : 15;
     $offset = ($page - 1) * $limit;
 
     $where = ["park_name NOT IN ('Desconocido', 'Unknown')"];
@@ -53,33 +55,33 @@ function listParks() {
     }
     if (!empty($_GET['opening_year_min'])) {
         $where[] = "opening_year >= :min_year";
-        $bind[':min_year'] = (int)$_GET['opening_year_min'];
+        $bind[':min_year'] = (int) $_GET['opening_year_min'];
     }
     if (!empty($_GET['opening_year_max'])) {
         $where[] = "opening_year <= :max_year";
-        $bind[':max_year'] = (int)$_GET['opening_year_max'];
+        $bind[':max_year'] = (int) $_GET['opening_year_max'];
     }
     if (!empty($_GET['min_coasters'])) {
         $where[] = "operating_coasters >= :min_coasters";
-        $bind[':min_coasters'] = (int)$_GET['min_coasters'];
+        $bind[':min_coasters'] = (int) $_GET['min_coasters'];
     }
     if (!empty($_GET['max_coasters'])) {
         $where[] = "operating_coasters <= :max_coasters";
-        $bind[':max_coasters'] = (int)$_GET['max_coasters'];
+        $bind[':max_coasters'] = (int) $_GET['max_coasters'];
     }
     if (!empty($_GET['min_stars'])) {
         $where[] = "stars >= :min_stars";
-        $bind[':min_stars'] = (float)$_GET['min_stars'];
+        $bind[':min_stars'] = (float) $_GET['min_stars'];
     }
 
     $sort = $_GET['sort'] ?? 'coasters';
     $reqDir = strtoupper($_GET['order_dir'] ?? '');
 
     $sortMap = [
-        'name'     => ['col' => 'park_name', 'default' => 'ASC'],
+        'name' => ['col' => 'park_name', 'default' => 'ASC'],
         'coasters' => ['col' => 'operating_coasters', 'default' => 'DESC'],
-        'stars'    => ['col' => 'stars', 'default' => 'DESC'],
-        'year'     => ['col' => 'NULLIF(opening_year, 0)', 'default' => 'ASC'],
+        'stars' => ['col' => 'stars', 'default' => 'DESC'],
+        'year' => ['col' => 'NULLIF(opening_year, 0)', 'default' => 'ASC'],
     ];
 
     $config = $sortMap[$sort] ?? $sortMap['coasters'];
@@ -102,14 +104,14 @@ function listParks() {
 
     $stmt = $db->prepare($sql);
     $stmtCount = $db->prepare($sqlCount);
-    
+
     foreach ($bind as $key => $val) {
         $stmt->bindValue($key, $val);
         $stmtCount->bindValue($key, $val);
     }
     $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
     $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-    
+
     $stmt->execute();
     $stmtCount->execute();
 
@@ -120,7 +122,8 @@ function listParks() {
 }
 
 // Obtener lista de países únicos (público)
-function getCountries() {
+function getCountries()
+{
     global $db;
     $stmt = $db->query("SELECT DISTINCT park_country FROM parks WHERE park_country IS NOT NULL ORDER BY park_country ASC");
     $countries = $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -128,9 +131,10 @@ function getCountries() {
 }
 
 // Detalle de un parque específico (público)
-function getParkDetails() {
+function getParkDetails()
+{
     global $db;
-    $id = (int)($_GET['id'] ?? 0);
+    $id = (int) ($_GET['id'] ?? 0);
 
     if ($id <= 0) {
         Response::error("ID de parque inválido", 400);
@@ -154,9 +158,10 @@ function getParkDetails() {
 
 
 // Obtener reseñas de un parque (público)
-function getParkReviews() {
+function getParkReviews()
+{
     global $db;
-    $id = (int)($_GET['id'] ?? 0);
+    $id = (int) ($_GET['id'] ?? 0);
     $order = $_GET['order'] ?? 'newest';
 
     if ($id <= 0) {
@@ -164,11 +169,13 @@ function getParkReviews() {
     }
 
     $orderBy = 'pr.created_at DESC';
-    if ($order === 'best') $orderBy = 'pr.note DESC, pr.created_at DESC';
-    if ($order === 'worst') $orderBy = 'pr.note ASC, pr.created_at DESC';
+    if ($order === 'best')
+        $orderBy = 'pr.note DESC, pr.created_at DESC';
+    if ($order === 'worst')
+        $orderBy = 'pr.note ASC, pr.created_at DESC';
 
     $stmt = $db->prepare("
-        SELECT pr.id, pr.review, pr.note, pr.created_at, u.username,
+        SELECT pr.id, pr.review, pr.note, pr.created_at, u.username, u.profile_image,
                (SELECT json_agg(json_build_object('tag', pt.tag, 'type', pt.type))
                 FROM park_review_tags pt WHERE pt.review_id = pr.id) AS tags
         FROM park_ratings pr
@@ -190,7 +197,8 @@ function getParkReviews() {
 // ── Endpoints protegidos (admin) ───────────────────────────────────────────────
 
 // Añadir nuevo parque (requiere admin)
-function addPark() {
+function addPark()
+{
     global $db;
 
     if (!isset($_SESSION['firebase_uid']) || $_SESSION['rol'] !== 'admin') {
@@ -216,17 +224,17 @@ function addPark() {
     ");
 
     $stmt->execute([
-        ':park_name'          => $data['park_name'],
-        ':park_location'      => $data['park_location'],
-        ':park_country'       => $data['park_country'] ?? null,
-        ':imagen_url'         => $data['imagen_url'] ?? null,
-        ':num_coasters'       => $data['num_coasters'] ?? 0,
+        ':park_name' => $data['park_name'],
+        ':park_location' => $data['park_location'],
+        ':park_country' => $data['park_country'] ?? null,
+        ':imagen_url' => $data['imagen_url'] ?? null,
+        ':num_coasters' => $data['num_coasters'] ?? 0,
         ':operating_coasters' => $data['operating_coasters'] ?? 0,
-        ':opening_year'       => $data['opening_year'] ?? null,
-        ':precio_entrada'     => $data['precio_entrada'] ?? null,
-        ':stars'              => $data['stars'] ?? 0,
-        ':latitude'           => $data['latitude'] ?? null,
-        ':longitude'          => $data['longitude'] ?? null,
+        ':opening_year' => $data['opening_year'] ?? null,
+        ':precio_entrada' => $data['precio_entrada'] ?? null,
+        ':stars' => $data['stars'] ?? 0,
+        ':latitude' => $data['latitude'] ?? null,
+        ':longitude' => $data['longitude'] ?? null,
     ]);
 
     $newId = $stmt->fetchColumn();
@@ -234,15 +242,17 @@ function addPark() {
 }
 
 // Actualizar parque (requiere admin)
-function updatePark() {
+function updatePark()
+{
     global $db;
 
     if (!isset($_SESSION['firebase_uid']) || $_SESSION['rol'] !== 'admin') {
         Response::error("Acceso denegado. Requiere rol admin.", 403);
     }
 
-    $id = (int)($_GET['id'] ?? $_POST['id'] ?? 0);
-    if ($id <= 0) Response::error("ID inválido", 400);
+    $id = (int) ($_GET['id'] ?? $_POST['id'] ?? 0);
+    if ($id <= 0)
+        Response::error("ID inválido", 400);
 
     $data = $_POST;
 
@@ -264,18 +274,18 @@ function updatePark() {
     ");
 
     $stmt->execute([
-        ':id'                 => $id,
-        ':park_name'          => $data['park_name'] ?? null,
-        ':park_location'      => $data['park_location'] ?? null,
-        ':park_country'       => $data['park_country'] ?? null,
-        ':imagen_url'         => $data['imagen_url'] ?? null,
-        ':num_coasters'       => $data['num_coasters'] ?? null,
+        ':id' => $id,
+        ':park_name' => $data['park_name'] ?? null,
+        ':park_location' => $data['park_location'] ?? null,
+        ':park_country' => $data['park_country'] ?? null,
+        ':imagen_url' => $data['imagen_url'] ?? null,
+        ':num_coasters' => $data['num_coasters'] ?? null,
         ':operating_coasters' => $data['operating_coasters'] ?? null,
-        ':opening_year'       => $data['opening_year'] ?? null,
-        ':precio_entrada'     => $data['precio_entrada'] ?? null,
-        ':stars'              => $data['stars'] ?? null,
-        ':latitude'           => $data['latitude'] ?? null,
-        ':longitude'          => $data['longitude'] ?? null,
+        ':opening_year' => $data['opening_year'] ?? null,
+        ':precio_entrada' => $data['precio_entrada'] ?? null,
+        ':stars' => $data['stars'] ?? null,
+        ':latitude' => $data['latitude'] ?? null,
+        ':longitude' => $data['longitude'] ?? null,
     ]);
 
     if ($stmt->rowCount() > 0) {
@@ -286,15 +296,17 @@ function updatePark() {
 }
 
 // Eliminar parque (requiere admin)
-function deletePark() {
+function deletePark()
+{
     global $db;
 
     if (!isset($_SESSION['firebase_uid']) || $_SESSION['rol'] !== 'admin') {
         Response::error("Acceso denegado. Requiere rol admin.", 403);
     }
 
-    $id = (int)($_GET['id'] ?? $_POST['id'] ?? 0);
-    if ($id <= 0) Response::error("ID inválido", 400);
+    $id = (int) ($_GET['id'] ?? $_POST['id'] ?? 0);
+    if ($id <= 0)
+        Response::error("ID inválido", 400);
 
     $stmt = $db->prepare("DELETE FROM parks WHERE id = :id");
     $stmt->execute([':id' => $id]);
@@ -307,14 +319,15 @@ function deletePark() {
 }
 
 // Añadir foto a parque (requiere admin)
-function addParkPhoto() {
+function addParkPhoto()
+{
     global $db;
 
     if (!isset($_SESSION['firebase_uid']) || $_SESSION['rol'] !== 'admin') {
         Response::error("Acceso denegado. Requiere rol admin.", 403);
     }
 
-    $parkId = (int)($_POST['park_id'] ?? 0);
+    $parkId = (int) ($_POST['park_id'] ?? 0);
     $photoUrl = $_POST['photo_url'] ?? '';
     $caption = $_POST['caption'] ?? '';
 
@@ -328,24 +341,26 @@ function addParkPhoto() {
         RETURNING id
     ");
     $stmt->execute([
-        ':park_id'    => $parkId,
-        ':photo_url'  => $photoUrl,
-        ':caption'    => $caption
+        ':park_id' => $parkId,
+        ':photo_url' => $photoUrl,
+        ':caption' => $caption
     ]);
 
     Response::success(['message' => 'Foto añadida']);
 }
 
 // Actualizar estadísticas de parque (requiere admin)
-function updateParkStats() {
+function updateParkStats()
+{
     global $db;
 
     if (!isset($_SESSION['firebase_uid']) || $_SESSION['rol'] !== 'admin') {
         Response::error("Acceso denegado. Requiere rol admin.", 403);
     }
 
-    $parkId = (int)($_GET['park_id'] ?? $_POST['park_id'] ?? 0);
-    if ($parkId <= 0) Response::error("park_id inválido", 400);
+    $parkId = (int) ($_GET['park_id'] ?? $_POST['park_id'] ?? 0);
+    if ($parkId <= 0)
+        Response::error("park_id inválido", 400);
 
     // Recalcular desde coasters (ejemplo simple)
     $countStmt = $db->prepare("SELECT COUNT(*) FROM coasters WHERE park_id = :id AND coaster_status IN ('Operating', 'Operativa', 'Abierta')");
@@ -359,16 +374,17 @@ function updateParkStats() {
         WHERE id = :id
     ");
     $stmt->execute([
-        ':num_coasters'       => $numCoasters,
+        ':num_coasters' => $numCoasters,
         ':operating_coasters' => $numCoasters, // simplificado
-        ':id'                 => $parkId
+        ':id' => $parkId
     ]);
 
     Response::success(['message' => 'Estadísticas actualizadas']);
 }
 
 // Guardar una nueva reseña (público, requiere login)
-function saveReview() {
+function saveReview()
+{
     global $db;
 
     if (!isset($_SESSION['user_id'])) {
@@ -376,8 +392,8 @@ function saveReview() {
     }
 
     $userId = $_SESSION['user_id'];
-    $parkId = (int)($_POST['park_id'] ?? 0);
-    $note = (float)($_POST['note'] ?? 0);
+    $parkId = (int) ($_POST['park_id'] ?? 0);
+    $note = (float) ($_POST['note'] ?? 0);
     $reviewText = trim($_POST['review'] ?? '');
     $pros = $_POST['pros'] ?? [];
     $contras = $_POST['contras'] ?? [];
@@ -387,6 +403,12 @@ function saveReview() {
     }
 
     try {
+        $checkStmt = $db->prepare("SELECT COUNT(*) FROM park_ratings WHERE user_id = :user_id AND park_id = :park_id");
+        $checkStmt->execute([':user_id' => $userId, ':park_id' => $parkId]);
+        if ($checkStmt->fetchColumn() > 0) {
+            Response::error("Ya has publicado una reseña para este parque anteriormente.", 400);
+        }
+
         $db->beginTransaction();
 
         $stmt = $db->prepare("
@@ -397,14 +419,14 @@ function saveReview() {
         $stmt->execute([
             ':user_id' => $userId,
             ':park_id' => $parkId,
-            ':review'  => !empty($reviewText) ? $reviewText : null,
-            ':note'    => $note
+            ':review' => !empty($reviewText) ? $reviewText : null,
+            ':note' => $note
         ]);
         $reviewId = $stmt->fetchColumn();
 
         if ($reviewId) {
             $tagStmt = $db->prepare("INSERT INTO park_review_tags (review_id, tag, type) VALUES (:review_id, :tag, :type)");
-            
+
             if (is_array($pros)) {
                 foreach ($pros as $tag) {
                     $tagStmt->execute([':review_id' => $reviewId, ':tag' => $tag, ':type' => 'pro']);
@@ -418,13 +440,35 @@ function saveReview() {
         }
 
         $db->commit();
-        
+
         // Actualizar estadísticas del parque (estrellas)
         StatsHelper::updateParkStats($parkId);
-        
+
         Response::success(['message' => 'Reseña guardada correctamente']);
     } catch (Exception $e) {
-        if ($db->inTransaction()) $db->rollBack();
+        if ($db->inTransaction())
+            $db->rollBack();
         Response::error("Error al guardar la reseña: " . $e->getMessage(), 500);
+    }
+}
+
+function checkReview()
+{
+    $parkId = (int) ($_GET['id'] ?? 0);
+    if ($parkId <= 0)
+        Response::error('ID inválido', 400);
+
+    if (!isset($_SESSION['user_id'])) {
+        Response::success(['hasReviewed' => false]);
+        return;
+    }
+
+    try {
+        global $db;
+        $stmt = $db->prepare("SELECT COUNT(*) FROM park_ratings WHERE user_id = :user_id AND park_id = :park_id");
+        $stmt->execute([':user_id' => $_SESSION['user_id'], ':park_id' => $parkId]);
+        Response::success(['hasReviewed' => $stmt->fetchColumn() > 0]);
+    } catch (Exception $e) {
+        Response::error("Error comprobando estado de reseña");
     }
 }

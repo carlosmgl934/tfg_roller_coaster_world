@@ -284,10 +284,12 @@ function deleteCoaster(): void
     try {
         global $db;
 
-        // Antes de borrar, obtenemos el park_id para actualizar sus stats
-        $stmtPark = $db->prepare("SELECT park_id FROM coasters WHERE id = :id");
+        // Antes de borrar, obtenemos el park_id y el nombre para actualizar sus stats y la respuesta
+        $stmtPark = $db->prepare("SELECT park_id, coaster_name FROM coasters WHERE id = :id");
         $stmtPark->execute([':id' => $id]);
-        $parkId = $stmtPark->fetchColumn();
+        $coasterRow = $stmtPark->fetch(PDO::FETCH_ASSOC);
+        $parkId = $coasterRow['park_id'] ?? null;
+        $coasterName = $coasterRow['coaster_name'] ?? '';
 
         // Eliminar
         $stmt = $db->prepare("DELETE FROM coasters WHERE id = :id");

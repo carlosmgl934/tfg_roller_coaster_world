@@ -36,6 +36,14 @@ require_once __DIR__ . '/../../partials/header.php';
                     <h4 class="mb-0 fw-semibold text-white">Escribir Reseña</h4>
                 </div>
                 <div class="card-body p-4 p-md-5">
+
+                    <div id="already-reviewed-msg" class="text-center py-5 d-none">
+                        <i class="fa-solid fa-star text-warning display-1 mb-4 opacity-75"></i>
+                        <h3 class="fw-bold text-white mb-3">¡Ya has valorado esta montaña rusa!</h3>
+                        <p class="text-muted mb-4" style="font-size: 1.1rem;">Solo se permite una única reseña por usuario en cada atracción para mantener la precisión de nuestras notas. ¡Gracias por aportar tu opinión!</p>
+                        <a href="<?= Router::url('coasters') ?>?id=<?= $id ?>" class="btn btn-success rounded-pill px-5 py-2 fw-bold">Volver a la atracción</a>
+                    </div>
+                    
                     <form id="review-form" action="#">
                         <input type="hidden" name="coaster_id" value="<?= $id ?>">
                         <input type="hidden" name="user_id" value="<?= $user_id ?>">
@@ -75,7 +83,7 @@ require_once __DIR__ . '/../../partials/header.php';
                             </select>
                         </div>
 
-                        <div class="mb-4">
+                        <div class="mb-4 wrapper-contras">
                             <label class="form-label fw-semibold text-danger" for="contras-select"><i
                                     class="fa-solid fa-minus-circle me-1"></i> Mayores Contras:</label>
                             <select name="contras[]" id="contras-select" multiple>

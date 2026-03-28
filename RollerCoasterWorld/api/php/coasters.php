@@ -23,6 +23,7 @@ $router->register('reviews',       'getCoasterReviews');
 $router->register('save_review',   'saveReview', 'POST');
 $router->register('save_photo',    'savePhoto', 'POST');
 $router->register('like_photo',    'likePhoto', 'POST');
+$router->register('check_review',  'checkReview');
 
 $router->dispatch();
 
@@ -303,7 +304,8 @@ function applyFilters()
         $sql = "SELECT coasters.id, coasters.coaster_name, coasters.imagen_url, 
                 parks.park_name, coasters.coaster_manufacter AS manufacter,
                 coasters.coaster_model AS modelo, coasters.opening_year, coasters.stars,
-                coasters.coaster_status
+                coasters.coaster_status, coasters.height, coasters.speed,
+                coasters.coaster_length, coasters.inversions
                 FROM coasters
                 INNER JOIN parks ON coasters.park_id = parks.id
                 WHERE $where
@@ -480,6 +482,12 @@ function saveReview()
 
     try {
         global $db;
+        $checkStmt = $db->prepare("SELECT COUNT(*) FROM coaster_ratings WHERE user_id = :user_id AND coaster_id = :coaster_id");
+        $checkStmt->execute([':user_id' => $userId, ':coaster_id' => $coasterId]);
+        if ($checkStmt->fetchColumn() > 0) {
+            Response::error('Ya has publicado una reseña para esta atracción anteriormente.', 400);
+        }
+
         $db->beginTransaction();
 
         $sql = "INSERT INTO coaster_ratings (user_id, coaster_id, review, note)
@@ -526,6 +534,28 @@ function saveReview()
     } catch (PDOException $e) {
         $db->rollBack();
         Response::error('Error al guardar reseña: ' . $e->getMessage());
+    }
+}
+
+function checkReview()
+{
+    $coasterId = intval($_GET['id'] ?? 0);
+    if ($coasterId <= 0) {
+        Response::error('ID inválido');
+    }
+
+    if (!isset($_SESSION['user_id'])) {
+        Response::success(['hasReviewed' => false]);
+        return;
+    }
+
+    try {
+        global $db;
+        $stmt = $db->prepare("SELECT COUNT(*) FROM coaster_ratings WHERE user_id = :user_id AND coaster_id = :coaster_id");
+        $stmt->execute([':user_id' => $_SESSION['user_id'], ':coaster_id' => $coasterId]);
+        Response::success(['hasReviewed' => $stmt->fetchColumn() > 0]);
+    } catch (PDOException $e) {
+        Response::error('Error comprobando estado de reseña');
     }
 }
 

@@ -136,6 +136,10 @@ function addNews(): void
     try {
         global $db;
         
+        if ($is_featured) {
+            $db->prepare("UPDATE news SET is_featured = false")->execute();
+        }
+
         $sql = "INSERT INTO news (title, tag, external_link, description, image_url, is_featured) 
                 VALUES (:title, :tag, :ext_link, :desc, :image, :is_featured) RETURNING id";
 
@@ -202,6 +206,11 @@ function updateNews(): void
     try {
         global $db;
         
+        if ($is_featured) {
+            $stmtReset = $db->prepare("UPDATE news SET is_featured = false WHERE id != :id");
+            $stmtReset->execute([':id' => $id]);
+        }
+
         $sql = "UPDATE news 
                 SET title = :title, 
                     tag = :tag, 

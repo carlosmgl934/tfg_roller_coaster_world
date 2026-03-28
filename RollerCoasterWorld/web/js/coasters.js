@@ -844,7 +844,7 @@ $(document).ready(function () {
               tagsHtml = '<div class="d-flex flex-wrap gap-2 mt-2 mb-2">';
               review.tags.forEach((t) => {
                 const cls = t.type === "pro" ? "success" : "danger";
-                tagsHtml += `<span class="badge bg-${cls} bg-opacity-10 text-${cls} border border-${cls} border-opacity-25 rounded-pill px-3 py-1" style="font-weight:600;font-size:0.75rem;">${t.tag.replace(/_/g, " ").toUpperCase()}</span>`;
+                tagsHtml += `<span class="badge bg-${cls} text-white rounded-pill px-3 py-1" style="font-weight:600;font-size:0.75rem;">${t.tag.replace(/_/g, " ").toUpperCase()}</span>`;
               });
               tagsHtml += "</div>";
             }
@@ -857,7 +857,7 @@ $(document).ready(function () {
                 <span class="text-muted small ms-2">• ${timeAgo(review.created_at)}</span>
               </div>
               ${tagsHtml}
-              <p class="mb-0 mt-2">${review.review || ""}</p>
+              <p class="mb-0 mt-3 text-white-50" style="font-size:0.9rem; line-height:1.6;">${review.review || ""}</p>
             </div>`,
             );
           });
@@ -880,6 +880,22 @@ $(document).ready(function () {
 
   // --- LÓGICA PARA EL FORMULARIO DE RESEÑAS ---
   if (document.getElementById("review-form")) {
+    const rf = document.getElementById("review-form");
+    const coasterIdInput = rf.querySelector('input[name="coaster_id"]');
+    if (coasterIdInput) {
+      const cId = coasterIdInput.value;
+      fetch(`${BASE_URL}/api/php/coasters.php?action=check_review&id=${cId}`)
+        .then(r => r.json())
+        .then(data => {
+           if (data.success && data.hasReviewed) {
+              rf.classList.add("d-none");
+              const msg = document.getElementById("already-reviewed-msg");
+              if (msg) msg.classList.remove("d-none");
+           }
+        })
+        .catch(e => console.error("Error check review:", e));
+    }
+
     new Choices("#pros-select", {
       removeItemButton: true,
       placeholderValue: "Selecciona las ventajas...",
