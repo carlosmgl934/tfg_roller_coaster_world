@@ -12,12 +12,20 @@ $(document).ready(function () {
       if (type === "global") {
         fetchGlobalTop();
       } else if (type === "users") {
-        fetchUserTops();
+        fetchUserTops(false);
+      } else if (type === "friends") {
+        fetchUserTops(true);
       }
     });
 
-    // Cargar inicialmente
-    fetchGlobalTop();
+    // Cargar inicialmente (priorizando filtros de URL)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("filter") === "friends") {
+      topTypeSelect.val("friends");
+      fetchUserTops(true);
+    } else {
+      fetchGlobalTop();
+    }
   }
 
   function showLoading() {
@@ -50,16 +58,20 @@ $(document).ready(function () {
     }
   }
 
-  async function fetchUserTops() {
+  async function fetchUserTops(isFriends = false) {
     showLoading();
     try {
-      const res = await fetch(`${apiBase}?action=user_tops`);
+      const url = isFriends ? `${apiBase}?action=user_tops&filter=friends` : `${apiBase}?action=user_tops`;
+      const res = await fetch(url);
       const data = await res.json();
 
       if (data.success && data.data.length > 0) {
-        renderUserTops(data.data);
+        renderUserTops(data.data, isFriends);
       } else {
-        topsList.html('<div class="col-12 text-center py-5 text-muted">Ningún usuario ha creado todavía su top personal de parques.</div>');
+        const msg = isFriends 
+          ? "Tus amigos aún no han organizado su top personal de parques o no tienes amigos agregados."
+          : "Ningún usuario ha creado todavía su top personal de parques.";
+        topsList.html(`<div class="col-12 text-center py-5 text-muted">${msg}</div>`);
       }
     } catch (e) {
       console.error(e);
@@ -147,7 +159,7 @@ $(document).ready(function () {
     }
   }
 
-  function renderUserTops(users) {
+  function renderUserTops(users, isFriends = false) {
     topPodium.html(""); // Hide podium for user tops
     topsList.empty();
 

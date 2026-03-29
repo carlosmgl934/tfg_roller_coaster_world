@@ -7,7 +7,16 @@ session_start();
 
 header('Content-Type: application/json');
 
-$db = new DBConexion();
+$db = null;
+
+function getDb() {
+    global $db;
+    if ($db === null) {
+        $db = new DBConexion();
+    }
+    return $db;
+}
+
 $router = new ApiRouter();
 
 $router->register('search_users', 'searchUsers');
@@ -23,7 +32,7 @@ function getUserId(): ?int
 {
     if (isset($_SESSION['user_id'])) return (int)$_SESSION['user_id'];
     if (isset($_SESSION['firebase_uid'])) {
-        global $db;
+        $db = getDb();
         $stmt = $db->prepare("SELECT id FROM users WHERE firebase_uid = :uid LIMIT 1");
         $stmt->execute([':uid' => $_SESSION['firebase_uid']]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -36,7 +45,7 @@ function getUserId(): ?int
 }
 
 function searchUsers() {
-    global $db;
+    $db = getDb();
     $current_user_id = getUserId();
     if (!$current_user_id) {
         Response::error("No autorizado", 401);
@@ -98,7 +107,7 @@ function searchUsers() {
 }
 
 function sendFriendRequest() {
-    global $db;
+    $db = getDb();
     $current_user_id = getUserId();
     if (!$current_user_id) Response::error("No autorizado", 401);
     
@@ -123,7 +132,7 @@ function sendFriendRequest() {
 }
 
 function acceptFriendRequest() {
-    global $db;
+    $db = getDb();
     $current_user_id = getUserId();
     if (!$current_user_id) Response::error("No autorizado", 401);
     
@@ -142,7 +151,7 @@ function acceptFriendRequest() {
 }
 
 function rejectOrRemoveFriend() {
-    global $db;
+    $db = getDb();
     $current_user_id = getUserId();
     if (!$current_user_id) Response::error("No autorizado", 401);
     
@@ -161,7 +170,7 @@ function rejectOrRemoveFriend() {
 }
 
 function getFriendsData() {
-    global $db;
+    $db = getDb();
     $current_user_id = getUserId();
     if (!$current_user_id) Response::error("No autorizado", 401);
     
@@ -209,7 +218,7 @@ function getFriendsData() {
 }
 
 function getPublicProfile() {
-    global $db;
+    $db = getDb();
     $target_id = $_GET['id'] ?? null;
     $current_user_id = getUserId();
     

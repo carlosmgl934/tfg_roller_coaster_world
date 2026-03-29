@@ -3,6 +3,7 @@ session_start();
 require_once __DIR__ . '/../../database/db_conexion.php';
 require_once __DIR__ . '/../utils/ApiRouter.php';
 require_once __DIR__ . '/../utils/Response.php';
+require_once __DIR__ . '/../../utils/ImageHelper.php';
 
 header('Content-Type: application/json');
 
@@ -202,20 +203,40 @@ function addPark(): void
 {
     requireAdmin();
 
-    $raw  = file_get_contents('php://input');
-    $data = json_decode($raw, true);
-
-    if (!$data) {
-        Response::error('Datos inválidos.', 400);
-        return;
-    }
+    $data = $_POST;
 
     $name     = trim($data['name']     ?? '');
     $country  = trim($data['country']  ?? '');
     $location = trim($data['location'] ?? '');
     $year     = isset($data['year']) && $data['year'] !== '' ? intval($data['year']) : null;
-    // Array de IDs de coasters a reasignar (puede estar vacío)
-    $coasterIds = array_filter(array_map('intval', $data['coasterIds'] ?? []), fn($id) => $id > 0);
+    
+    // Si viene como string separado por comas (desde FormData)
+    $coasterIdsRaw = $data['coasterIds'] ?? [];
+    if (is_string($coasterIdsRaw) && !empty($coasterIdsRaw)) {
+        $coasterIds = array_filter(array_map('intval', explode(',', $coasterIdsRaw)), fn($id) => $id > 0);
+    } else {
+        $coasterIds = array_filter(array_map('intval', (array)$coasterIdsRaw), fn($id) => $id > 0);
+    }
+
+    $imagenUrl = $data['imagenUrl'] ?? null;
+
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = __DIR__ . '/../../../web/img/uploads/parks/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+        $fileName = uniqid('park_') . '-' . pathinfo($_FILES['image']['name'], PATHINFO_FILENAME) . '.webp';
+        $optimized = ImageHelper::optimizeAndConvertToWebP($_FILES['image']['tmp_name'], 1920, 80);
+        if ($optimized && rename($optimized, $uploadDir . $fileName)) {
+            $imagenUrl = '/web/img/uploads/parks/' . $fileName;
+        } else {
+            // Fallback
+            $fileNameFallback = uniqid('park_') . '-' . basename($_FILES['image']['name']);
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileNameFallback)) {
+                $imagenUrl = '/web/img/uploads/parks/' . $fileNameFallback;
+            }
+        }
+    }
 
     if ($name === '') {
         Response::error('El nombre del parque es obligatorio.', 400);
@@ -246,8 +267,8 @@ function addPark(): void
 
         // Insertar el parque
         $stmtInsert = $db->prepare("
-            INSERT INTO parks (park_name, park_country, park_location, opening_year, num_coasters, operating_coasters)
-            VALUES (:name, :country, :location, :year, :total, :operating)
+            INSERT INTO parks (park_name, park_country, park_location, opening_year, num_coasters, operating_coasters, imagen_url)
+            VALUES (:name, :country, :location, :year, :total, :operating, :imagenUrl)
             RETURNING id
         ");
         $stmtInsert->execute([
@@ -257,6 +278,7 @@ function addPark(): void
             ':year'      => $year,
             ':total'     => $totalCoasters,
             ':operating' => $operatingCoasters,
+            ':imagenUrl' => $imagenUrl
         ]);
         $newId = (int)$stmtInsert->fetchColumn();
 

@@ -1,12 +1,43 @@
 <?php
 session_start();
 require_once __DIR__ . '/../database/db_conexion.php';
+require_once __DIR__ . '/utils/Response.php';
+require_once __DIR__ . '/utils/ApiRouter.php';
 
 header('Content-Type: application/json');
 
-$db = new DBConexion();
-require_once __DIR__ . '/utils/ApiRouter.php';
-require_once __DIR__ . '/utils/StatsHelper.php';
+$db = null;
+
+function getDb() {
+    global $db;
+    if ($db === null) {
+        $db = new DBConexion();
+    }
+    return $db;
+}
+
+/**
+ * Obtiene el ID numérico del usuario actual desde la base de datos
+ * sincronizando la sesión si es necesario.
+ */
+function getUserId(): ?int
+{
+    if (isset($_SESSION['user_id'])) return (int)$_SESSION['user_id'];
+    if (isset($_SESSION['firebase_uid'])) {
+        $db = getDb();
+        $stmt = $db->prepare("SELECT id, rol, email, profile_image FROM users WHERE firebase_uid = :uid LIMIT 1");
+        $stmt->execute([':uid' => $_SESSION['firebase_uid']]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            $_SESSION['user_id'] = (int)$row['id'];
+            if (!isset($_SESSION['user_rol'])) $_SESSION['user_rol'] = $row['rol'] ?: 'user';
+            if (!isset($_SESSION['user_email'])) $_SESSION['user_email'] = $row['email'];
+            if (!isset($_SESSION['profile_image'])) $_SESSION['profile_image'] = $row['profile_image'];
+            return (int)$row['id'];
+        }
+    }
+    return null;
+}
 
 $router = new ApiRouter('list');
 
@@ -19,11 +50,15 @@ $router->register('save_review', 'saveReview', 'POST');
 $router->register('check_review', 'checkReview');
 $router->register('top_global', 'getTopGlobalParks');
 $router->register('user_tops', 'getUserParkTops');
-// ── Endpoints protegidos (requieren login y rol admin) ─────────────────────────
+$router->register('get_photos', 'getParkPhotos');
+
+// ── Endpoints protegidos ─────────────────────────
+$router->register('add_photo', 'addParkPhoto', 'POST');
+
+// ── Endpoints de administración ─────────────────────────
 $router->register('add', 'addPark', 'POST');
 $router->register('update', 'updatePark', 'POST');
 $router->register('delete', 'deletePark', 'POST');
-$router->register('add_photo', 'addParkPhoto', 'POST');
 $router->register('update_stats', 'updateParkStats', 'POST');
 
 $router->dispatch();
@@ -33,7 +68,7 @@ $router->dispatch();
 // Listar todos los parques (público)
 function listParks()
 {
-    global $db;
+    $db = getDb();
 
     $page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
     $limit = isset($_GET['limit']) ? min(2000, max(1, (int) $_GET['limit'])) : 15;
@@ -126,7 +161,7 @@ function listParks()
 // Obtener lista de países únicos (público)
 function getCountries()
 {
-    global $db;
+    $db = getDb();
     $stmt = $db->query("SELECT DISTINCT park_country FROM parks WHERE park_country IS NOT NULL ORDER BY park_country ASC");
     $countries = $stmt->fetchAll(PDO::FETCH_COLUMN);
     Response::success(['data' => $countries]);
@@ -135,7 +170,7 @@ function getCountries()
 // Detalle de un parque específico (público)
 function getParkDetails()
 {
-    global $db;
+    $db = getDb();
     $id = (int) ($_GET['id'] ?? 0);
 
     if ($id <= 0) {
@@ -162,7 +197,7 @@ function getParkDetails()
 // Obtener reseñas de un parque (público)
 function getParkReviews()
 {
-    global $db;
+    $db = getDb();
     $id = (int) ($_GET['id'] ?? 0);
     $order = $_GET['order'] ?? 'newest';
 
@@ -201,7 +236,7 @@ function getParkReviews()
 // Añadir nuevo parque (requiere admin)
 function addPark()
 {
-    global $db;
+    $db = getDb();
 
     if (!isset($_SESSION['firebase_uid']) || $_SESSION['rol'] !== 'admin') {
         Response::error("Acceso denegado. Requiere rol admin.", 403);
@@ -246,7 +281,7 @@ function addPark()
 // Actualizar parque (requiere admin)
 function updatePark()
 {
-    global $db;
+    $db = getDb();
 
     if (!isset($_SESSION['firebase_uid']) || $_SESSION['rol'] !== 'admin') {
         Response::error("Acceso denegado. Requiere rol admin.", 403);
@@ -297,18 +332,19 @@ function updatePark()
     }
 }
 
-// Eliminar parque (requiere admin)
+// Borrar parque (admin)
 function deletePark()
 {
-    global $db;
+    $db = getDb();
 
-    if (!isset($_SESSION['firebase_uid']) || $_SESSION['rol'] !== 'admin') {
+    if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'admin') {
         Response::error("Acceso denegado. Requiere rol admin.", 403);
     }
 
-    $id = (int) ($_GET['id'] ?? $_POST['id'] ?? 0);
-    if ($id <= 0)
-        Response::error("ID inválido", 400);
+    $id = (int)($_POST['id'] ?? 0);
+    if ($id <= 0) {
+        Response::error("ID de parque inválido.", 400);
+    }
 
     $stmt = $db->prepare("DELETE FROM parks WHERE id = :id");
     $stmt->execute([':id' => $id]);
@@ -320,41 +356,10 @@ function deletePark()
     }
 }
 
-// Añadir foto a parque (requiere admin)
-function addParkPhoto()
-{
-    global $db;
-
-    if (!isset($_SESSION['firebase_uid']) || $_SESSION['rol'] !== 'admin') {
-        Response::error("Acceso denegado. Requiere rol admin.", 403);
-    }
-
-    $parkId = (int) ($_POST['park_id'] ?? 0);
-    $photoUrl = $_POST['photo_url'] ?? '';
-    $caption = $_POST['caption'] ?? '';
-
-    if ($parkId <= 0 || empty($photoUrl)) {
-        Response::error("park_id y photo_url son obligatorios", 400);
-    }
-
-    $stmt = $db->prepare("
-        INSERT INTO park_photos (park_id, photo_url, caption)
-        VALUES (:park_id, :photo_url, :caption)
-        RETURNING id
-    ");
-    $stmt->execute([
-        ':park_id' => $parkId,
-        ':photo_url' => $photoUrl,
-        ':caption' => $caption
-    ]);
-
-    Response::success(['message' => 'Foto añadida']);
-}
-
 // Actualizar estadísticas de parque (requiere admin)
 function updateParkStats()
 {
-    global $db;
+    $db = getDb();
 
     if (!isset($_SESSION['firebase_uid']) || $_SESSION['rol'] !== 'admin') {
         Response::error("Acceso denegado. Requiere rol admin.", 403);
@@ -384,12 +389,12 @@ function updateParkStats()
     Response::success(['message' => 'Estadísticas actualizadas']);
 }
 
-// Guardar una nueva reseña (público, requiere login)
 function saveReview()
 {
-    global $db;
-
-    if (!isset($_SESSION['user_id'])) {
+    $db = getDb();
+    
+    $userId = getUserId();
+    if (!$userId) {
         Response::error("Debe iniciar sesión para dejar una reseña", 401);
     }
 
@@ -466,9 +471,9 @@ function checkReview()
     }
 
     try {
-        global $db;
+        $db = getDb();
         $stmt = $db->prepare("SELECT COUNT(*) FROM park_ratings WHERE user_id = :user_id AND park_id = :park_id");
-        $stmt->execute([':user_id' => $_SESSION['user_id'], ':park_id' => $parkId]);
+        $stmt->execute([':user_id' => getUserId() ?: 0, ':park_id' => $parkId]);
         Response::success(['hasReviewed' => $stmt->fetchColumn() > 0]);
     } catch (Exception $e) {
         Response::error("Error comprobando estado de reseña");
@@ -480,7 +485,7 @@ function checkReview()
 // Obtener Top 10 Global de Parques (Público)
 function getTopGlobalParks()
 {
-    global $db;
+    $db = getDb();
     try {
         $stmt = $db->prepare("
             SELECT id, park_name, park_location, park_country, imagen_url, stars, num_coasters
@@ -497,13 +502,30 @@ function getTopGlobalParks()
     }
 }
 
-// Obtener Tops Personales de Usuarios (Público)
+// Obtener Tops Personales de Usuarios (Público / Amigos)
 function getUserParkTops()
 {
-    global $db;
+    $db = getDb();
+    $currentUserId = getUserId();
+    $filterFriends = (isset($_GET['filter']) && $_GET['filter'] === 'friends' && $currentUserId !== null);
+
     try {
-        // Encontrar usuarios que han organizado un Top de parques (tienen rank_position != NULL)
-        // Y traer sus 5 mejores parques en formato JSON.
+        error_log("getUserParkTops: filter=" . ($_GET['filter'] ?? 'none') . " | currentUserId=" . ($currentUserId ?? 'null'));
+        
+        $where = "upc.rank_position IS NOT NULL AND upc.rank_position > 0";
+        $join = "";
+        $orderBy = "RANDOM()";
+        $limit = 10;
+        $params = [];
+
+        if ($filterFriends) {
+            $join = "JOIN friendship f ON ((f.solicitante_id = :my_id AND f.solicitada_id = u.id) OR (f.solicitada_id = :my_id AND f.solicitante_id = u.id))";
+            $where .= " AND f.estado_solicitud = 'ACEPTADA'";
+            $orderBy = "username ASC";
+            $limit = 30; // Más margen para amigos
+            $params[':my_id'] = $currentUserId;
+        }
+
         $stmt = $db->prepare("
             WITH UserTops AS (
                 SELECT 
@@ -519,7 +541,8 @@ function getUserParkTops()
                 FROM user_park_credits upc
                 JOIN users u ON upc.user_id = u.id
                 JOIN parks p ON upc.park_id = p.id
-                WHERE upc.rank_position IS NOT NULL AND upc.rank_position > 0
+                $join
+                WHERE $where
             )
             SELECT user_id, username, profile_image,
                    json_agg(
@@ -534,19 +557,91 @@ function getUserParkTops()
             FROM UserTops
             WHERE rn <= 5 -- Máximo 5 parques por tarjeta
             GROUP BY user_id, username, profile_image
-            ORDER BY user_id DESC
-            LIMIT 20
+            ORDER BY $orderBy
+            LIMIT :limit
         ");
+
+        foreach ($params as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
         $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // Decodificar el JSON de postgresql
         foreach ($users as &$u) {
             $u['top_parks'] = $u['top_parks'] ? json_decode($u['top_parks'], true) : [];
         }
         
         Response::success(['data' => $users]);
+        error_log("getUserParkTops returned " . count($users) . " users");
     } catch (Exception $e) {
-        Response::error("Error al obtener los tops de usuarios: " . $e->getMessage(), 500);
+        Response::error("Error al obtener los tops: " . $e->getMessage(), 500);
     }
 }
+
+// Obtener fotos de un parque
+function getParkPhotos()
+{
+    $db = getDb();
+    $parkId = (int)($_GET['park_id'] ?? 0);
+    if ($parkId === 0) {
+        Response::error('ID de parque inválido.');
+        return;
+    }
+
+    try {
+        $stmt = $db->prepare("
+            SELECT pp.*, u.username, u.profile_image 
+            FROM park_photos pp
+            JOIN users u ON pp.user_id = u.id
+            WHERE pp.park_id = :park_id AND pp.status = 'approved'
+            ORDER BY pp.created_at DESC
+        ");
+        $stmt->execute([':park_id' => $parkId]);
+        $photos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        Response::success(['data' => $photos]);
+    } catch (Exception $e) {
+        Response::error('Error al obtener fotos: ' . $e->getMessage());
+    }
+}
+
+function addParkPhoto()
+{
+    $currentUserId = getUserId();
+    if (!$currentUserId) {
+        Response::error('No autorizado.', 401);
+        return;
+    }
+
+    $parkId = (int)($_POST['park_id'] ?? 0);
+    $url = $_POST['photo_url'] ?? '';
+    $caption = trim($_POST['caption'] ?? '');
+
+    if ($parkId === 0 || empty($url)) {
+        Response::error('Datos incompletos.', 400);
+        return;
+    }
+
+    try {
+        global $db;
+        $stmt = $db->prepare("
+            INSERT INTO park_photos (park_id, user_id, photo_url, caption, status)
+            VALUES (:park_id, :user_id, :url, :caption, 'approved')
+        ");
+        // Nota: Por ahora las pongo como 'approved' para facilitar, 
+        // normalmente irían como 'pending'
+        $stmt->execute([
+            ':park_id' => $parkId,
+            ':user_id' => $_SESSION['user_id'],
+            ':url'     => $url,
+            ':caption' => $caption
+        ]);
+
+        Response::success(['message' => 'Foto guardada correctamente.']);
+    } catch (Exception $e) {
+        Response::error('Error al guardar la foto: ' . $e->getMessage());
+    }
+}
+
+$router->dispatch();

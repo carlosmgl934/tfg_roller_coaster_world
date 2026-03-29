@@ -193,6 +193,25 @@ if (!$is_logged || !$is_admin) {
                         </div>
                     </div>
 
+                    <!-- Imagen del parque -->
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-semibold small text-uppercase text-muted mb-2">Imagen del parque</label>
+                        <div id="add-park-dropzone"
+                            onclick="document.getElementById('add-park-image').click()"
+                            style="border:2px dashed #198754;background:rgba(25,135,84,0.05);cursor:pointer;
+                                   padding:1rem;display:flex;flex-direction:column;align-items:center;text-align:center;gap:0.5rem;
+                                   transition:all .2s ease; height:46px; justify-content:center; overflow:hidden;">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-cloud-arrow-up text-success"></i>
+                                <span class="text-white small fw-bold" id="add-park-dropzone-text">Subir imagen</span>
+                            </div>
+                        </div>
+                        <input type="file" id="add-park-image" accept="image/*" class="d-none">
+                        <div id="add-park-preview-container" class="mt-2 d-none">
+                            <img id="add-park-preview" src="" class="img-thumbnail bg-dark border-secondary" style="max-height: 100px;">
+                        </div>
+                    </div>
+
                     <!-- Montañas rusas vinculadas (desconocido) -->
                     <div class="col-12">
                         <label class="form-label fw-semibold small text-uppercase text-muted mb-2">

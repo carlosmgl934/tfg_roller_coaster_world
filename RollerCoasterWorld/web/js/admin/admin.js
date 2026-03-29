@@ -1781,6 +1781,30 @@ $(document).ready(function () {
       });
     }
 
+    // --- Previsualización de imagen para nuevo parque ---
+    const addParkImage = document.getElementById("add-park-image");
+    const addParkPreview = document.getElementById("add-park-preview");
+    const addParkPreviewContainer = document.getElementById(
+      "add-park-preview-container",
+    );
+    const addParkDropzoneText = document.getElementById("add-park-dropzone-text");
+
+    addParkImage?.addEventListener("change", function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          addParkPreview.src = e.target.result;
+          addParkPreviewContainer.classList.remove("d-none");
+          addParkDropzoneText.textContent = file.name;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        addParkPreviewContainer.classList.add("d-none");
+        addParkDropzoneText.textContent = "Subir imagen";
+      }
+    });
+
     // ── Confirmar añadir parque ──────────────────────────────────────────────────
     document
       .getElementById("confirm-add-park")
@@ -1837,9 +1861,7 @@ $(document).ready(function () {
           const coasterIdsRaw = document.getElementById(
             "add-park-coasters-ids",
           ).value;
-          const coasterIds = coasterIdsRaw
-            ? coasterIdsRaw.split(",").map(Number).filter(Boolean)
-            : [];
+          const imageFile = addParkImage?.files[0];
 
           if (!name) {
             showParkError("El nombre del parque es obligatorio.");
@@ -1872,19 +1894,22 @@ $(document).ready(function () {
             }
           }
 
+          const formData = new FormData();
+          formData.append("name", name);
+          formData.append("country", country);
+          formData.append("location", location);
+          formData.append("year", yearUnknown ? "" : year);
+          formData.append("coasterIds", coasterIdsRaw);
+          if (imageFile) {
+            formData.append("image", imageFile);
+          }
+
           const res = await fetch(
             `${BASE_URL}/api/php/admin/admin_parks.php?action=addPark`,
             {
               method: "POST",
               credentials: "include",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                name,
-                country,
-                location,
-                year: yearUnknown ? "" : year,
-                coasterIds,
-              }),
+              body: formData,
             },
           );
           const data = await res.json();
