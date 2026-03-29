@@ -17,6 +17,8 @@ $router->register('details', 'getParkDetails');
 $router->register('reviews', 'getParkReviews');
 $router->register('save_review', 'saveReview', 'POST');
 $router->register('check_review', 'checkReview');
+$router->register('top_global', 'getTopGlobalParks');
+$router->register('user_tops', 'getUserParkTops');
 // ── Endpoints protegidos (requieren login y rol admin) ─────────────────────────
 $router->register('add', 'addPark', 'POST');
 $router->register('update', 'updatePark', 'POST');
@@ -470,5 +472,81 @@ function checkReview()
         Response::success(['hasReviewed' => $stmt->fetchColumn() > 0]);
     } catch (Exception $e) {
         Response::error("Error comprobando estado de reseña");
+    }
+}
+
+// ── Endpoints de Tops ─────────────────────────────────────────────────────────
+
+// Obtener Top 10 Global de Parques (Público)
+function getTopGlobalParks()
+{
+    global $db;
+    try {
+        $stmt = $db->prepare("
+            SELECT id, park_name, park_location, park_country, imagen_url, stars, num_coasters
+            FROM parks
+            WHERE stars > 0
+            ORDER BY stars DESC, id ASC
+            LIMIT 10
+        ");
+        $stmt->execute();
+        $parks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        Response::success(['data' => $parks]);
+    } catch (Exception $e) {
+        Response::error("Error al obtener el top global de parques: " . $e->getMessage(), 500);
+    }
+}
+
+// Obtener Tops Personales de Usuarios (Público)
+function getUserParkTops()
+{
+    global $db;
+    try {
+        // Encontrar usuarios que han organizado un Top de parques (tienen rank_position != NULL)
+        // Y traer sus 5 mejores parques en formato JSON.
+        $stmt = $db->prepare("
+            WITH UserTops AS (
+                SELECT 
+                    upc.user_id,
+                    u.username,
+                    u.profile_image,
+                    upc.park_id,
+                    p.park_name,
+                    p.park_country,
+                    p.imagen_url,
+                    upc.rank_position,
+                    ROW_NUMBER() OVER(PARTITION BY upc.user_id ORDER BY upc.rank_position ASC) as rn
+                FROM user_park_credits upc
+                JOIN users u ON upc.user_id = u.id
+                JOIN parks p ON upc.park_id = p.id
+                WHERE upc.rank_position IS NOT NULL AND upc.rank_position > 0
+            )
+            SELECT user_id, username, profile_image,
+                   json_agg(
+                       json_build_object(
+                           'park_id', park_id,
+                           'park_name', park_name,
+                           'park_country', park_country,
+                           'imagen_url', imagen_url,
+                           'rank_position', rank_position
+                       ) ORDER BY rank_position ASC
+                   ) as top_parks
+            FROM UserTops
+            WHERE rn <= 5 -- Máximo 5 parques por tarjeta
+            GROUP BY user_id, username, profile_image
+            ORDER BY user_id DESC
+            LIMIT 20
+        ");
+        $stmt->execute();
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Decodificar el JSON de postgresql
+        foreach ($users as &$u) {
+            $u['top_parks'] = $u['top_parks'] ? json_decode($u['top_parks'], true) : [];
+        }
+        
+        Response::success(['data' => $users]);
+    } catch (Exception $e) {
+        Response::error("Error al obtener los tops de usuarios: " . $e->getMessage(), 500);
     }
 }

@@ -50,13 +50,6 @@ require_once __DIR__ . '/../../partials/header.php';
             <input type="range" class="form-range" id="num-coaster-min" min="0" max="50" value="0">
           </div>
 
-          <!-- Rating mínimo -->
-          <div class="mb-4">
-            <label for="rating-filter" class="form-label d-flex justify-content-between">
-              Rating mínimo <span class="badge bg-success" id="rating-val">0★</span>
-            </label>
-            <input type="range" class="form-range" id="rating-filter" min="0" max="5" step="0.1" value="0">
-          </div>
 
           <!-- Botones limpiar y filtrar -->
           <div class="d-grid gap-2">

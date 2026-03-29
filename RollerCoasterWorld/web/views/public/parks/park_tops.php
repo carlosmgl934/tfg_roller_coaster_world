@@ -17,24 +17,14 @@ $isLoggedIn = isset($_SESSION['firebase_uid']);
 
     <!-- Filtros rápidos -->
     <div class="row justify-content-center mb-5">
-        <div class="col-12 col-md-8 col-lg-6">
-            <div class="d-flex flex-wrap justify-content-center gap-3">
-                <select class="form-select w-auto" id="top-type">
-                    <option value="global">Top Global</option>
-                    <?php if ($isLoggedIn): ?>
-                        <option value="personal">Mi Top Personal</option>
-                    <?php endif; ?>
-                    <option value="rating">Mejor Rating</option>
-                    <option value="coasters">Más Coasters</option>
-                    <option value="newest">Más Recientes</option>
+        <div class="col-12 text-center">
+            <div class="d-inline-flex gap-3 align-items-center bg-dark p-3 rounded-4 shadow-lg border border-success border-opacity-25">
+                <label for="top-type" class="text-white fw-bold mb-0 ms-2"><i class="fa-solid fa-ranking-star text-warning me-2"></i>Ver Ranking:</label>
+                <select class="form-select w-auto fw-semibold border-0 shadow-none bg-success text-white" id="top-type" style="cursor: pointer; min-width: 250px;">
+                    <option value="global" class="bg-dark text-white">🌍 Top 10 Global (Mejores Reseñas)</option>
+                    <option value="users" class="bg-dark text-white">👥 Top de Usuarios (Comunidad)</option>
                 </select>
-
-                <select class="form-select w-auto" id="top-country">
-                    <option value="">Todos los países</option>
-                    <!-- Se llenará dinámicamente con JS -->
-                </select>
-
-                <button class="btn btn-outline-light" id="refresh-tops">Actualizar</button>
+                <div class="spinner-border spinner-border-sm text-success ms-2 d-none" role="status" id="top-loading-spinner"></div>
             </div>
         </div>
     </div>
@@ -55,4 +45,4 @@ $isLoggedIn = isset($_SESSION['firebase_uid']);
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 
-<script src="<?= $base_url ?>/web/js/parks.js"></script>
+<script src="<?= $base_url ?>/web/js/park_tops.js"></script>
