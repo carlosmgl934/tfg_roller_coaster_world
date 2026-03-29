@@ -4,6 +4,7 @@ require_once __DIR__ . '/../../database/db_conexion.php';
 require_once __DIR__ . '/../utils/ApiRouter.php';
 require_once __DIR__ . '/../utils/Response.php';
 require_once __DIR__ . '/../utils/StatsHelper.php';
+require_once __DIR__ . '/../../utils/ImageHelper.php';
 
 header('Content-Type: application/json');
 
@@ -284,10 +285,12 @@ function deleteCoaster(): void
     try {
         global $db;
 
-        // Antes de borrar, obtenemos el park_id para actualizar sus stats
-        $stmtPark = $db->prepare("SELECT park_id FROM coasters WHERE id = :id");
-        $stmtPark->execute([':id' => $id]);
-        $parkId = $stmtPark->fetchColumn();
+        // Antes de borrar, obtenemos datos para stats y respuesta
+        $stmtInfo = $db->prepare("SELECT park_id, coaster_name FROM coasters WHERE id = :id");
+        $stmtInfo->execute([':id' => $id]);
+        $info = $stmtInfo->fetch(PDO::FETCH_ASSOC);
+        $parkId = $info['park_id'] ?? null;
+        $coasterName = $info['coaster_name'] ?? 'Desconocida';
 
         // Eliminar
         $stmt = $db->prepare("DELETE FROM coasters WHERE id = :id");
@@ -339,9 +342,16 @@ function addCoaster(): void
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
-        $fileName = uniqid('coaster_') . '-' . basename($_FILES['image']['name']);
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileName)) {
+        $fileName = uniqid('coaster_') . '-' . pathinfo($_FILES['image']['name'], PATHINFO_FILENAME) . '.webp';
+        $optimized = ImageHelper::optimizeAndConvertToWebP($_FILES['image']['tmp_name'], 1920, 80);
+        if ($optimized && rename($optimized, $uploadDir . $fileName)) {
             $imagenUrl = '/web/img/' . $fileName;
+        } else {
+            // Fallback
+            $fileNameFallback = uniqid('coaster_') . '-' . basename($_FILES['image']['name']);
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileNameFallback)) {
+                $imagenUrl = '/web/img/' . $fileNameFallback;
+            }
         }
     }
 
@@ -451,9 +461,16 @@ function updateCoaster(): void
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
-        $fileName = uniqid('coaster_') . '-' . basename($_FILES['image']['name']);
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileName)) {
+        $fileName = uniqid('coaster_') . '-' . pathinfo($_FILES['image']['name'], PATHINFO_FILENAME) . '.webp';
+        $optimized = ImageHelper::optimizeAndConvertToWebP($_FILES['image']['tmp_name'], 1920, 80);
+        if ($optimized && rename($optimized, $uploadDir . $fileName)) {
             $imagenUrl = '/web/img/' . $fileName;
+        } else {
+            // Fallback
+            $fileNameFallback = uniqid('coaster_') . '-' . basename($_FILES['image']['name']);
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileNameFallback)) {
+                $imagenUrl = '/web/img/' . $fileNameFallback;
+            }
         }
     }
 

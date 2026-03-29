@@ -3,6 +3,7 @@ session_start();
 require_once __DIR__ . '/../../database/db_conexion.php';
 require_once __DIR__ . '/../utils/ApiRouter.php';
 require_once __DIR__ . '/../utils/Response.php';
+require_once __DIR__ . '/../../utils/ImageHelper.php';
 
 header('Content-Type: application/json');
 
@@ -118,9 +119,15 @@ function addNews(): void
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
-        $fileName = uniqid('news_') . '-' . basename($_FILES['image']['name']);
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileName)) {
+        $fileName = uniqid('news_') . '-' . pathinfo($_FILES['image']['name'], PATHINFO_FILENAME) . '.webp';
+        $optimized = ImageHelper::optimizeAndConvertToWebP($_FILES['image']['tmp_name'], 1920, 80);
+        if ($optimized && rename($optimized, $uploadDir . $fileName)) {
             $imagenUrl = '/web/img/' . $fileName;
+        } else {
+            $fileNameFallback = uniqid('news_') . '-' . basename($_FILES['image']['name']);
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileNameFallback)) {
+                $imagenUrl = '/web/img/' . $fileNameFallback;
+            }
         }
     }
 
@@ -184,9 +191,15 @@ function updateNews(): void
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
-        $fileName = uniqid('news_') . '-' . basename($_FILES['image']['name']);
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileName)) {
+        $fileName = uniqid('news_') . '-' . pathinfo($_FILES['image']['name'], PATHINFO_FILENAME) . '.webp';
+        $optimized = ImageHelper::optimizeAndConvertToWebP($_FILES['image']['tmp_name'], 1920, 80);
+        if ($optimized && rename($optimized, $uploadDir . $fileName)) {
             $imagenUrl = '/web/img/' . $fileName;
+        } else {
+            $fileNameFallback = uniqid('news_') . '-' . basename($_FILES['image']['name']);
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileNameFallback)) {
+                $imagenUrl = '/web/img/' . $fileNameFallback;
+            }
         }
     }
 
