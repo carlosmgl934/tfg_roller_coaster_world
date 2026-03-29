@@ -133,3 +133,18 @@
     padding: 1.5rem;
     border: 1px solid rgba(255,255,255,0.05);
 }
+
+.park-coaster-row:hover {
+    --card-bg: #21262d !important;
+    border-color: rgba(0, 230, 118, 0.4) !important;
+    background-color: var(--card-bg) !important;
+    transform: translateX(4px);
+}
+
+.park-coaster-row img {
+    transition: transform 0.4s ease;
+}
+
+.park-coaster-row:hover img {
+    transform: scale(1.06);
+}

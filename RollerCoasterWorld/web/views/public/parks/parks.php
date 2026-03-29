@@ -173,8 +173,8 @@ require_once __DIR__ . '/../../partials/header.php';
                     </div>
                     <span class="badge badge-dark-green rounded-pill px-3 py-1 shadow-sm fs-6" id="operating-count-badge">0</span>
                 </div>
-                <div class="card-body p-3">
-                    <div class="row g-3" id="park-coasters-grid">
+                <div class="card-body p-3 pt-4">
+                    <div class="row g-2" id="park-coasters-grid">
                         <!-- Se cargan aquí -->
                         <div class="col-12 text-center py-4 text-muted">
                             <div class="spinner-border spinner-border-sm text-success me-2"></div>

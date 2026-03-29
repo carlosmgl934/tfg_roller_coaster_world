@@ -449,14 +449,17 @@ $(document).ready(function () {
 
         if (data.success && data.coasters && data.coasters.length > 0) {
           const operatingList = [];
-          const otherList = [];
+          const constructionList = [];
+          const closedList = [];
 
           data.coasters.forEach(c => {
              let statusText = c.coaster_status || "Operativa";
              if (statusText === "Operating" || statusText === "Operativa") {
                 operatingList.push({c, statusText});
+             } else if (statusText === "Under Construction" || statusText === "Under construction" || statusText === "Construction") {
+                constructionList.push({c, statusText});
              } else {
-                otherList.push({c, statusText});
+                closedList.push({c, statusText});
              }
           });
 
@@ -474,54 +477,72 @@ $(document).ready(function () {
                  ? (c.imagen_url.startsWith('/') ? (window.BASE_URL || '') + c.imagen_url : c.imagen_url)
                  : fallback;
 
-               let statusClass = "secondary";
+               let statusLabel = statusText;
+               let statusColor = "#6c757d";
+               let statusTextLabel = "UNK";
+
                if (statusText === "Operating" || statusText === "Operativa") {
-                 statusClass = "success";
-               } else if (statusText === "Defunct") {
-                 statusClass = "danger";
+                 statusLabel = "Operativa";
+                 statusColor = "#00e676";
+                 statusTextLabel = "OP";
+               } else if (statusText === "Defunct" || statusText === "Closed" || statusText === "Cerrada") {
+                 statusLabel = "Cerrada";
+                 statusColor = "#ff4c4c";
+                 statusTextLabel = "DEF";
                } else if (statusText === "SBNO") {
-                 statusClass = "warning";
-               } else if (statusText === "Under Construction" || statusText === "Under construction") {
-                 statusClass = "info";
+                 statusLabel = "SBNO";
+                 statusColor = "#ffc107";
+                 statusTextLabel = "SBN";
+               } else if (statusText === "Under Construction" || statusText === "Under construction" || statusText === "Construction") {
+                 statusLabel = "En Construcción";
+                 statusColor = "#0dcaf0";
+                 statusTextLabel = "CNS";
                }
 
-               // Gradiente disolvente y borde elegante en vez de etiqueta cartoon
-               const borderColor = `var(--bs-${statusClass})`;
-               const gradientBase = `rgba(var(--bs-${statusClass}-rgb), 0.08)`;
-               const cardStyle = `border: 1px solid #2d333b; border-right: 4px solid ${borderColor}; background: linear-gradient(90deg, #161b22 60%, ${gradientBase} 100%); min-height: 90px;`;
+               // Stats con Bootstrap icons layout
+               const statItems = [];
+               if (c.height && c.height !== '0') statItems.push(`<span><i class="fa-solid fa-ruler-vertical opacity-75 me-1"></i>${c.height}m</span>`);
+               if (c.speed && c.speed !== '0') statItems.push(`<span><i class="fa-solid fa-gauge opacity-75 me-1"></i>${c.speed}km/h</span>`);
+               if (c.coaster_length && c.coaster_length !== '0') statItems.push(`<span><i class="fa-solid fa-road opacity-75 me-1"></i>${c.coaster_length}m</span>`);
+               if (c.inversions && c.inversions !== '0') statItems.push(`<span><i class="fa-solid fa-arrows-rotate opacity-75 me-1"></i>${c.inversions} inv.</span>`);
+
+               // Subtítulo text-muted Bootstrap
+               const subtitleParts = [];
+               if (c.manufacter) subtitleParts.push(`<span class="text-success fw-medium">${c.manufacter}</span>`);
+               if (c.modelo) subtitleParts.push(`<span>${c.modelo}</span>`);
+               if (c.coaster_type) subtitleParts.push(`<span>${c.coaster_type}</span>`);
 
                return `
-               <div class="col-12 mb-2 animate__animated animate__fadeIn">
-                 <a href="${window.BASE_URL || ""}/web/views/public/coasters/coasters.php?id=${c.id}" class="text-decoration-none d-block">
-                     <div class="card flex-row coaster-card-hover overflow-hidden shadow-sm align-items-center" style="transition: transform 0.2s ease; ${cardStyle}">
-                         
-                         <!-- Imagen Izquierda -->
-                         <div style="width: 140px; height: 100px; flex-shrink: 0;" class="position-relative">
-                             <img src="${img}" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='${fallback}'">
-                             <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to right, transparent 50%, #161b22 100%);"></div>
-                         </div>
-
-                         <!-- Contenido -->
-                         <div class="p-3 d-flex flex-column justify-content-center flex-grow-1" style="min-width: 0;">
-                             <div class="d-flex justify-content-between align-items-baseline mb-1">
-                                 <h5 class="text-white mb-0 text-truncate fw-bold pe-3" style="font-size: 1.15rem;">${c.coaster_name}</h5>
-                                 <span class="text-${statusClass} fw-bold opacity-75 small text-uppercase" style="letter-spacing:1px;">${statusText === 'Operating' ? 'Operativa' : statusText}</span>
-                             </div>
+               <div class="col-12 animate__animated animate__fadeIn mb-2">
+                 <a href="${window.BASE_URL || ""}/web/views/public/coasters/coasters.php?id=${c.id}" class="text-decoration-none">
+                     <div class="card park-coaster-row rounded-0" style="--card-bg: #1a1e24; background-color: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); transition: all 0.2s cubic-bezier(.4,0,.2,1);">
+                         <div class="row g-0 align-items-center position-relative">
                              
-                             <!-- Detalles principales -->
-                             <div class="text-muted text-truncate" style="font-size: 0.85rem;">
-                                 <strong class="text-success"><i class="fa-solid fa-industry me-1"></i>${c.manufacter || "Desconocido"}</strong>
-                                 ${c.modelo ? ` <span class="mx-1">•</span> ${c.modelo}` : ''}
+                             <!-- Imagen Izquierda (Cuadrada, fade perfecto usando CSS mask-image) -->
+                             <div class="col-auto">
+                                 <div style="width: 110px; height: 80px; position:relative; overflow: hidden;">
+                                    <img src="${img}" style="width:100%; height:100%; object-fit:cover; display:block; -webkit-mask-image: linear-gradient(to right, black 25%, transparent 100%); mask-image: linear-gradient(to right, black 25%, transparent 100%);" onerror="this.src='${fallback}'">
+                                 </div>
                              </div>
 
-                             <!-- Stats Extras -->
-                             <div class="d-flex flex-wrap gap-3 mt-2" style="font-size: 0.8rem; color: #8b949e;">
-                                 ${c.coaster_type ? `<span><i class="fa-solid fa-tag text-success me-1"></i>${c.coaster_type}</span>` : ''}
-                                 ${c.coaster_design ? `<span><i class="fa-solid fa-pen-ruler text-success me-1"></i>${c.coaster_design}</span>` : ''}
-                                 ${c.speed && c.speed !== '0' ? `<span><i class="fa-solid fa-gauge text-success me-1"></i>${c.speed}</span>` : ''}
-                                 ${c.height && c.height !== '0' ? `<span><i class="fa-solid fa-ruler-vertical text-success me-1"></i>${c.height}</span>` : ''}
-                                 ${c.coaster_length && c.coaster_length !== '0' ? `<span><i class="fa-solid fa-ruler-horizontal text-success me-1"></i>${c.coaster_length}</span>` : ''}
-                                 ${c.inversions && c.inversions !== '0' ? `<span><i class="fa-solid fa-arrows-rotate text-success me-1"></i>${c.inversions} inv.</span>` : ''}
+                             <!-- Contenido central: nombre + subtítulo + stats -->
+                             <div class="col px-3 py-2 d-flex flex-column justify-content-center" style="min-width:0; position:relative; z-index:1;">
+                                 <div class="text-white fw-bold text-truncate" style="font-size:0.95rem; line-height: 1.2; margin-bottom: 2px;">${c.coaster_name}</div>
+                                 <div class="text-truncate" style="font-size:0.75rem; color: #8b949e; margin-bottom: 4px;">
+                                   ${subtitleParts.join(' <span class="mx-1 opacity-50">&bull;</span> ')}
+                                 </div>
+                                 <div class="d-flex flex-wrap" style="gap: 12px; font-size:0.75rem; color: #6e7681;">
+                                   ${statItems.length > 0 ? statItems.join('') : '<span class="fst-italic opacity-50">Sin datos estadísticos</span>'}
+                                 </div>
+                             </div>
+
+                             <!-- Lado derecho: Estado como Texto -->
+                             <div class="col-auto px-4 text-end d-flex align-items-center">
+                                 <!-- Texto de estado real -->
+                                 <span style="color: ${statusColor}; font-weight: 800; font-size: 0.75rem; letter-spacing: 0.5px; text-transform: uppercase;">
+                                     ${statusLabel}
+                                 </span>
+                                 <i class="fa-solid fa-chevron-right ms-3" style="color: #495057; font-size: 0.8rem;"></i>
                              </div>
                          </div>
                      </div>
@@ -530,20 +551,25 @@ $(document).ready(function () {
             };
 
             const separator = (title) => `
-            <div class="col-12 w-100 mt-2 mb-3 d-flex align-items-center">
-                <div class="flex-grow-1" style="height: 1px; background: rgba(25, 135, 84, 0.3);"></div>
-                <span class="px-3 text-uppercase fw-bold text-success" style="letter-spacing: 2px; font-size: 0.8rem; opacity: 0.8;">${title}</span>
-                <div class="flex-grow-1" style="height: 1px; background: rgba(25, 135, 84, 0.3);"></div>
+            <div class="col-12 w-100 mt-4 mb-2 d-flex align-items-center" style="gap:10px;">
+                <div style="flex:1; height:1px; background:linear-gradient(to right, transparent, rgba(0,230,118,0.25));"></div>
+                <span style="font-size:0.68rem; font-weight:800; letter-spacing:2.5px; text-transform:uppercase; color:rgba(0,230,118,0.55);">${title}</span>
+                <div style="flex:1; height:1px; background:linear-gradient(to left, transparent, rgba(0,230,118,0.25));"></div>
             </div>`;
+
+            if (constructionList.length > 0) {
+              html += separator("En Construcción");
+              html += constructionList.map(renderRow).join('');
+            }
 
             if (operatingList.length > 0) {
               html += separator("Operativas");
               html += operatingList.map(renderRow).join('');
             }
 
-            if (otherList.length > 0) {
-              html += separator("Cerradas / En Construcción");
-              html += otherList.map(renderRow).join('');
+            if (closedList.length > 0) {
+              html += separator("Cerradas / SBNO");
+              html += closedList.map(renderRow).join('');
             }
 
             grid.html(html);
