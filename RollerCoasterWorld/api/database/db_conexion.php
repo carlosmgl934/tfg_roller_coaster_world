@@ -64,36 +64,27 @@ class DBConexion
             $this->conn->exec("SET NAMES 'utf8'");
             $this->conn->exec("SET TIME ZONE 'Europe/Madrid'");
         } catch (PDOException $e) {
-            die("Error al conectar a Supabase (PostgreSQL): " . $e->getMessage());
+            header('Content-Type: application/json');
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => "Error al conectar a Supabase: " . $e->getMessage()]);
+            exit;
         }
     }
 
     public function query($sql)
     {
-        try {
-            return $this->conn->query($sql);
-        } catch (PDOException $e) {
-            die("Error en query: " . $e->getMessage());
-        }
+        return $this->conn->query($sql);
     }
 
     public function prepare($sql)
     {
-        try {
-            return $this->conn->prepare($sql);
-        } catch (PDOException $e) {
-            die("Error al preparar: " . $e->getMessage());
-        }
+        return $this->conn->prepare($sql);
     }
 
     public function execute($stmt, $params = [])
     {
-        try {
-            $stmt->execute($params);
-            return $stmt;
-        } catch (PDOException $e) {
-            die("Error al ejecutar: " . $e->getMessage());
-        }
+        $stmt->execute($params);
+        return $stmt;
     }
 
     public function lastInsertId()

@@ -29,6 +29,7 @@ if (empty($_FILES['file'])) {
 
 // ── Leer credenciales de Supabase usando el cargador central ─────────────────────────────────
 require_once __DIR__ . '/../database/db_conexion.php';
+require_once __DIR__ . '/../utils/ImageHelper.php';
 
 $supabaseUrl = $_ENV['SUPABASE_URL'] ?? null;
 $supabaseKey = $_ENV['SUPABASE_SERVICE_KEY'] ?? null;
@@ -52,6 +53,21 @@ if ($file['size'] > 10 * 1024 * 1024) {
 }
 
 $filename = time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+
+// ── Optimizar imagen si es JPG/PNG/WEBP ─────────────────────────────────────
+$is_image = in_array($ext, ['jpg', 'jpeg', 'png', 'webp']);
+if ($is_image) {
+    $optimized = ImageHelper::optimizeAndConvertToWebP($file['tmp_name'], 1920, 80, false); 
+    if ($optimized) {
+        // Actualizar datos para que el resto del script use el archivo .webp optimizado
+        $ext = 'webp';
+        $filename = pathinfo($filename, PATHINFO_FILENAME) . '.webp';
+        // Nota: optimizeAndConvertToWebP crea un nuevo archivo con extensión .webp en la misma carpeta que el original (tmp)
+        // Pero en Windows/PHP el tmp_name suele no tener extensión. 
+        // El helper lo guardará como [tmp_name].webp
+    }
+}
+
 $objectPath = $subpath ? "{$subpath}/{$filename}" : $filename;
 
 // ── Determinar URL y Almacenamiento ──────────────────────────────────────────────────
@@ -60,8 +76,11 @@ $publicUrl = '';
 if ($supabaseUrl && $supabaseKey) {
     // ── Subir a Supabase Storage ──────────────────────────────────────────────────
     $uploadUrl = rtrim($supabaseUrl, '/') . "/storage/v1/object/{$bucket}/{$objectPath}";
-    $mimeType = $file['type'] ?: 'application/octet-stream';
-    $fileData = file_get_contents($file['tmp_name']);
+    $mimeType = $is_image ? 'image/webp' : ($file['type'] ?: 'application/octet-stream');
+    
+    // Si se optimizó, leemos el nuevo archivo .webp
+    $pathToUpload = ($is_image && isset($optimized) && $optimized) ? $optimized : $file['tmp_name'];
+    $fileData = file_get_contents($pathToUpload);
 
     $ch = curl_init($uploadUrl);
     curl_setopt_array($ch, [
@@ -110,9 +129,19 @@ if ($supabaseUrl && $supabaseKey) {
     
     $localFilePath = $uploadDirBase . '/' . $filename;
     
-    if (!move_uploaded_file($file['tmp_name'], $localFilePath)) {
-        echo json_encode(['success' => false, 'error' => 'Error al guardar el archivo localmente']);
-        exit;
+    $pathToMove = ($is_image && isset($optimized) && $optimized) ? $optimized : $file['tmp_name'];
+    
+    // Si es optimizado, usamos rename/copy en lugar de move_uploaded_file porque ya no es un "uploaded file" estrictamente
+    if ($is_image && isset($optimized) && $optimized) {
+        if (!rename($optimized, $localFilePath)) {
+            echo json_encode(['success' => false, 'error' => 'Error al mover el archivo optimizado localmente']);
+            exit;
+        }
+    } else {
+        if (!move_uploaded_file($file['tmp_name'], $localFilePath)) {
+            echo json_encode(['success' => false, 'error' => 'Error al guardar el archivo localmente']);
+            exit;
+        }
     }
     
     // Construir la URL relativa para el frontend (ej. /tfg/tfg_roller_coaster_world/RollerCoasterWorld/web/...)
