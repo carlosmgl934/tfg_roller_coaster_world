@@ -23,6 +23,9 @@ $isLoggedIn = isset($_SESSION['firebase_uid']);
                 <select class="form-select w-auto fw-semibold border-0 shadow-none bg-success text-white" id="top-type" style="cursor: pointer; min-width: 250px;">
                     <option value="global" class="bg-dark text-white">🌍 Top 10 Global (Mejores Reseñas)</option>
                     <option value="users" class="bg-dark text-white">👥 Top de Usuarios (Comunidad)</option>
+                    <?php if ($isLoggedIn): ?>
+                        <option value="friends" class="bg-dark text-white">🤝 Tops de tus Amigos</option>
+                    <?php endif; ?>
                 </select>
                 <div class="spinner-border spinner-border-sm text-success ms-2 d-none" role="status" id="top-loading-spinner"></div>
             </div>

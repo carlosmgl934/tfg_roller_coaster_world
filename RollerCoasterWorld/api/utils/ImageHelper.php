@@ -14,6 +14,10 @@ class ImageHelper
      */
     public static function optimizeAndConvertToWebP($source_path, $max_width = 1920, $quality = 80, $delete_original = false)
     {
+        if (!extension_loaded('gd')) {
+            return false;
+        }
+
         if (!file_exists($source_path)) {
             return false;
         }

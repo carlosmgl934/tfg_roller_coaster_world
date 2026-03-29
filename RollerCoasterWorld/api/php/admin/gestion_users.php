@@ -127,20 +127,22 @@ function updateUser(): void
                     gender = :gender,
                     city = :city,
                     country = :country,
-                    rol = :rol
+                    rol = :rol,
+                    profile_image = COALESCE(:profile_image, profile_image)
                 WHERE id = :id";
 
         $stmt = $db->prepare($sql);
         $stmt->execute([
-            ':username'  => trim($data['username']),
-            ':email'     => trim($data['email']),
-            ':full_name' => trim($data['full_name'] ?? ''),
-            ':birthdate' => !empty($data['birthdate']) ? $data['birthdate'] : null,
-            ':gender'    => $data['gender'] ?? null,
-            ':city'      => trim($data['city'] ?? ''),
-            ':country'   => trim($data['country'] ?? ''),
-            ':rol'       => $data['rol'] ?? 'user',
-            ':id'        => $id
+            ':username'      => trim($data['username']),
+            ':email'         => trim($data['email']),
+            ':full_name'     => trim($data['full_name'] ?? ''),
+            ':birthdate'     => !empty($data['birthdate']) ? $data['birthdate'] : null,
+            ':gender'        => $data['gender'] ?? null,
+            ':city'          => trim($data['city'] ?? ''),
+            ':country'       => trim($data['country'] ?? ''),
+            ':rol'           => $data['rol'] ?? 'user',
+            ':profile_image' => $data['profile_image'] ?? null,
+            ':id'            => $id
         ]);
 
         Response::success(['message' => 'Usuario actualizado correctamente.']);
