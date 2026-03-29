@@ -110,6 +110,11 @@ header("Expires: 0"); // Proxies
 
   <!-- Firebase auth init (global) -->
   <script src="<?= Router::asset('web/js/auth.js') ?>"></script>
+  
+  <!-- Funciones Nav para búsqueda de comunidad -->
+  <?php if ($is_logged): ?>
+    <script src="<?= Router::asset('web/js/header_friends.js') ?>"></script>
+  <?php endif; ?>
 
   <!-- Design System globals (dark mode tokens + overrides) -->
   <link rel="stylesheet" href="<?= Router::asset('web/css/globals.css') ?>">
@@ -224,6 +229,32 @@ header("Expires: 0"); // Proxies
             </li>
           <?php endif; ?>
 
+          <!-- Comunidad / Usuarios -->
+          <?php if ($is_logged): ?>
+            <li class="nav-item dropdown custom-dropdown">
+              <a class="nav-link rcw-nav-pill dropdown-toggle position-relative" href="#" role="button"
+                data-bs-toggle="dropdown">
+                <i class="fa-solid fa-users me-1"></i> Comunidad
+                <span id="nav-comm-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" style="font-size: 0.65rem; padding: 0.35em 0.5em;">0</span>
+              </a>
+              <ul class="dropdown-menu shadow border-0" style="min-width: 320px;">
+                <li class="px-3 py-2">
+                  <div class="input-group input-group-sm rounded-pill overflow-hidden border border-success border-opacity-50">
+                    <span class="input-group-text bg-transparent border-0 text-muted ps-3"><i class="fa-solid fa-search"></i></span>
+                    <input type="text" id="nav-user-search" class="form-control border-0 shadow-none bg-transparent" placeholder="Buscar usuarios...">
+                  </div>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <div id="nav-user-search-results" style="max-height: 250px; overflow-y: auto;" class="px-2">
+                   <!-- Results injected via JS -->
+                   <div class="text-center text-muted small py-3"><i class="fa-solid fa-magnifying-glass mb-2 d-block fa-2x opacity-25"></i>Busca a otros fans...</div>
+                </div>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item py-2 fw-semibold text-center text-success" href="<?= Router::url('friends') ?>"><i class="fa-solid fa-user-group me-1"></i> Gestionar mis Amistades</a></li>
+              </ul>
+            </li>
+          <?php endif; ?>
+
           <!-- Botón CTA: Mi agenda de Parques (solo logueados) -->
           <?php if ($is_logged): ?>
             <li class="nav-item">
@@ -301,8 +332,6 @@ header("Expires: 0"); // Proxies
                       class="fa-solid fa-id-card w-20px text-center me-2 text-secondary"></i> Mi perfil</a></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('profile') ?>#tops"><i
                       class="fa-solid fa-list-ol w-20px text-center me-2 text-warning"></i> Mis tops</a></li>
-                <li><a class="dropdown-item py-2" href="<?= Router::url('friends') ?>"><i
-                      class="fa-solid fa-user-group w-20px text-center me-2 text-primary"></i> Usuarios</a></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('carrito') ?>"><i
                       class="fa-solid fa-cart-shopping w-20px text-center me-2 text-success"></i> Carrito</a></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('orders') ?>"><i
