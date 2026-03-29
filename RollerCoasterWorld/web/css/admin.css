@@ -116,3 +116,49 @@
 .field-error .input-group-text {
   border-color: #dc3545 !important;
 }
+
+/* ============================================================
+   BOTONES DE ACCIÓN EN TABLAS ADMIN
+   ============================================================ */
+.admin-action-btn {
+  background: transparent;
+  border: 1px solid #30363d;
+  color: #94a3b8;
+  transition: border-color .2s, color .2s, background .2s;
+}
+.admin-action-btn:hover {
+  border-color: #198754;
+  color: #198754;
+  background: rgba(25, 135, 84, .08);
+}
+.admin-action-btn.admin-action-del:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: rgba(239, 68, 68, .08);
+}
+
+/* ============================================================
+   FILE INPUTS
+   ============================================================ */
+.form-control[type="file"]::-webkit-file-upload-button {
+  background-color: #198754 !important;
+  color: #fff !important;
+  border: none !important;
+  border-right: 1px solid #30363d !important;
+  margin-right: 1rem !important;
+  cursor: pointer !important;
+}
+.form-control[type="file"]::file-selector-button {
+  background-color: #198754 !important;
+  color: #fff !important;
+  border: none !important;
+  border-right: 1px solid #30363d !important;
+  margin-right: 1rem !important;
+  transition: background-color 0.2s ease-in-out !important;
+  cursor: pointer !important;
+}
+
+.form-control[type="file"]::file-selector-button:hover,
+.form-control[type="file"]::-webkit-file-upload-button:hover {
+  background-color: #157347 !important;
+}

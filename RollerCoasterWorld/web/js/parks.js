@@ -160,7 +160,7 @@ $(document).ready(function () {
 
           let html = "";
           parks.forEach((park) => {
-            const fallbackImg = "https://placehold.co/400x300?text=Park";
+            const fallbackImg = "https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png";
             const imgSrc = park.imagen_url || fallbackImg;
             html += `
               <a href="${window.BASE_URL || ""}/web/views/public/parks/parks.php?id=${park.id}" class="list-group-item list-group-item-action d-flex align-items-center p-3">
@@ -367,7 +367,7 @@ $(document).ready(function () {
           } else {
             $("#park-hero-img").attr(
               "src",
-              "https://placehold.co/900x500?text=Sin+Imagen",
+              "https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png",
             );
           }
 
@@ -439,61 +439,114 @@ $(document).ready(function () {
 
         const grid = $("#park-coasters-grid");
         grid.empty();
+        // SCROLL INTERNO para no alargar demasiado la página
+        grid.css({
+           "max-height": "600px",
+           "overflow-y": "auto",
+           "overflow-x": "hidden",
+           "padding-right": "8px"
+        });
 
         if (data.success && data.coasters && data.coasters.length > 0) {
-          const operating = data.coasters.filter(
-            (c) =>
-              !c.coaster_status ||
-              c.coaster_status === "Operating" ||
-              c.coaster_status === "Operativa",
-          );
+          const operatingList = [];
+          const otherList = [];
+
+          data.coasters.forEach(c => {
+             let statusText = c.coaster_status || "Operativa";
+             if (statusText === "Operating" || statusText === "Operativa") {
+                operatingList.push({c, statusText});
+             } else {
+                otherList.push({c, statusText});
+             }
+          });
 
           $("#operating-count-badge").text(data.coasters.length); // Total coasters in the park
-          $("#operating-coasters-val").text(operating.length); // Only operating for the stat block
+          $("#operating-coasters-val").text(operatingList.length); // Only operating for the stat block
 
           if (data.coasters.length > 0) {
-            data.coasters.forEach((c) => {
-              const fallback = "https://placehold.co/400x300?text=Coaster";
-              const img = c.imagen_url
-              ? (c.imagen_url.startsWith('/') ? (window.BASE_URL || '') + c.imagen_url : c.imagen_url)
-              : fallback;
+            let html = "";
 
-              let badgeHtml = "";
-              let statusText = c.coaster_status || "Operativa";
-              if (statusText === "Operating" || statusText === "Operativa") {
-                badgeHtml = `<span class="badge bg-success-subtle text-success border border-success px-2 py-1" style="font-size:0.7rem;">OPERATIVA</span>`;
-              } else if (statusText === "Defunct") {
-                badgeHtml = `<span class="badge bg-danger-subtle text-danger border border-danger px-2 py-1" style="font-size:0.7rem;">CERRADA</span>`;
-              } else if (statusText === "SBNO") {
-                badgeHtml = `<span class="badge bg-warning-subtle text-warning border border-warning px-2 py-1" style="font-size:0.7rem;">SBNO</span>`;
-              } else if (
-                statusText === "Under Construction" ||
-                statusText === "Under construction"
-              ) {
-                badgeHtml = `<span class="badge bg-info-subtle text-info border border-info px-2 py-1" style="font-size:0.7rem;">EN CONSTRUCCIÓN</span>`;
-              } else {
-                badgeHtml = `<span class="badge bg-secondary-subtle text-secondary border border-secondary px-2 py-1" style="font-size:0.7rem;">${statusText.toUpperCase()}</span>`;
-              }
+            const renderRow = (item) => {
+               const c = item.c;
+               const statusText = item.statusText;
+               const fallback = "https://placehold.co/400x300?text=Coaster";
+               const img = c.imagen_url
+                 ? (c.imagen_url.startsWith('/') ? (window.BASE_URL || '') + c.imagen_url : c.imagen_url)
+                 : fallback;
 
-              grid.append(`
-                <div class="col-12 col-md-6 col-xl-4 animate__animated animate__fadeIn">
-                  <a href="${window.BASE_URL || ""}/web/views/public/coasters/coasters.php?id=${c.id}" class="text-decoration-none">
-                      <div class="card bg-dark border-secondary h-100 coaster-card-hover overflow-hidden shadow-sm" style="transition: transform 0.3s ease;">
-                          <div style="height:160px; overflow:hidden;">
-                              <img src="${img}" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='${fallback}'">
-                          </div>
-                          <div class="p-3 border-top border-secondary">
-                              <h6 class="text-white mb-1 text-truncate fw-bold">${c.coaster_name}</h6>
-                              <div class="d-flex justify-content-between align-items-center">
-                                  <small class="text-success fw-bold">${c.manufacter || "Fabricante"}</small>
-                                  ${badgeHtml}
-                              </div>
-                          </div>
-                      </div>
-                  </a>
-                </div>
-              `);
-            });
+               let statusClass = "secondary";
+               if (statusText === "Operating" || statusText === "Operativa") {
+                 statusClass = "success";
+               } else if (statusText === "Defunct") {
+                 statusClass = "danger";
+               } else if (statusText === "SBNO") {
+                 statusClass = "warning";
+               } else if (statusText === "Under Construction" || statusText === "Under construction") {
+                 statusClass = "info";
+               }
+
+               // Gradiente disolvente y borde elegante en vez de etiqueta cartoon
+               const borderColor = `var(--bs-${statusClass})`;
+               const gradientBase = `rgba(var(--bs-${statusClass}-rgb), 0.08)`;
+               const cardStyle = `border: 1px solid #2d333b; border-right: 4px solid ${borderColor}; background: linear-gradient(90deg, #161b22 60%, ${gradientBase} 100%); min-height: 90px;`;
+
+               return `
+               <div class="col-12 mb-2 animate__animated animate__fadeIn">
+                 <a href="${window.BASE_URL || ""}/web/views/public/coasters/coasters.php?id=${c.id}" class="text-decoration-none d-block">
+                     <div class="card flex-row coaster-card-hover overflow-hidden shadow-sm align-items-center" style="transition: transform 0.2s ease; ${cardStyle}">
+                         
+                         <!-- Imagen Izquierda -->
+                         <div style="width: 140px; height: 100px; flex-shrink: 0;" class="position-relative">
+                             <img src="${img}" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='${fallback}'">
+                             <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to right, transparent 50%, #161b22 100%);"></div>
+                         </div>
+
+                         <!-- Contenido -->
+                         <div class="p-3 d-flex flex-column justify-content-center flex-grow-1" style="min-width: 0;">
+                             <div class="d-flex justify-content-between align-items-baseline mb-1">
+                                 <h5 class="text-white mb-0 text-truncate fw-bold pe-3" style="font-size: 1.15rem;">${c.coaster_name}</h5>
+                                 <span class="text-${statusClass} fw-bold opacity-75 small text-uppercase" style="letter-spacing:1px;">${statusText === 'Operating' ? 'Operativa' : statusText}</span>
+                             </div>
+                             
+                             <!-- Detalles principales -->
+                             <div class="text-muted text-truncate" style="font-size: 0.85rem;">
+                                 <strong class="text-success"><i class="fa-solid fa-industry me-1"></i>${c.manufacter || "Desconocido"}</strong>
+                                 ${c.modelo ? ` <span class="mx-1">•</span> ${c.modelo}` : ''}
+                             </div>
+
+                             <!-- Stats Extras -->
+                             <div class="d-flex flex-wrap gap-3 mt-2" style="font-size: 0.8rem; color: #8b949e;">
+                                 ${c.coaster_type ? `<span><i class="fa-solid fa-tag text-success me-1"></i>${c.coaster_type}</span>` : ''}
+                                 ${c.coaster_design ? `<span><i class="fa-solid fa-pen-ruler text-success me-1"></i>${c.coaster_design}</span>` : ''}
+                                 ${c.speed && c.speed !== '0' ? `<span><i class="fa-solid fa-gauge text-success me-1"></i>${c.speed}</span>` : ''}
+                                 ${c.height && c.height !== '0' ? `<span><i class="fa-solid fa-ruler-vertical text-success me-1"></i>${c.height}</span>` : ''}
+                                 ${c.coaster_length && c.coaster_length !== '0' ? `<span><i class="fa-solid fa-ruler-horizontal text-success me-1"></i>${c.coaster_length}</span>` : ''}
+                                 ${c.inversions && c.inversions !== '0' ? `<span><i class="fa-solid fa-arrows-rotate text-success me-1"></i>${c.inversions} inv.</span>` : ''}
+                             </div>
+                         </div>
+                     </div>
+                 </a>
+               </div>`;
+            };
+
+            const separator = (title) => `
+            <div class="col-12 w-100 mt-2 mb-3 d-flex align-items-center">
+                <div class="flex-grow-1" style="height: 1px; background: rgba(25, 135, 84, 0.3);"></div>
+                <span class="px-3 text-uppercase fw-bold text-success" style="letter-spacing: 2px; font-size: 0.8rem; opacity: 0.8;">${title}</span>
+                <div class="flex-grow-1" style="height: 1px; background: rgba(25, 135, 84, 0.3);"></div>
+            </div>`;
+
+            if (operatingList.length > 0) {
+              html += separator("Operativas");
+              html += operatingList.map(renderRow).join('');
+            }
+
+            if (otherList.length > 0) {
+              html += separator("Cerradas / En Construcción");
+              html += otherList.map(renderRow).join('');
+            }
+
+            grid.html(html);
           } else {
             grid.html(
               '<div class="col-12 text-center py-5 text-white-50">No hay montañas rusas listadas para este parque.</div>',
@@ -512,6 +565,29 @@ $(document).ready(function () {
       }
     }
 
+    function renderStars(note) {
+      const full = Math.floor(note);
+      const half = note % 1 >= 0.5 ? 1 : 0;
+      const empty = 5 - full - half;
+
+      let html = "";
+      for (let i = 0; i < full; i++) html += '<i class="fa-solid fa-star text-warning"></i>';
+      if (half) html += '<i class="fa-solid fa-star-half-stroke text-warning"></i>';
+      for (let i = 0; i < empty; i++) html += '<i class="fa-regular fa-star text-warning"></i>';
+
+      return html;
+    }
+
+    function timeAgo(dateString) {
+      const diff = Math.floor((new Date() - new Date(dateString)) / 1000);
+      if (diff < 60) return "hace un momento";
+      if (diff < 3600) return `hace ${Math.floor(diff / 60)} minutos`;
+      if (diff < 86400) return `hace ${Math.floor(diff / 3600)} horas`;
+      if (diff < 2592000) return `hace ${Math.floor(diff / 86400)} días`;
+      if (diff < 31536000) return `hace ${Math.floor(diff / 2592000)} meses`;
+      return `hace ${Math.floor(diff / 31536000)} años`;
+    }
+
     async function loadReviews(order = "newest") {
       try {
         const res = await fetch(
@@ -525,41 +601,31 @@ $(document).ready(function () {
           data.reviews.forEach((review) => {
             let tagsHtml = "";
             if (review.tags && review.tags.length > 0) {
-              tagsHtml = '<div class="review-tags mt-2 d-flex flex-wrap gap-1">';
-              review.tags.forEach((tag) => {
-                const icon =
-                  tag.type === "pro"
-                    ? "fa-plus-circle text-success"
-                    : "fa-minus-circle text-danger";
-                const badgeClass =
-                  tag.type === "pro"
-                    ? "bg-success-subtle text-success border-success"
-                    : "bg-danger-subtle text-danger border-danger";
-                tagsHtml += `<span class="badge ${badgeClass} border d-flex align-items-center gap-1" style="font-size:0.7rem;">
-                            <i class="fa-solid ${icon}"></i> ${tag.tag}
-                        </span>`;
+              tagsHtml = '<div class="d-flex flex-wrap gap-2 mt-2 mb-2">';
+              review.tags.forEach((t) => {
+                const cls = t.type === "pro" ? "success" : "danger";
+                tagsHtml += `<span class="badge bg-${cls} bg-opacity-10 text-${cls} border border-${cls} border-opacity-25 rounded-pill px-3 py-1" style="font-weight:600;font-size:0.75rem;">${t.tag.replace(/_/g, " ").toUpperCase()}</span>`;
               });
               tagsHtml += "</div>";
             }
 
             container.append(`
-                  <div class="border-bottom border-secondary pb-3 mb-3 animate__animated animate__fadeIn">
-                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <div class="d-flex align-items-center gap-2">
-                           <div class="bg-success rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width:32px; height:32px; font-size:12px;">
-                              ${(review.username || "U").charAt(0).toUpperCase()}
-                           </div>
-                           <strong class="text-white">${review.username || "Usuario anónimo"}</strong>
-                        </div>
-                        <span class="badge bg-success">${review.note || 0} ★</span>
-                     </div>
-                     <p class="mb-0 text-white-50" style="font-size:0.9rem;">${review.review || "Sin comentarios."}</p>
-                     ${tagsHtml}
-                     <div class="mt-2 text-muted" style="font-size:0.75rem;">
-                        <i class="fa-regular fa-clock me-1"></i>${new Date(review.created_at).toLocaleDateString("es-ES")}
-                     </div>
-                  </div>
-               `);
+              <div class="border-bottom pb-3 mb-3 animate__animated animate__fadeIn">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                   ${review.profile_image 
+                     ? `<img src="${review.profile_image}" alt="${review.username}" class="review-avatar" style="width:40px; height:40px; object-fit:cover; border-radius:50%; border: 2px solid var(--rcw-green-dim);">`
+                     : `<div class="bg-success rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width:40px; height:40px; font-size:16px; border: 2px solid var(--rcw-green-dim);">
+                          ${(review.username || "U").charAt(0).toUpperCase()}
+                       </div>`
+                   }
+                   <strong>${review.username || "Usuario anónimo"}</strong>
+                   <span class="stars-display ms-2">${renderStars(review.note)}</span>
+                   <span class="text-muted small ms-2">• ${timeAgo(review.created_at)}</span>
+                </div>
+                ${tagsHtml}
+                <p class="mb-0 mt-3 text-white-50" style="font-size:0.9rem; line-height:1.6;">${review.review || ""}</p>
+              </div>
+            `);
           });
         } else {
           $("#reviews-list").html(
@@ -590,6 +656,22 @@ $(document).ready(function () {
 
   // --- LÓGICA PARA EL FORMULARIO DE RESEÑAS DE PARQUES ---
   if (document.getElementById("review-form")) {
+    const rf = document.getElementById("review-form");
+    const parkIdInput = rf.querySelector('input[name="park_id"]');
+    if (parkIdInput) {
+      const pId = parkIdInput.value;
+      fetch(`${BASE_URL}/api/php/parks.php?action=check_review&id=${pId}`)
+        .then(r => r.json())
+        .then(data => {
+           if (data.success && data.hasReviewed) {
+              rf.classList.add("d-none");
+              const msg = document.getElementById("already-reviewed-msg");
+              if (msg) msg.classList.remove("d-none");
+           }
+        })
+        .catch(e => console.error("Error check review:", e));
+    }
+
     new Choices("#pros-select", {
       removeItemButton: true,
       placeholderValue: "Selecciona las ventajas...",

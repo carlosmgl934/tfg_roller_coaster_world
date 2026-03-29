@@ -33,10 +33,12 @@ function listUsers(): void
 {
     requireAdmin();
 
-    $search = trim($_GET['search'] ?? '');
-    $page   = max(1, intval($_GET['page'] ?? 1));
-    $limit  = 15;
-    $offset = ($page - 1) * $limit;
+    $search  = trim($_GET['search']  ?? '');
+    $rolFilt = trim($_GET['rol']     ?? '');
+    $cntFilt = trim($_GET['country'] ?? '');
+    $page    = max(1, intval($_GET['page'] ?? 1));
+    $limit   = 15;
+    $offset  = ($page - 1) * $limit;
 
     $conditions = ['1=1'];
     $params     = [];
@@ -44,6 +46,16 @@ function listUsers(): void
     if ($search !== '') {
         $conditions[] = "(username ILIKE :search OR email ILIKE :search OR full_name ILIKE :search)";
         $params[':search'] = '%' . $search . '%';
+    }
+
+    if ($rolFilt !== '') {
+        $conditions[] = "rol = :rol";
+        $params[':rol'] = $rolFilt;
+    }
+
+    if ($cntFilt !== '') {
+        $conditions[] = "country ILIKE :country";
+        $params[':country'] = '%' . $cntFilt . '%';
     }
 
     $where = implode(' AND ', $conditions);

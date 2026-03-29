@@ -39,7 +39,6 @@ if (!$is_logged || !$is_admin) {
                             <option value="">Todas las categorías</option>
                             <option value="Destacado">Destacado</option>
                             <option value="Comunidad">Comunidad</option>
-                            <option value="Viajes">Viajes</option>
                             <option value="Actualización">Actualización</option>
                         </select>
                     </div>
@@ -142,7 +141,11 @@ if (!$is_logged || !$is_admin) {
                     
                     <div class="col-12 col-md-6">
                         <label class="form-label fw-semibold small text-uppercase text-muted">Etiqueta (Tag)</label>
-                        <input type="text" id="news-form-tag" class="form-control rounded-0" style="background:#0d1117;color:#e6edf3;border:1px solid #30363d;" placeholder="Ej: Comunidad">
+                        <select id="news-form-tag" class="form-select rounded-0" style="background:#0d1117;color:#e6edf3;border:1px solid #30363d;">
+                            <option value="Destacado">Destacado</option>
+                            <option value="Comunidad">Comunidad</option>
+                            <option value="Actualización">Actualización</option>
+                        </select>
                     </div>
 
                     <div class="col-12 col-md-6">

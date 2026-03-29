@@ -99,19 +99,19 @@
 } /* ============================================================
    ESTILOS DASHBOARD LOGUEADO (Mockup style)
    ============================================================ */
-/* HERO CAROUSEL */
+/* HERO CAROUSEL - full-width */
 .home-hero {
   position: relative;
-  height: 520px;
+  height: 460px;
   overflow: hidden;
-  border-radius: 12px;
-  margin-bottom: 2rem;
+  margin-bottom: 0;
 }
 .home-hero-slide {
   position: absolute;
   inset: 0;
   background-size: cover;
-  background-position: center;
+  background-repeat: no-repeat;
+  background-position: center center;
   transition: opacity 1.2s ease;
   opacity: 0;
 }
@@ -242,16 +242,16 @@
   width: 48px;
 }
 
-/* STATS BAR */
+/* STATS BAR - full-width */
 .home-stats-bar {
-  background: var(--rcw-bg);
-  border: 1px solid var(--rcw-border);
-  border-radius: 6px;
-  padding: 1.5rem 2rem;
+  background: rgba(13, 17, 23, 0.97);
+  border: none;
+  border-bottom: 1px solid var(--rcw-border);
+  padding: 1.4rem 3rem;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 0;
 }
 .home-stat-item {
   text-align: center;
@@ -566,5 +566,53 @@
   }
   .home-hero-title {
     font-size: 2.5rem;
+  }
+}
+/* Flechas del carrusel */
+.home-hero-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 4;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #fff;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  backdrop-filter: blur(4px);
+}
+.home-hero-arrow:hover {
+  background: rgba(16,185,129,0.55);
+  transform: translateY(-50%) scale(1.08);
+}
+.home-hero-arrow-prev { left: 1.5rem; }
+.home-hero-arrow-next { right: 1.5rem; }
+
+.home-wrapper {
+  max-width: 1700px;
+  margin: 0 auto;
+  padding: 2rem 2.5rem;
+}
+
+@media (max-width: 768px) {
+  .home-wrapper {
+    padding: 1rem 1rem;
+  }
+  .home-hero {
+    height: 420px;
+  }
+  .home-hero-arrow {
+    display: none;
+  }
+  .home-stats-bar {
+    padding: 1rem 1rem;
+    flex-wrap: wrap;
+    gap: 0.8rem;
   }
 }

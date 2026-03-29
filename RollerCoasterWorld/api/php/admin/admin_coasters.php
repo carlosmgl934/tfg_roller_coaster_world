@@ -22,9 +22,9 @@ $router->dispatch();
 function requireAdmin(): void
 {
     if (
-    !isset($_SESSION['firebase_uid']) ||
-    !isset($_SESSION['user_rol']) ||
-    $_SESSION['user_rol'] !== 'admin'
+        !isset($_SESSION['firebase_uid']) ||
+        !isset($_SESSION['user_rol']) ||
+        $_SESSION['user_rol'] !== 'admin'
     ) {
         Response::error('Acceso denegado.', 403);
         exit;
@@ -87,11 +87,10 @@ function searchCoasters(): void
         $stmt2 = $db->prepare($sql_count);
         $stmt2->bindValue(':like', $like, PDO::PARAM_STR);
         $stmt2->execute();
-        $total = (int)$stmt2->fetchColumn();
+        $total = (int) $stmt2->fetchColumn();
 
         Response::success(['coasters' => $coasters, 'total' => $total]);
-    }
-    catch (PDOException $e) {
+    } catch (PDOException $e) {
         Response::error('Error buscando coasters: ' . $e->getMessage());
     }
 }
@@ -122,8 +121,7 @@ function filterCoasters(): void
     if (isset($_GET['manufacter']) && $_GET['manufacter'] !== '') {
         if ($_GET['manufacter'] === '__null__') {
             $conditions[] = "c.coaster_manufacter IS NULL";
-        }
-        else {
+        } else {
             $conditions[] = "c.coaster_manufacter = :manufacter";
             $params[':manufacter'] = $_GET['manufacter'];
         }
@@ -133,8 +131,7 @@ function filterCoasters(): void
     if (isset($_GET['country']) && $_GET['country'] !== '') {
         if ($_GET['country'] === '__null__') {
             $conditions[] = "p.park_country IS NULL";
-        }
-        else {
+        } else {
             $conditions[] = "p.park_country = :country";
             $params[':country'] = $_GET['country'];
         }
@@ -144,8 +141,7 @@ function filterCoasters(): void
     if (isset($_GET['park']) && $_GET['park'] !== '') {
         if ($_GET['park'] === '__null__') {
             $conditions[] = "(c.park_id IS NULL OR p.id IS NULL OR c.park_id = 2895)";
-        }
-        else {
+        } else {
             $conditions[] = "c.park_id = :park";
             $params[':park'] = intval($_GET['park']);
         }
@@ -217,11 +213,10 @@ function filterCoasters(): void
         $stmt2->execute();
 
         $coasters = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $total = (int)$stmt2->fetchColumn();
+        $total = (int) $stmt2->fetchColumn();
 
         Response::success(['coasters' => $coasters, 'total' => $total]);
-    }
-    catch (PDOException $e) {
+    } catch (PDOException $e) {
         Response::error('Error filtrando coasters: ' . $e->getMessage());
     }
 }
@@ -234,7 +229,7 @@ function listModels(): void
     requireAdmin();
 
     $q = trim($_GET['q'] ?? '');
-    $limit = isset($_GET['limit']) ? min(50, max(1, (int)$_GET['limit'])) : 50;
+    $limit = isset($_GET['limit']) ? min(50, max(1, (int) $_GET['limit'])) : 50;
 
     $where = "coaster_model IS NOT NULL AND coaster_model <> ''";
     $bind = [];
@@ -261,8 +256,7 @@ function listModels(): void
 
         $models = $stmt->fetchAll(PDO::FETCH_COLUMN);
         Response::success(['models' => array_map(fn($m) => ['coaster_model' => $m], $models)]);
-    }
-    catch (PDOException $e) {
+    } catch (PDOException $e) {
         Response::error('Error obteniendo modelos: ' . $e->getMessage());
     }
 }
@@ -285,12 +279,12 @@ function deleteCoaster(): void
     try {
         global $db;
 
-        // Antes de borrar, obtenemos datos para stats y respuesta
-        $stmtInfo = $db->prepare("SELECT park_id, coaster_name FROM coasters WHERE id = :id");
-        $stmtInfo->execute([':id' => $id]);
-        $info = $stmtInfo->fetch(PDO::FETCH_ASSOC);
-        $parkId = $info['park_id'] ?? null;
-        $coasterName = $info['coaster_name'] ?? 'Desconocida';
+        // Antes de borrar, obtenemos el park_id y el nombre para actualizar sus stats y la respuesta
+        $stmtPark = $db->prepare("SELECT park_id, coaster_name FROM coasters WHERE id = :id");
+        $stmtPark->execute([':id' => $id]);
+        $coasterRow = $stmtPark->fetch(PDO::FETCH_ASSOC);
+        $parkId = $coasterRow['park_id'] ?? null;
+        $coasterName = $coasterRow['coaster_name'] ?? '';
 
         // Eliminar
         $stmt = $db->prepare("DELETE FROM coasters WHERE id = :id");
@@ -298,12 +292,11 @@ function deleteCoaster(): void
 
         // Actualizar estadísticas del parque
         if ($parkId) {
-            StatsHelper::updateParkStats((int)$parkId);
+            StatsHelper::updateParkStats((int) $parkId);
         }
 
         Response::success(['coaster_name' => $coasterName]);
-    }
-    catch (PDOException $e) {
+    } catch (PDOException $e) {
         Response::error('Error eliminando coaster: ' . $e->getMessage());
     }
 }
@@ -365,7 +358,7 @@ function addCoaster(): void
 
         // Coasters agregadas con ID >= 100000 para no interferir con las de RCDB
         $stmt_id = $db->query("SELECT COALESCE(MAX(id), 99999) + 1 FROM coasters WHERE id >= 100000");
-        $nextId = (int)$stmt_id->fetchColumn();
+        $nextId = (int) $stmt_id->fetchColumn();
 
         $sql = "INSERT INTO coasters (
                     id, coaster_name, coaster_model, coaster_manufacter,
@@ -409,12 +402,11 @@ function addCoaster(): void
 
         // Actualizar estadísticas del parque beneficiado
         if ($parkId) {
-            StatsHelper::updateParkStats((int)$parkId);
+            StatsHelper::updateParkStats((int) $parkId);
         }
 
         Response::success(['coaster' => $newCoaster]);
-    }
-    catch (PDOException $e) {
+    } catch (PDOException $e) {
         Response::error('Error añadiendo coaster: ' . $e->getMessage());
     }
 }
@@ -536,12 +528,11 @@ function updateCoaster(): void
         // NOTA: Para simplificar, actualizamos el actual. 
         // Si queremos ser súper precisos, deberíamos haber guardado el OLD park_id antes del UPDATE.
         if ($parkId) {
-            StatsHelper::updateParkStats((int)$parkId);
+            StatsHelper::updateParkStats((int) $parkId);
         }
 
         Response::success(['coaster' => $updatedCoaster]);
-    }
-    catch (PDOException $e) {
+    } catch (PDOException $e) {
         Response::error('Error actualizando coaster: ' . $e->getMessage());
     }
 }

@@ -314,6 +314,19 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
 }
 
 /* ============================================================
+   CONTRAS MULTIPLE CHOICES (OVERRIDE A ROJO)
+   ============================================================ */
+.wrapper-contras .choices__list--multiple .choices__item {
+  background-color: #dc3545 !important;
+  border-color: #bb2d3b !important;
+  color: #fff !important;
+}
+.wrapper-contras .choices__list--multiple .choices__button {
+  border-left-color: rgba(255, 255, 255, 0.2) !important;
+  opacity: 0.9;
+}
+
+/* ============================================================
    PREMIUM STAT BOXES & FICHA
    ============================================================ */
 .premium-stat-box {

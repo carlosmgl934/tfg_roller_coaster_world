@@ -915,22 +915,22 @@ $(document).ready(function () {
         const country = document
           .getElementById("add-coaster-country")
           .value.trim();
-        const year = document.getElementById("add-coaster-year").value.trim();
-        let height = document
-          .getElementById("add-coaster-height")
-          .value.trim();
-        let speed = document.getElementById("add-coaster-speed").value.trim();
-        let length = document
-          .getElementById("add-coaster-length")
-          .value.trim();
-        let inversions = document
-          .getElementById("add-coaster-inversions")
-          .value.trim();
-          
-        if (height === "") height = "0";
-        if (speed === "") speed = "0";
-        if (length === "") length = "0";
-        if (inversions === "") inversions = "0";
+        const unknownYear       = document.getElementById("unknown-year").checked;
+        const unknownHeight     = document.getElementById("unknown-height").checked;
+        const unknownSpeed      = document.getElementById("unknown-speed").checked;
+        const unknownLength     = document.getElementById("unknown-length").checked;
+        const unknownInversions = document.getElementById("unknown-inversions").checked;
+
+        const year = unknownYear ? "" : document.getElementById("add-coaster-year").value.trim();
+        let height     = unknownHeight     ? "" : document.getElementById("add-coaster-height").value.trim();
+        let speed      = unknownSpeed      ? "" : document.getElementById("add-coaster-speed").value.trim();
+        let length     = unknownLength     ? "" : document.getElementById("add-coaster-length").value.trim();
+        let inversions = unknownInversions ? "" : document.getElementById("add-coaster-inversions").value.trim();
+
+        if (!unknownHeight     && height === "")     height = "0";
+        if (!unknownSpeed      && speed === "")      speed = "0";
+        if (!unknownLength     && length === "")     length = "0";
+        if (!unknownInversions && inversions === "") inversions = "0";
         const status = document
           .getElementById("add-coaster-status")
           .value.trim();
@@ -991,125 +991,125 @@ $(document).ready(function () {
           return;
         }
 
-        if (!year) {
-          showModalError(
-            "Por favor introduce el año de apertura. (Si no lo conoces, marca la opción 'Desconocido')",
-          );
-          markError("add-coaster-year");
-          return;
+        if (!unknownYear) {
+          if (!year) {
+            showModalError(
+              "Por favor introduce el año de apertura. (Si no lo conoces, marca la opción 'Desconocido')",
+            );
+            markError("add-coaster-year");
+            return;
+          }
+          if (isNaN(year) || year.trim() === "") {
+            showModalError(
+              "Por favor introduce un año válido. (Si no lo conoces, marca la opción 'Desconocido')",
+            );
+            markError("add-coaster-year");
+            return;
+          }
+          const currentYear = new Date().getFullYear();
+          if (year > currentYear + 10 || year < 1800) {
+            showModalError(
+              "Por favor introduce un año válido. (Si no lo conoces, marca la opción 'Desconocido')",
+            );
+            markError("add-coaster-year");
+            return;
+          }
         }
 
-        if (isNaN(year) || year.trim() === "") {
-          showModalError(
-            "Por favor introduce un año válido. (Si no lo conoces, marca la opción 'Desconocido')",
-          );
-          markError("add-coaster-year");
-          return;
+        if (!unknownHeight) {
+          if (!height) {
+            showModalError(
+              "Por favor introduce la altura. (Si no lo conoces, marca la opción 'Desconocido')",
+            );
+            markError("add-coaster-height");
+            return;
+          }
+          if (isNaN(height) || height.trim() === "") {
+            showModalError(
+              "Por favor introduce una altura válida. (Si no lo conoces, marca la opción 'Desconocido')",
+            );
+            markError("add-coaster-height");
+            return;
+          }
+          if (height > 400 || height < 0) {
+            showModalError(
+              "Por favor introduce una altura válida. (Si no lo conoces, marca la opción 'Desconocido')",
+            );
+            markError("add-coaster-height");
+            return;
+          }
         }
 
-        const currentYear = new Date().getFullYear();
-        if (year > currentYear + 10 || year < 1800) {
-          showModalError(
-            "Por favor introduce un año válido. (Si no lo conoces, marca la opción 'Desconocido')",
-          );
-          markError("add-coaster-year");
-          return;
+        if (!unknownSpeed) {
+          if (!speed) {
+            showModalError(
+              "Por favor introduce la velocidad. (Si no lo conoces, marca la opción 'Desconocido')",
+            );
+            markError("add-coaster-speed");
+            return;
+          }
+          if (isNaN(speed) || speed.trim() === "") {
+            showModalError(
+              "Por favor introduce una velocidad válida. (Si no lo conoces, marca la opción 'Desconocido')",
+            );
+            markError("add-coaster-speed");
+            return;
+          }
+          if (speed > 400 || speed < 0) {
+            showModalError(
+              "Por favor introduce una velocidad válida. (Si no lo conoces, marca la opción 'Desconocido')",
+            );
+            markError("add-coaster-speed");
+            return;
+          }
         }
 
-        if (!height) {
-          showModalError(
-            "Por favor introduce la altura. (Si no lo conoces, marca la opción 'Desconocido')",
-          );
-          markError("add-coaster-height");
-          return;
+        if (!unknownLength) {
+          if (!length) {
+            showModalError(
+              "Por favor introduce la longitud. (Si no lo conoces, marca la opción 'Desconocido')",
+            );
+            markError("add-coaster-length");
+            return;
+          }
+          if (isNaN(length) || length.trim() === "") {
+            showModalError(
+              "Por favor introduce una longitud válida. (Si no lo conoces, marca la opción 'Desconocido')",
+            );
+            markError("add-coaster-length");
+            return;
+          }
+          if (length > 20000 || length < 0) {
+            showModalError(
+              "Por favor introduce una longitud válida. (Si no lo conoces, marca la opción 'Desconocido')",
+            );
+            markError("add-coaster-length");
+            return;
+          }
         }
 
-        if (isNaN(height) || height.trim() === "") {
-          showModalError(
-            "Por favor introduce una altura válida. (Si no lo conoces, marca la opción 'Desconocido')",
-          );
-          markError("add-coaster-height");
-          return;
-        }
-
-        if (height > 400 || height < 0) {
-          showModalError(
-            "Por favor introduce una altura válida. (Si no lo conoces, marca la opción 'Desconocido')",
-          );
-          markError("add-coaster-height");
-          return;
-        }
-
-        if (!speed) {
-          showModalError(
-            "Por favor introduce la velocidad. (Si no lo conoces, marca la opción 'Desconocido')",
-          );
-          markError("add-coaster-speed");
-          return;
-        }
-
-        if (isNaN(speed) || speed.trim() === "") {
-          showModalError(
-            "Por favor introduce una velocidad válida. (Si no lo conoces, marca la opción 'Desconocido')",
-          );
-          markError("add-coaster-speed");
-          return;
-        }
-
-        if (speed > 400 || speed < 0) {
-          showModalError(
-            "Por favor introduce una velocidad válida. (Si no lo conoces, marca la opción 'Desconocido')",
-          );
-          markError("add-coaster-speed");
-          return;
-        }
-
-        if (!length) {
-          showModalError(
-            "Por favor introduce la longitud. (Si no lo conoces, marca la opción 'Desconocido')",
-          );
-          markError("add-coaster-length");
-          return;
-        }
-
-        if (isNaN(length) || length.trim() === "") {
-          showModalError(
-            "Por favor introduce una longitud válida. (Si no lo conoces, marca la opción 'Desconocido')",
-          );
-          markError("add-coaster-length");
-          return;
-        }
-
-        if (length > 20000 || length < 0) {
-          showModalError(
-            "Por favor introduce una longitud válida. (Si no lo conoces, marca la opción 'Desconocido')",
-          );
-          markError("add-coaster-length");
-          return;
-        }
-
-        if (!inversions) {
-          showModalError(
-            "Por favor introduce el número de inversiones. (Si no lo conoces, marca la opción 'Desconocido')",
-          );
-          markError("add-coaster-inversions");
-          return;
-        }
-
-        if (isNaN(inversions) || inversions.trim() === "") {
-          showModalError(
-            "Por favor introduce un número de inversiones válido. (Si no lo conoces, marca la opción 'Desconocido')",
-          );
-          markError("add-coaster-inversions");
-          return;
-        }
-
-        if (inversions > 40 || inversions < 0) {
-          showModalError(
-            "Por favor introduce un número de inversiones válido. (Si no lo conoces, marca la opción 'Desconocido')",
-          );
-          markError("add-coaster-inversions");
-          return;
+        if (!unknownInversions) {
+          if (!inversions) {
+            showModalError(
+              "Por favor introduce el número de inversiones. (Si no lo conoces, marca la opción 'Desconocido')",
+            );
+            markError("add-coaster-inversions");
+            return;
+          }
+          if (isNaN(inversions) || inversions.trim() === "") {
+            showModalError(
+              "Por favor introduce un número de inversiones válido. (Si no lo conoces, marca la opción 'Desconocido')",
+            );
+            markError("add-coaster-inversions");
+            return;
+          }
+          if (inversions > 40 || inversions < 0) {
+            showModalError(
+              "Por favor introduce un número de inversiones válido. (Si no lo conoces, marca la opción 'Desconocido')",
+            );
+            markError("add-coaster-inversions");
+            return;
+          }
         }
 
         if (!status) {
@@ -2149,22 +2149,16 @@ if (_confirmEditCoaster) {
         "edit-unknown-inversions",
       ).checked;
 
-      const year = document.getElementById("edit-coaster-year").value.trim();
-      let height = document
-        .getElementById("edit-coaster-height")
-        .value.trim();
-      let speed = document.getElementById("edit-coaster-speed").value.trim();
-      let length = document
-        .getElementById("edit-coaster-length")
-        .value.trim();
-      let inversions = document
-        .getElementById("edit-coaster-inversions")
-        .value.trim();
-        
-      if (height === "") height = "0";
-      if (speed === "") speed = "0";
-      if (length === "") length = "0";
-      if (inversions === "") inversions = "0";
+      const year       = unknownYear       ? "" : document.getElementById("edit-coaster-year").value.trim();
+      let height       = unknownHeight     ? "" : document.getElementById("edit-coaster-height").value.trim();
+      let speed        = unknownSpeed      ? "" : document.getElementById("edit-coaster-speed").value.trim();
+      let length       = unknownLength     ? "" : document.getElementById("edit-coaster-length").value.trim();
+      let inversions   = unknownInversions ? "" : document.getElementById("edit-coaster-inversions").value.trim();
+
+      if (!unknownHeight     && height === "")     height = "0";
+      if (!unknownSpeed      && speed === "")      speed = "0";
+      if (!unknownLength     && length === "")     length = "0";
+      if (!unknownInversions && inversions === "") inversions = "0";
 
       // Validaciones
       if (!name) {
