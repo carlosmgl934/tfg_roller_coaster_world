@@ -744,4 +744,4 @@ if (!$is_logged || !$is_admin) {
 
 <?php require_once __DIR__ . '/../partials/footer.php'; ?>
 
-<script src="<?= Router::asset('web/js/admin.js') ?>"></script>
+<script src="<?= Router::asset('web/js/admin/admin.js') ?>"></script>
