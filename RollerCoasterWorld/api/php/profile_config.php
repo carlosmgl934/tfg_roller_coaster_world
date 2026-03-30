@@ -189,15 +189,27 @@ function getProfile()
             $stmtC->execute([':id' => $user_id]);
             $stats['coasters_count'] = $stmtC->fetchColumn();
 
-            // Parques count (Parques distintos deducidos de las coasters montadas)
-            $stmtP = $db->prepare("SELECT COUNT(DISTINCT c.park_id) FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :id");
+            // Parques count (Parques distintos deducidos de las coasters montadas + parques rankeados)
+            $stmtP = $db->prepare("
+                SELECT COUNT(*) FROM (
+                    SELECT park_id FROM user_park_credits WHERE user_id = :id
+                    UNION
+                    SELECT c.park_id FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :id
+                ) as distinct_parks
+            ");
             $stmtP->execute([':id' => $user_id]);
-            $stats['parks_count'] = $stmtP->fetchColumn();
+            $stats['parks_count'] = (int)$stmtP->fetchColumn() ?: 0;
 
-            // Paises count (Países distintos deducidos de los parques de las coasters)
-            $stmtCountry = $db->prepare("SELECT COUNT(DISTINCT p.park_country) FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id JOIN parks p ON c.park_id = p.id WHERE uc.user_id = :id");
+            // Paises count (Países distintos deducidos de los parques visitados/rankeados)
+            $stmtCountry = $db->prepare("
+                SELECT COUNT(DISTINCT park_country) FROM parks WHERE id IN (
+                    SELECT park_id FROM user_park_credits WHERE user_id = :id
+                    UNION
+                    SELECT c.park_id FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :id
+                )
+            ");
             $stmtCountry->execute([':id' => $user_id]);
-            $stats['countries_count'] = $stmtCountry->fetchColumn();
+            $stats['countries_count'] = (int)$stmtCountry->fetchColumn() ?: 0;
 
             // Reviews count
             // Dependiendo de cómo se llamen las tablas
@@ -231,7 +243,19 @@ function getProfile()
             // --- Estadísticas Técnicas ---
             
             // País más visitado (país en el que has visitado más parques diferentes)
-            $stmtMainCountry = $db->prepare("SELECT p.park_country FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id JOIN parks p ON c.park_id = p.id WHERE uc.user_id = :id GROUP BY p.park_country ORDER BY COUNT(DISTINCT p.id) DESC LIMIT 1");
+            $stmtMainCountry = $db->prepare("
+                SELECT p.park_country 
+                FROM parks p 
+                JOIN (
+                    SELECT park_id FROM user_park_credits WHERE user_id = :id
+                    UNION
+                    SELECT c.park_id FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :id
+                ) dp ON p.id = dp.park_id
+                WHERE p.park_country IS NOT NULL AND p.park_country != ''
+                GROUP BY p.park_country 
+                ORDER BY COUNT(dp.park_id) DESC 
+                LIMIT 1
+            ");
             $stmtMainCountry->execute([':id' => $user_id]);
             $stats['main_country'] = $stmtMainCountry->fetchColumn() ?: '—';
             

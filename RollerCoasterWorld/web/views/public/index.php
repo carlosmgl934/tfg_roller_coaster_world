@@ -233,7 +233,7 @@ require_once __DIR__ . '/../partials/header.php';
         <!-- HERO -->
         <section class="landing-hero d-flex align-items-center" style="
             min-height: 100vh;
-            background: linear-gradient(rgba(2,6,23,0.55), rgba(2,6,23,0.72)), url('<?= $base_url ?>/web/img/hero-bg.jpg');
+            background: linear-gradient(rgba(2,6,23,0.55), rgba(2,6,23,0.72)), url('<?= $base_url ?>/web/img/taron_phanta_opt.jpg');
             background-size: cover;
             background-position: center 25%;
         ">

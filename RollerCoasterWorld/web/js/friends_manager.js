@@ -45,9 +45,51 @@ $(document).ready(function () {
   // Make available globally so header_friends.js can call it
   window.fetchFriendsData = fetchFriendsData;
 
+  // Helper: resuelve un profile_image problemático (sólo nombre vs relativo vs absoluto Supabase)
+  function getAvatarUrl(
+    profileImage,
+    username,
+    fallbackColor = "198754",
+    fallbackText = "fff",
+  ) {
+    const fallbackInitials = `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=${fallbackColor}&color=${fallbackText}`;
+
+    if (!profileImage) return fallbackInitials;
+
+    // URL absoluta de Supabase u otro CDN → usar directamente
+    if (
+      profileImage.startsWith("http://") ||
+      profileImage.startsWith("https://")
+    ) {
+      return profileImage;
+    }
+
+    // Ruta relativa que empieza por "/"
+    if (profileImage.startsWith("/")) {
+      // Si es una subida local (/web/img/uploads/...) solo existe en la máquina
+      // de quien la subió → usar fallback de iniciales para evitar 404
+      if (profileImage.includes("/web/img/uploads/")) {
+        return fallbackInitials;
+      }
+      return BASE_URL + profileImage;
+    }
+
+    // Caso: guardado solo como nombre de archivo "123456_abcd.webp" → construir URL Supabase
+    return (
+      "https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/" +
+      profileImage
+    );
+  }
+
   function renderReceived(requests) {
     requestsList.empty();
     requestsCount.text(requests.length);
+
+    if (requests.length > 0) {
+      requestsCount.removeClass('badge-gray bg-secondary').addClass('bg-danger');
+    } else {
+      requestsCount.removeClass('bg-danger bg-secondary').addClass('badge-gray');
+    }
 
     if (requests.length === 0) {
       requestsList.html(
@@ -58,23 +100,24 @@ $(document).ready(function () {
 
     let html = "";
     requests.forEach((req) => {
-      const avatarSrc = req.profile_image
-        ? req.profile_image.startsWith("/")
-          ? BASE_URL + req.profile_image
-          : req.profile_image
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(req.username)}&background=ffc107&color=000`;
+      const avatarSrc = getAvatarUrl(
+        req.profile_image,
+        req.username,
+        "ffc107",
+        "000",
+      );
 
       html += `
-        <div class="list-group-item bg-dark text-white border-warning border-opacity-10 py-3" style="transition: background 0.2s;">
+        <div class="list-group-item bg-transparent py-3 px-4 border-bottom border-secondary border-opacity-25" style="border-left: 3px solid var(--rcw-green-neon) !important;">
           <div class="d-flex align-items-center">
-            <img src="${avatarSrc}" alt="${req.username}" class="rounded-circle object-fit-cover me-3 border border-warning shadow-sm" style="width: 45px; height: 45px;">
+            <img src="${avatarSrc}" alt="${req.username}" class="rounded-circle object-fit-cover me-4 shadow-sm border border-success border-opacity-50" style="width: 50px; height: 50px;" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(req.username)}&background=020617&color=10b981'">
             <div class="flex-grow-1 min-w-0">
-               <a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${req.id}" class="text-white text-decoration-none fw-bold d-block text-truncate">${req.username}</a>
-               <small class="text-muted d-block">Quiere ser tu amigo</small>
+               <a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${req.id}" class="text-white text-decoration-none fw-bold d-block text-truncate fs-5 mb-1">${req.username}</a>
+               <small class="text-muted d-block"><i class="fa-solid fa-user-plus opacity-50 me-1"></i> Quiere ser tu amigo</small>
             </div>
-            <div class="d-flex flex-column gap-2 ms-2">
-               <button class="btn btn-sm btn-success shadow-sm rcw-action-btn" data-action="accept" data-id="${req.id}" title="Aceptar"><i class="fa-solid fa-check"></i></button>
-               <button class="btn btn-sm btn-outline-danger shadow-sm border-0 rcw-action-btn" data-action="reject" data-id="${req.id}" title="Rechazar"><i class="fa-solid fa-xmark"></i></button>
+            <div class="d-flex flex-column gap-2 ms-2 position-relative" style="z-index: 2;">
+               <button class="btn btn-sm btn-success shadow-sm rcw-action-btn px-3 fw-bold" data-action="accept" data-id="${req.id}" title="Aceptar"><i class="fa-solid fa-check"></i></button>
+               <button class="btn btn-sm btn-outline-danger shadow-sm rcw-action-btn px-3 fw-bold" data-action="reject" data-id="${req.id}" title="Rechazar"><i class="fa-solid fa-xmark"></i></button>
             </div>
           </div>
         </div>
@@ -96,25 +139,26 @@ $(document).ready(function () {
 
     let html = "";
     friends.forEach((friend) => {
-      const avatarSrc = friend.profile_image
-        ? friend.profile_image.startsWith("/")
-          ? BASE_URL + friend.profile_image
-          : friend.profile_image
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(friend.username)}&background=198754&color=fff`;
+      const avatarSrc = getAvatarUrl(
+        friend.profile_image,
+        friend.username,
+        "198754",
+        "fff",
+      );
 
       html += `
-        <div class="col-12 col-md-6 col-lg-4">
-           <div class="card h-100 bg-transparent border-success border-opacity-25 shadow-sm text-white" style="transition: transform 0.2s;">
-             <div class="card-body d-flex align-items-center p-3 position-relative">
-               <img src="${avatarSrc}" class="rounded-circle object-fit-cover shadow me-3" style="width: 60px; height: 60px; border: 2px solid var(--rcw-green);">
+        <div class="col-12 col-xl-6">
+           <div class="card profile-card h-100 border-start border-3 border-success">
+             <div class="card-body d-flex align-items-center p-3 px-4 position-relative">
+               <img src="${avatarSrc}" class="rounded-circle object-fit-cover shadow-sm me-4 border border-1 border-white border-opacity-25" style="width: 65px; height: 65px;" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(friend.username)}&background=10b981&color=000'">
                <div class="flex-grow-1 min-w-0">
-                 <h6 class="mb-1 text-truncate"><a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${friend.id}" class="text-white text-decoration-none fw-bold stretched-link">${friend.username}</a></h6>
-                 <small class="text-muted d-block"><i class="fa-solid fa-calendar-check me-1"></i>Amigos</small>
+                 <h5 class="fw-bold text-truncate mb-1"><a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${friend.id}" class="text-white text-decoration-none stretched-link">${friend.username}</a></h5>
+                 <small class="text-success d-block fw-semibold opacity-75"><i class="fa-solid fa-user-check me-1"></i>Amigos</small>
                </div>
-               <div class="position-absolute dropdown dropstart" style="top: 10px; right: 10px; z-index: 2;">
-                 <button class="btn btn-sm btn-link text-muted pe-1 shadow-none" type="button" data-bs-toggle="dropdown"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                 <ul class="dropdown-menu dropdown-menu-dark shadow border-0">
-                    <li><a class="dropdown-item text-danger rcw-action-btn" href="#" data-action="remove" data-id="${friend.id}"><i class="fa-solid fa-user-minus me-2"></i>Eliminar Amigo</a></li>
+               <div class="position-absolute dropdown dropstart" style="top: 50%; right: 15px; transform: translateY(-50%); z-index: 2;">
+                 <button class="btn btn-link text-muted pe-1 shadow-none" type="button" data-bs-toggle="dropdown"><i class="fa-solid fa-ellipsis-vertical fa-lg"></i></button>
+                 <ul class="dropdown-menu shadow border-rcw">
+                    <li><a class="dropdown-item text-danger rcw-action-btn py-2" href="#" data-action="remove" data-id="${friend.id}"><i class="fa-solid fa-user-minus me-2"></i>Eliminar Amigo</a></li>
                  </ul>
                </div>
              </div>
@@ -138,19 +182,20 @@ $(document).ready(function () {
 
     let html = "";
     sent.forEach((req) => {
-      const avatarSrc = req.profile_image
-        ? req.profile_image.startsWith("/")
-          ? BASE_URL + req.profile_image
-          : req.profile_image
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(req.username)}&background=6c757d&color=fff`;
+      const avatarSrc = getAvatarUrl(
+        req.profile_image,
+        req.username,
+        "6c757d",
+        "fff",
+      );
       html += `
-        <li class="list-group-item bg-transparent text-white border-bottom border-light border-opacity-10 py-2">
-           <div class="d-flex align-items-center justify-content-between">
+        <li class="list-group-item bg-transparent border-bottom border-secondary border-opacity-25 py-3">
+           <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
               <div class="d-flex align-items-center">
-                 <img src="${avatarSrc}" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
-                 <span class="small fw-semibold text-muted">Invitación enviada a ${req.username}</span>
+                 <img src="${avatarSrc}" class="rounded-circle me-3 border border-secondary border-opacity-50" style="width: 40px; height: 40px; object-fit: cover;">
+                 <a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${req.id}" class="small fw-bold text-muted text-decoration-none">Invitación enviada a ${req.username}</a>
               </div>
-              <button class="btn btn-sm btn-outline-danger border-0 py-0 px-2 rcw-action-btn" data-action="cancel" data-id="${req.id}" title="Cancelar envío"><i class="fa-solid fa-xmark"></i> Cancelar</button>
+              <button class="btn btn-sm btn-outline-danger py-1 px-3 rcw-action-btn ms-auto" data-action="cancel" data-id="${req.id}" title="Cancelar envío"><i class="fa-solid fa-xmark me-1"></i> Cancelar</button>
            </div>
         </li>
       `;

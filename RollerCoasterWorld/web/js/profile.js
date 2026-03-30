@@ -297,15 +297,33 @@ $(document).ready(function () {
 
         // Actualizar avatar si hay imagen guardada
         if (data.user.profile_image) {
-          // En la tarjeta de perfil
-          const avatarDiv = document.querySelector(".avatar-circle");
-          if (avatarDiv) {
-            avatarDiv.innerHTML = `<img src="${data.user.profile_image}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+          let imgSrc = data.user.profile_image;
+          // Si es URL absoluta, usarla tal cual
+          if (imgSrc.startsWith('http://') || imgSrc.startsWith('https://')) {
+            // OK — usar directamente
+          } else if (imgSrc.startsWith('/')) {
+            // Ruta local de otro XAMPP → no existe en esta máquina → ignorar
+            if (imgSrc.includes('/web/img/uploads/')) {
+              imgSrc = null; // No mostrar imagen rota
+            } else {
+              imgSrc = window.BASE_URL + imgSrc;
+            }
+          } else {
+            // Solo nombre de archivo → construir URL Supabase
+            imgSrc = 'https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/' + imgSrc;
           }
-          // En el header del navbar
-          const headerAvatar = document.getElementById("header-avatar");
-          if (headerAvatar) {
-            headerAvatar.innerHTML = `<img src="${data.user.profile_image}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+
+          if (imgSrc) {
+            // En la tarjeta de perfil
+            const avatarDiv = document.querySelector('.avatar-circle');
+            if (avatarDiv) {
+              avatarDiv.innerHTML = `<img src="${imgSrc}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentElement.innerHTML=this.parentElement.dataset.initials||'?'">`;
+            }
+            // En el header del navbar
+            const headerAvatar = document.getElementById('header-avatar');
+            if (headerAvatar) {
+              headerAvatar.innerHTML = `<img src="${imgSrc}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentElement.innerHTML=this.parentElement.dataset.initials||'?'">`;
+            }
           }
         }
 

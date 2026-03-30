@@ -45,7 +45,20 @@ $(document).ready(function () {
     users.forEach(user => {
       let actionHtml = '';
       
-      const avatarSrc = user.profile_image ? (user.profile_image.startsWith('/') ? BASE_URL + user.profile_image : user.profile_image) : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=198754&color=fff`;
+      let avatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=198754&color=fff`;
+      if (user.profile_image) {
+        const img = user.profile_image;
+        if (img.startsWith('http://') || img.startsWith('https://')) {
+          avatarSrc = img; // URL absoluta (Supabase u otro CDN)
+        } else if (img.startsWith('/')) {
+          // Ruta local de uploads → solo existe en quien la subió → usar iniciales
+          if (!img.includes('/web/img/uploads/')) {
+            avatarSrc = window.BASE_URL + img;
+          }
+        } else {
+          avatarSrc = 'https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/' + img;
+        }
+      }
 
       if (user.friendship_status === 'none') {
         actionHtml = `<button class="btn btn-sm btn-outline-success border-0 px-2 rcw-add-friend-btn" data-id="${user.id}" title="Añadir a mis amigos"><i class="fa-solid fa-user-plus"></i></button>`;

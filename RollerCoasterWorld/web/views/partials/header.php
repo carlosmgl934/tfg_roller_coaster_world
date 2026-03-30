@@ -42,7 +42,7 @@ $public_pages = [
 
 // Determina si el usuario está logueado
 $is_logged = isset($_SESSION['firebase_uid']);
-$is_admin  = $is_logged && isset($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
+$is_admin = $is_logged && isset($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
 
 // Obtener iniciales del nombre de usuario para el avatar
 $user_display = '';
@@ -50,14 +50,15 @@ $user_initials = '?';
 if ($is_logged) {
   // Intentar obtener el username desde la sesión o BD
   if (isset($_SESSION['username'])) {
-    $user_display  = $_SESSION['username'];
+    $user_display = $_SESSION['username'];
   } elseif (isset($_SESSION['user_email'])) {
-    $user_display  = explode('@', $_SESSION['user_email'])[0];
+    $user_display = explode('@', $_SESSION['user_email'])[0];
   }
   if ($user_display) {
     $parts = preg_split('/[\s_\-]+/', trim($user_display));
     $user_initials = strtoupper(substr($parts[0], 0, 1));
-    if (count($parts) > 1) $user_initials .= strtoupper(substr($parts[1], 0, 1));
+    if (count($parts) > 1)
+      $user_initials .= strtoupper(substr($parts[1], 0, 1));
   }
 }
 
@@ -91,7 +92,9 @@ header("Expires: 0"); // Proxies
   <!-- Google Fonts: Inter + Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700;800;900&display=swap"
+    rel="stylesheet">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <!-- Bootstrap -->
@@ -110,7 +113,7 @@ header("Expires: 0"); // Proxies
 
   <!-- Firebase auth init (global) -->
   <script src="<?= Router::asset('web/js/auth.js') ?>"></script>
-  
+
   <!-- Funciones Nav para búsqueda de comunidad -->
   <?php if ($is_logged): ?>
     <script src="<?= Router::asset('web/js/header_friends.js') ?>"></script>
@@ -132,20 +135,24 @@ header("Expires: 0"); // Proxies
       <a class="navbar-brand rcw-brand me-3 me-xl-4" href="<?= Router::url('home') ?>">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="28" height="28" class="rcw-brand-icon">
           <!-- Pistas -->
-          <path d="M4 48 C 20 48, 24 16, 40 16 C 52 16, 56 32, 60 48" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
-          <path d="M4 56 C 24 56, 28 24, 40 24 C 50 24, 54 38, 60 56" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+          <path d="M4 48 C 20 48, 24 16, 40 16 C 52 16, 56 32, 60 48" fill="none" stroke="currentColor" stroke-width="4"
+            stroke-linecap="round" />
+          <path d="M4 56 C 24 56, 28 24, 40 24 C 50 24, 54 38, 60 56" fill="none" stroke="currentColor" stroke-width="4"
+            stroke-linecap="round" />
           <!-- Soportes -->
-          <line x1="16" y1="42" x2="16" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-          <line x1="32" y1="20" x2="32" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-          <line x1="48" y1="24" x2="48" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-          <line x1="24" y1="28" x2="16" y2="60" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
-          <line x1="40" y1="16" x2="32" y2="60" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+          <line x1="16" y1="42" x2="16" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+          <line x1="32" y1="20" x2="32" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+          <line x1="48" y1="24" x2="48" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+          <line x1="24" y1="28" x2="16" y2="60" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            opacity="0.6" />
+          <line x1="40" y1="16" x2="32" y2="60" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            opacity="0.6" />
           <!-- Vagón -->
-          <rect x="23" y="10" width="10" height="6" rx="2" fill="currentColor"/>
-          <circle cx="25" cy="18" r="2" fill="currentColor"/>
-          <circle cx="31" cy="18" r="2" fill="currentColor"/>
+          <rect x="23" y="10" width="10" height="6" rx="2" fill="currentColor" />
+          <circle cx="25" cy="18" r="2" fill="currentColor" />
+          <circle cx="31" cy="18" r="2" fill="currentColor" />
           <!-- Vagón 2 -->
-          <rect x="11" y="24" width="10" height="6" rx="2" fill="currentColor" transform="rotate(-40 16 27)"/>
+          <rect x="11" y="24" width="10" height="6" rx="2" fill="currentColor" transform="rotate(-40 16 27)" />
         </svg>
         <span class="rcw-brand-text">RollerCoaster<span class="rcw-brand-accent">World</span></span>
       </a>
@@ -171,8 +178,7 @@ header("Expires: 0"); // Proxies
 
           <!-- Coasters -->
           <li class="nav-item dropdown custom-dropdown">
-            <a class="nav-link rcw-nav-pill dropdown-toggle" href="#" role="button"
-              data-bs-toggle="dropdown">
+            <a class="nav-link rcw-nav-pill dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
               Coasters
             </a>
             <ul class="dropdown-menu shadow border-0">
@@ -189,22 +195,23 @@ header("Expires: 0"); // Proxies
 
           <!-- Parques -->
           <li class="nav-item dropdown custom-dropdown">
-            <a class="nav-link rcw-nav-pill dropdown-toggle" href="#" role="button"
-              data-bs-toggle="dropdown">
+            <a class="nav-link rcw-nav-pill dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
               Parques
             </a>
             <ul class="dropdown-menu shadow border-0">
-              <li><a class="dropdown-item py-2" href="<?= Router::url('park_search') ?>"><i
-                    class="fa-solid fa-magnifying-glass w-20px text-center me-2 text-primary"></i> Buscar</a></li>
-              <li><a class="dropdown-item py-2" href="<?= Router::url('park_tops') ?>"><i
-                    class="fa-solid fa-trophy w-20px text-center me-2 text-info"></i> Tops Usuarios</a></li>
+              <li><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('park_search') ?>"><i
+                    class="fa-solid fa-magnifying-glass w-20px text-center me-2 text-primary"></i> Buscar Parque</a>
+              </li>
+              <li><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('park_tops') ?>?filter=global"><i
+                    class="fa-solid fa-earth-europe w-20px text-center me-2 text-success"></i> Ranking Global</a></li>
+              <li><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('park_tops') ?>?filter=users"><i
+                    class="fa-solid fa-users w-20px text-center me-2 text-info"></i> Top Usuarios</a></li>
             </ul>
           </li>
 
           <!-- Foros -->
           <li class="nav-item dropdown custom-dropdown">
-            <a class="nav-link rcw-nav-pill dropdown-toggle" href="#" role="button"
-              data-bs-toggle="dropdown">
+            <a class="nav-link rcw-nav-pill dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
               <i class="fa-solid fa-comments me-1"></i> Foros
             </a>
             <ul class="dropdown-menu shadow border-0">
@@ -216,15 +223,15 @@ header("Expires: 0"); // Proxies
           <!-- Viajes -->
           <?php if ($is_logged): ?>
             <li class="nav-item dropdown custom-dropdown">
-              <a class="nav-link rcw-nav-pill dropdown-toggle" href="#" role="button"
-                data-bs-toggle="dropdown">
+              <a class="nav-link rcw-nav-pill dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                 <i class="fa-solid fa-suitcase-rolling me-1"></i> Viajes
               </a>
               <ul class="dropdown-menu shadow border-0">
                 <li><a class="dropdown-item py-2" href="<?= Router::url('trips') ?>"><i
                       class="fa-solid fa-suitcase w-20px text-center me-2 text-warning"></i> Mis viajes</a></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('trip_generator') ?>"><i
-                      class="fa-solid fa-wand-magic-sparkles w-20px text-center me-2 text-danger"></i> Generador de viajes</a></li>
+                      class="fa-solid fa-wand-magic-sparkles w-20px text-center me-2 text-danger"></i> Generador de
+                    viajes</a></li>
               </ul>
             </li>
           <?php endif; ?>
@@ -235,22 +242,17 @@ header("Expires: 0"); // Proxies
               <a class="nav-link rcw-nav-pill dropdown-toggle position-relative" href="#" role="button"
                 data-bs-toggle="dropdown">
                 <i class="fa-solid fa-users me-1"></i> Comunidad
-                <span id="nav-comm-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" style="font-size: 0.65rem; padding: 0.35em 0.5em;">0</span>
+                <span id="nav-comm-badge"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
+                  style="font-size: 0.65rem; padding: 0.35em 0.5em;">0</span>
               </a>
-              <ul class="dropdown-menu shadow border-0" style="min-width: 320px;">
-                <li class="px-3 py-2">
-                  <div class="input-group input-group-sm rounded-pill overflow-hidden border border-success border-opacity-50">
-                    <span class="input-group-text bg-transparent border-0 text-muted ps-3"><i class="fa-solid fa-search"></i></span>
-                    <input type="text" id="nav-user-search" class="form-control border-0 shadow-none bg-transparent" placeholder="Buscar usuarios...">
-                  </div>
+              <ul class="dropdown-menu shadow border-0">
+                <li><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('user_search') ?>"><i
+                      class="fa-solid fa-magnifying-glass w-20px text-center me-2 text-primary"></i> Buscar usuarios</a>
                 </li>
-                <li><hr class="dropdown-divider"></li>
-                <div id="nav-user-search-results" style="max-height: 250px; overflow-y: auto;" class="px-2">
-                   <!-- Results injected via JS -->
-                   <div class="text-center text-muted small py-3"><i class="fa-solid fa-magnifying-glass mb-2 d-block fa-2x opacity-25"></i>Busca a otros fans...</div>
-                </div>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item py-2 fw-semibold text-center text-success" href="<?= Router::url('friends') ?>"><i class="fa-solid fa-user-group me-1"></i> Gestionar mis Amistades</a></li>
+                <li><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('friends') ?>"><i 
+                      class="fa-solid fa-user-group w-20px text-center me-2 text-success"></i> Amistades</a>
+                </li>
               </ul>
             </li>
           <?php endif; ?>
@@ -284,7 +286,9 @@ header("Expires: 0"); // Proxies
                         class="fa-solid fa-chart-line w-20px text-center me-2 text-primary"></i> Dashboard</a></li>
                   <li><a class="dropdown-item py-2" href="<?= Router::url('admin_users') ?>"><i
                         class="fa-solid fa-users w-20px text-center me-2 text-primary"></i> Usuarios</a></li>
-                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <hr class="dropdown-divider">
+                  </li>
                   <li><a class="dropdown-item py-2" href="<?= Router::url('admin_coasters') ?>"><i
                         class="fa-solid fa-train-tram w-20px text-center me-2 text-success"></i> Coasters</a></li>
                   <li><a class="dropdown-item py-2" href="<?= Router::url('admin_parks') ?>"><i
@@ -293,7 +297,9 @@ header("Expires: 0"); // Proxies
                         class="fa-solid fa-comments w-20px text-center me-2 text-success"></i> Foros</a></li>
                   <li><a class="dropdown-item py-2" href="<?= Router::url('admin_news') ?>"><i
                         class="fa-solid fa-newspaper w-20px text-center me-2 text-success"></i> Noticias</a></li>
-                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <hr class="dropdown-divider">
+                  </li>
                   <li><a class="dropdown-item py-2" href="<?= Router::url('admin_messages') ?>"><i
                         class="fa-solid fa-envelope w-20px text-center me-2 text-warning"></i> Mensajes</a></li>
                   <li><a class="dropdown-item py-2" href="<?= Router::url('admin_photos') ?>"><i
@@ -308,26 +314,41 @@ header("Expires: 0"); // Proxies
 
             <!-- Avatar + Perfil dropdown -->
             <div class="nav-item dropdown custom-dropdown">
-              <a class="d-flex align-items-center gap-2 rcw-user-trigger text-decoration-none dropdown-toggle"
-                href="#" role="button" data-bs-toggle="dropdown">
+              <a class="d-flex align-items-center gap-2 rcw-user-trigger text-decoration-none dropdown-toggle" href="#"
+                role="button" data-bs-toggle="dropdown">
                 <div class="rcw-user-avatar" id="header-avatar">
-                  <?php if (!empty($_SESSION['profile_image'])): ?>
-                    <img src="<?= htmlspecialchars($_SESSION['profile_image']) ?>" alt="Avatar"
-                      style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                  <?php
+                  $sessionImg = $_SESSION['profile_image'] ?? '';
+                  // Si es una ruta de upload local (/web/img/uploads/...) solo existe
+                  // en la máquina que la subió → no mostrar imagen rota, usar iniciales
+                  $isLocalUpload = !empty($sessionImg) && strpos($sessionImg, '/web/img/uploads/') !== false;
+                  $showImg = !empty($sessionImg) && !$isLocalUpload;
+                  ?>
+                  <?php if ($showImg): ?>
+                    <img src="<?= htmlspecialchars($sessionImg) ?>" alt="Avatar"
+                      style="width:100%;height:100%;object-fit:cover;border-radius:50%;"
+                      onerror="this.style.display='none';this.parentElement.innerHTML='<span><?= htmlspecialchars($user_initials) ?></span>'">
                   <?php else: ?>
                     <span><?= htmlspecialchars($user_initials) ?></span>
                   <?php endif; ?>
                 </div>
-                <span class="rcw-user-name d-none d-xl-inline" id="header-username-display"><?= htmlspecialchars(ucfirst($user_display)) ?></span>
+                <span class="rcw-user-name d-none d-xl-inline"
+                  id="header-username-display"><?= htmlspecialchars(ucfirst($user_display)) ?></span>
               </a>
               <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                 <li>
                   <div class="rcw-dropdown-header px-3 py-2">
-                    <div class="fw-semibold" id="header-dropdown-name" style="color: var(--rcw-text-primary);"><?= htmlspecialchars(ucfirst($user_display)) ?></div>
-                    <div class="small" style="color: var(--rcw-text-muted);"><?= htmlspecialchars($_SESSION['user_email'] ?? '') ?></div>
+                    <div class="fw-semibold" id="header-dropdown-name" style="color: var(--rcw-text-primary);">
+                    
+                      <?= htmlspecialchars(ucfirst($user_display)) ?></div>
+
+                                        <div class="small" style="color: var(--rcw-text-muted);">
+                      <?= htmlspecialchars($_SESSION['user_email'] ?? '') ?></div>
                   </div>
                 </li>
-                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('profile') ?>"><i
                       class="fa-solid fa-id-card w-20px text-center me-2 text-secondary"></i> Mi perfil</a></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('profile') ?>#tops"><i
@@ -336,21 +357,22 @@ header("Expires: 0"); // Proxies
                       class="fa-solid fa-cart-shopping w-20px text-center me-2 text-success"></i> Carrito</a></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('orders') ?>"><i
                       class="fa-solid fa-box w-20px text-center me-2 text-info"></i> Mis pedidos</a></li>
-                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
                 <li><a class="dropdown-item py-2 text-danger signOutBtn" href="#"><i
                       class="fa-solid fa-arrow-right-from-bracket w-20px text-center me-2"></i> Cerrar sesión</a></li>
-              </ul>
-            </div>
+                </ul>
+              </div>
 
-          <?php else: ?>
-
+        <?php else: ?>
             <!-- Login / Registro -->
             <a class="nav-link rcw-btn-login" href="<?= Router::url('login') ?>">
               <i class="fa-solid fa-right-to-bracket me-1"></i> Login
             </a>
             <a class="nav-link rcw-btn-register" href="<?= Router::url('register') ?>">
-              Registro
-            </a>
+                Registro
+              </a>
 
           <?php endif; ?>
 

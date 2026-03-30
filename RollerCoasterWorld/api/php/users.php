@@ -9,7 +9,8 @@ header('Content-Type: application/json');
 
 $db = null;
 
-function getDb() {
+function getDb()
+{
     global $db;
     if ($db === null) {
         $db = new DBConexion();
@@ -30,36 +31,38 @@ $router->dispatch();
 
 function getUserId(): ?int
 {
-    if (isset($_SESSION['user_id'])) return (int)$_SESSION['user_id'];
+    if (isset($_SESSION['user_id']))
+        return (int) $_SESSION['user_id'];
     if (isset($_SESSION['firebase_uid'])) {
         $db = getDb();
         $stmt = $db->prepare("SELECT id FROM users WHERE firebase_uid = :uid LIMIT 1");
         $stmt->execute([':uid' => $_SESSION['firebase_uid']]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
-            $_SESSION['user_id'] = (int)$row['id'];
-            return (int)$row['id'];
+            $_SESSION['user_id'] = (int) $row['id'];
+            return (int) $row['id'];
         }
     }
     return null;
 }
 
-function searchUsers() {
+function searchUsers()
+{
     $db = getDb();
     $current_user_id = getUserId();
     if (!$current_user_id) {
         Response::error("No autorizado", 401);
     }
-    
+
     $q = $_GET['q'] ?? '';
-    
+
     if (empty($q)) {
         Response::success(['data' => []]);
     }
-    
+
     try {
         $stmt = $db->prepare("
-            SELECT u.id, u.username, u.profile_image, 
+            SELECT u.id, u.username, u.full_name, u.city, u.country, u.profile_image, 
                    f.estado_solicitud,
                    f.solicitante_id,
                    f.solicitada_id
@@ -68,7 +71,7 @@ function searchUsers() {
                 (f.solicitante_id = u.id AND f.solicitada_id = :cid) 
                 OR 
                 (f.solicitante_id = :cid AND f.solicitada_id = u.id)
-            WHERE u.id != :cid AND u.username ILIKE :q
+            WHERE u.id != :cid AND (u.username ILIKE :q OR u.full_name ILIKE :q)
             ORDER BY u.username ASC
             LIMIT 10
         ");
@@ -76,11 +79,11 @@ function searchUsers() {
             ':cid' => $current_user_id,
             ':q' => '%' . $q . '%'
         ]);
-        
+
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         // Formatear resultados
-        $data = array_map(function($row) use ($current_user_id) {
+        $data = array_map(function ($row) use ($current_user_id) {
             $status = 'none';
             if ($row['estado_solicitud'] === 'PENDIENTE') {
                 if ($row['solicitante_id'] == $current_user_id) {
@@ -91,38 +94,44 @@ function searchUsers() {
             } else if ($row['estado_solicitud'] === 'ACEPTADA') {
                 $status = 'accepted';
             }
-            
+
             return [
                 'id' => $row['id'],
                 'username' => $row['username'],
+                'full_name' => $row['full_name'],
+                'city' => $row['city'],
+                'country' => $row['country'],
                 'profile_image' => $row['profile_image'],
                 'friendship_status' => $status
             ];
         }, $results);
-        
+
         Response::success(['data' => $data]);
     } catch (Exception $e) {
         Response::error("Error en servidor", 500);
     }
 }
 
-function sendFriendRequest() {
+function sendFriendRequest()
+{
     $db = getDb();
     $current_user_id = getUserId();
-    if (!$current_user_id) Response::error("No autorizado", 401);
-    
+    if (!$current_user_id)
+        Response::error("No autorizado", 401);
+
     $data = json_decode(file_get_contents('php://input'), true) ?? $_POST;
     $target_id = $data['target_id'] ?? null;
-    
-    if (!$target_id || $target_id == $current_user_id) Response::error("ID inválido");
-    
+
+    if (!$target_id || $target_id == $current_user_id)
+        Response::error("ID inválido");
+
     try {
         $stmt = $db->prepare("SELECT id FROM friendship WHERE (solicitante_id = ? AND solicitada_id = ?) OR (solicitante_id = ? AND solicitada_id = ?)");
         $stmt->execute([$current_user_id, $target_id, $target_id, $current_user_id]);
         if ($stmt->fetch()) {
             Response::error("Ya existe una relación o solicitud con este usuario");
         }
-        
+
         $stmt = $db->prepare("INSERT INTO friendship (estado_solicitud, solicitante_id, solicitada_id, created_at) VALUES ('PENDIENTE', ?, ?, NOW())");
         $stmt->execute([$current_user_id, $target_id]);
         Response::success(['message' => 'Solicitud enviada']);
@@ -131,16 +140,19 @@ function sendFriendRequest() {
     }
 }
 
-function acceptFriendRequest() {
+function acceptFriendRequest()
+{
     $db = getDb();
     $current_user_id = getUserId();
-    if (!$current_user_id) Response::error("No autorizado", 401);
-    
+    if (!$current_user_id)
+        Response::error("No autorizado", 401);
+
     $data = json_decode(file_get_contents('php://input'), true) ?? $_POST;
     $target_id = $data['target_id'] ?? null;
-    
-    if (!$target_id) Response::error("ID inválido");
-    
+
+    if (!$target_id)
+        Response::error("ID inválido");
+
     try {
         $stmt = $db->prepare("UPDATE friendship SET estado_solicitud = 'ACEPTADA', accepted_at = NOW() WHERE solicitante_id = ? AND solicitada_id = ? AND estado_solicitud = 'PENDIENTE'");
         $stmt->execute([$target_id, $current_user_id]); // Target was the sender
@@ -150,16 +162,19 @@ function acceptFriendRequest() {
     }
 }
 
-function rejectOrRemoveFriend() {
+function rejectOrRemoveFriend()
+{
     $db = getDb();
     $current_user_id = getUserId();
-    if (!$current_user_id) Response::error("No autorizado", 401);
-    
+    if (!$current_user_id)
+        Response::error("No autorizado", 401);
+
     $data = json_decode(file_get_contents('php://input'), true) ?? $_POST;
     $target_id = $data['target_id'] ?? null;
-    
-    if (!$target_id) Response::error("ID inválido");
-    
+
+    if (!$target_id)
+        Response::error("ID inválido");
+
     try {
         $stmt = $db->prepare("DELETE FROM friendship WHERE (solicitante_id = ? AND solicitada_id = ?) OR (solicitante_id = ? AND solicitada_id = ?)");
         $stmt->execute([$current_user_id, $target_id, $target_id, $current_user_id]);
@@ -169,11 +184,13 @@ function rejectOrRemoveFriend() {
     }
 }
 
-function getFriendsData() {
+function getFriendsData()
+{
     $db = getDb();
     $current_user_id = getUserId();
-    if (!$current_user_id) Response::error("No autorizado", 401);
-    
+    if (!$current_user_id)
+        Response::error("No autorizado", 401);
+
     try {
         // Amigos aceptados
         $stmt = $db->prepare("
@@ -184,7 +201,7 @@ function getFriendsData() {
         ");
         $stmt->execute([':uid' => $current_user_id]);
         $friends = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         // Solicitudes recibidas
         $stmt = $db->prepare("
             SELECT u.id, u.username, u.profile_image, f.created_at
@@ -194,7 +211,7 @@ function getFriendsData() {
         ");
         $stmt->execute([':uid' => $current_user_id]);
         $received = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         // Solicitudes enviadas
         $stmt = $db->prepare("
             SELECT u.id, u.username, u.profile_image, f.created_at
@@ -204,7 +221,7 @@ function getFriendsData() {
         ");
         $stmt->execute([':uid' => $current_user_id]);
         $sent = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         Response::success([
             'data' => [
                 'friends' => $friends,
@@ -217,21 +234,30 @@ function getFriendsData() {
     }
 }
 
-function getPublicProfile() {
+function getPublicProfile()
+{
     $db = getDb();
     $target_id = $_GET['id'] ?? null;
     $current_user_id = getUserId();
-    
-    if (!$target_id) Response::error("ID de usuario no especificado");
-    
+
+    if (!$target_id)
+        Response::error("ID de usuario no especificado");
+
     try {
         // Datos básicos del usuario
-        $stmt = $db->prepare("SELECT id, username, profile_image, city, country, favorite_coaster, home_park, created_at FROM users WHERE id = :tid");
+        $stmt = $db->prepare("SELECT id, username, profile_image, city, country, home_park, created_at FROM users WHERE id = :tid");
         $stmt->execute([':tid' => $target_id]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if (!$user) Response::notFound("Usuario no encontrado");
-        
+
+        if (!$user)
+            Response::notFound("Usuario no encontrado");
+
+        // Coaster favorita (Top 1)
+        $stmtFC = $db->prepare("SELECT c.coaster_name FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :tid AND uc.rank_position > 0 ORDER BY uc.rank_position ASC LIMIT 1");
+        $stmtFC->execute([':tid' => $target_id]);
+        $fav_coaster = $stmtFC->fetchColumn();
+        $user['favorite_coaster'] = $fav_coaster ?: null;
+
         // Estado de amistad con el visor
         $friendship = null;
         if ($current_user_id && $current_user_id != $target_id) {
@@ -248,40 +274,182 @@ function getPublicProfile() {
                 $friendship = 'none';
             }
         }
-        
+
         // Estadísticas básicas (Coasters y Parques)
         $stmtC = $db->prepare("SELECT COUNT(*) FROM user_credits WHERE user_id = :tid");
         $stmtC->execute([':tid' => $target_id]);
         $coasters_count = $stmtC->fetchColumn();
-        
-        $stmtP = $db->prepare("SELECT COUNT(DISTINCT c.park_id) FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :tid");
+
+        // Parques Visitados (Unión de parques con coasters subidas y parques rankeados)
+        $stmtP = $db->prepare("
+            SELECT COUNT(*) FROM (
+                SELECT park_id FROM user_park_credits WHERE user_id = :tid
+                UNION
+                SELECT c.park_id FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :tid
+            ) as distinct_parks
+        ");
         $stmtP->execute([':tid' => $target_id]);
-        $parks_count = $stmtP->fetchColumn();
-        
-        // Top 5 Parques del usuario
+        $parks_count = $stmtP->fetchColumn() ?: 0;
+
+        // Países visitados basados en esa misma unión de parques
+        $stmtCtryCount = $db->prepare("
+            SELECT COUNT(DISTINCT park_country) FROM parks WHERE id IN (
+                SELECT park_id FROM user_park_credits WHERE user_id = :tid
+                UNION
+                SELECT c.park_id FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :tid
+            )
+        ");
+        $stmtCtryCount->execute([':tid' => $target_id]);
+        $countries_count = $stmtCtryCount->fetchColumn() ?: 0;
+
+        $stmtFriends = $db->prepare("SELECT COUNT(*) FROM friendship WHERE (solicitante_id = :tid OR solicitada_id = :tid) AND estado_solicitud = 'ACEPTADA'");
+        $stmtFriends->execute([':tid' => $target_id]);
+        $friends_count = $stmtFriends->fetchColumn() ?: 0;
+
+        $stmtPhotosCount = $db->prepare("SELECT COUNT(*) FROM coaster_photos WHERE user_id = :tid AND status != 'rejected'");
+        $stmtPhotosCount->execute([':tid' => $target_id]);
+        $photos_count = $stmtPhotosCount->fetchColumn() ?: 0;
+
+        // Top Parques del usuario (ranked explicitly)
         $stmtTop = $db->prepare("
             SELECT up.rank_position, p.id, p.park_name, p.park_country, p.imagen_url
             FROM user_park_credits up
             JOIN parks p ON up.park_id = p.id
-            WHERE up.user_id = :tid
+            WHERE up.user_id = :tid AND up.rank_position > 0
             ORDER BY up.rank_position ASC
-            LIMIT 5
         ");
         $stmtTop->execute([':tid' => $target_id]);
         $top_parks = $stmtTop->fetchAll(PDO::FETCH_ASSOC);
+
+        // Fallback: Buscar parques en sus coasters si el usuario no los ha rankeado
+        if (empty($top_parks)) {
+            $stmtFallback = $db->prepare("
+                SELECT ROW_NUMBER() OVER (ORDER BY p.park_name ASC) as rank_position,
+                       p.id, p.park_name, p.park_country, p.imagen_url
+                FROM (
+                    SELECT DISTINCT c.park_id 
+                    FROM user_credits uc 
+                    JOIN coasters c ON uc.coaster_id = c.id 
+                    WHERE uc.user_id = :tid
+                ) ucp
+                JOIN parks p ON ucp.park_id = p.id
+                ORDER BY p.park_name ASC
+                LIMIT 5
+            ");
+            $stmtFallback->execute([':tid' => $target_id]);
+            $top_parks = $stmtFallback->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        // Top Coasters del usuario
+        $stmtTopCoasters = $db->prepare("
+            SELECT uc.rank_position, c.id, c.coaster_name, c.coaster_manufacter as manufacturer, p.park_name as location, p.park_country, c.imagen_url
+            FROM user_credits uc 
+            JOIN coasters c ON uc.coaster_id = c.id 
+            JOIN parks p ON c.park_id = p.id
+            WHERE uc.user_id = :tid AND uc.rank_position > 0
+            ORDER BY uc.rank_position ASC
+        ");
+        $stmtTopCoasters->execute([':tid' => $target_id]);
+        $top_coasters = $stmtTopCoasters->fetchAll(PDO::FETCH_ASSOC);
+
+        // Fallback para coasters: Si no hay, extraer hasta 5 aleatorias de sus credits list
+        if (empty($top_coasters)) {
+            $stmtFallCoasters = $db->prepare("
+                SELECT ROW_NUMBER() OVER (ORDER BY c.coaster_name ASC) as rank_position,
+                       c.id, c.coaster_name, c.coaster_manufacter as manufacturer, p.park_name as location, p.park_country, c.imagen_url
+                FROM user_credits uc
+                JOIN coasters c ON uc.coaster_id = c.id
+                JOIN parks p ON c.park_id = p.id
+                WHERE uc.user_id = :tid
+                ORDER BY c.coaster_name ASC
+                LIMIT 5
+            ");
+            $stmtFallCoasters->execute([':tid' => $target_id]);
+            $top_coasters = $stmtFallCoasters->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        // Estadísticas Técnicas Acumuladas
+        $stmtTech = $db->prepare("
+            SELECT 
+                COALESCE(SUM(c.inversions), 0) as total_inversions,
+                COALESCE(SUM(c.height), 0) as total_height,
+                COUNT(DISTINCT c.coaster_manufacter) as total_manufacturers
+            FROM user_credits uc
+            JOIN coasters c ON uc.coaster_id = c.id
+            WHERE uc.user_id = :tid
+        ");
+        $stmtTech->execute([':tid' => $target_id]);
+        $tech_stats = $stmtTech->fetch(PDO::FETCH_ASSOC);
+
+        // Más rápida
+        $stmtFastest = $db->prepare("SELECT c.coaster_name FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :tid AND c.speed IS NOT NULL ORDER BY c.speed DESC LIMIT 1");
+        $stmtFastest->execute([':tid' => $target_id]);
+        $tech_stats['fastest_coaster'] = $stmtFastest->fetchColumn() ?: '—';
         
+        // Más larga
+        $stmtLongest = $db->prepare("SELECT c.coaster_name FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :tid AND c.coaster_length IS NOT NULL ORDER BY c.coaster_length DESC LIMIT 1");
+        $stmtLongest->execute([':tid' => $target_id]);
+        $tech_stats['longest_coaster'] = $stmtLongest->fetchColumn() ?: '—';
+
+        // Fabricante más probado
+        $stmtMan = $db->prepare("
+            SELECT c.coaster_manufacter as manufacturer, COUNT(uc.coaster_id) as rides
+            FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id
+            WHERE uc.user_id = :tid AND c.coaster_manufacter IS NOT NULL AND c.coaster_manufacter != '' AND c.coaster_manufacter != 'Unknown'
+            GROUP BY c.coaster_manufacter ORDER BY rides DESC LIMIT 1
+        ");
+        $stmtMan->execute([':tid' => $target_id]);
+        $most_ridden_manu = $stmtMan->fetchColumn() ?: 'Ninguno';
+        $tech_stats['favorite_manufacturer'] = $most_ridden_manu;
+
+        // País más visitado
+        $stmtCtry = $db->prepare("
+            SELECT p.park_country 
+            FROM parks p 
+            JOIN (
+                SELECT park_id FROM user_park_credits WHERE user_id = :tid
+                UNION
+                SELECT c.park_id FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :tid
+            ) dp ON p.id = dp.park_id
+            WHERE p.park_country IS NOT NULL AND p.park_country != ''
+            GROUP BY p.park_country 
+            ORDER BY COUNT(dp.park_id) DESC 
+            LIMIT 1
+        ");
+        $stmtCtry->execute([':tid' => $target_id]);
+        $most_visited_country = $stmtCtry->fetchColumn() ?: 'Ninguno';
+        $tech_stats['most_visited_country'] = $most_visited_country;
+
+        // Fotos del usuario
+        $stmtPhotos = $db->prepare("
+            SELECT cp.id, cp.photo_url, cp.caption, c.coaster_name, p.park_name 
+            FROM coaster_photos cp 
+            JOIN coasters c ON cp.coaster_id = c.id 
+            JOIN parks p ON c.park_id = p.id
+            WHERE cp.user_id = :tid AND cp.status != 'rejected'
+            ORDER BY cp.created_at DESC
+        ");
+        $stmtPhotos->execute([':tid' => $target_id]);
+        $user_photos = $stmtPhotos->fetchAll(PDO::FETCH_ASSOC);
+
         Response::success([
             'data' => [
                 'user' => $user,
                 'friendship_status' => $friendship,
                 'stats' => [
                     'coasters' => $coasters_count,
-                    'parks' => $parks_count
+                    'parks' => $parks_count,
+                    'countries' => $countries_count,
+                    'friends' => $friends_count,
+                    'photos' => $photos_count
                 ],
-                'top_parks' => $top_parks
+                'tech_stats' => $tech_stats,
+                'top_parks' => $top_parks,
+                'top_coasters' => $top_coasters,
+                'photos' => $user_photos
             ]
         ]);
-        
+
     } catch (Exception $e) {
         Response::error("Error cargando perfil: " . $e->getMessage(), 500);
     }

@@ -672,7 +672,7 @@ $(document).ready(function () {
           const coasterNameEl = document.getElementById("coaster-name");
           const coasterName = coasterNameEl ? coasterNameEl.textContent : "";
 
-          data.photos.forEach((photo) => {
+          data.photos.forEach((photo, index) => {
             const hasLiked = localStorage.getItem("liked_photo_" + photo.id) === "true";
             const heartClass = hasLiked ? "fa-solid text-danger" : "fa-regular";
             
@@ -683,9 +683,10 @@ $(document).ready(function () {
                   <div class="photo-square-container position-relative overflow-hidden w-100" 
                        style="padding-bottom: 100%; border-radius: 8px; cursor: pointer;"
                        data-id="${photo.id}"
+                       data-index="${index}"
                        data-url="${photo.photo_url}"
                        data-username="${photo.username}"
-                       data-avatar="${photo.profile_image || 'https://placehold.co/40x40'}"
+                       data-avatar="${window.rcwGetAvatarPath(photo.profile_image, photo.username)}"
                        data-caption="${photo.caption || ''}"
                        data-likes="${photo.likes || 0}">
                       <img src="${photo.photo_url}" alt="${photo.caption || "Foto"}" class="position-absolute w-100 h-100" style="object-fit: cover; top:0; left:0; transition: transform 0.3s ease;">
@@ -707,38 +708,97 @@ $(document).ready(function () {
     }
 
     // Handlers para Lightbox IG y Likes
+    let currentPhotoIndex = 0;
+
+    function updateModalContent(index) {
+        const allPhotosList = $(".photo-square-container");
+        if (index < 0 || index >= allPhotosList.length) return;
+        currentPhotoIndex = index;
+        const el = $(allPhotosList[index]);
+
+        const id = el.data("id");
+        const url = el.data("url");
+        const username = el.data("username");
+        const avatar = el.data("avatar");
+        const caption = el.data("caption");
+        const likes = el.data("likes");
+        const hasLiked = localStorage.getItem("liked_photo_" + id) === "true";
+
+        $("#ig-modal-img").attr("src", url);
+        $("#ig-modal-avatar").attr("src", avatar);
+        $("#ig-modal-username").text(username);
+        
+        if (caption) {
+          $("#ig-modal-caption-user").text(username);
+          $("#ig-modal-caption").html(`<span class="text-muted opacity-50 mx-1">&bull;</span> ${caption}`);
+        } else {
+          $("#ig-modal-caption-user").text("");
+          $("#ig-modal-caption").text("");
+        }
+
+        $("#ig-modal-likes").text(likes + " me gusta");
+        
+        const btn = $("#ig-modal-like-btn");
+        btn.data("id", id);
+        if (hasLiked) {
+          btn.html('<i class="fa-solid fa-heart text-danger"></i>');
+        } else {
+          btn.html('<i class="fa-regular fa-heart"></i>');
+        }
+
+        $("#ig-modal-prev").toggle(index > 0);
+        $("#ig-modal-next").toggle(index < allPhotosList.length - 1);
+    }
+
     $("#photos-grid").on("click", ".photo-square-container", function() {
-      const id = $(this).data("id");
-      const url = $(this).data("url");
-      const username = $(this).data("username");
-      const avatar = $(this).data("avatar");
-      const caption = $(this).data("caption");
-      const likes = $(this).data("likes");
-      const hasLiked = localStorage.getItem("liked_photo_" + id) === "true";
-
-      $("#ig-modal-img").attr("src", url);
-      $("#ig-modal-avatar").attr("src", avatar);
-      $("#ig-modal-username").text(username);
-      
-      if (caption) {
-        $("#ig-modal-caption-user").text(username);
-        $("#ig-modal-caption").html(`<span class="text-muted opacity-50 mx-1">&bull;</span> ${caption}`);
+      const index = $(this).data("index");
+      // Fallback in case index is not present (although we added it above)
+      if (index !== undefined) {
+          updateModalContent(index);
       } else {
-        $("#ig-modal-caption-user").text("");
-        $("#ig-modal-caption").text("");
-      }
+          // Backward compatibility behavior if needed, but it should be set
+          const id = $(this).data("id");
+          const url = $(this).data("url");
+          const username = $(this).data("username");
+          const avatar = $(this).data("avatar");
+          const caption = $(this).data("caption");
+          const likes = $(this).data("likes");
+          const hasLiked = localStorage.getItem("liked_photo_" + id) === "true";
 
-      $("#ig-modal-likes").text(likes + " me gusta");
-      
-      const btn = $("#ig-modal-like-btn");
-      btn.data("id", id);
-      if (hasLiked) {
-        btn.html('<i class="fa-solid fa-heart text-danger"></i>');
-      } else {
-        btn.html('<i class="fa-regular fa-heart"></i>');
+          $("#ig-modal-img").attr("src", url);
+          $("#ig-modal-avatar").attr("src", avatar);
+          $("#ig-modal-username").text(username);
+          
+          if (caption) {
+            $("#ig-modal-caption-user").text(username);
+            $("#ig-modal-caption").html(`<span class="text-muted opacity-50 mx-1">&bull;</span> ${caption}`);
+          } else {
+            $("#ig-modal-caption-user").text("");
+            $("#ig-modal-caption").text("");
+          }
+
+          $("#ig-modal-likes").text(likes + " me gusta");
+          
+          const btn = $("#ig-modal-like-btn");
+          btn.data("id", id);
+          if (hasLiked) {
+            btn.html('<i class="fa-solid fa-heart text-danger"></i>');
+          } else {
+            btn.html('<i class="fa-regular fa-heart"></i>');
+          }
+          $("#ig-modal-prev").hide();
+          $("#ig-modal-next").hide();
       }
 
       new bootstrap.Modal(document.getElementById("ig-lightbox-modal")).show();
+    });
+
+    $("#ig-modal-prev").off("click").on("click", function() {
+        updateModalContent(currentPhotoIndex - 1);
+    });
+
+    $("#ig-modal-next").off("click").on("click", function() {
+        updateModalContent(currentPhotoIndex + 1);
     });
 
     $("#ig-modal-like-btn").on("click", async function() {
@@ -851,7 +911,7 @@ $(document).ready(function () {
             $("#reviews-list").append(
               `<div class="border-bottom pb-3 mb-3">
               <div class="d-flex align-items-center gap-2 mb-1">
-                <img src="${review.profile_image || "https://placehold.co/40x40"}" alt="${review.username}" class="review-avatar" style="width:40px;height:40px;object-fit:cover;border-radius:50%;">
+                <img src="${window.rcwGetAvatarPath(review.profile_image, review.username)}" alt="${review.username}" class="review-avatar" style="width:40px;height:40px;object-fit:cover;border-radius:50%;">
                 <strong>${review.username}</strong>
                 <span class="stars-display ms-2">${renderStars(review.note)}</span>
                 <span class="text-muted small ms-2">• ${timeAgo(review.created_at)}</span>

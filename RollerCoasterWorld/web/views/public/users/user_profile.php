@@ -8,101 +8,280 @@ $user_id = $_GET['id'] ?? null;
 
 <link rel="stylesheet" href="<?= $base_url ?>/web/css/profile.css">
 
-<main class="container-fluid px-lg-5 my-5" id="profile-content" style="display: none;">
-    <!-- Hero Section / Header -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card profile-card overflow-hidden border-0 shadow-lg">
-                <div class="card-body p-0">
-                    <div class="row g-0">
-                        <div class="col-md-4 bg-dark d-flex align-items-center justify-content-center py-5 border-end border-success border-opacity-10 position-relative">
-                            <div class="text-center">
-                                <div class="avatar-circle mb-3" id="user-avatar">?</div>
-                                <h3 class="fw-bold text-white mb-1" id="user-username">---</h3>
-                                <p class="text-success small fw-bold mb-3" id="user-location">
-                                    <i class="fa-solid fa-location-dot me-1"></i> <span>Ubicación desconocida</span>
-                                </p>
-                                <div id="friendship-action-container">
-                                    <!-- Botón de amistad inyectado via JS -->
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-8 bg-dark bg-opacity-50 p-4 p-lg-5">
-                            <div class="row g-4">
-                                <div class="col-6 col-sm-3 text-center border-end border-secondary border-opacity-25">
-                                    <div class="h3 fw-bold text-success mb-0" id="stat-coasters">0</div>
-                                    <div class="small text-muted text-uppercase fw-bold ls-1">Coasters</div>
-                                </div>
-                                <div class="col-6 col-sm-3 text-center border-end border-secondary border-opacity-25">
-                                    <div class="h3 fw-bold text-success mb-0" id="stat-parks">0</div>
-                                    <div class="small text-muted text-uppercase fw-bold ls-1">Parques</div>
-                                </div>
-                                <div class="col-12 col-sm-6 ps-md-4">
-                                    <div class="mb-3">
-                                        <label class="form-label text-white opacity-50 small mb-1">Coaster Favorita</label>
-                                        <div class="d-flex align-items-center">
-                                            <i class="fa-solid fa-star text-warning me-2"></i>
-                                            <span class="fw-bold text-white" id="user-fav-coaster">---</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="form-label text-white opacity-50 small mb-1">Parque Home</label>
-                                        <div class="d-flex align-items-center">
-                                            <i class="fa-solid fa-house-chimney text-success me-2"></i>
-                                            <span class="fw-bold text-white" id="user-home-park">---</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<main class="container-fluid px-3 px-lg-5 my-5" id="profile-content" style="display:none;">
+
+    <!-- Título Principal -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1 class="display-6 fw-bold border-bottom pb-2 text-success">
+                <i class="fa-solid fa-user me-2"></i> Perfil de Viajero
+            </h1>
         </div>
     </div>
 
-    <!-- Content Sections -->
-    <div class="row g-4">
-        <!-- Tops Section -->
-        <div class="col-12 col-lg-8">
-            <div class="card bg-dark text-white border-0 shadow-sm profile-card">
-                <div class="card-header bg-transparent border-bottom border-success border-opacity-25 py-3">
-                    <h5 class="mb-0"><i class="fa-solid fa-trophy me-2 text-warning"></i>Top 5 Parques Favoritos</h5>
-                </div>
+    <!-- Layout en 2 Columnas Estilo Profile -->
+    <div class="row g-4 mb-4">
+
+        <!-- Columna Izquierda: Perfil y Menú Lateral -->
+        <div class="col-lg-4 col-md-5">
+            <!-- Tarjeta de Perfil Principal -->
+            <div class="card profile-card text-center mb-4">
                 <div class="card-body p-4">
-                    <div id="user-tops-container" class="row g-3">
-                        <!-- Tops inyectados via JS -->
+                    <div class="d-flex align-items-center mb-0">
+                        <div class="position-relative d-inline-block me-3">
+                            <div class="avatar-circle shadow-sm" id="user-avatar"
+                                style="width: 80px; height: 80px; font-size: 36px;">?</div>
+                        </div>
+                        <div class="text-start overflow-hidden">
+                            <h5 class="card-title fw-bold mb-1 text-truncate text-success" id="user-username">---</h5>
+                            <p class="text-muted small mb-0 text-truncate" id="user-location"><i
+                                    class="fa-solid fa-location-dot me-1"></i><span>Ubicación desconocida</span></p>
+                            <p class="text-muted small mt-1 mb-0"><i class="fa-regular fa-calendar me-1"></i> <span
+                                    id="user-joined">---</span></p>
+                        </div>
                     </div>
+
+                    <!-- Acciones -->
+                    <div class="mt-4 pt-3 border-top border-secondary border-opacity-25">
+                        <div id="friendship-action-container" class="mb-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menú Lateral -->
+            <div class="card profile-card mb-4">
+                <div class="list-group list-group-flush profile-menu" id="sidebar-menu">
+                    <a href="#" id="menu-profile"
+                        class="list-group-item list-group-item-action py-3 active fw-medium"><i
+                            class="fa-solid fa-user me-2 w-20px text-center"></i> Perfil</a>
+                    <a href="#" id="menu-tops" class="list-group-item list-group-item-action py-3"><i
+                            class="fa-solid fa-list-ol me-2 w-20px text-center"></i> Sus tops</a>
+                    <a href="#" id="menu-photos" class="list-group-item list-group-item-action py-3"><i
+                            class="fa-solid fa-images me-2 w-20px text-center"></i> Sus fotos</a>
+                    <a href="<?= Router::url('trip_generator') ?>"
+                        class="list-group-item list-group-item-action text-success mt-1 py-3 border-top fw-bold"><i
+                            class="fa-solid fa-wand-magic-sparkles me-2 w-20px text-center"></i> Organizar un viaje
+                        juntos</a>
                 </div>
             </div>
         </div>
 
-        <!-- Sidebar / Recent Activity or Friends -->
-        <div class="col-12 col-lg-4">
-            <div class="card bg-dark text-white border-0 shadow-sm profile-card">
-                <div class="card-header bg-transparent border-bottom border-success border-opacity-25 py-3">
-                    <h5 class="mb-0"><i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i>Info Comunidad</h5>
+        <!-- Columna Derecha: Contenido Dinámico -->
+        <div class="col-lg-8 col-md-7" id="section-profile-content">
+
+            <!-- TAB 1: Información del Usuario (Stats, Favoritos) -->
+            <div class="content-section" id="section-info">
+                <!-- Favoritos -->
+                <div class="card profile-card mb-4">
+                    <div class="card-header pt-3 pb-3 d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-heart fs-5 text-success"></i>
+                        <h5 class="fw-bold mb-0">Favoritos</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-sm-4">
+                                <div class="p-3 fav-box text-center square-box h-100">
+                                    <div class="fav-icon text-success mb-2"><i class="fa-solid fa-star fs-3"></i></div>
+                                    <p class="text-muted mb-1 small fw-bold text-uppercase"
+                                        style="letter-spacing: 0.5px; font-size: 0.75rem;">Coaster Favorita</p>
+                                    <p class="fw-bold mb-0 text-truncate text-light fs-5" id="user-fav-coaster">—</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="p-3 fav-box text-center square-box h-100">
+                                    <div class="fav-icon text-success mb-2"><i class="fa-solid fa-map-pin fs-3"></i>
+                                    </div>
+                                    <p class="text-muted mb-1 small fw-bold text-uppercase"
+                                        style="letter-spacing: 0.5px; font-size: 0.75rem;">Parque Favorito</p>
+                                    <p class="fw-bold mb-0 text-truncate text-light fs-5" id="user-top-park">—</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="p-3 fav-box text-center square-box h-100">
+                                    <div class="fav-icon text-success mb-2"><i class="fa-solid fa-house fs-3"></i></div>
+                                    <p class="text-muted mb-1 small fw-bold text-uppercase"
+                                        style="letter-spacing: 0.5px; font-size: 0.75rem;">Home Park</p>
+                                    <p class="fw-bold mb-0 text-truncate text-light fs-5" id="user-home-park">—</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <p class="text-muted small">Miembro desde: <span class="text-white fw-bold" id="user-joined">---</span></p>
-                    <hr class="border-secondary opacity-25">
-                    <div class="d-grid gap-2">
-                        <a href="<?= Router::url('trip_generator') ?>" class="btn btn-outline-success btn-sm py-2">
-                            <i class="fa-solid fa-wand-magic-sparkles me-2"></i>¡Planear viaje con este usuario!
-                        </a>
+
+                <!-- Estadísticas Generales -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <div class="card profile-card h-100">
+                            <div class="card-header pt-3 pb-3 d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-ticket fs-5 text-warning"></i>
+                                <h5 class="fw-bold mb-0">Estadísticas Generales</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush bg-transparent">
+                                    <li
+                                        class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3 bg-transparent">
+                                        <span class="text-muted fw-medium"><i
+                                                class="fa-solid fa-bolt me-2 text-success"></i>Montañas rusas</span>
+                                        <span class="badge badge-profile fs-6 bg-success" id="stat-coasters">0</span>
+                                    </li>
+                                    <li
+                                        class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3 border-top border-secondary border-opacity-25 bg-transparent">
+                                        <span class="text-muted fw-medium"><i
+                                                class="fa-solid fa-map-location-dot me-2 text-success"></i>Parques
+                                            visitados</span>
+                                        <span class="badge badge-profile fs-6 bg-success" id="stat-parks">0</span>
+                                    </li>
+                                    <li
+                                        class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3 border-top border-secondary border-opacity-25 bg-transparent">
+                                        <span class="text-muted fw-medium"><i
+                                                class="fa-solid fa-earth-americas me-2 text-success"></i>Países</span>
+                                        <span class="badge badge-profile fs-6 bg-success" id="stat-countries">0</span>
+                                    </li>
+                                    <li
+                                        class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3 border-top border-secondary border-opacity-25 bg-transparent">
+                                        <span class="text-muted fw-medium"><i
+                                                class="fa-solid fa-user-group me-2 text-info"></i>Amigos</span>
+                                        <span class="badge badge-profile fs-6 bg-success" id="stat-friends">0</span>
+                                    </li>
+                                    <li
+                                        class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3 border-top border-secondary border-opacity-25 bg-transparent">
+                                        <span class="text-muted fw-medium"><i
+                                                class="fa-solid fa-camera-retro me-2 text-primary"></i>Fotos
+                                            compartidas</span>
+                                        <span class="badge badge-profile fs-6 bg-success" id="stat-photos">0</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estadísticas Técnicas -->
+                    <div class="col-md-6">
+                        <div class="card profile-card h-100">
+                            <div class="card-header pt-3 pb-3 d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-chart-pie fs-5 text-info"></i>
+                                <h5 class="fw-bold mb-0">Estadísticas Técnicas</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush bg-transparent">
+                                    <li
+                                        class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 bg-transparent">
+                                        <span class="text-muted">País más visitado</span>
+                                        <span class="fw-bold" id="stat-tech-country">—</span>
+                                    </li>
+                                    <li
+                                        class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 bg-transparent">
+                                        <span class="text-muted">Fabricante favorito</span>
+                                        <span class="fw-bold" id="stat-tech-manufacturer">—</span>
+                                    </li>
+                                    <li
+                                        class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 border-bottom border-secondary border-opacity-25 bg-transparent mb-2">
+                                        <span class="text-muted">Fabricantes totales</span>
+                                        <span class="fw-bold" id="stat-tech-total-manu">0</span>
+                                    </li>
+                                    <li
+                                        class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 bg-transparent mt-2">
+                                        <span class="text-muted">Altura total superada</span>
+                                        <span class="fw-bold"><span id="stat-tech-height">0</span> m</span>
+                                    </li>
+                                    <li
+                                        class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 bg-transparent">
+                                        <span class="text-muted">Inversiones totales</span>
+                                        <span class="fw-bold" id="stat-tech-inversions">0</span>
+                                    </li>
+                                    <li
+                                        class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 bg-transparent">
+                                        <span class="text-muted">Más rápida</span>
+                                        <span class="fw-bold" id="stat-tech-speed">—</span>
+                                    </li>
+                                    <li
+                                        class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 bg-transparent">
+                                        <span class="text-muted">Más larga</span>
+                                        <span class="fw-bold" id="stat-tech-length">—</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: Sus Tops -->
+            <div class="content-section" id="section-tops" style="display:none;">
+                <div class="card profile-card mb-4">
+                    <div class="card-header pt-3 pb-3 d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-ranking-star fs-5 text-warning"></i>
+                            <h5 class="fw-bold mb-0">Ranking Personal</h5>
+                        </div>
+                        <select id="tops-type-selector"
+                            class="form-select w-auto fw-bold bg-dark text-white border-success border-opacity-50">
+                            <option value="coasters">Tops Coasters</option>
+                            <option value="parks">Tops Parques</option>
+                        </select>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush bg-transparent tops-preview-scroll" id="tops-list-container">
+                            <!-- Inyectado via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: Sus Fotos -->
+            <div class="content-section" id="section-photos" style="display:none;">
+                <div class="card profile-card mb-4">
+                    <div class="card-header pt-3 pb-3 d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-camera fs-5 text-primary"></i>
+                        <h5 class="fw-bold mb-0">Galería de Fotos</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="tops-preview-scroll">
+                            <div class="row g-3" id="photos-grid-container">
+                                <!-- Inyectado via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- IG LIGHTBOX MODAL -->
+    <div class="modal fade" id="ig-lightbox-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+            <div class="modal-content bg-dark text-white border-secondary rounded-0 overflow-visible position-relative">
+                <button id="ig-modal-prev" class="btn text-white position-absolute top-50 translate-middle-y rounded-circle px-3 py-2" style="z-index: 1055; left: -60px; font-size: 1.5rem; background: rgba(0,0,0,0.5);"><i class="fa-solid fa-chevron-left"></i></button>
+                <button id="ig-modal-next" class="btn text-white position-absolute top-50 translate-middle-y rounded-circle px-3 py-2" style="z-index: 1055; right: -60px; font-size: 1.5rem; background: rgba(0,0,0,0.5);"><i class="fa-solid fa-chevron-right"></i></button>
+                <div class="modal-header border-secondary d-flex align-items-center py-2 px-3">
+                    <img id="ig-modal-avatar" src="" alt="Avatar" class="rounded-circle me-2" style="width:32px; height:32px; object-fit:cover;">
+                    <span id="ig-modal-username" class="fw-bold fs-6"></span>
+                    <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <img id="ig-modal-img" src="" alt="Foto" class="w-100" style="aspect-ratio: 1/1; object-fit:cover;">
+                </div>
+                <!-- Removemos los likes, dejamos solo el caption si es necesario o eliminamos todo el footer si solo quiere la foto -->
+                <div class="modal-footer border-secondary flex-column align-items-start py-3 px-3">
+                    <div class="w-100">
+                        <span id="ig-modal-caption-user" class="fw-bold text-success me-2"></span>
+                        <span id="ig-modal-caption" class="text-light"></span>
                     </div>
                 </div>
             </div>
         </div>
+        </div>
     </div>
+
 </main>
 
+<!-- Loading -->
 <div id="profile-loading" class="text-center py-5">
-    <div class="spinner-border text-success" role="status"></div>
-    <p class="mt-3 text-muted fw-bold">Cargando perfil de aventurero...</p>
+    <div class="spinner-border text-success" role="status" style="width: 3rem; height: 3rem;"></div>
+    <p class="mt-3 text-muted fw-bold text-uppercase" style="letter-spacing: 0.05em;">Cargando perfil...</p>
 </div>
 
 <script src="<?= $base_url ?>/web/js/user_profile.js"></script>
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
-<script src="<?= $base_url ?>/web/js/profile.js"></script>

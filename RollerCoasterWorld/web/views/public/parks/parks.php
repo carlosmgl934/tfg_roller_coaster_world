@@ -278,7 +278,9 @@ require_once __DIR__ . '/../../partials/header.php';
                     <span id="ig-modal-username" class="fw-bold fs-6"></span>
                     <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-0">
+                <div class="modal-body p-0 position-relative">
+                    <button id="ig-modal-prev" class="btn text-white position-absolute start-0 top-50 translate-middle-y bg-dark bg-opacity-50 border-0 rounded-end px-3 py-2" style="z-index: 10; display: none;"><i class="fa-solid fa-chevron-left"></i></button>
+                    <button id="ig-modal-next" class="btn text-white position-absolute end-0 top-50 translate-middle-y bg-dark bg-opacity-50 border-0 rounded-start px-3 py-2" style="z-index: 10; display: none;"><i class="fa-solid fa-chevron-right"></i></button>
                     <img id="ig-modal-img" src="" alt="Foto" class="w-100" style="aspect-ratio: 1/1; object-fit:cover;">
                 </div>
                 <div class="modal-footer border-secondary flex-column align-items-start py-3 px-3">

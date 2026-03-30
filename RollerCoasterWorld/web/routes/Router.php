@@ -53,6 +53,7 @@ class Router {
             'profile' => '/web/views/public/users/profile.php',
             'friends' => '/web/views/public/users/friends.php',
             'user_profile' => '/web/views/public/users/user_profile.php',
+            'user_search' => '/web/views/public/users/user_search.php',
 
             // Tienda
             'carrito' => '/web/views/public/shop/carrito.php',

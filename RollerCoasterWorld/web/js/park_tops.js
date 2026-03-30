@@ -5,31 +5,34 @@ $(document).ready(function () {
   const topsList = $("#tops-list");
   const loadingSpinner = $("#top-loading-spinner");
 
+  // Determinamos el filtro inicial a partir del input oculto
+  const initialFilter = $("#initial-filter").val() || "global";
+
   if (topTypeSelect.length) {
-    // Escuchar cambios en el selector
+    // Modo Usuarios: Escuchar cambios en el selector
     topTypeSelect.on("change", function () {
       const type = $(this).val();
-      if (type === "global") {
-        fetchGlobalTop();
-      } else if (type === "users") {
+      if (type === "users") {
         fetchUserTops(false);
       } else if (type === "friends") {
         fetchUserTops(true);
       }
     });
 
-    // Cargar inicialmente (priorizando filtros de URL)
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get("filter") === "friends") {
-      topTypeSelect.val("friends");
+    // Cargar inicialmente en base al selector
+    const currentVal = topTypeSelect.val();
+    if (currentVal === "friends") {
       fetchUserTops(true);
     } else {
-      fetchGlobalTop();
+      fetchUserTops(false); // por defecto users
     }
+  } else {
+    // Modo Global: No hay selector
+    fetchGlobalTop();
   }
 
   function showLoading() {
-    loadingSpinner.removeClass("d-none");
+    if (loadingSpinner.length) loadingSpinner.removeClass("d-none");
     topPodium.html("");
     topsList.html(`
       <div class="col-12 text-center py-5">
@@ -48,11 +51,15 @@ $(document).ready(function () {
       if (data.success && data.data.length > 0) {
         renderGlobalTop(data.data);
       } else {
-        topsList.html('<div class="col-12 text-center py-5 text-muted">Aún no hay suficientes valoraciones de parques para mostrar el ranking global.</div>');
+        topsList.html(
+          '<div class="col-12 text-center py-5 text-muted">Aún no hay suficientes valoraciones de parques para mostrar el ranking global.</div>',
+        );
       }
     } catch (e) {
       console.error(e);
-      topsList.html('<div class="col-12 text-center py-5 text-danger">Error conectando con el servidor.</div>');
+      topsList.html(
+        '<div class="col-12 text-center py-5 text-danger">Error conectando con el servidor.</div>',
+      );
     } finally {
       loadingSpinner.addClass("d-none");
     }
@@ -61,21 +68,27 @@ $(document).ready(function () {
   async function fetchUserTops(isFriends = false) {
     showLoading();
     try {
-      const url = isFriends ? `${apiBase}?action=user_tops&filter=friends` : `${apiBase}?action=user_tops`;
+      const url = isFriends
+        ? `${apiBase}?action=user_tops&filter=friends`
+        : `${apiBase}?action=user_tops`;
       const res = await fetch(url);
       const data = await res.json();
 
       if (data.success && data.data.length > 0) {
         renderUserTops(data.data, isFriends);
       } else {
-        const msg = isFriends 
+        const msg = isFriends
           ? "Tus amigos aún no han organizado su top personal de parques o no tienes amigos agregados."
           : "Ningún usuario ha creado todavía su top personal de parques.";
-        topsList.html(`<div class="col-12 text-center py-5 text-muted">${msg}</div>`);
+        topsList.html(
+          `<div class="col-12 text-center py-5 text-muted">${msg}</div>`,
+        );
       }
     } catch (e) {
       console.error(e);
-      topsList.html('<div class="col-12 text-center py-5 text-danger">Error conectando con el servidor.</div>');
+      topsList.html(
+        '<div class="col-12 text-center py-5 text-danger">Error conectando con el servidor.</div>',
+      );
     } finally {
       loadingSpinner.addClass("d-none");
     }
@@ -90,20 +103,29 @@ $(document).ready(function () {
 
     parks.forEach((park, index) => {
       const pos = index + 1;
-      const fallbackImg = "https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png";
-      const imgSrc = park.imagen_url ? (park.imagen_url.startsWith('/') ? BASE_URL + park.imagen_url : park.imagen_url) : fallbackImg;
-      const parkUrl = BASE_URL + `/web/views/public/parks/parks.php?id=${park.id}`;
+      const fallbackImg =
+        "https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png";
+      const imgSrc = park.imagen_url
+        ? park.imagen_url.startsWith("/")
+          ? BASE_URL + park.imagen_url
+          : park.imagen_url
+        : fallbackImg;
+      const parkUrl =
+        BASE_URL + `/web/views/public/parks/parks.php?id=${park.id}`;
 
       let medalIcon = "";
       let borderClass = "";
       if (pos === 1) {
-        medalIcon = '<i class="fa-solid fa-trophy text-warning fa-2x mb-2 shadow-sm rounded-circle p-2" style="background: rgba(255,193,7,0.1);"></i>';
+        medalIcon =
+          '<i class="fa-solid fa-trophy text-warning fa-2x mb-2 shadow-sm rounded-circle p-2" style="background: rgba(255,193,7,0.1);"></i>';
         borderClass = "border-warning border-2";
       } else if (pos === 2) {
-        medalIcon = '<i class="fa-solid fa-medal fa-2x mb-2 p-2 rounded-circle" style="color: #c0c0c0; background: rgba(192,192,192,0.1);"></i>';
+        medalIcon =
+          '<i class="fa-solid fa-medal fa-2x mb-2 p-2 rounded-circle" style="color: #c0c0c0; background: rgba(192,192,192,0.1);"></i>';
         borderClass = "border-2" + ' style="border-color: #c0c0c0 !important;"';
       } else if (pos === 3) {
-        medalIcon = '<i class="fa-solid fa-award fa-2x mb-2 p-2 rounded-circle" style="color: #cd7f32; background: rgba(205,127,50,0.1);"></i>';
+        medalIcon =
+          '<i class="fa-solid fa-award fa-2x mb-2 p-2 rounded-circle" style="color: #cd7f32; background: rgba(205,127,50,0.1);"></i>';
         borderClass = "border-2" + ' style="border-color: #cd7f32 !important;"';
       }
 
@@ -166,13 +188,19 @@ $(document).ready(function () {
     let html = "";
     users.forEach((user, index) => {
       let ranksHtml = "";
-      
+
       // Render user's top parks
       user.top_parks.forEach((parkItem) => {
-        const fall = "https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png";
-        const img = parkItem.imagen_url ? (parkItem.imagen_url.startsWith('/') ? BASE_URL + parkItem.imagen_url : parkItem.imagen_url) : fall;
-        const pkUrl = BASE_URL + `/web/views/public/parks/parks.php?id=${parkItem.park_id}`;
-        
+        const fall =
+          "https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png";
+        const img = parkItem.imagen_url
+          ? parkItem.imagen_url.startsWith("/")
+            ? BASE_URL + parkItem.imagen_url
+            : parkItem.imagen_url
+          : fall;
+        const pkUrl =
+          BASE_URL + `/web/views/public/parks/parks.php?id=${parkItem.park_id}`;
+
         ranksHtml += `
           <a href="${pkUrl}" class="text-decoration-none d-block mb-3 list-group-item-action rounded p-2" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(25,135,84,0.1);">
             <div class="d-flex align-items-center">
@@ -188,8 +216,29 @@ $(document).ready(function () {
         `;
       });
 
-      const avatar = user.profile_image ? user.profile_image : "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.username) + "&background=198754&color=fff";
-      
+      // Resolver avatar con lógica defensiva (igual que el resto de la app)
+      let avatar;
+      const rawImg = user.profile_image;
+      const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=198754&color=fff`;
+      if (!rawImg) {
+        avatar = fallbackAvatar;
+      } else if (
+        rawImg.startsWith("http://") ||
+        rawImg.startsWith("https://")
+      ) {
+        avatar = rawImg; // URL absoluta (Supabase u otro CDN)
+      } else if (rawImg.startsWith("/")) {
+        // Ruta relativa: si es una subida local solo existe en quien la subió → iniciales
+        avatar = rawImg.includes("/web/img/uploads/")
+          ? fallbackAvatar
+          : BASE_URL + rawImg;
+      } else {
+        // Solo nombre de archivo → construir URL Supabase
+        avatar =
+          "https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/" +
+          rawImg;
+      }
+
       html += `
         <div class="col-12 col-md-6 col-lg-4 animate__animated animate__zoomIn" style="animation-delay: ${index * 0.05}s">
           <div class="card bg-dark text-white border-secondary h-100 shadow">
@@ -198,7 +247,7 @@ $(document).ready(function () {
                 <img src="${avatar}" class="rounded-circle shadow-sm border border-2 border-success p-1" style="width: 55px; height: 55px; object-fit: cover;">
                 <div class="ms-3">
                   <h5 class="mb-0 fw-bold text-success">Top de ${user.username}</h5>
-                  <small class="text-muted"><i class="fa-solid fa-map-location-dot me-1"></i>${user.top_parks.length} parque${user.top_parks.length !== 1 ? 's' : ''} rankeados</small>
+                  <small class="text-muted"><i class="fa-solid fa-map-location-dot me-1"></i>${user.top_parks.length} parque${user.top_parks.length !== 1 ? "s" : ""} en el top</small>
                 </div>
               </div>
             </div>

@@ -24,6 +24,15 @@ console.log(
   BASE,
 );
 
+// Helper global para avatares (importante al tener nombres de archivo locales sueltos)
+window.rcwGetAvatarPath = function(imgSrc, username = 'Usuario', color1 = '198754', textCol = 'fff') {
+    if (!imgSrc) return `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=${color1}&color=${textCol}`;
+    if (imgSrc.startsWith("http://") || imgSrc.startsWith("https://")) return imgSrc;
+    if (imgSrc.startsWith("/")) return window.BASE_URL + imgSrc;
+    // Si solo hay un nombre pelado ("1774886670_xxxx.webp"), está en Supabase Storage
+    return "https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/" + imgSrc;
+};
+
 // ── Helpers de modal ──────────────────────────────────────────────────────────
 function showAlert(msg) {
   const existing = document.getElementById("auth-modal");
