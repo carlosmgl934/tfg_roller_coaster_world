@@ -23,6 +23,7 @@ $public_pages = [
   Router::getRoutePath('coaster_detail'),
   Router::getRoutePath('coaster_reviews'),
   Router::getRoutePath('coaster_tops'),
+  Router::getRoutePath('ranking'),
 
   // Parques — acceso público (sin login)
   Router::getRoutePath('parks'),

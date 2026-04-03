@@ -36,7 +36,7 @@ if (!$is_logged) {
                         <i class="fa-solid fa-bell text-warning"></i>
                         <h5 class="mb-0 fw-bold">Solicitudes</h5>
                     </div>
-                    <span class="badge badge-profile bg-secondary text-dark" id="requests-count">0</span>
+                    <span class="badge badge-profile-gray" id="requests-count">0</span>
                 </div>
                 <!-- Body sin padding para que la list-group llene la tarjeta -->
                 <div class="card-body p-0">
@@ -59,6 +59,25 @@ if (!$is_logged) {
                     <span class="badge badge-profile" id="friends-count">0</span>
                 </div>
                 <div class="card-body p-4">
+                    <div class="row align-items-center mb-4">
+                        <div class="col-12 col-md-6 mb-3 mb-md-0">
+                            <div class="input-group">
+                                <input type="text" class="form-control square-box border-success" id="search-friends-input" placeholder="Buscar amigo..." style="background-color: var(--rcw-bg-input);">
+                                <span class="input-group-text bg-success text-white border-success rounded-0 px-3"><i class="fa-solid fa-magnifying-glass"></i></span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 text-md-end text-start">
+                            <label for="sort-friends-select" class="visually-hidden">Ordenar por</label>
+                            <select class="form-select square-box d-inline-block w-auto" id="sort-friends-select">
+                                <option value="antiguedad_desc">Más recientes</option>
+                                <option value="antiguedad_asc">Más antiguos</option>
+                                <option value="alfabetico_asc">Alfabéticamente (A-Z)</option>
+                                <option value="alfabetico_desc">Alfabéticamente (Z-A)</option>
+                                <option value="credits_desc">Número de credits</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="row g-3" id="friends-list">
                         <!-- Amigos inyectados via JS -->
                     </div>
@@ -102,6 +121,26 @@ if (!$is_logged) {
             <p class="mt-3 text-muted fw-bold text-uppercase" style="letter-spacing: 0.05em;">Cargando red de
                 aventureros...</p>
         </div>
+    </div>
+
+    <!-- Modal Eliminar Amigo -->
+    <div class="modal fade" id="removeFriendModal" tabindex="-1" aria-labelledby="removeFriendModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-bottom border-secondary border-opacity-25 pb-3">
+            <h5 class="modal-title fw-bold text-danger" id="removeFriendModalLabel"><i class="fa-solid fa-triangle-exclamation me-2"></i>Eliminar Amigo</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body py-4">
+            ¿Estás seguro de que deseas eliminar de tus amigos a <strong id="removeFriendName" class="text-white"></strong>?<br>
+            <span class="text-muted small">Esta acción no se puede deshacer.</span>
+          </div>
+          <div class="modal-footer border-top border-secondary border-opacity-25 pt-3">
+            <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-danger px-4 fw-bold" id="confirmRemoveFriendBtn">Eliminar</button>
+          </div>
+        </div>
+      </div>
     </div>
 </main>
 

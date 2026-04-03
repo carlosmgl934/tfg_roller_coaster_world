@@ -84,12 +84,16 @@ $(document).ready(function () {
       let usernameHtml = user.full_name ? `<span class="text-muted fw-normal ms-1 fs-6">@${user.username}</span>` : '';
       
       let locationText = 'Coaster Enthusiast';
+      let locationIconClass = 'fa-star';
       if (user.city && user.country) {
           locationText = `${user.city}, ${user.country}`;
+          locationIconClass = 'fa-location-dot';
       } else if (user.country) {
           locationText = user.country;
+          locationIconClass = 'fa-location-dot';
       } else if (user.city) {
           locationText = user.city;
+          locationIconClass = 'fa-location-dot';
       }
 
       html += `
@@ -98,7 +102,7 @@ $(document).ready(function () {
              <img src="${avatarSrc}" alt="${user.username}" class="rounded-circle object-fit-cover shadow-sm me-4" style="width: 55px; height: 55px; border: 2px solid var(--bs-success);">
              <div class="flex-grow-1 min-w-0">
                <h5 class="fw-bold text-truncate mb-1"><a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${user.id}" class="text-white text-decoration-none stretched-link">${displayName}${usernameHtml}</a></h5>
-               <small class="text-muted d-block text-truncate"><i class="fa-solid fa-location-dot text-success opacity-75 me-1"></i> ${locationText}</small>
+               <small class="text-muted d-block text-truncate"><i class="fa-solid ${locationIconClass} text-success opacity-75 me-1"></i> ${locationText}</small>
              </div>
              <div class="ms-3 position-relative z-index-1" style="z-index: 2;">
                ${actionHtml}

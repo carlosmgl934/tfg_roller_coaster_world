@@ -308,12 +308,13 @@ $(document).ready(function () {
         const modelo = coaster.modelo || "Desconocido";
         const year = coaster.opening_year || "N/A";
 
+        const scoreText = parseFloat(coaster.score || 0).toFixed(2) + " ★";
         coasterCard.innerHTML = `
         ${img}
         <div class="flex-grow-1">
           <h5 class="mb-1 fw-bold text-primary" style="font-size: 1.25rem;">${coaster.coaster_name}</h5>
           <p class="mb-1 text-muted"><i class="fa-solid fa-map-pin me-1"></i>${coaster.park_name}</p>
-          <small class="text-secondary">${manufacter} • ${modelo} • ${year}</small>
+          <small class="text-secondary">${manufacter} • ${modelo} • ${year} • ${scoreText}</small>
         </div>
         <i class="fa-solid fa-chevron-right text-muted ms-3"></i>
       `;
@@ -559,9 +560,7 @@ $(document).ready(function () {
               ? "#" + coaster.global_rank
               : "#" + coaster.id;
           if (puntuacion)
-            puntuacion.textContent = coaster.score
-              ? coaster.score + "%"
-              : "N/A";
+            puntuacion.textContent = parseFloat(coaster.score || 0).toFixed(2);
           if (personalRanking)
             personalRanking.textContent = coaster.personal_ranking
               ? "#" + coaster.personal_ranking

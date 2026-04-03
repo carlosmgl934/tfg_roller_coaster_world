@@ -11,6 +11,10 @@ $(document).ready(function () {
   const sentList = $("#sent-list");
   const sentCount = $("#sent-count");
 
+  const searchInput = $("#search-friends-input");
+  const sortSelect = $("#sort-friends-select");
+  let allFriends = [];
+
   // Load friends on init
   fetchFriendsData();
 
@@ -26,9 +30,10 @@ $(document).ready(function () {
       sentContainer.show();
 
       if (payload.success) {
+        allFriends = payload.data.friends || [];
         renderReceived(payload.data.received_requests);
-        renderFriends(payload.data.friends);
         renderSent(payload.data.sent_requests);
+        filterAndRenderFriends();
       } else {
         alert(
           "Error cargando amistades: " + (payload.error || "Error desconocido"),
@@ -81,14 +86,43 @@ $(document).ready(function () {
     );
   }
 
+  function filterAndRenderFriends() {
+    const query = searchInput.val().toLowerCase().trim();
+    const sortVal = sortSelect.val();
+
+    let filtered = allFriends.filter((f) =>
+      f.username.toLowerCase().includes(query)
+    );
+
+    filtered.sort((a, b) => {
+      if (sortVal === "antiguedad_desc") {
+        return new Date(b.since || 0) - new Date(a.since || 0);
+      } else if (sortVal === "antiguedad_asc") {
+        return new Date(a.since || 0) - new Date(b.since || 0);
+      } else if (sortVal === "alfabetico_asc") {
+        return a.username.localeCompare(b.username);
+      } else if (sortVal === "alfabetico_desc") {
+        return b.username.localeCompare(a.username);
+      } else if (sortVal === "credits_desc") {
+        return (b.credits || 0) - (a.credits || 0);
+      }
+      return 0;
+    });
+
+    renderFriends(filtered);
+  }
+
+  searchInput.on("input", filterAndRenderFriends);
+  sortSelect.on("change", filterAndRenderFriends);
+
   function renderReceived(requests) {
     requestsList.empty();
     requestsCount.text(requests.length);
 
     if (requests.length > 0) {
-      requestsCount.removeClass('badge-gray bg-secondary').addClass('bg-danger');
+      requestsCount.removeClass('badge-profile-gray').addClass('badge-profile-danger');
     } else {
-      requestsCount.removeClass('bg-danger bg-secondary').addClass('badge-gray');
+      requestsCount.removeClass('badge-profile-danger').addClass('badge-profile-gray');
     }
 
     if (requests.length === 0) {
@@ -148,20 +182,51 @@ $(document).ready(function () {
 
       html += `
         <div class="col-12 col-xl-6">
-           <div class="card profile-card h-100 border-start border-3 border-success">
-             <div class="card-body d-flex align-items-center p-3 px-4 position-relative">
-               <img src="${avatarSrc}" class="rounded-circle object-fit-cover shadow-sm me-4 border border-1 border-white border-opacity-25" style="width: 65px; height: 65px;" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(friend.username)}&background=10b981&color=000'">
-               <div class="flex-grow-1 min-w-0">
-                 <h5 class="fw-bold text-truncate mb-1"><a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${friend.id}" class="text-white text-decoration-none stretched-link">${friend.username}</a></h5>
-                 <small class="text-success d-block fw-semibold opacity-75"><i class="fa-solid fa-user-check me-1"></i>Amigos</small>
-               </div>
-               <div class="position-absolute dropdown dropstart" style="top: 50%; right: 15px; transform: translateY(-50%); z-index: 2;">
-                 <button class="btn btn-link text-muted pe-1 shadow-none" type="button" data-bs-toggle="dropdown"><i class="fa-solid fa-ellipsis-vertical fa-lg"></i></button>
-                 <ul class="dropdown-menu shadow border-rcw">
-                    <li><a class="dropdown-item text-danger rcw-action-btn py-2" href="#" data-action="remove" data-id="${friend.id}"><i class="fa-solid fa-user-minus me-2"></i>Eliminar Amigo</a></li>
-                 </ul>
-               </div>
+           <div class="card bg-dark text-white rounded-0 h-100 shadow-sm border-0 d-flex flex-row overflow-hidden" style="border: 1px solid var(--rcw-border-strong) !important; background: linear-gradient(135deg, rgba(25,135,84,0.05) 0%, rgba(0,0,0,0) 100%);">
+             
+             <!-- MAIN ID CONTENT -->
+             <div class="flex-grow-1 d-flex flex-column position-relative z-index-1">
+                 <!-- DNI Header section -->
+                 <div class="w-100 px-3 py-1 bg-success bg-opacity-10 border-bottom border-success border-opacity-25 d-flex justify-content-between align-items-center" style="font-size: 0.6rem; letter-spacing: 0.1em;">
+                    <span class="fw-bold text-success text-uppercase">RCW Member ID</span>
+                    <span class="text-muted font-monospace opacity-75">Nº ${String(friend.id).padStart(6, '0')}</span>
+                 </div>
+                 
+                 <div class="card-body d-flex align-items-center p-3 position-relative flex-grow-1">
+                   <!-- Background Pattern / Logo subtle -->
+                   <img src="${BASE_URL}/web/img/bg-coaster.svg" class="position-absolute" style="bottom: -15px; right: -5px; width: 120px; opacity: 0.05; filter: invert(100%); z-index: 0; pointer-events: none;">
+                   
+                   <!-- ID Photo (Squared) -->
+                   <div class="me-3 p-1 border border-secondary border-opacity-50 shadow-sm rounded-1 position-relative z-index-1" style="width: 65px; height: 65px; background-color: #0d1117;">
+                     <img src="${avatarSrc}" class="w-100 h-100 object-fit-cover rounded-1" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(friend.username)}&background=10b981&color=000&size=128&rounded=false'">
+                   </div>
+                   
+                   <!-- ID Data -->
+                   <div class="flex-grow-1 min-w-0" style="z-index: 1;">
+                     <div class="text-uppercase text-muted fw-bold" style="font-size: 0.55rem; letter-spacing: 0.05em; margin-bottom: 2px;">Apodo / Username</div>
+                     <h5 class="fw-bold text-truncate mb-2" style="font-size: 1.15rem;"><a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${friend.id}" class="text-white text-decoration-none stretched-link">${friend.username}</a></h5>
+                     
+                     <div class="d-flex align-items-center gap-3 mt-1">
+                        <div>
+                            <div class="text-uppercase text-muted fw-bold" style="font-size: 0.55rem; letter-spacing: 0.05em;">Estado</div>
+                            <small class="text-success d-block fw-bold"><i class="fa-solid fa-circle-check me-1 small"></i>AMIGO</small>
+                        </div>
+                        <div>
+                            <div class="text-uppercase text-muted fw-bold" style="font-size: 0.55rem; letter-spacing: 0.05em;">Credits</div>
+                            <small class="text-info d-block fw-bold position-relative z-index-2"><img src="${BASE_URL}/web/img/bg-coaster.svg" style="width: 14px; opacity: 0.8; margin-top: -3px; filter: invert(72%) sepia(35%) saturate(3015%) hue-rotate(159deg) brightness(97%) contrast(100%);" class="me-1">${friend.credits || 0}</small>
+                        </div>
+                     </div>
+                   </div>
+                 </div>
              </div>
+
+             <!-- ELIMINAR AMIGO BUTTON (SIDEBAR) -->
+             <div class="d-flex flex-column justify-content-center border-start border-danger bg-danger position-relative z-index-3 rcw-trigger-remove" style="width: 50px; transition: filter 0.2s; cursor: pointer;" onmouseover="this.style.filter='brightness(1.2)'" onmouseout="this.style.filter='brightness(1)'" data-id="${friend.id}" data-name="${friend.username}">
+                 <button class="btn btn-link text-white w-100 h-100 p-0 shadow-none d-flex flex-column align-items-center justify-content-center m-0" style="pointer-events: none;" tabindex="-1" title="Eliminar Amigo">
+                   <i class="fa-solid fa-user-xmark fs-5"></i>
+                 </button>
+             </div>
+
            </div>
         </div>
       `;
@@ -243,5 +308,42 @@ $(document).ready(function () {
       console.error(err);
       btn.prop("disabled", false).html(originalHtml);
     }
+  });
+
+  // Modal Remove Friend Logic
+  $(document).on("click", ".rcw-trigger-remove", function(e) {
+      e.stopPropagation();
+      const id = $(this).data("id");
+      const name = $(this).data("name");
+      $("#removeFriendName").text(name);
+      $("#confirmRemoveFriendBtn").data("id", id);
+      const modal = new bootstrap.Modal(document.getElementById('removeFriendModal'));
+      modal.show();
+  });
+
+  $("#confirmRemoveFriendBtn").on("click", async function() {
+      const btn = $(this);
+      const targetId = btn.data("id");
+      const originalHtml = btn.text() || "Eliminando...";
+
+      btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span>');
+
+      try {
+        const res = await fetch(`${BASE_URL}/api/php/users.php?action=reject_remove_friend`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ target_id: targetId }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          bootstrap.Modal.getInstance(document.getElementById('removeFriendModal')).hide();
+          fetchFriendsData();
+        } else {
+          alert("Error: " + (data.error || "Petición fallida"));
+        }
+      } catch (err) {
+        alert("Error de conexión al eliminar amigo.");
+      }
+      btn.prop("disabled", false).text("Eliminar");
   });
 });

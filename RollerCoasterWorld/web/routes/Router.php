@@ -49,7 +49,7 @@ class Router {
             'notice' => '/web/views/public/notice.php',
 
             // Usuarios / Social
-            'ranking' => '/web/views/public/users/ranking.php',
+            'ranking' => '/web/views/public/coasters/ranking.php',
             'profile' => '/web/views/public/users/profile.php',
             'friends' => '/web/views/public/users/friends.php',
             'user_profile' => '/web/views/public/users/user_profile.php',

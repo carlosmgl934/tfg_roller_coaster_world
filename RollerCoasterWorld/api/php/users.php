@@ -194,7 +194,8 @@ function getFriendsData()
     try {
         // Amigos aceptados
         $stmt = $db->prepare("
-            SELECT u.id, u.username, u.profile_image, f.accepted_at as since 
+            SELECT u.id, u.username, u.profile_image, f.accepted_at as since,
+                   (SELECT COUNT(*) FROM user_credits uc WHERE uc.user_id = u.id) as credits
             FROM friendship f
             JOIN users u ON u.id = CASE WHEN f.solicitante_id = :uid THEN f.solicitada_id ELSE f.solicitante_id END
             WHERE (f.solicitante_id = :uid OR f.solicitada_id = :uid) AND f.estado_solicitud = 'ACEPTADA'

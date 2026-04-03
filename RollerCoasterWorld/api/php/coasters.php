@@ -142,7 +142,8 @@ function listCoasters()
         $sql = "SELECT
     coasters.id, coasters.coaster_name, coasters.imagen_url, parks.park_name, coasters.coaster_manufacter AS manufacter,
     coasters.coaster_model AS modelo,
-    coasters.opening_year, coasters.stars
+    coasters.opening_year, coasters.stars,
+    (SELECT ROUND(AVG(note)::numeric, 1) FROM coaster_ratings WHERE coaster_id = coasters.id) AS score
     FROM coasters
     INNER JOIN parks ON coasters.park_id = parks.id
     ORDER BY $orderBy
@@ -186,7 +187,8 @@ function filterCoasters()
         $sql = "SELECT
         coasters.id, coasters.coaster_name, coasters.imagen_url, parks.park_name, coasters.coaster_manufacter AS manufacter,
         coasters.coaster_model AS modelo,
-        coasters.opening_year
+        coasters.opening_year,
+        (SELECT ROUND(AVG(note)::numeric, 1) FROM coaster_ratings WHERE coaster_id = coasters.id) AS score
         FROM coasters
         INNER JOIN parks ON coasters.park_id = parks.id
         WHERE coasters.coaster_name ILIKE :name
@@ -305,7 +307,8 @@ function applyFilters()
                 parks.park_name, coasters.coaster_manufacter AS manufacter,
                 coasters.coaster_model AS modelo, coasters.opening_year, coasters.stars,
                 coasters.coaster_status, coasters.height, coasters.speed,
-                coasters.coaster_length, coasters.inversions
+                coasters.coaster_length, coasters.inversions,
+                (SELECT ROUND(AVG(note)::numeric, 1) FROM coaster_ratings WHERE coaster_id = coasters.id) AS score
                 FROM coasters
                 INNER JOIN parks ON coasters.park_id = parks.id
                 WHERE $where
@@ -352,7 +355,7 @@ function getCoasters()
         global $db;
         $sql = "SELECT coasters.*, parks.park_name,
         parks.park_country, parks.id AS park_id,
-        (SELECT ROUND(AVG(note) * 20) FROM coaster_ratings WHERE coaster_id = coasters.id) AS score,
+        (SELECT ROUND(AVG(note)::numeric, 1) FROM coaster_ratings WHERE coaster_id = coasters.id) AS score,
         (SELECT COUNT(*) + 1 FROM coasters AS c2 
             WHERE (SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = c2.id) 
                 > (SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = coasters.id)) AS global_rank,

@@ -104,7 +104,6 @@ require_once __DIR__ . '/../../partials/header.php';
                     <select class="form-select shadow-sm rounded-0 w-auto border-success me-2" id="sort-filter" style="cursor: pointer; font-weight: 500;">
                         <option value="id" selected>Por defecto</option>
                         <option value="name">Nombre</option>
-                        <option value="stars">Valoración</option>
                         <option value="height">Altura</option>
                         <option value="speed">Velocidad</option>
                         <option value="year">Año de apertura</option>

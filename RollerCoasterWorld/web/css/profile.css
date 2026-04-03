@@ -125,6 +125,20 @@
   padding: 6px 12px !important;
   font-weight: 700;
 }
+.badge-profile-gray {
+  background-color: #475569;
+  color: #f8fafc;
+  border-radius: 0 !important;
+  padding: 6px 12px !important;
+  font-weight: 700;
+}
+.badge-profile-danger {
+  background-color: #dc3545;
+  color: #fff;
+  border-radius: 0 !important;
+  padding: 6px 12px !important;
+  font-weight: 700;
+}
 
 /* ── DATA/FAV BOXES ──────────────────────────────────────────── */
 .data-box {
