@@ -34,7 +34,7 @@ if (!$is_logged) {
     <!-- Contenedor Resultados -->
     <div class="row justify-content-center">
         <div class="col-12 col-md-8 col-lg-6">
-            <div id="page-user-search-results" class="d-flex flex-column gap-3 pe-2" style="max-height: 60vh; overflow-y: auto; overflow-x: hidden;">
+            <div id="page-user-search-results" class="d-flex flex-column pe-2 rcw-custom-scrollbar" style="max-height: 480px; overflow-y: auto; overflow-x: hidden;">
                 <div class="text-center text-muted py-5 w-100">
                     <i class="fa-solid fa-magnifying-glass mb-3 d-block fa-3x opacity-25"></i>
                     <h5>Empieza a escribir para buscar...</h5>

@@ -194,8 +194,9 @@ function getFriendsData()
     try {
         // Amigos aceptados
         $stmt = $db->prepare("
-            SELECT u.id, u.username, u.profile_image, f.accepted_at as since,
-                   (SELECT COUNT(*) FROM user_credits uc WHERE uc.user_id = u.id) as credits
+            SELECT u.id, u.username, u.profile_image, f.accepted_at as since, u.city, u.country, u.created_at as joined_at,
+                   (SELECT COUNT(*) FROM user_credits uc WHERE uc.user_id = u.id) as credits,
+                   (SELECT c.coaster_name FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = u.id AND uc.rank_position > 0 ORDER BY uc.rank_position ASC LIMIT 1) as favorite_coaster
             FROM friendship f
             JOIN users u ON u.id = CASE WHEN f.solicitante_id = :uid THEN f.solicitada_id ELSE f.solicitante_id END
             WHERE (f.solicitante_id = :uid OR f.solicitada_id = :uid) AND f.estado_solicitud = 'ACEPTADA'
@@ -433,6 +434,18 @@ function getPublicProfile()
         $stmtPhotos->execute([':tid' => $target_id]);
         $user_photos = $stmtPhotos->fetchAll(PDO::FETCH_ASSOC);
 
+        // Lista de amigos del usuario
+        $stmtFriendList = $db->prepare("
+            SELECT u.id, u.username, u.profile_image, u.city, u.country, u.created_at,
+                   (SELECT COUNT(*) FROM user_credits uc WHERE uc.user_id = u.id) as credits
+            FROM friendship f
+            JOIN users u ON u.id = CASE WHEN f.solicitante_id = :tid THEN f.solicitada_id ELSE f.solicitante_id END
+            WHERE (f.solicitante_id = :tid OR f.solicitada_id = :tid) AND f.estado_solicitud = 'ACEPTADA'
+            ORDER BY u.username ASC
+        ");
+        $stmtFriendList->execute([':tid' => $target_id]);
+        $friend_list = $stmtFriendList->fetchAll(PDO::FETCH_ASSOC);
+
         Response::success([
             'data' => [
                 'user' => $user,
@@ -447,7 +460,8 @@ function getPublicProfile()
                 'tech_stats' => $tech_stats,
                 'top_parks' => $top_parks,
                 'top_coasters' => $top_coasters,
-                'photos' => $user_photos
+                'photos' => $user_photos,
+                'friends' => $friend_list
             ]
         ]);
 

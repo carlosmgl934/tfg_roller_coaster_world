@@ -130,10 +130,11 @@ $(document).ready(function () {
       $("#stat-tech-total-manu").text(techStats.total_manufacturers || 0);
     }
 
-    // Botón de amistad, tops y fotos
+    // Botón de amistad, tops, fotos y amigos
     renderFriendshipButton(user.id, fStatus);
     renderTops(topCoasters, topParks);
     renderPhotos(userPhotos, user);
+    renderFriendsList(data.friends || [], user.username);
 
     setupTabs();
   }
@@ -154,6 +155,7 @@ $(document).ready(function () {
       if (targetId === "menu-profile") $("#section-info").fadeIn(300);
       else if (targetId === "menu-tops") $("#section-tops").fadeIn(300);
       else if (targetId === "menu-photos") $("#section-photos").fadeIn(300);
+      else if (targetId === "menu-friends") $("#section-friends").fadeIn(300);
     });
   }
 
@@ -177,14 +179,10 @@ $(document).ready(function () {
                         <i class="fa-solid fa-xmark"></i></button>
                  </div>`;
     } else if (status === "accepted") {
-      btnHtml = `<div class="dropdown">
-                    <button class="btn btn-outline-success fw-bold px-4 rounded-pill py-2 dropdown-toggle" data-bs-toggle="dropdown">
-                        <i class="fa-solid fa-user-check me-2"></i>Amigos</button>
-                    <ul class="dropdown-menu dropdown-menu-dark">
-                        <li><a class="dropdown-item text-danger action-friend" href="#" data-action="remove">
-                            <i class="fa-solid fa-user-minus me-2"></i>Eliminar Amigo</a></li>
-                    </ul>
-                 </div>`;
+      btnHtml = `<button class="btn btn-outline-success fw-bold px-4 rounded-pill py-2 profile-remove-friend-trigger"
+                     data-id="${targetId}" data-name="${$("#user-username").text()}">
+                     <i class="fa-solid fa-user-check me-2"></i>Amigos
+                 </button>`;
     }
     container.html(btnHtml);
 
@@ -380,4 +378,112 @@ $(document).ready(function () {
     });
 
   }
+
+  // ─── Renderizar amigos del perfil visitado ──────────────────────
+  function renderFriendsList(friends, ownerUsername) {
+    const container = $("#friends-list-container");
+    container.empty();
+
+    $("#friends-section-username").text(ownerUsername);
+    $("#friends-section-count").text(friends.length);
+
+    if (!friends || friends.length === 0) {
+      container.html('<div class="p-5 text-center text-muted"><i class="fa-solid fa-user-group fa-3x mb-3 d-block opacity-25"></i>Este usuario aún no tiene amigos en la plataforma.</div>');
+      return;
+    }
+
+    let html = '';
+    friends.forEach(friend => {
+      const avatarObj = resolveAvatarUrl(friend.profile_image, friend.username);
+      const avatarSrc = avatarObj.type === "image"
+        ? avatarObj.src
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(friend.username)}&background=198754&color=fff&size=128`;
+
+      let details = [];
+      if (friend.city || friend.country) {
+          let loc = [friend.city, friend.country].filter(Boolean).join(", ");
+          details.push(`<i class="fa-solid fa-location-dot text-success me-1"></i>${loc}`);
+      }
+      if (friend.credits > 0) {
+          details.push(`<i class="fa-solid fa-ticket text-warning me-1"></i>${friend.credits} credits`);
+      }
+      if (friend.created_at) {
+          const date = new Date(friend.created_at);
+          const mes = new Intl.DateTimeFormat('es-ES', { month: 'long' }).format(date);
+          const anio = date.getFullYear();
+          details.push(`<i class="fa-regular fa-calendar text-info me-1"></i>Miembro desde ${mes} de ${anio}`);
+      }
+      let detailsHtml = details.length > 0 ? details.join('<span class="mx-2 opacity-25">&bull;</span>') : 'Miembro RCW';
+
+      html += `
+        <div class="d-flex align-items-center gap-3 px-4 py-3 position-relative"
+             style="border-bottom: 1px solid var(--rcw-border); transition: background 0.2s;"
+             onmouseover="this.style.background='rgba(25,135,84,0.06)'"
+             onmouseout="this.style.background='transparent'">
+
+          <!-- Avatar -->
+          <img src="${avatarSrc}"
+               alt="${friend.username}"
+               class="rounded-circle object-fit-cover flex-shrink-0"
+               style="width: 46px; height: 46px; border: 2px solid rgba(25,135,84,0.4);"
+               onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(friend.username)}&background=198754&color=fff&size=128'">
+
+          <!-- Nombre -->
+          <div class="flex-grow-1 min-w-0">
+            <div class="fw-bold text-white text-truncate" style="font-size: 0.95rem;">${friend.username}</div>
+            <small class="text-muted d-block text-truncate mt-1" style="font-size: 0.75rem;">${detailsHtml}</small>
+          </div>
+
+          <!-- Acciones -->
+          <div class="d-flex gap-2 flex-shrink-0 position-relative" style="z-index: 2;">
+            <a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${friend.id}"
+               class="btn btn-sm btn-outline-secondary px-3" style="border-radius: 20px; font-size: 0.78rem;">
+              <i class="fa-solid fa-eye me-1"></i>Ver perfil
+            </a>
+            <button class="btn btn-sm btn-success px-3 rcw-add-from-profile-btn"
+                    data-id="${friend.id}"
+                    style="border-radius: 20px; font-size: 0.78rem; display: none;">
+              <i class="fa-solid fa-user-plus me-1"></i>Añadir
+            </button>
+          </div>
+        </div>
+      `;
+    });
+
+    container.html(html);
+  }
+
+  // ─── Modal Confirmar Eliminar Amigo (perfil público) ───────────
+  $(document).on("click", ".profile-remove-friend-trigger", function() {
+    const id = $(this).data("id");
+    const name = $(this).data("name") || $("#user-username").text();
+    $("#removeProfileFriendName").text(name);
+    $("#confirmRemoveProfileFriendBtn").data("id", id);
+    new bootstrap.Modal(document.getElementById("removeProfileFriendModal")).show();
+  });
+
+  $("#confirmRemoveProfileFriendBtn").on("click", async function() {
+    const btn = $(this);
+    const targetId = btn.data("id");
+    btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span>');
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/php/users.php?action=reject_remove_friend`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ target_id: targetId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        bootstrap.Modal.getInstance(document.getElementById("removeProfileFriendModal")).hide();
+        fetchProfileData(targetId);
+      } else {
+        alert("Error: " + (data.error || "No se pudo eliminar"));
+      }
+    } catch (err) {
+      alert("Error de conexión.");
+    }
+    btn.prop("disabled", false).text("Eliminar");
+  });
+
 });

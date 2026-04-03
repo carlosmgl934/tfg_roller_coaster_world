@@ -180,59 +180,81 @@ $(document).ready(function () {
         "fff",
       );
 
+      let details = [];
+      if (friend.city || friend.country) {
+          let loc = [friend.city, friend.country].filter(Boolean).join(", ");
+          details.push(`<i class="fa-solid fa-location-dot text-success me-1"></i>${loc}`);
+      }
+      if (friend.joined_at) {
+          const date = new Date(friend.joined_at);
+          const mes = new Intl.DateTimeFormat('es-ES', { month: 'long' }).format(date);
+          const anio = date.getFullYear();
+          details.push(`<i class="fa-regular fa-calendar text-info me-1"></i>Miembro desde ${mes} de ${anio}`);
+      }
+      if (friend.favorite_coaster) {
+          details.push(`<i class="fa-solid fa-star text-warning me-1"></i>Top 1: ${friend.favorite_coaster}`);
+      }
+      let detailsHtml = details.length > 0 ? details.join('<span class="mx-2 opacity-25">&bull;</span>') : '<i class="fa-solid fa-user text-muted me-1"></i>Miembro RCW';
+
       html += `
-        <div class="col-12 col-xl-6">
-           <div class="card bg-dark text-white rounded-0 h-100 shadow-sm border-0 d-flex flex-row overflow-hidden" style="border: 1px solid var(--rcw-border-strong) !important; background: linear-gradient(135deg, rgba(25,135,84,0.05) 0%, rgba(0,0,0,0) 100%);">
-             
-             <!-- MAIN ID CONTENT -->
-             <div class="flex-grow-1 d-flex flex-column position-relative z-index-1">
-                 <!-- DNI Header section -->
-                 <div class="w-100 px-3 py-1 bg-success bg-opacity-10 border-bottom border-success border-opacity-25 d-flex justify-content-between align-items-center" style="font-size: 0.6rem; letter-spacing: 0.1em;">
-                    <span class="fw-bold text-success text-uppercase">RCW Member ID</span>
-                    <span class="text-muted font-monospace opacity-75">Nº ${String(friend.id).padStart(6, '0')}</span>
-                 </div>
-                 
-                 <div class="card-body d-flex align-items-center p-3 position-relative flex-grow-1">
-                   <!-- Background Pattern / Logo subtle -->
-                   <img src="${BASE_URL}/web/img/bg-coaster.svg" class="position-absolute" style="bottom: -15px; right: -5px; width: 120px; opacity: 0.05; filter: invert(100%); z-index: 0; pointer-events: none;">
-                   
-                   <!-- ID Photo (Squared) -->
-                   <div class="me-3 p-1 border border-secondary border-opacity-50 shadow-sm rounded-1 position-relative z-index-1" style="width: 65px; height: 65px; background-color: #0d1117;">
-                     <img src="${avatarSrc}" class="w-100 h-100 object-fit-cover rounded-1" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(friend.username)}&background=10b981&color=000&size=128&rounded=false'">
-                   </div>
-                   
-                   <!-- ID Data -->
-                   <div class="flex-grow-1 min-w-0" style="z-index: 1;">
-                     <div class="text-uppercase text-muted fw-bold" style="font-size: 0.55rem; letter-spacing: 0.05em; margin-bottom: 2px;">Apodo / Username</div>
-                     <h5 class="fw-bold text-truncate mb-2" style="font-size: 1.15rem;"><a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${friend.id}" class="text-white text-decoration-none stretched-link">${friend.username}</a></h5>
-                     
-                     <div class="d-flex align-items-center gap-3 mt-1">
-                        <div>
-                            <div class="text-uppercase text-muted fw-bold" style="font-size: 0.55rem; letter-spacing: 0.05em;">Estado</div>
-                            <small class="text-success d-block fw-bold"><i class="fa-solid fa-circle-check me-1 small"></i>AMIGO</small>
-                        </div>
-                        <div>
-                            <div class="text-uppercase text-muted fw-bold" style="font-size: 0.55rem; letter-spacing: 0.05em;">Credits</div>
-                            <small class="text-info d-block fw-bold position-relative z-index-2"><img src="${BASE_URL}/web/img/bg-coaster.svg" style="width: 14px; opacity: 0.8; margin-top: -3px; filter: invert(72%) sepia(35%) saturate(3015%) hue-rotate(159deg) brightness(97%) contrast(100%);" class="me-1">${friend.credits || 0}</small>
-                        </div>
-                     </div>
-                   </div>
-                 </div>
-             </div>
+        <div class="col-12">
+          <div class="rcw-friend-row d-flex align-items-center gap-3 px-4 py-3"
+               style="background-color: #1a222e;
+                      border-bottom: 1px solid var(--rcw-border);
+                      transition: background 0.2s;"
+               onmouseover="this.style.background='#222b38'"
+               onmouseout="this.style.background='#1a222e'">
 
-             <!-- ELIMINAR AMIGO BUTTON (SIDEBAR) -->
-             <div class="d-flex flex-column justify-content-center border-start border-danger bg-danger position-relative z-index-3 rcw-trigger-remove" style="width: 50px; transition: filter 0.2s; cursor: pointer;" onmouseover="this.style.filter='brightness(1.2)'" onmouseout="this.style.filter='brightness(1)'" data-id="${friend.id}" data-name="${friend.username}">
-                 <button class="btn btn-link text-white w-100 h-100 p-0 shadow-none d-flex flex-column align-items-center justify-content-center m-0" style="pointer-events: none;" tabindex="-1" title="Eliminar Amigo">
-                   <i class="fa-solid fa-user-xmark fs-5"></i>
-                 </button>
-             </div>
+            <!-- Avatar Redondo -->
+            <div class="flex-shrink-0">
+              <img src="${avatarSrc}"
+                alt="${friend.username}"
+                class="rounded-circle shadow-sm border border-success border-opacity-25 object-fit-cover"
+                style="width: 52px; height: 52px;"
+                onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(friend.username)}&background=198754&color=fff&size=128'">
+            </div>
 
-           </div>
+            <!-- Info del amigo -->
+            <div class="flex-grow-1 min-w-0 py-1">
+              <div class="d-flex align-items-baseline gap-2 mb-0">
+                <a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${friend.id}"
+                   class="text-white text-decoration-none fw-bold"
+                   style="font-size: 1rem;">
+                  ${friend.username}
+                </a>
+                <small class="text-success fw-bold" style="font-size: 0.65rem;"><i class="fa-solid fa-circle-check me-1"></i>Amigo</small>
+                <small class="text-muted font-monospace ms-1" style="font-size: 0.7rem;">Nº ${String(friend.id).padStart(6, '0')}</small>
+              </div>
+              <div class="text-muted text-truncate mt-1" style="font-size: 0.75rem;">
+                ${detailsHtml}
+              </div>
+            </div>
+
+            <!-- Credits (horizontal: label + valor) -->
+            <div class="flex-shrink-0 me-3 d-flex align-items-center gap-2">
+              <span class="text-muted" style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.05em;">Credits</span>
+              <span class="text-info fw-bold" style="font-size:1.1rem;">${friend.credits || 0}</span>
+            </div>
+
+            <!-- Btn Eliminar -->
+            <div class="flex-shrink-0 rcw-trigger-remove"
+                 data-id="${friend.id}" data-name="${friend.username}"
+                 title="Eliminar amigo"
+                 style="cursor:pointer; position:relative; z-index:10;">
+              <button class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center"
+                      style="width:36px; height:36px; border-width: 2px;"
+                      tabindex="-1">
+                <i class="fa-solid fa-user-xmark" style="pointer-events: none;"></i>
+              </button>
+            </div>
+
+          </div>
         </div>
       `;
     });
     friendsList.html(html);
   }
+
 
   function renderSent(sent) {
     sentList.empty();

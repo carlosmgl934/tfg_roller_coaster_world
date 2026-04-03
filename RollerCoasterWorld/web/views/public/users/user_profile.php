@@ -58,6 +58,8 @@ $user_id = $_GET['id'] ?? null;
                             class="fa-solid fa-list-ol me-2 w-20px text-center"></i> Sus tops</a>
                     <a href="#" id="menu-photos" class="list-group-item list-group-item-action py-3"><i
                             class="fa-solid fa-images me-2 w-20px text-center"></i> Sus fotos</a>
+                    <a href="#" id="menu-friends" class="list-group-item list-group-item-action py-3"><i
+                            class="fa-solid fa-user-group me-2 w-20px text-center"></i> Sus Amigos</a>
                     <a href="<?= Router::url('trip_generator') ?>"
                         class="list-group-item list-group-item-action text-success mt-1 py-3 border-top fw-bold"><i
                             class="fa-solid fa-wand-magic-sparkles me-2 w-20px text-center"></i> Organizar un viaje
@@ -221,7 +223,8 @@ $user_id = $_GET['id'] ?? null;
                         </select>
                     </div>
                     <div class="card-body p-0">
-                        <div class="list-group list-group-flush bg-transparent tops-preview-scroll" id="tops-list-container">
+                        <div class="list-group list-group-flush bg-transparent tops-preview-scroll"
+                            id="tops-list-container">
                             <!-- Inyectado via JS -->
                         </div>
                     </div>
@@ -245,19 +248,71 @@ $user_id = $_GET['id'] ?? null;
                 </div>
             </div>
 
+            <!-- TAB 4: Mis Amigos -->
+            <div class="content-section" id="section-friends" style="display:none;">
+                <div class="card profile-card mb-4">
+                    <div class="card-header pt-3 pb-3 d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-user-group fs-5 text-success"></i>
+                        <h5 class="fw-bold mb-0">Amigos de <span id="friends-section-username">este usuario</span></h5>
+                        <span class="badge badge-profile ms-auto" id="friends-section-count">0</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="friends-list-container">
+                            <!-- Inyectado via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- IG LIGHTBOX MODAL -->
+    <!-- Modal Confirmar Eliminar Amigo (desde perfil público) -->
+    <div class="modal fade" id="removeProfileFriendModal" tabindex="-1" aria-labelledby="removeProfileFriendModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+            <div class="modal-content" style="background: #141e2a; border: 1px solid rgba(255,255,255,0.08);">
+                <div class="modal-header border-0 pb-0">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-danger"></i>
+                        <h6 class="modal-title fw-bold text-white mb-0" id="removeProfileFriendModalLabel">Eliminar
+                            Amigo</h6>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-3">
+                    <p class="text-muted mb-1">¿Seguro que quieres eliminar de tus amigos a <strong class="text-white"
+                            id="removeProfileFriendName"></strong>?</p>
+                    <small class="text-muted opacity-75">Esta acción no se puede deshacer.</small>
+                </div>
+                <div class="modal-footer border-0 pt-0 gap-2">
+                    <button type="button" class="btn btn-sm btn-dark px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-sm btn-danger px-4 fw-bold"
+                        id="confirmRemoveProfileFriendBtn">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="modal fade" id="ig-lightbox-modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
             <div class="modal-content bg-dark text-white border-secondary rounded-0 overflow-visible position-relative">
-                <button id="ig-modal-prev" class="btn text-white position-absolute top-50 translate-middle-y rounded-circle px-3 py-2" style="z-index: 1055; left: -60px; font-size: 1.5rem; background: rgba(0,0,0,0.5);"><i class="fa-solid fa-chevron-left"></i></button>
-                <button id="ig-modal-next" class="btn text-white position-absolute top-50 translate-middle-y rounded-circle px-3 py-2" style="z-index: 1055; right: -60px; font-size: 1.5rem; background: rgba(0,0,0,0.5);"><i class="fa-solid fa-chevron-right"></i></button>
+                <button id="ig-modal-prev"
+                    class="btn text-white position-absolute top-50 translate-middle-y rounded-circle px-3 py-2"
+                    style="z-index: 1055; left: -60px; font-size: 1.5rem; background: rgba(0,0,0,0.5);"><i
+                        class="fa-solid fa-chevron-left"></i></button>
+                <button id="ig-modal-next"
+                    class="btn text-white position-absolute top-50 translate-middle-y rounded-circle px-3 py-2"
+                    style="z-index: 1055; right: -60px; font-size: 1.5rem; background: rgba(0,0,0,0.5);"><i
+                        class="fa-solid fa-chevron-right"></i></button>
                 <div class="modal-header border-secondary d-flex align-items-center py-2 px-3">
-                    <img id="ig-modal-avatar" src="" alt="Avatar" class="rounded-circle me-2" style="width:32px; height:32px; object-fit:cover;">
+                    <img id="ig-modal-avatar" src="" alt="Avatar" class="rounded-circle me-2"
+                        style="width:32px; height:32px; object-fit:cover;">
                     <span id="ig-modal-username" class="fw-bold fs-6"></span>
-                    <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-0">
                     <img id="ig-modal-img" src="" alt="Foto" class="w-100" style="aspect-ratio: 1/1; object-fit:cover;">
@@ -271,7 +326,7 @@ $user_id = $_GET['id'] ?? null;
                 </div>
             </div>
         </div>
-        </div>
+    </div>
     </div>
 
 </main>

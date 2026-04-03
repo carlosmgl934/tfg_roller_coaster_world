@@ -59,9 +59,8 @@ $(document).ready(function () {
       if (user.profile_image) {
         const img = user.profile_image;
         if (img.startsWith('http://') || img.startsWith('https://')) {
-          avatarSrc = img; // URL absoluta (Supabase u otro CDN)
+          avatarSrc = img;
         } else if (img.startsWith('/')) {
-          // Ruta local de uploads → solo existe en quien la subió → usar iniciales
           if (!img.includes('/web/img/uploads/')) {
             avatarSrc = window.BASE_URL + img;
           }
@@ -70,51 +69,99 @@ $(document).ready(function () {
         }
       }
 
+      let statusClass = '';
+      let avatarBorderColor = 'var(--bs-success)';
+
       if (user.friendship_status === 'none') {
-        actionHtml = `<button class="btn btn-outline-success rcw-add-friend-btn fw-bold px-4 rounded-0 shadow-sm" data-id="${user.id}" title="Añadir a mis amigos"><i class="fa-solid fa-user-plus me-1"></i> Añadir</button>`;
+        actionHtml = `<button class="btn btn-success rcw-add-friend-btn fw-bold px-3 py-2 shadow-sm" 
+                        data-id="${user.id}" title="Añadir a mis amigos"
+                        style="border-radius: 20px; font-size: 0.85rem; white-space:nowrap;">
+                        <i class="fa-solid fa-user-plus me-1"></i> Añadir
+                      </button>`;
       } else if (user.friendship_status === 'pending_sent') {
-        actionHtml = `<span class="badge bg-secondary p-2 px-3 fw-bold rounded-0 mx-auto"><i class="fa-solid fa-clock me-1"></i> Pendiente</span>`;
+        avatarBorderColor = '#ffc107';
+        actionHtml = `<span class="badge fw-semibold px-3 py-2" 
+                        style="background: rgba(255,193,7,0.15); border: 1px solid rgba(255,193,7,0.4); color: #ffc107; border-radius: 20px; font-size: 0.8rem; white-space:nowrap;">
+                        <i class="fa-solid fa-clock me-1"></i> Pendiente
+                      </span>`;
       } else if (user.friendship_status === 'pending_received') {
-        actionHtml = `<button class="btn btn-success rcw-accept-friend-btn fw-bold px-3 rounded-0 shadow-sm" data-id="${user.id}" title="Aceptar"><i class="fa-solid fa-check me-1"></i> Aceptar</button>`;
+        avatarBorderColor = '#0dcaf0';
+        actionHtml = `<button class="btn rcw-accept-friend-btn fw-bold px-3 py-2 shadow-sm" 
+                        data-id="${user.id}" title="Aceptar"
+                        style="background: rgba(13,202,240,0.15); border: 1px solid rgba(13,202,240,0.4); color: #0dcaf0; border-radius: 20px; font-size: 0.85rem; white-space:nowrap;">
+                        <i class="fa-solid fa-check me-1"></i> Aceptar
+                      </button>`;
       } else if (user.friendship_status === 'accepted') {
-        actionHtml = `<span class="badge bg-success p-2 px-3 fw-bold rounded-0 mx-auto"><i class="fa-solid fa-user-check me-1"></i> Amigos</span>`;
+        avatarBorderColor = '#198754';
+        actionHtml = `<span class="badge fw-semibold px-3 py-2" 
+                        style="background: rgba(25,135,84,0.2); border: 1px solid rgba(25,135,84,0.5); color: #2bde8e; border-radius: 20px; font-size: 0.8rem; white-space:nowrap;">
+                        <i class="fa-solid fa-user-check me-1"></i> Amigos
+                      </span>`;
       }
 
       let displayName = user.full_name ? user.full_name : user.username;
-      let usernameHtml = user.full_name ? `<span class="text-muted fw-normal ms-1 fs-6">@${user.username}</span>` : '';
+      let usernameHtml = user.full_name ? `<span class="fw-normal ms-1" style="color:#6c8a7a; font-size: 0.85rem;">@${user.username}</span>` : '';
       
       let locationText = 'Coaster Enthusiast';
       let locationIconClass = 'fa-star';
+      let locationColor = '#2bde8e';
       if (user.city && user.country) {
           locationText = `${user.city}, ${user.country}`;
           locationIconClass = 'fa-location-dot';
+          locationColor = 'var(--bs-success)';
       } else if (user.country) {
           locationText = user.country;
           locationIconClass = 'fa-location-dot';
+          locationColor = 'var(--bs-success)';
       } else if (user.city) {
           locationText = user.city;
           locationIconClass = 'fa-location-dot';
+          locationColor = 'var(--bs-success)';
       }
 
       html += `
-        <div class="card text-white border-0 border-start border-4 border-success shadow-sm rounded-0 w-100" style="transition: transform 0.2s; background-color: #21262d !important;">
-          <div class="card-body d-flex align-items-center p-3">
-             <img src="${avatarSrc}" alt="${user.username}" class="rounded-circle object-fit-cover shadow-sm me-4" style="width: 55px; height: 55px; border: 2px solid var(--bs-success);">
-             <div class="flex-grow-1 min-w-0">
-               <h5 class="fw-bold text-truncate mb-1"><a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${user.id}" class="text-white text-decoration-none stretched-link">${displayName}${usernameHtml}</a></h5>
-               <small class="text-muted d-block text-truncate"><i class="fa-solid ${locationIconClass} text-success opacity-75 me-1"></i> ${locationText}</small>
-             </div>
-             <div class="ms-3 position-relative z-index-1" style="z-index: 2;">
-               ${actionHtml}
-             </div>
+        <div class="rcw-user-card position-relative w-100" 
+             style="background-color: #1a222e; border-bottom: 1px solid var(--rcw-border); transition: background 0.2s;"
+             onmouseover="this.style.background='#222b38'"
+             onmouseout="this.style.background='#1a222e'">
+          
+          <div class="d-flex align-items-center gap-3 p-3 ps-4">
+            
+            <!-- Avatar -->
+            <div class="flex-shrink-0 position-relative">
+              <img src="${avatarSrc}" 
+                   alt="${user.username}" 
+                   class="rounded-circle object-fit-cover"
+                   style="width: 54px; height: 54px; border: 2.5px solid ${avatarBorderColor}; box-shadow: 0 0 0 3px rgba(43,222,142,0.1);"
+                   onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=198754&color=fff&size=128'">
+            </div>
+
+            <!-- Info -->
+            <div class="flex-grow-1 min-w-0">
+              <div class="d-flex align-items-baseline gap-1 mb-1 flex-wrap">
+                <a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${user.id}" 
+                   class="text-white fw-bold text-decoration-none stretched-link" 
+                   style="font-size: 1rem;">
+                  ${displayName}
+                </a>
+                ${usernameHtml}
+              </div>
+              <small style="color: #6c8a7a; font-size: 0.78rem;">
+                <i class="fa-solid ${locationIconClass} me-1" style="color: ${locationColor};"></i>${locationText}
+              </small>
+            </div>
+
+            <!-- Action -->
+            <div class="flex-shrink-0 position-relative" style="z-index: 2;">
+              ${actionHtml}
+            </div>
+
           </div>
         </div>
       `;
     });
 
     resultsContainer.html(html);
-
-    // Bind actions
     bindNavFriendActions();
   }
 

@@ -78,8 +78,10 @@ if (!$is_logged) {
                         </div>
                     </div>
 
-                    <div class="row g-3" id="friends-list">
-                        <!-- Amigos inyectados via JS -->
+                    <div style="max-height: 480px; overflow-y: auto; overflow-x: hidden;" class="rcw-custom-scrollbar pe-2">
+                        <div class="row g-0" id="friends-list">
+                            <!-- Amigos inyectados via JS -->
+                        </div>
                     </div>
                 </div>
             </div>
