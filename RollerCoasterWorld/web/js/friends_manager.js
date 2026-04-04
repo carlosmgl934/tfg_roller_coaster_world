@@ -91,7 +91,7 @@ $(document).ready(function () {
     const sortVal = sortSelect.val();
 
     let filtered = allFriends.filter((f) =>
-      f.username.toLowerCase().includes(query)
+      f.username.toLowerCase().includes(query),
     );
 
     filtered.sort((a, b) => {
@@ -120,9 +120,13 @@ $(document).ready(function () {
     requestsCount.text(requests.length);
 
     if (requests.length > 0) {
-      requestsCount.removeClass('badge-profile-gray').addClass('badge-profile-danger');
+      requestsCount
+        .removeClass("badge-profile-gray")
+        .addClass("badge-profile-danger");
     } else {
-      requestsCount.removeClass('badge-profile-danger').addClass('badge-profile-gray');
+      requestsCount
+        .removeClass("badge-profile-danger")
+        .addClass("badge-profile-gray");
     }
 
     if (requests.length === 0) {
@@ -182,19 +186,29 @@ $(document).ready(function () {
 
       let details = [];
       if (friend.city || friend.country) {
-          let loc = [friend.city, friend.country].filter(Boolean).join(", ");
-          details.push(`<i class="fa-solid fa-location-dot text-success me-1"></i>${loc}`);
+        let loc = [friend.city, friend.country].filter(Boolean).join(", ");
+        details.push(
+          `<i class="fa-solid fa-location-dot text-success me-1"></i>${loc}`,
+        );
       }
       if (friend.joined_at) {
-          const date = new Date(friend.joined_at);
-          const mes = new Intl.DateTimeFormat('es-ES', { month: 'long' }).format(date);
-          const anio = date.getFullYear();
-          details.push(`<i class="fa-regular fa-calendar text-info me-1"></i>Miembro desde ${mes} de ${anio}`);
+        const date = new Date(friend.joined_at);
+        const mes = new Intl.DateTimeFormat("es-ES", { month: "long" }).format(
+          date,
+        );
+        const anio = date.getFullYear();
+        details.push(
+          `<i class="fa-regular fa-calendar text-info me-1"></i>Miembro desde ${mes} de ${anio}`,
+        );
       }
-      if (friend.favorite_coaster) {
-          details.push(`<i class="fa-solid fa-star text-warning me-1"></i>Top 1: ${friend.favorite_coaster}`);
-      }
-      let detailsHtml = details.length > 0 ? details.join('<span class="mx-2 opacity-25">&bull;</span>') : '<i class="fa-solid fa-user text-muted me-1"></i>Miembro RCW';
+      details.push(
+        `<span class="text-warning fw-bold">${friend.credits || 0}</span> credits`,
+      );
+
+      let detailsHtml =
+        details.length > 0
+          ? details.join('<span class="mx-2 opacity-25">&bull;</span>')
+          : '<i class="fa-solid fa-user text-muted me-1"></i>Miembro RCW';
 
       html += `
         <div class="col-12">
@@ -223,18 +237,14 @@ $(document).ready(function () {
                   ${friend.username}
                 </a>
                 <small class="text-success fw-bold" style="font-size: 0.65rem;"><i class="fa-solid fa-circle-check me-1"></i>Amigo</small>
-                <small class="text-muted font-monospace ms-1" style="font-size: 0.7rem;">Nº ${String(friend.id).padStart(6, '0')}</small>
+                <small class="text-muted font-monospace ms-1" style="font-size: 0.7rem;">Nº ${String(friend.id).padStart(6, "0")}</small>
               </div>
               <div class="text-muted text-truncate mt-1" style="font-size: 0.75rem;">
                 ${detailsHtml}
               </div>
             </div>
 
-            <!-- Credits (horizontal: label + valor) -->
-            <div class="flex-shrink-0 me-3 d-flex align-items-center gap-2">
-              <span class="text-muted" style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.05em;">Credits</span>
-              <span class="text-info fw-bold" style="font-size:1.1rem;">${friend.credits || 0}</span>
-            </div>
+
 
             <!-- Btn Eliminar -->
             <div class="flex-shrink-0 rcw-trigger-remove"
@@ -254,7 +264,6 @@ $(document).ready(function () {
     });
     friendsList.html(html);
   }
-
 
   function renderSent(sent) {
     sentList.empty();
@@ -333,39 +342,48 @@ $(document).ready(function () {
   });
 
   // Modal Remove Friend Logic
-  $(document).on("click", ".rcw-trigger-remove", function(e) {
-      e.stopPropagation();
-      const id = $(this).data("id");
-      const name = $(this).data("name");
-      $("#removeFriendName").text(name);
-      $("#confirmRemoveFriendBtn").data("id", id);
-      const modal = new bootstrap.Modal(document.getElementById('removeFriendModal'));
-      modal.show();
+  $(document).on("click", ".rcw-trigger-remove", function (e) {
+    e.stopPropagation();
+    const id = $(this).data("id");
+    const name = $(this).data("name");
+    $("#removeFriendName").text(name);
+    $("#confirmRemoveFriendBtn").data("id", id);
+    const modal = new bootstrap.Modal(
+      document.getElementById("removeFriendModal"),
+    );
+    modal.show();
   });
 
-  $("#confirmRemoveFriendBtn").on("click", async function() {
-      const btn = $(this);
-      const targetId = btn.data("id");
-      const originalHtml = btn.text() || "Eliminando...";
+  $("#confirmRemoveFriendBtn").on("click", async function () {
+    const btn = $(this);
+    const targetId = btn.data("id");
+    const originalHtml = btn.text() || "Eliminando...";
 
-      btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span>');
+    btn
+      .prop("disabled", true)
+      .html('<span class="spinner-border spinner-border-sm"></span>');
 
-      try {
-        const res = await fetch(`${BASE_URL}/api/php/users.php?action=reject_remove_friend`, {
+    try {
+      const res = await fetch(
+        `${BASE_URL}/api/php/users.php?action=reject_remove_friend`,
+        {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ target_id: targetId }),
-        });
-        const data = await res.json();
-        if (data.success) {
-          bootstrap.Modal.getInstance(document.getElementById('removeFriendModal')).hide();
-          fetchFriendsData();
-        } else {
-          alert("Error: " + (data.error || "Petición fallida"));
-        }
-      } catch (err) {
-        alert("Error de conexión al eliminar amigo.");
+        },
+      );
+      const data = await res.json();
+      if (data.success) {
+        bootstrap.Modal.getInstance(
+          document.getElementById("removeFriendModal"),
+        ).hide();
+        fetchFriendsData();
+      } else {
+        alert("Error: " + (data.error || "Petición fallida"));
       }
-      btn.prop("disabled", false).text("Eliminar");
+    } catch (err) {
+      alert("Error de conexión al eliminar amigo.");
+    }
+    btn.prop("disabled", false).text("Eliminar");
   });
 });

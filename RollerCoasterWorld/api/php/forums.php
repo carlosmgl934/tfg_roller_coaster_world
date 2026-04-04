@@ -57,6 +57,15 @@ function createForum()
         // Usar una transacción para asegurar que tanto el foro como los colaboradores se guardan
         $db->beginTransaction();
 
+        // Mantener como máximo 50 foros en total en la BBDD (dejamos los 49 más recientes antes de insertar el nuevo)
+        $stmtLimit = $db->prepare("
+            DELETE FROM forums 
+            WHERE id NOT IN (
+                SELECT id FROM forums ORDER BY created_at DESC LIMIT 49
+            )
+        ");
+        $stmtLimit->execute();
+
         $stmt = $db->prepare("
             INSERT INTO forums (title, forum_subject, author_id, privacy) 
             VALUES (:title, :subject, :author_id, :privacy) 

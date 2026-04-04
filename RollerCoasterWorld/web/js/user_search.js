@@ -11,14 +11,14 @@ $(document).ready(function () {
 
       if (query.length < 2) {
         if (query.length === 0) {
-            resultsContainer.html('<div class="col-12 text-center text-muted py-5"><i class="fa-solid fa-magnifying-glass mb-3 d-block fa-3x opacity-25"></i><h5>Empieza a escribir para buscar...</h5></div>');
+            resultsContainer.html('<div class="text-center text-muted py-5"><i class="fa-solid fa-magnifying-glass mb-3 d-block fa-3x opacity-25"></i><h5>Empieza a escribir para buscar...</h5><p class="small">Escribe al menos 2 letras</p></div>');
         } else {
-            resultsContainer.html('<div class="col-12 text-center text-muted py-5"><i class="fa-solid fa-keyboard mb-3 d-block fa-3x opacity-25"></i><h5>Escribe al menos 2 caracteres...</h5></div>');
+            resultsContainer.html('<div class="text-center text-muted py-5"><i class="fa-solid fa-keyboard mb-3 d-block fa-3x opacity-25"></i><h5>Escribe al menos 2 caracteres...</h5></div>');
         }
         return;
       }
 
-      resultsContainer.html('<div class="col-12 text-center text-success py-5"><div class="spinner-border mb-3" role="status"></div><h5>Buscando en la comunidad...</h5></div>');
+      resultsContainer.html('<div class="text-center text-success py-5"><div class="spinner-border mb-3" role="status"></div><h5>Buscando en la comunidad...</h5></div>');
 
       searchTimeout = setTimeout(() => {
         fetchUsers(query);
@@ -35,16 +35,16 @@ $(document).ready(function () {
         renderNavSearchResults(payload.data);
       } else {
         resultsContainer.html(`
-        <div class="text-center text-muted py-5 w-100">
-          <i class="fa-solid fa-ghost mb-3 d-block fa-3x opacity-25"></i>
-          <h5>No se ha encontrado a nadie</h5>
-          <p class="small">Prueba con otro nombre o asegúrate de haberlo escrito bien.</p>
-        </div>
-      `);
+          <div class="text-center text-muted py-5">
+            <i class="fa-solid fa-ghost mb-3 d-block fa-3x opacity-25"></i>
+            <h5>No se ha encontrado a nadie</h5>
+            <p class="small">Prueba con otro nombre o asegúrate de haberlo escrito bien.</p>
+          </div>
+        `);
       }
     } catch (e) {
       console.error(e);
-      resultsContainer.html('<div class="col-12 text-center text-danger py-5"><i class="fa-solid fa-triangle-exclamation mb-3 d-block fa-3x"></i><h5>Error al buscar</h5></div>');
+      resultsContainer.html('<div class="text-center text-danger py-5"><i class="fa-solid fa-triangle-exclamation mb-3 d-block fa-3x"></i><h5>Error al buscar</h5></div>');
     }
   }
 
@@ -121,18 +121,18 @@ $(document).ready(function () {
 
       html += `
         <div class="rcw-user-card position-relative w-100" 
-             style="background-color: #1a222e; border-bottom: 1px solid var(--rcw-border); transition: background 0.2s;"
-             onmouseover="this.style.background='#222b38'"
-             onmouseout="this.style.background='#1a222e'">
+             style="border-bottom: 1px solid #30363d; transition: background 0.2s;"
+             onmouseover="this.style.background='#1c2330'"
+             onmouseout="this.style.background=''">
           
-          <div class="d-flex align-items-center gap-3 p-3 ps-4">
+          <div class="d-flex align-items-center gap-3 px-4 py-3">
             
             <!-- Avatar -->
-            <div class="flex-shrink-0 position-relative">
+            <div class="flex-shrink-0">
               <img src="${avatarSrc}" 
                    alt="${user.username}" 
                    class="rounded-circle object-fit-cover"
-                   style="width: 54px; height: 54px; border: 2.5px solid ${avatarBorderColor}; box-shadow: 0 0 0 3px rgba(43,222,142,0.1);"
+                   style="width: 52px; height: 52px; border: 2px solid ${avatarBorderColor};"
                    onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=198754&color=fff&size=128'">
             </div>
 

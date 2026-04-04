@@ -19,7 +19,7 @@ function _escUser(str) {
 
 function _initialsDiv(initials) {
     return `<div class="d-flex align-items-center justify-content-center rounded-circle fw-bold text-white flex-shrink-0"
-                style="width:38px;height:38px;background:#198754;font-size:.85rem;letter-spacing:.5px;">
+                style="width:42px;height:42px;background:#198754;font-size:.85rem;letter-spacing:.5px;">
                 ${initials}
             </div>`;
 }
@@ -28,24 +28,22 @@ function _initialsDiv(initials) {
 window.buildInitialsAvatar = function (initials) {
     const div = document.createElement('div');
     div.className = 'd-flex align-items-center justify-content-center rounded-circle fw-bold text-white flex-shrink-0';
-    div.style.cssText = 'width:38px;height:38px;background:#198754;font-size:.85rem;letter-spacing:.5px;';
+    div.style.cssText = 'width:42px;height:42px;background:#198754;font-size:.85rem;letter-spacing:.5px;';
     div.textContent = initials;
     return div;
 };
 
-// ─── Render tabla ─────────────────────────────────────────────────────────────
+// ─── Render list-group ────────────────────────────────────────────────────────
 function _renderUsersTable(users) {
-    const tbody = $('#users-table-body');
-    tbody.empty();
+    const $list = $('#admin-users-list');
+    $list.empty();
 
     if (!users || users.length === 0) {
-        tbody.html(`
-            <tr>
-                <td colspan="6" class="text-center py-5 text-muted">
-                    <i class="fa-solid fa-users-slash fa-2x d-block mb-3" style="opacity:.3;"></i>
-                    No se encontraron usuarios con ese criterio.
-                </td>
-            </tr>
+        $list.html(`
+            <div class="list-group-item text-center py-5 text-muted" style="background:#161b22;">
+                <i class="fa-solid fa-users-slash fa-2x d-block mb-3" style="opacity:.3;"></i>
+                No se encontraron usuarios con ese criterio.
+            </div>
         `);
         return;
     }
@@ -58,7 +56,7 @@ function _renderUsersTable(users) {
             ? `<img src="${_escUser(user.profile_image)}"
                     alt="${safeInits}"
                     class="rounded-circle flex-shrink-0"
-                    style="width:38px;height:38px;object-fit:cover;border:2px solid #198754;"
+                    style="width:42px;height:42px;object-fit:cover;border:2px solid #198754;"
                     onerror="this.replaceWith(buildInitialsAvatar('${safeInits}'))">`
             : _initialsDiv(initials);
 
@@ -66,38 +64,45 @@ function _renderUsersTable(users) {
             ? `<span class="badge text-uppercase fw-semibold" style="background:rgba(239,68,68,.18);color:#ef4444;border:1px solid rgba(239,68,68,.35);letter-spacing:.5px;">Admin</span>`
             : `<span class="badge text-uppercase fw-semibold" style="background:rgba(59,130,246,.18);color:#60a5fa;border:1px solid rgba(59,130,246,.35);letter-spacing:.5px;">User</span>`;
 
+        const loc = [user.city, user.country].filter(Boolean).join(', ') || null;
         const dateStr = user.created_at
             ? new Date(user.created_at).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })
-            : '—';
+            : null;
+
+        const meta = [
+            loc     ? `<i class="fa-solid fa-location-dot me-1 text-success opacity-75"></i>${_escUser(loc)}` : null,
+            dateStr ? `<i class="fa-regular fa-calendar me-1 opacity-50"></i>${dateStr}` : null,
+            user.email ? `<i class="fa-solid fa-envelope me-1 opacity-50"></i>${_escUser(user.email)}` : null,
+        ].filter(Boolean).join('<span class="mx-2 opacity-25">&bull;</span>');
 
         const userJson = JSON.stringify(user).replace(/"/g, '&quot;');
 
-        tbody.append(`
-            <tr style="border-color:#30363d;">
-                <td class="py-3 px-4" style="border-color:#30363d;">
-                    <div class="d-flex align-items-center gap-3">
-                        ${avatarHtml}
-                        <div>
-                            <div class="fw-semibold text-white" style="font-size:.9rem;">${_escUser(user.username)}</div>
-                            <div class="text-muted" style="font-size:.78rem;">${_escUser(user.email)}</div>
+        $list.append(`
+            <div class="list-group-item list-group-item-action border-0 border-bottom px-4 py-3"
+                 style="background:#161b22; border-color:#30363d !important; cursor:default;"
+                 onmouseover="this.style.background='#1c2330'" onmouseout="this.style.background='#161b22'">
+                <div class="d-flex align-items-center gap-3">
+                    ${avatarHtml}
+                    <div class="flex-grow-1 min-w-0">
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <span class="fw-semibold text-white" style="font-size:.95rem;">${_escUser(user.username)}</span>
+                            ${roleBadge}
+                            <span class="text-muted font-monospace" style="font-size:.7rem;">Nº ${String(user.id).padStart(6,'0')}</span>
                         </div>
+                        <div class="text-muted text-truncate mt-1" style="font-size:.78rem;">${meta || '—'}</div>
                     </div>
-                </td>
-                <td class="py-3 px-4 text-muted" style="border-color:#30363d;font-size:.88rem;">${_escUser(user.full_name || '—')}</td>
-                <td class="py-3 px-4 text-muted d-none d-md-table-cell" style="border-color:#30363d;font-size:.88rem;">${_escUser(user.country || '—')}</td>
-                <td class="py-3 px-4" style="border-color:#30363d;">${roleBadge}</td>
-                <td class="py-3 px-4 text-muted d-none d-lg-table-cell" style="border-color:#30363d;font-size:.82rem;">${dateStr}</td>
-                <td class="py-3 px-4 text-end" style="border-color:#30363d;">
-                    <button class="btn btn-sm rounded-0 me-1 admin-action-btn" title="Editar"
-                        onclick='openEditModal(${userJson})'>
-                        <i class="fa-solid fa-pen-to-square"></i>
-                    </button>
-                    <button class="btn btn-sm rounded-0 admin-action-btn admin-action-del" title="Eliminar"
-                        onclick="openDeleteModal(${user.id}, '${_escUser(user.username)}')">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
+                    <div class="d-flex gap-2 flex-shrink-0">
+                        <button class="btn btn-sm rounded-0 admin-action-btn" title="Editar"
+                            onclick='openEditModal(${userJson})'>
+                            <i class="fa-solid fa-pen-to-square"></i> Editar
+                        </button>
+                        <button class="btn btn-sm rounded-0 admin-action-btn admin-action-del" title="Eliminar"
+                            onclick="openDeleteModal(${user.id}, '${_escUser(user.username)}')">
+                            <i class="fa-solid fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
         `);
     });
 }
@@ -129,13 +134,11 @@ function _renderUsersPagination(total, limit) {
 
 // ─── Función de carga principal (global) ──────────────────────────────────────
 window.loadUsers = function () {
-    const tbody = $('#users-table-body');
-    tbody.html(`
-        <tr>
-            <td colspan="6" class="text-center py-5 text-muted">
-                <i class="fa-solid fa-spinner fa-spin me-2 text-success"></i>Cargando usuarios...
-            </td>
-        </tr>
+    const $list = $('#admin-users-list');
+    $list.html(`
+        <div class="list-group-item text-center py-5 text-muted" style="background:#161b22;">
+            <i class="fa-solid fa-spinner fa-spin me-2 text-success"></i>Cargando usuarios...
+        </div>
     `);
 
     $.ajax({
@@ -152,15 +155,15 @@ window.loadUsers = function () {
                 const n = res.total;
                 $('#users-count').text(n === 1 ? '1 usuario encontrado' : `${n.toLocaleString()} usuarios encontrados`);
             } else {
-                tbody.html(`<tr><td colspan="6" class="text-center py-5 text-danger">
+                $list.html(`<div class="list-group-item text-center py-5 text-danger" style="background:#161b22;">
                     <i class="fa-solid fa-circle-exclamation me-2"></i>${res.error || 'Error al cargar usuarios'}
-                </td></tr>`);
+                </div>`);
             }
         },
         error() {
-            tbody.html(`<tr><td colspan="6" class="text-center py-5 text-danger">
+            $list.html(`<div class="list-group-item text-center py-5 text-danger" style="background:#161b22;">
                 <i class="fa-solid fa-wifi me-2"></i>Error de conexión con la API
-            </td></tr>`);
+            </div>`);
         }
     });
 };
@@ -280,7 +283,10 @@ $(document).ready(function () {
                 bootstrap.Modal.getInstance($('#modal-delete-user')[0]).hide();
                 if (res.success) {
                     loadUsers();
-                    _showUserAlert('Usuario eliminado correctamente.');
+
+                    let msg = 'Usuario eliminado correctamente.';
+                    if (res.supabase_warn) msg += `\n⚠️ ${res.supabase_warn}`;
+                    _showUserAlert(msg);
                 } else {
                     _showUserAlert(res.error || 'Error al eliminar.');
                 }

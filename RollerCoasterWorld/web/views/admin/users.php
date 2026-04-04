@@ -69,7 +69,7 @@ if (!$is_logged || !$is_admin) {
                         class="form-control shadow-sm pe-5 border-success rounded-0"
                         placeholder="Buscar por nombre, email o usuario..."
                         style="border-width: 2px;">
-                    <i class="fa-solid fa-magnifying-glass text-muted position-absolute"
+                    <i id="user-search-icon" class="fa-solid fa-magnifying-glass text-muted position-absolute"
                         style="right: 14px; top: 50%; transform: translateY(-50%); cursor: default;"></i>
                 </div>
                 <button class="btn btn-outline-secondary rounded-0" onclick="loadUsers()" title="Recargar">
@@ -80,28 +80,11 @@ if (!$is_logged || !$is_admin) {
             <!-- Contador -->
             <p class="text-muted fw-semibold mb-2 small" id="users-count"></p>
 
-            <!-- Tabla de usuarios -->
-            <div class="shadow-sm rounded-0" style="background:#161b22; border:1px solid #30363d; overflow:hidden;">
-                <div class="table-responsive">
-                    <table class="table table-dark table-hover mb-0" style="border-color:#30363d;">
-                        <thead>
-                            <tr style="border-color:#30363d; background:#0d1117;">
-                                <th class="py-3 px-4 text-uppercase small text-muted fw-semibold" style="letter-spacing:.5px;">Usuario</th>
-                                <th class="py-3 px-4 text-uppercase small text-muted fw-semibold" style="letter-spacing:.5px;">Nombre</th>
-                                <th class="py-3 px-4 text-uppercase small text-muted fw-semibold d-none d-md-table-cell" style="letter-spacing:.5px;">País</th>
-                                <th class="py-3 px-4 text-uppercase small text-muted fw-semibold" style="letter-spacing:.5px;">Rol</th>
-                                <th class="py-3 px-4 text-uppercase small text-muted fw-semibold d-none d-lg-table-cell" style="letter-spacing:.5px;">Registro</th>
-                                <th class="py-3 px-4 text-end text-uppercase small text-muted fw-semibold" style="letter-spacing:.5px;">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="users-table-body">
-                            <tr>
-                                <td colspan="6" class="text-center py-5 text-muted">
-                                    <i class="fa-solid fa-spinner fa-spin me-2 text-success"></i>Cargando usuarios...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <!-- Lista de usuarios -->
+            <div class="list-group shadow-sm rounded-0" id="admin-users-list"
+                 style="max-height: 600px; overflow-y: auto; overflow-x: hidden;">
+                <div class="list-group-item text-center text-muted py-5" id="admin-users-loading">
+                    <i class="fa-solid fa-spinner fa-spin me-2 text-success"></i>Cargando usuarios...
                 </div>
             </div>
 

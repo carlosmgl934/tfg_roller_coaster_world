@@ -404,9 +404,6 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
     border: 1px solid #1e7038;
 }
 
-/* ============================================================
-   FILE INPUT — Botón "Seleccionar archivo" del modal de foto
-   ============================================================ */
 #photo::file-selector-button {
     background-color: var(--rcw-green-neon);
     color: #000;
@@ -419,4 +416,21 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
 }
 #photo::file-selector-button:hover {
     background-color: var(--rcw-green-bright);
+}
+
+/* ============================================================
+   COASTER TOPS - Grid de la Comunidad
+   ============================================================ */
+.rcw-top-card:hover {
+    transform: translateY(-5px);
+}
+.rcw-top-card:hover .card-body {
+    box-shadow: 0 10px 25px rgba(25,135,84,0.15) !important;
+    border-color: #198754 !important;
+}
+
+/* Estilo del checkbox de boostrap personalizado a verde */
+.form-check-input:checked {
+    background-color: #198754 !important;
+    border-color: #198754 !important;
 }

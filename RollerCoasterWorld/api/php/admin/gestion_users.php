@@ -152,7 +152,7 @@ function updateUser(): void
 }
 
 // ─────────────────────────────────────────────────────────────
-// deleteUser — eliminar usuario
+// deleteUser — eliminar usuario (BD + Supabase avatar)
 // ─────────────────────────────────────────────────────────────
 function deleteUser(): void
 {
@@ -174,10 +174,78 @@ function deleteUser(): void
 
     try {
         global $db;
+
+        // 1. Obtener datos del usuario antes de borrar (avatar + firebase_uid)
+        $stmtFetch = $db->prepare("SELECT profile_image, firebase_uid FROM users WHERE id = :id");
+        $stmtFetch->execute([':id' => $id]);
+        $user = $stmtFetch->fetch(PDO::FETCH_ASSOC);
+
+        $firebaseUid  = $user['firebase_uid']  ?? null;
+        $profileImage = $user['profile_image'] ?? null;
+
+        // 2. Borrar avatar de Supabase Storage (si existe y es una URL de Supabase)
+        $supabaseUrl = $_ENV['SUPABASE_URL'] ?? null;
+        $supabaseKey = $_ENV['SUPABASE_SERVICE_KEY'] ?? null;
+        $supabaseError = null;
+
+        if ($profileImage && $supabaseUrl && $supabaseKey) {
+            // Extraer el nombre de archivo del avatar (guardado como solo nombre de archivo o URL completa)
+            $filename = null;
+            if (str_starts_with($profileImage, 'http')) {
+                // URL completa → extraer la parte tras /avatars/
+                if (preg_match('#/avatars/(.+)$#', $profileImage, $matches)) {
+                    $filename = $matches[1];
+                }
+            } elseif (!str_starts_with($profileImage, '/')) {
+                // Solo nombre de archivo
+                $filename = $profileImage;
+            }
+
+            if ($filename) {
+                $deleteUrl = rtrim($supabaseUrl, '/') . "/storage/v1/object/avatars/{$filename}";
+                $ch = curl_init($deleteUrl);
+                curl_setopt_array($ch, [
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_CUSTOMREQUEST  => 'DELETE',
+                    CURLOPT_HTTPHEADER     => [
+                        "Authorization: Bearer {$supabaseKey}",
+                        "Content-Type: application/json",
+                    ],
+                ]);
+                curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+                if ($httpCode < 200 || $httpCode >= 300) {
+                    $supabaseError = "Avatar no eliminado de Supabase (HTTP {$httpCode})";
+                }
+            }
+        }
+
+        // 3. Borrar de la base de datos
         $stmt = $db->prepare("DELETE FROM users WHERE id = :id");
         $stmt->execute([':id' => $id]);
 
-        Response::success(['message' => 'Usuario eliminado correctamente.']);
+        // 4. Borrar de Firebase Auth mediante la Service Account
+        $firebaseWarn = null;
+        if ($firebaseUid) {
+            require_once __DIR__ . '/../utils/FirebaseAuthAdmin.php';
+            $firebaseAdmin = new FirebaseAuthAdmin();
+            $firebaseRes = $firebaseAdmin->deleteUser($firebaseUid);
+            if (!$firebaseRes['success']) {
+                $firebaseWarn = "Firebase Auth no eliminado: " . $firebaseRes['error'];
+            }
+        }
+
+        // 5. Preparar advertencias combinadas
+        $warnings = array_filter([$supabaseError, $firebaseWarn]);
+        $warnText = !empty($warnings) ? implode(' | ', $warnings) : null;
+
+        Response::success([
+            'message'       => 'Usuario eliminado correctamente.',
+            // Ya no es necesario que el front maneje a Firebase porque lo hemos hecho nosotros
+            'supabase_warn' => $warnText,
+        ]);
+
     } catch (PDOException $e) {
         Response::error('Error al eliminar usuario: ' . $e->getMessage());
     }

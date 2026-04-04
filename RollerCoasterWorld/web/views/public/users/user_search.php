@@ -13,14 +13,16 @@ if (!$is_logged) {
             <h1 class="display-6 fw-bold border-bottom border-light border-opacity-50 pb-2 text-success">
                 <i class="fa-solid fa-users me-2"></i> Buscar Usuarios
             </h1>
-            <p class="text-muted text-uppercase fw-bold mt-3" style="letter-spacing: 0.1em; font-size: 0.85rem;">Encuentra a otros enthusiasts para ver sus tops, viajes y convertirte en su amigo.</p>
+            <p class="text-muted text-uppercase fw-bold mt-3" style="letter-spacing: 0.1em; font-size: 0.85rem;">
+                Encuentra a otros enthusiasts para ver sus tops, viajes y convertirte en su amigo</p>
         </div>
     </div>
 
     <!-- Buscador -->
     <div class="row justify-content-center mb-5">
         <div class="col-12 col-md-8 col-lg-6">
-            <div class="input-group input-group-lg shadow-sm border border-secondary border-opacity-25 rounded-0 overflow-hidden bg-dark">
+            <div
+                class="input-group input-group-lg shadow-sm border border-secondary border-opacity-25 rounded-0 overflow-hidden bg-dark">
                 <span class="input-group-text bg-success border-0 text-white px-4 rounded-0">
                     <i class="fa-solid fa-search"></i>
                 </span>
@@ -34,7 +36,8 @@ if (!$is_logged) {
     <!-- Contenedor Resultados -->
     <div class="row justify-content-center">
         <div class="col-12 col-md-8 col-lg-6">
-            <div id="page-user-search-results" class="d-flex flex-column pe-2 rcw-custom-scrollbar" style="max-height: 480px; overflow-y: auto; overflow-x: hidden;">
+            <div id="page-user-search-results"
+                style="background:#161b22; border:1px solid #30363d; max-height: 480px; overflow-y: auto; overflow-x: hidden;">
                 <div class="text-center text-muted py-5 w-100">
                     <i class="fa-solid fa-magnifying-glass mb-3 d-block fa-3x opacity-25"></i>
                     <h5>Empieza a escribir para buscar...</h5>
