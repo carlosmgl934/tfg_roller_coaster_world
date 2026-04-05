@@ -1,4 +1,24 @@
 <?php
+/**
+ * FirebaseAuthAdmin.php
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Cliente PHP para la Firebase Admin REST API.
+ * Permite eliminar usuarios de Firebase Authentication desde el servidor,
+ * sin usar el SDK oficial (que requiere Composer).
+ *
+ * Cómo funciona:
+ *   1. Lee la Service Account (JSON) de /api/config/auth-firebase-adminsdk.json
+ *   2. Genera un JWT firmado con la clave privada de la Service Account
+ *   3. Intercambia ese JWT por un access token válido en Google OAuth2
+ *   4. Usa ese token para llamar a la Firebase Identity Toolkit API y borrar el usuario
+ *
+ * Uso:
+ *   $fb = new FirebaseAuthAdmin();
+ *   $result = $fb->deleteUser($firebaseUid); // ['success' => bool, 'error' => string]
+ *
+ * ⚠️ Requiere: api/config/auth-firebase-adminsdk.json (NO subir a git)
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
 
 class FirebaseAuthAdmin
 {

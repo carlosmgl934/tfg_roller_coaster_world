@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../../partials/header.php';
 // Solo logueados (opcional basado en requerimientos, pero la sección Comunidad está restringida a logueados
 // en header.php, así que aseguramos aquí)
@@ -49,5 +49,5 @@ if (!$is_logged) {
 
 </main>
 
-<script src="<?= $base_url ?>/web/js/user_search.js"></script>
+<script src="<?= Router::asset('web/js/social/user_search.js') ?>"></script>
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>

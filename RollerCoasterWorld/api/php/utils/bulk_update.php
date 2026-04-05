@@ -1,4 +1,17 @@
 <?php
+/**
+ * bulk_update.php
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Script de mantenimiento: actualiza el contador reviews_count de TODOS
+ * los parques y coasters con una única SQL masiva (sin pasar por StatsHelper).
+ *
+ * Cuándo ejecutarlo: después de importaciones masivas de ratings, o para
+ * reparar contadores desincronizados.
+ *
+ * Uso (terminal desde la raíz del proyecto):
+ *   php api/php/utils/bulk_update.php
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
 require_once __DIR__ . '/../../database/db_conexion.php';
 
 try {

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 
@@ -55,4 +55,4 @@ $park_id = $_GET['id'] ?? null;
 $login_msg = 'Para crear o participar en foros necesitas iniciar sesión.';
 require_once __DIR__ . '/../../partials/login_modal.php';
 ?>
-<script src="<?= $base_url ?>/web/js/forums.js"></script>
+<script src="<?= Router::asset('web/js/forums/forums.js') ?>"></script>

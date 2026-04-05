@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 ?>
@@ -116,4 +116,4 @@ require_once __DIR__ . '/../../partials/header.php';
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 
-<script src="<?= $base_url ?>/web/js/parks.js"></script>
+<script src="<?= Router::asset('web/js/parks/parks.js') ?>"></script>

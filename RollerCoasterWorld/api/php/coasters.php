@@ -10,20 +10,22 @@ require_once __DIR__ . '/utils/StatsHelper.php';
 
 $router = new ApiRouter('list');
 
-$router->register('search',        'searchCoasters');
-$router->register('list',          'listCoasters');
-$router->register('filter',        'filterCoasters');
-$router->register('manufacter',    'getManufacturers');
-$router->register('country',       'getCountries');
-$router->register('ridden',        'getRidden');
+$router->register('search', 'searchCoasters');
+$router->register('list', 'listCoasters');
+$router->register('filter', 'filterCoasters');
+$router->register('manufacter', 'getManufacturers');
+$router->register('country', 'getCountries');
+$router->register('ridden', 'getRidden');
 $router->register('apply_filters', 'applyFilters');
-$router->register('coaster',       'getCoasters');
-$router->register('photos',        'getCoasterPhotos');
-$router->register('reviews',       'getCoasterReviews');
-$router->register('save_review',   'saveReview', 'POST');
-$router->register('save_photo',    'savePhoto', 'POST');
-$router->register('like_photo',    'likePhoto', 'POST');
-$router->register('check_review',  'checkReview');
+$router->register('coaster', 'getCoasters');
+$router->register('photos', 'getCoasterPhotos');
+$router->register('reviews', 'getCoasterReviews');
+$router->register('save_review', 'saveReview', 'POST');
+$router->register('save_photo', 'savePhoto', 'POST');
+$router->register('like_photo', 'likePhoto', 'POST');
+$router->register('check_review', 'checkReview');
+$router->register('user_tops', 'getUserCoasterTops');
+
 
 $router->dispatch();
 
@@ -89,7 +91,7 @@ function searchCoasters()
 
         // Si el usuario envía un límite numérico por GET (via profile.js) 
         if (isset($_GET['limit']) && is_numeric($_GET['limit'])) {
-            $limitNum = (int)$_GET['limit'];
+            $limitNum = (int) $_GET['limit'];
             $limitClause = "LIMIT " . $limitNum;
         }
 
@@ -123,12 +125,12 @@ function listCoasters()
     $reqDir = strtoupper($_GET['order_dir'] ?? '');
 
     $sortMap = [
-        'name'   => ['col' => 'coasters.coaster_name', 'default' => 'ASC'],
-        'stars'  => ['col' => '(SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = coasters.id)', 'default' => 'DESC'],
+        'name' => ['col' => 'coasters.coaster_name', 'default' => 'ASC'],
+        'stars' => ['col' => '(SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = coasters.id)', 'default' => 'DESC'],
         'height' => ['col' => 'coasters.height', 'default' => 'DESC'],
-        'speed'  => ['col' => 'coasters.speed', 'default' => 'DESC'],
-        'year'   => ['col' => 'NULLIF(coasters.opening_year, 0)', 'default' => 'ASC'],
-        'id'     => ['col' => 'coasters.id', 'default' => 'ASC'],
+        'speed' => ['col' => 'coasters.speed', 'default' => 'DESC'],
+        'year' => ['col' => 'NULLIF(coasters.opening_year, 0)', 'default' => 'ASC'],
+        'id' => ['col' => 'coasters.id', 'default' => 'ASC'],
     ];
 
     $config = $sortMap[$sort] ?? $sortMap['id'];
@@ -280,12 +282,12 @@ function applyFilters()
     $reqDir = strtoupper($_GET['order_dir'] ?? '');
 
     $sortMap = [
-        'name'   => ['col' => 'coasters.coaster_name', 'default' => 'ASC'],
-        'stars'  => ['col' => '(SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = coasters.id)', 'default' => 'DESC'],
+        'name' => ['col' => 'coasters.coaster_name', 'default' => 'ASC'],
+        'stars' => ['col' => '(SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = coasters.id)', 'default' => 'DESC'],
         'height' => ['col' => 'coasters.height', 'default' => 'DESC'],
-        'speed'  => ['col' => 'coasters.speed', 'default' => 'DESC'],
-        'year'   => ['col' => 'NULLIF(coasters.opening_year, 0)', 'default' => 'ASC'],
-        'id'     => ['col' => 'coasters.id', 'default' => 'ASC'],
+        'speed' => ['col' => 'coasters.speed', 'default' => 'DESC'],
+        'year' => ['col' => 'NULLIF(coasters.opening_year, 0)', 'default' => 'ASC'],
+        'id' => ['col' => 'coasters.id', 'default' => 'ASC'],
     ];
 
     $config = $sortMap[$sort] ?? $sortMap['id'];
@@ -296,8 +298,10 @@ function applyFilters()
 
     $page = intval($_GET['page'] ?? 1);
     $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 15;
-    if ($limit > 100) $limit = 100;
-    if ($limit <= 0) $limit = 15;
+    if ($limit > 100)
+        $limit = 100;
+    if ($limit <= 0)
+        $limit = 15;
     $offset = ($page - 1) * $limit;
     $where = implode(" AND ", $conditions);
 
@@ -529,10 +533,10 @@ function saveReview()
         }
 
         $db->commit();
-        
+
         // Actualizar estadísticas de la montaña rusa (estrellas)
         StatsHelper::updateCoasterStats($coasterId);
-        
+
         Response::success();
     } catch (PDOException $e) {
         $db->rollBack();
@@ -638,3 +642,105 @@ function likePhoto()
         Response::error('Error al modificar like de la foto');
     }
 }
+
+function getUserCoasterTops()
+{
+    global $db;
+
+    // Leer parámetros GET
+    $filterFriends = (isset($_GET['filter']) && $_GET['filter'] === 'friends');
+
+    // Si piden filtro de amigos pero no están logueados → error
+    if ($filterFriends && !isset($_SESSION['user_id'])) {
+        Response::error('Debes iniciar sesión para ver los tops de tus amigos', 401);
+        return;
+    }
+
+    $currentUserId = $_SESSION['user_id'] ?? null;
+
+    // Ordenación
+    $sort = $_GET['sort'] ?? 'random';
+    $orderBy = match ($sort) {
+        'alpha_asc'    => 'username ASC',
+        'credits_desc' => 'total_coasters DESC',
+        default        => 'RANDOM()',
+    };
+
+    $limit  = $filterFriends ? 30 : 12;
+    $join   = '';
+    $where  = 'uc.rank_position IS NOT NULL AND uc.rank_position > 0';
+    $params = [];
+
+    if ($filterFriends) {
+        $join = "JOIN friendship f ON (
+                    (f.solicitante_id = :my_id AND f.solicitada_id = u.id)
+                 OR (f.solicitada_id = :my_id AND f.solicitante_id = u.id)
+                 )";
+        $where  .= " AND f.estado_solicitud = 'ACEPTADA'";
+        $params[':my_id'] = $currentUserId;
+    }
+
+    try {
+        $stmt = $db->prepare("
+            WITH UserTops AS (
+                SELECT
+                    uc.user_id,
+                    u.username,
+                    u.profile_image,
+                    (SELECT COUNT(*) FROM user_credits WHERE user_id = u.id) AS real_total,
+                    uc.coaster_id,
+                    c.coaster_name,
+                    p.park_name,
+                    c.imagen_url,
+                    uc.rank_position,
+                    uc.created_at,
+                    ROW_NUMBER() OVER(PARTITION BY uc.user_id ORDER BY uc.rank_position ASC) AS rn
+                FROM user_credits uc
+                JOIN users u    ON uc.user_id    = u.id
+                JOIN coasters c ON uc.coaster_id = c.id
+                JOIN parks p    ON c.park_id     = p.id
+                $join
+                WHERE $where
+            )
+            SELECT
+                user_id,
+                username,
+                profile_image,
+                MAX(real_total) AS total_coasters,
+                MAX(created_at) AS last_modified,
+                json_agg(
+                    json_build_object(
+                        'coaster_id',   coaster_id,
+                        'coaster_name', coaster_name,
+                        'park_name',    park_name,
+                        'imagen_url',   imagen_url,
+                        'rank_position', rank_position
+                    ) ORDER BY rank_position ASC
+                ) AS top_coasters
+            FROM UserTops
+            WHERE rn <= 5
+            GROUP BY user_id, username, profile_image
+            ORDER BY $orderBy
+            LIMIT :limit
+        ");
+
+        foreach ($params as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Decodificar el JSON de top_coasters que devuelve PostgreSQL
+        foreach ($users as &$u) {
+            $u['top_coasters'] = $u['top_coasters'] ? json_decode($u['top_coasters'], true) : [];
+        }
+
+        Response::success(['data' => $users]);
+    } catch (Exception $e) {
+        error_log('getUserCoasterTops error: ' . $e->getMessage());
+        Response::error('Error al obtener los tops de coasters: ' . $e->getMessage(), 500);
+    }
+}
+

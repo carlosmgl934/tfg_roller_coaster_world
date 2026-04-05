@@ -29,6 +29,82 @@ function requireAdmin(): void
 }
 
 // ─────────────────────────────────────────────────────────────
+// uploadNewsImage — convierte a WebP y sube a Supabase Storage (bucket: news-covers)
+// Devuelve la URL pública o null si falla.
+// ─────────────────────────────────────────────────────────────
+function uploadNewsImage(array $fileEntry): ?string
+{
+    $supabaseUrl = $_ENV['SUPABASE_URL']         ?? null;
+    $supabaseKey = $_ENV['SUPABASE_SERVICE_KEY'] ?? null;
+
+    if (!$supabaseUrl || !$supabaseKey) {
+        error_log('uploadNewsImage: SUPABASE_URL o SUPABASE_SERVICE_KEY no configurados.');
+        return null;
+    }
+
+    // Convertir a WebP optimizado (se guarda junto al tmp original)
+    $webpPath = ImageHelper::optimizeAndConvertToWebP($fileEntry['tmp_name'], 1920, 82);
+    $readPath = $webpPath ?: $fileEntry['tmp_name'];
+
+    $fileData = file_get_contents($readPath);
+    if ($fileData === false) return null;
+
+    $fileName  = uniqid('news_') . '.webp';
+    $bucket    = 'news-covers';
+    $uploadUrl = rtrim($supabaseUrl, '/') . "/storage/v1/object/{$bucket}/{$fileName}";
+
+    $ch = curl_init($uploadUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_CUSTOMREQUEST  => 'PUT',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POSTFIELDS     => $fileData,
+        CURLOPT_HTTPHEADER     => [
+            "Authorization: Bearer {$supabaseKey}",
+            'Content-Type: image/webp',
+            'x-upsert: true',
+        ],
+    ]);
+    curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    // Limpiar WebP temporal
+    if ($webpPath && file_exists($webpPath)) @unlink($webpPath);
+
+    if ($httpCode < 200 || $httpCode >= 300) {
+        error_log("uploadNewsImage: Error subiendo a Supabase. HTTP {$httpCode}");
+        return null;
+    }
+
+    return rtrim($supabaseUrl, '/') . "/storage/v1/object/public/{$bucket}/{$fileName}";
+}
+
+// Elimina una imagen de Supabase Storage (solo si la URL apunta al bucket news-covers)
+function deleteNewsImage(?string $imageUrl): void
+{
+    if (!$imageUrl || !str_contains($imageUrl, '/news-covers/')) return;
+
+    $supabaseUrl = $_ENV['SUPABASE_URL']         ?? null;
+    $supabaseKey = $_ENV['SUPABASE_SERVICE_KEY'] ?? null;
+    if (!$supabaseUrl || !$supabaseKey) return;
+
+    // Extraer el nombre de archivo del final de la URL
+    $filename = basename(parse_url($imageUrl, PHP_URL_PATH));
+    if (!$filename) return;
+
+    $deleteUrl = rtrim($supabaseUrl, '/') . "/storage/v1/object/news-covers/{$filename}";
+    $ch = curl_init($deleteUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_CUSTOMREQUEST  => 'DELETE',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER     => [
+            "Authorization: Bearer {$supabaseKey}",
+            'Content-Type: application/json',
+        ],
+    ]);
+    curl_exec($ch);
+}
+
+// ─────────────────────────────────────────────────────────────
 // filterNews — lista noticias con filtros y búsqueda
 // ─────────────────────────────────────────────────────────────
 function filterNews(): void
@@ -115,19 +191,10 @@ function addNews(): void
 
     $imagenUrl = null;
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $uploadDir = __DIR__ . '/../../../web/img/';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
-        }
-        $fileName = uniqid('news_') . '-' . pathinfo($_FILES['image']['name'], PATHINFO_FILENAME) . '.webp';
-        $optimized = ImageHelper::optimizeAndConvertToWebP($_FILES['image']['tmp_name'], 1920, 80);
-        if ($optimized && rename($optimized, $uploadDir . $fileName)) {
-            $imagenUrl = '/web/img/' . $fileName;
-        } else {
-            $fileNameFallback = uniqid('news_') . '-' . basename($_FILES['image']['name']);
-            if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileNameFallback)) {
-                $imagenUrl = '/web/img/' . $fileNameFallback;
-            }
+        $imagenUrl = uploadNewsImage($_FILES['image']);
+        if (!$imagenUrl) {
+            Response::error('Error al subir la imagen a Supabase. Comprueba el bucket news-covers.', 500);
+            return;
         }
     }
 
@@ -187,24 +254,17 @@ function updateNews(): void
     $desc        = trim($data['description'] ?? '');
     $is_featured = filter_var($data['is_featured'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
-    // Imagen previa si no se sube una nueva
+    // Imagen: si viene nueva, subir a Supabase; si no, conservar la actual
     $imagenUrl = $data['image_url'] ?? null;
-    
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $uploadDir = __DIR__ . '/../../../web/img/';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
+        $newUrl = uploadNewsImage($_FILES['image']);
+        if (!$newUrl) {
+            Response::error('Error al subir la imagen a Supabase. Comprueba el bucket news-covers.', 500);
+            return;
         }
-        $fileName = uniqid('news_') . '-' . pathinfo($_FILES['image']['name'], PATHINFO_FILENAME) . '.webp';
-        $optimized = ImageHelper::optimizeAndConvertToWebP($_FILES['image']['tmp_name'], 1920, 80);
-        if ($optimized && rename($optimized, $uploadDir . $fileName)) {
-            $imagenUrl = '/web/img/' . $fileName;
-        } else {
-            $fileNameFallback = uniqid('news_') . '-' . basename($_FILES['image']['name']);
-            if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileNameFallback)) {
-                $imagenUrl = '/web/img/' . $fileNameFallback;
-            }
-        }
+        // Borrar imagen anterior de Supabase si la hay
+        deleteNewsImage($imagenUrl);
+        $imagenUrl = $newUrl;
     }
 
     if ($title === '') {
@@ -266,6 +326,12 @@ function deleteNews(): void
 
     try {
         global $db;
+        // Obtener la imagen antes de borrar para eliminarla de Supabase
+        $stmtImg = $db->prepare("SELECT image_url FROM news WHERE id = :id");
+        $stmtImg->execute([':id' => $id]);
+        $row = $stmtImg->fetch(PDO::FETCH_ASSOC);
+        deleteNewsImage($row['image_url'] ?? null);
+
         $stmt = $db->prepare("DELETE FROM news WHERE id = :id");
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
         $stmt->execute();

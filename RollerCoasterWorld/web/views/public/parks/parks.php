@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../../../routes/Router.php';
 
 $id = intval($_GET['id'] ?? 0);
@@ -342,7 +342,7 @@ require_once __DIR__ . '/../../partials/login_modal.php';
 
 <?php require_once __DIR__ . '/../../partials/footer.php';?>
 
-<script src="<?= Router::asset('web/js/parks.js') ?>"></script>
+<script src="<?= Router::asset('web/js/parks/parks.js') ?>"></script>
 
 <!-- CropperJS para recortar imágenes -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>

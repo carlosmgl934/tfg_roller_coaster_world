@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 
@@ -680,7 +680,7 @@ $user_uid = $_SESSION['firebase_uid'];
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
-<script src="<?= $base_url ?>/web/js/profile.js"></script>
+<script src="<?= Router::asset('web/js/users/profile.js') ?>"></script>
 
 
 

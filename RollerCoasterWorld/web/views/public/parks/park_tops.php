@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 
@@ -59,4 +59,4 @@ $pageSubtitle = $isGlobal ? 'Los mejores parques del mundo según valoraciones' 
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 
-<script src="<?= $base_url ?>/web/js/park_tops.js"></script>
+<script src="<?= Router::asset('web/js/parks/park_tops.js') ?>"></script>

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../partials/header.php';
 /** @var string $base_url */
 /** @var bool   $is_logged */
@@ -323,7 +323,7 @@ require_once __DIR__ . '/../partials/header.php';
 </main>
 
 <link rel="stylesheet" href="<?= $base_url ?>/web/css/home.css">
-<script src="<?= Router::asset('web/js/index.js') ?>" defer></script>
+<script src="<?= Router::asset('web/js/shared/index.js') ?>" defer></script>
 
 <?php
 require_once __DIR__ . '/../partials/footer.php';

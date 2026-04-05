@@ -143,20 +143,31 @@ $(document).ready(function () {
     const menuLinks = $("#sidebar-menu a.list-group-item").not(
       'a[href*="trip_generator"]',
     );
+
+    function activateSection(menuId) {
+      menuLinks.removeClass("active");
+      $(`#${menuId}`).addClass("active");
+      $(".content-section").hide();
+      const map = {
+        "menu-profile": "#section-info",
+        "menu-tops":    "#section-tops",
+        "menu-photos":  "#section-photos",
+        "menu-friends": "#section-friends",
+      };
+      if (map[menuId]) $(map[menuId]).show();
+    }
+
     menuLinks.on("click", function (e) {
       e.preventDefault();
-      const targetId = $(this).attr("id");
-
-      menuLinks.removeClass("active");
-      $(this).addClass("active");
-
-      $(".content-section").hide();
-
-      if (targetId === "menu-profile") $("#section-info").fadeIn(300);
-      else if (targetId === "menu-tops") $("#section-tops").fadeIn(300);
-      else if (targetId === "menu-photos") $("#section-photos").fadeIn(300);
-      else if (targetId === "menu-friends") $("#section-friends").fadeIn(300);
+      activateSection($(this).attr("id"));
     });
+
+    // Leer el hash de la URL para abrir la pestaña correcta al cargar
+    const hash = window.location.hash;
+    if      (hash === "#tops")    activateSection("menu-tops");
+    else if (hash === "#photos")  activateSection("menu-photos");
+    else if (hash === "#friends") activateSection("menu-friends");
+    else                          activateSection("menu-profile");
   }
 
   function renderFriendshipButton(targetId, status) {

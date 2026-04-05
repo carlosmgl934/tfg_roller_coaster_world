@@ -1,4 +1,20 @@
 <?php
+/**
+ * sync_initial_counts.php
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Script de mantenimiento: recalcula las estadísticas de TODOS los parques
+ * y coasters usando StatsHelper (valoración media, número de coasters, etc.).
+ *
+ * Es la versión completa de bulk_update: usa la lógica de StatsHelper en lugar
+ * de SQLs simples, así que actualiza también stars y operating_coasters.
+ *
+ * Cuándo ejecutarlo: tras importar datos nuevos, migraciones o cuando los
+ * contadores estén muy desincronizados.
+ *
+ * Uso (terminal desde la raíz del proyecto):
+ *   php api/php/utils/sync_initial_counts.php
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
 require_once __DIR__ . '/../utils/StatsHelper.php';
 require_once __DIR__ . '/../../database/db_conexion.php';
 

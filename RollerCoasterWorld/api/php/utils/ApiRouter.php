@@ -1,4 +1,19 @@
 <?php
+/**
+ * ApiRouter.php
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Enrutador centralizado para los endpoints de la API PHP.
+ *
+ * Uso:
+ *   $router = new ApiRouter();
+ *   $router->register('mi_accion', 'miFuncion');          // cualquier método HTTP
+ *   $router->register('guardar', 'guardarFuncion', 'POST'); // solo POST
+ *   $router->dispatch(); // lee $_GET['action'] y llama a la función correspondiente
+ *
+ * Si la acción no existe → devuelve error 400.
+ * Si el método HTTP no coincide → devuelve error 405.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
 
 require_once __DIR__ . '/Response.php';
 

@@ -121,28 +121,16 @@ function updateUser(): void
 
         $sql = "UPDATE users SET 
                     username = :username,
-                    email = :email,
-                    full_name = :full_name,
-                    birthdate = :birthdate,
-                    gender = :gender,
-                    city = :city,
-                    country = :country,
-                    rol = :rol,
-                    profile_image = COALESCE(:profile_image, profile_image)
+                    email    = :email,
+                    rol      = :rol
                 WHERE id = :id";
 
         $stmt = $db->prepare($sql);
         $stmt->execute([
-            ':username'      => trim($data['username']),
-            ':email'         => trim($data['email']),
-            ':full_name'     => trim($data['full_name'] ?? ''),
-            ':birthdate'     => !empty($data['birthdate']) ? $data['birthdate'] : null,
-            ':gender'        => $data['gender'] ?? null,
-            ':city'          => trim($data['city'] ?? ''),
-            ':country'       => trim($data['country'] ?? ''),
-            ':rol'           => $data['rol'] ?? 'user',
-            ':profile_image' => $data['profile_image'] ?? null,
-            ':id'            => $id
+            ':username' => trim($data['username']),
+            ':email'    => trim($data['email']),
+            ':rol'      => $data['rol'] ?? 'user',
+            ':id'       => $id
         ]);
 
         Response::success(['message' => 'Usuario actualizado correctamente.']);

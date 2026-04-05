@@ -57,13 +57,48 @@ function rejectPhoto()
         return;
     }
     $id = intval($_GET['id'] ?? 0);
-    if (!$id)
-        return Response::error("ID inválido");
+    if (!$id) return Response::error("ID inválido");
 
     global $db;
-    $stmt = $db->prepare("UPDATE coaster_photos SET status = 'rejected' WHERE id = :id");
-    $stmt->execute(['id' => $id]);
-    Response::success(['message' => 'Foto rechazada']);
+
+    // 1. Obtener la URL de la foto antes de borrar
+    $stmtFetch = $db->prepare("SELECT photo_url FROM coaster_photos WHERE id = :id");
+    $stmtFetch->execute([':id' => $id]);
+    $row = $stmtFetch->fetch(PDO::FETCH_ASSOC);
+    $photoUrl = $row['photo_url'] ?? null;
+
+    // 2. Borrar de Supabase Storage si la URL apunta al bucket
+    if ($photoUrl) {
+        $supabaseUrl = $_ENV['SUPABASE_URL']         ?? null;
+        $supabaseKey = $_ENV['SUPABASE_SERVICE_KEY'] ?? null;
+
+        if ($supabaseUrl && $supabaseKey) {
+            // Extraer "{bucket}/{object_path}" desde la URL pública
+            // Formato: https://xxx.supabase.co/storage/v1/object/public/{bucket}/{path}
+            $marker = '/storage/v1/object/public/';
+            $pos = strpos($photoUrl, $marker);
+            if ($pos !== false) {
+                $objectWithBucket = substr($photoUrl, $pos + strlen($marker));
+                $deleteUrl = rtrim($supabaseUrl, '/') . '/storage/v1/object/' . $objectWithBucket;
+
+                $ch = curl_init($deleteUrl);
+                curl_setopt_array($ch, [
+                    CURLOPT_CUSTOMREQUEST  => 'DELETE',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_HTTPHEADER     => [
+                        "Authorization: Bearer {$supabaseKey}",
+                        'Content-Type: application/json',
+                    ],
+                ]);
+                curl_exec($ch);
+            }
+        }
+    }
+
+    // 3. Eliminar el registro de la BD
+    $stmt = $db->prepare("DELETE FROM coaster_photos WHERE id = :id");
+    $stmt->execute([':id' => $id]);
+    Response::success(['message' => 'Foto rechazada y eliminada']);
 }
 
 function clearCaption()

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 /** @var bool $is_logged */
@@ -146,7 +146,7 @@ if (!$is_logged) {
     </div>
 </main>
 
-<script src="<?= $base_url ?>/web/js/friends_manager.js"></script>
+<script src="<?= Router::asset('web/js/social/friends_manager.js') ?>"></script>
 
 <!-- Add some quick inline styles to handle list-group inside dark cards properly if not fully covered globally -->
 <style>

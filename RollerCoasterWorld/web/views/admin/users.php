@@ -100,111 +100,64 @@ if (!$is_logged || !$is_admin) {
 
 <!-- ===================== MODAL EDITAR USUARIO ===================== -->
 <div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:520px;">
         <div class="modal-content rounded-0 border-0 shadow-lg" style="background:#161b22;">
 
             <div class="modal-header bg-success text-white border-0 py-3 px-4">
                 <div class="d-flex align-items-center gap-2">
                     <i class="fa-solid fa-user-pen fs-5"></i>
-                    <h5 class="modal-title fw-bold mb-0">Editar Usuario</h5>
+                    <h5 class="modal-title fw-bold mb-0">Cuenta de usuario</h5>
                 </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
 
-            <div class="modal-body p-5" style="background:#161b22;">
+            <!-- Info de solo lectura: quién es el usuario -->
+            <div class="px-4 pt-4 pb-3 d-flex align-items-center gap-3" style="border-bottom:1px solid #30363d;">
+                <div id="edit-user-avatar-wrap" class="flex-shrink-0"></div>
+                <div class="min-w-0">
+                    <div class="fw-bold text-white" id="edit-user-display-name" style="font-size:.95rem;"></div>
+                    <div class="text-muted" style="font-size:.75rem;" id="edit-user-meta"></div>
+                </div>
+            </div>
+
+            <div class="modal-body px-4 py-4" style="background:#161b22;">
                 <form id="edit-user-form">
                     <input type="hidden" id="edit-user-id">
-                    <div class="row g-4">
+                    <div class="row g-3">
 
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-uppercase text-muted mb-2">Username</label>
+                        <!-- Username -->
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small text-uppercase text-muted mb-1">Username</label>
                             <div class="input-group">
-                                <span class="input-group-text rounded-0 border-success" style="background:#0d1117; border-width:2px; color:#198754; border-right:none;">
+                                <span class="input-group-text rounded-0 border-success" style="background:#0d1117;border-width:2px;color:#198754;border-right:none;">
                                     <i class="fa-solid fa-at"></i>
                                 </span>
                                 <input type="text" id="edit-username" class="form-control rounded-0" required
-                                    style="border-width:2px;border-color:#198754;background:#0d1117;color:#e6edf3; border-left:none; box-shadow:none;">
+                                    style="border-width:2px;border-color:#198754;background:#0d1117;color:#e6edf3;border-left:none;box-shadow:none;">
                             </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-uppercase text-muted mb-2">Email</label>
+                        <!-- Email -->
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small text-uppercase text-muted mb-1">Email</label>
                             <div class="input-group">
-                                <span class="input-group-text rounded-0 border-success" style="background:#0d1117; border-width:2px; color:#198754; border-right:none;">
+                                <span class="input-group-text rounded-0 border-success" style="background:#0d1117;border-width:2px;color:#198754;border-right:none;">
                                     <i class="fa-solid fa-envelope"></i>
                                 </span>
                                 <input type="email" id="edit-email" class="form-control rounded-0" required
-                                    style="border-width:2px;border-color:#198754;background:#0d1117;color:#e6edf3; border-left:none; box-shadow:none;">
+                                    style="border-width:2px;border-color:#198754;background:#0d1117;color:#e6edf3;border-left:none;box-shadow:none;">
                             </div>
                         </div>
 
+                        <!-- Rol -->
                         <div class="col-12">
-                            <label class="form-label fw-semibold small text-uppercase text-muted mb-2">Nombre Completo</label>
+                            <label class="form-label fw-semibold small text-uppercase text-muted mb-1">Rol del usuario</label>
                             <div class="input-group">
-                                <span class="input-group-text rounded-0 border-success" style="background:#0d1117; border-width:2px; color:#198754; border-right:none;">
-                                    <i class="fa-solid fa-user"></i>
-                                </span>
-                                <input type="text" id="edit-fullname" class="form-control rounded-0"
-                                    style="border-width:2px;border-color:#198754;background:#0d1117;color:#e6edf3; border-left:none; box-shadow:none;">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-uppercase text-muted mb-2">Fecha de Nacimiento</label>
-                            <div class="input-group">
-                                <span class="input-group-text rounded-0 border-success" style="background:#0d1117; border-width:2px; color:#198754; border-right:none;">
-                                    <i class="fa-regular fa-calendar-days"></i>
-                                </span>
-                                <input type="date" id="edit-birthdate" class="form-control rounded-0"
-                                    style="border-width:2px;border-color:#198754;background:#0d1117;color:#e6edf3; border-left:none; box-shadow:none; color-scheme:dark;">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-uppercase text-muted mb-2">Género</label>
-                            <div class="input-group">
-                                <span class="input-group-text rounded-0 border-success" style="background:#0d1117; border-width:2px; color:#198754; border-right:none;">
-                                    <i class="fa-solid fa-venus-mars"></i>
-                                </span>
-                                <select id="edit-gender" class="form-select rounded-0"
-                                    style="border-width:2px;border-color:#198754;background:#0d1117;color:#e6edf3; border-left:none; box-shadow:none;">
-                                    <option value="Masculino">Masculino</option>
-                                    <option value="Femenino">Femenino</option>
-                                    <option value="Otro">Otro</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-uppercase text-muted mb-2">Ciudad</label>
-                            <div class="input-group">
-                                <span class="input-group-text rounded-0 border-success" style="background:#0d1117; border-width:2px; color:#198754; border-right:none;">
-                                    <i class="fa-solid fa-city"></i>
-                                </span>
-                                <input type="text" id="edit-city" class="form-control rounded-0"
-                                    style="border-width:2px;border-color:#198754;background:#0d1117;color:#e6edf3; border-left:none; box-shadow:none;">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-uppercase text-muted mb-2">País</label>
-                            <div class="input-group">
-                                <span class="input-group-text rounded-0 border-success" style="background:#0d1117; border-width:2px; color:#198754; border-right:none;">
-                                    <i class="fa-solid fa-earth-americas"></i>
-                                </span>
-                                <input type="text" id="edit-country" class="form-control rounded-0"
-                                    style="border-width:2px;border-color:#198754;background:#0d1117;color:#e6edf3; border-left:none; box-shadow:none;">
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label fw-semibold small text-uppercase text-muted mb-2">Rol del Usuario</label>
-                            <div class="input-group">
-                                <span class="input-group-text rounded-0 border-success" style="background:#0d1117; border-width:2px; color:#198754; border-right:none;">
+                                <span class="input-group-text rounded-0 border-success" style="background:#0d1117;border-width:2px;color:#198754;border-right:none;">
                                     <i class="fa-solid fa-shield-halved"></i>
                                 </span>
                                 <select id="edit-rol" class="form-select rounded-0"
-                                    style="border-width:2px;border-color:#198754;background:#0d1117;color:#e6edf3; border-left:none; box-shadow:none;">
+                                    style="border-width:2px;border-color:#198754;background:#0d1117;color:#e6edf3;border-left:none;box-shadow:none;">
                                     <option value="user">Usuario (User)</option>
                                     <option value="admin">Administrador (Admin)</option>
                                 </select>
@@ -215,7 +168,7 @@ if (!$is_logged || !$is_admin) {
                 </form>
 
                 <!-- Mensajes -->
-                <div id="edit-user-messages" class="w-100 mt-4 d-none">
+                <div id="edit-user-messages" class="w-100 mt-3 d-none">
                     <div class="alert alert-danger rounded-0 border-0 mb-0 d-none" id="edit-user-error">
                         <i class="fa-solid fa-circle-exclamation me-2"></i><span></span>
                     </div>
@@ -225,7 +178,7 @@ if (!$is_logged || !$is_admin) {
                 </div>
             </div>
 
-            <div class="modal-footer border-0 px-5 pb-4 pt-2" style="background:#161b22;">
+            <div class="modal-footer border-0 px-4 pb-4 pt-0" style="background:#161b22;">
                 <button type="button" class="btn btn-outline-secondary rounded-0 px-4" data-bs-dismiss="modal">
                     Cancelar
                 </button>
@@ -237,7 +190,6 @@ if (!$is_logged || !$is_admin) {
         </div>
     </div>
 </div>
-
 <!-- ===================== MODAL CONFIRMAR ELIMINAR USUARIO ===================== -->
 <div class="modal fade" id="modal-delete-user" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 
@@ -119,4 +119,4 @@ $is_logged   = isset($_SESSION['user_id']);
 <script>
     window.BASE_URL = '<?= $base_url ?>';
 </script>
-<script src="<?= $base_url ?>/web/js/forums.js"></script>
+<script src="<?= Router::asset('web/js/forums/forums.js') ?>"></script>

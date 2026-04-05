@@ -14,13 +14,45 @@ const StatManager = {
     },
 
     bindEvents() {
-        document.querySelectorAll('.dash-btn-toggle').forEach(btn => {
+        const btns = document.querySelectorAll('.dash-btn-toggle');
+
+        btns.forEach(btn => {
             btn.addEventListener('click', () => {
-                document.querySelectorAll('.dash-btn-toggle').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                this.currentPeriod = btn.dataset.period;
-                this.loadGrowthCharts();
+                // Resetear todos a outline
+                btns.forEach(b => {
+                    b.classList.remove('btn-success');
+                    b.classList.add('btn-outline-success');
+                });
+                // Marcar el activo como filled
+                btn.classList.remove('btn-outline-success');
+                btn.classList.add('btn-success');
+
+                const period = btn.dataset.period;
+                const rangeRow = document.getElementById('custom-range-row');
+
+                if (period === 'custom') {
+                    rangeRow.classList.remove('d-none');
+                    // No cargamos hasta que pulse Aplicar
+                } else {
+                    rangeRow.classList.add('d-none');
+                    this.customFrom = null;
+                    this.customTo   = null;
+                    this.currentPeriod = period;
+                    this.loadGrowthCharts();
+                }
             });
+        });
+
+        // Botón Aplicar rango
+        document.getElementById('btn-apply-range').addEventListener('click', () => {
+            const from = document.getElementById('range-from').value;
+            const to   = document.getElementById('range-to').value;
+            if (!from || !to) { alert('Selecciona ambas fechas'); return; }
+            if (from > to)    { alert('La fecha inicial no puede ser posterior a la final'); return; }
+            this.currentPeriod = 'custom';
+            this.customFrom    = from;
+            this.customTo      = to;
+            this.loadGrowthCharts();
         });
     },
 
@@ -38,21 +70,28 @@ const StatManager = {
             const data = await res.json();
             if (data.success && data.data) {
                 const s = data.data;
-                document.getElementById('kpi-users').innerText    = s.total_users    ?? '--';
-                document.getElementById('kpi-coasters').innerText = s.total_coasters ?? '--';
-                document.getElementById('kpi-parks').innerText    = s.total_parks    ?? '--';
-                document.getElementById('kpi-reviews').innerText  = s.total_reviews  ?? '--';
-                document.getElementById('kpi-photos').innerText   = s.total_photos   ?? '--';
+                document.getElementById('kpi-users').innerText    = s.total_users       ?? '--';
+                document.getElementById('kpi-coasters').innerText = s.total_coasters    ?? '--';
+                document.getElementById('kpi-parks').innerText    = s.total_parks       ?? '--';
+                document.getElementById('kpi-reviews').innerText  = s.total_reviews     ?? '--';
+                document.getElementById('kpi-photos').innerText   = s.total_photos      ?? '--';
+                const kpiForum = document.getElementById('kpi-forum-posts');
+                if (kpiForum) kpiForum.innerText = s.total_forum_posts ?? '--';
             }
         } catch (e) { console.error('Error KPI:', e); }
     },
 
     async loadGrowthCharts() {
-        const usersData   = await this.fetchGrowthData('users',   this.currentPeriod);
+        const usersData   = await this.fetchGrowthData('users',       this.currentPeriod);
         this.renderLineChart('chart-growth-users', usersData, 'Nuevos Usuarios', '#28a745');
 
-        const reviewsData = await this.fetchGrowthData('reviews', this.currentPeriod);
+        const reviewsData = await this.fetchGrowthData('reviews',     this.currentPeriod);
         this.renderBarChart('chart-growth-reviews', reviewsData, 'Reseñas', '#17a2b8');
+
+        const forumData   = await this.fetchGrowthData('forum_posts', this.currentPeriod);
+        if (document.getElementById('chart-growth-forum')) {
+            this.renderBarChart('chart-growth-forum', forumData, 'Mensajes en Foros', '#ffc107');
+        }
     },
 
     async loadDistCharts() {
@@ -65,7 +104,11 @@ const StatManager = {
 
     async fetchGrowthData(type, period) {
         try {
-            const res  = await fetch(`${window.DASHBOARD_API}?action=getGrowth&type=${type}&period=${period}`);
+            let url = `${window.DASHBOARD_API}?action=getGrowth&type=${type}&period=${period}`;
+            if (period === 'custom' && this.customFrom && this.customTo) {
+                url += `&from=${this.customFrom}&to=${this.customTo}`;
+            }
+            const res  = await fetch(url);
             const data = await res.json();
             return data.success ? data.data : [];
         } catch (e) { return []; }

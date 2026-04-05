@@ -172,13 +172,31 @@ window.loadUsers = function () {
 window.openEditModal = function (user) {
     $('#edit-user-id').val(user.id);
     $('#edit-username').val(user.username || '');
-    $('#edit-email').val(user.email || '');
-    $('#edit-fullname').val(user.full_name || '');
-    $('#edit-birthdate').val(user.birthdate || '');
-    $('#edit-gender').val(user.gender || 'Otro');
-    $('#edit-city').val(user.city || '');
-    $('#edit-country').val(user.country || '');
-    $('#edit-rol').val(user.rol || 'user');
+    $('#edit-email').val(user.email    || '');
+    $('#edit-rol').val(user.rol        || 'user');
+
+    // ── Franja de info de solo lectura ──
+    const initials = (user.username || '?').substring(0, 2).toUpperCase();
+    const avatarWrap = document.getElementById('edit-user-avatar-wrap');
+    if (user.profile_image) {
+        avatarWrap.innerHTML = `<img src="${_escUser(user.profile_image)}"
+            class="rounded-circle" style="width:48px;height:48px;object-fit:cover;border:2px solid #198754;"
+            onerror="this.replaceWith(buildInitialsAvatar('${initials}'))">` ;
+    } else {
+        avatarWrap.innerHTML = '';
+        avatarWrap.appendChild(buildInitialsAvatar(initials));
+    }
+
+    // Nombre y métadatos
+    document.getElementById('edit-user-display-name').textContent =
+        user.full_name ? `${user.full_name} (@${user.username})` : `@${user.username}`;
+    const loc = [user.city, user.country].filter(Boolean).join(', ');
+    const joined = user.created_at
+        ? 'Miembro desde ' + new Date(user.created_at).toLocaleDateString('es-ES', { year:'numeric', month:'short' })
+        : '';
+    document.getElementById('edit-user-meta').textContent =
+        [loc, joined].filter(Boolean).join(' · ');
+
     $('#edit-user-messages').addClass('d-none');
     $('#edit-user-error, #edit-user-success').addClass('d-none');
     new bootstrap.Modal($('#editUserModal')[0]).show();
@@ -237,15 +255,10 @@ $(document).ready(function () {
             url:         `${window.BASE_URL}/api/php/admin/gestion_users.php?action=update`,
             method:      'POST',
             data:        JSON.stringify({
-                id:        $('#edit-user-id').val(),
-                username:  $('#edit-username').val().trim(),
-                email:     $('#edit-email').val().trim(),
-                full_name: $('#edit-fullname').val().trim(),
-                birthdate: $('#edit-birthdate').val(),
-                gender:    $('#edit-gender').val(),
-                city:      $('#edit-city').val().trim(),
-                country:   $('#edit-country').val().trim(),
-                rol:       $('#edit-rol').val()
+                id:       $('#edit-user-id').val(),
+                username: $('#edit-username').val().trim(),
+                email:    $('#edit-email').val().trim(),
+                rol:      $('#edit-rol').val()
             }),
             contentType: 'application/json',
             success(res) {

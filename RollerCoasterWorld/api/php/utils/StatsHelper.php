@@ -1,4 +1,18 @@
 <?php
+/**
+ * StatsHelper.php
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Clase de utilidades para recalcular y sincronizar estadísticas agregadas
+ * en las tablas `parks` y `coasters`.
+ *
+ * Se usa en los endpoints de la API que añaden/editan opiniones:
+ *   StatsHelper::updateParkStats($parkId)     → recalcula stars + reviews_count de un parque
+ *   StatsHelper::updateCoasterStats($coasterId) → recalcula stars + reviews_count de una coaster
+ *
+ * Se puede invocar también desde scripts de mantenimiento (sync_initial_counts.php)
+ * cuando se necesite regenerar los contadores para todos los registros.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
 require_once __DIR__ . '/../../database/db_conexion.php';
 
 class StatsHelper {

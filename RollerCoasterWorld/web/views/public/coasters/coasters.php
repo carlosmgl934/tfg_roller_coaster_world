@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 
@@ -337,7 +337,7 @@ require_once __DIR__ . '/../../partials/login_modal.php';
 ?>
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
-<script src="<?= $base_url ?>/web/js/coasters.js"></script>
+<script src="<?= Router::asset('web/js/coasters/coasters.js') ?>"></script>
 
 <!-- CropperJS para recortar imágenes al subir fotos -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>

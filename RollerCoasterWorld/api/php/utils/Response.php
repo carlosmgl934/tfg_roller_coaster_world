@@ -1,4 +1,18 @@
 <?php
+/**
+ * Response.php
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Clase estática para estandarizar todas las respuestas JSON de la API.
+ *
+ * Métodos disponibles:
+ *   Response::success(['clave' => $valor])  → HTTP 200 + { success: true, ... }
+ *   Response::error('Mensaje', 400)         → HTTP 400 + { success: false, error: '...' }
+ *   Response::unauthorized('Mensaje')       → HTTP 401 (atajo)
+ *   Response::notFound('Mensaje')           → HTTP 404 (atajo)
+ *
+ * Todos los métodos llaman a exit() al final, cortando la ejecución del script.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
 
 class Response {
     // Devuelve un JSON con success = true

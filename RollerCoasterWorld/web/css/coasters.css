@@ -421,12 +421,118 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
 /* ============================================================
    COASTER TOPS - Grid de la Comunidad
    ============================================================ */
+
+/* Tarjeta contenedora */
+.rcw-top-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 0;
+}
 .rcw-top-card:hover {
     transform: translateY(-5px);
+}
+.rcw-top-card .card-body {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 0;
+    position: relative;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 .rcw-top-card:hover .card-body {
     box-shadow: 0 10px 25px rgba(25,135,84,0.15) !important;
     border-color: #198754 !important;
+}
+
+/* Cabecera de la tarjeta (avatar + nombre) */
+.rcw-top-card-header {
+    background: rgba(25, 135, 84, 0.05);
+    border-bottom: 1px solid #30363d;
+}
+
+/* Zona de la lista de coasters */
+.rcw-top-card-body {
+    background: linear-gradient(180deg, #161b22 0%, #1a202a 100%);
+}
+
+/* Fila de cada coaster */
+.rcw-rank-row {
+    background: rgba(0,0,0,0.15);
+    border: 1px solid rgba(255,255,255,0.03);
+    border-radius: 0;
+}
+.rcw-rank-row--first {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Imagen del coaster dentro de la fila */
+.rcw-rank-row img {
+    border-radius: 0;
+    object-fit: cover;
+    opacity: 0.85;
+}
+.rcw-rank-row--first img {
+    opacity: 0.9;
+}
+
+/* Badge de posición (número flotante a la izquierda) */
+.rcw-rank-badge {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    border-radius: 0;
+    font-weight: 900;
+    font-size: 0.8rem;
+    width: 24px;
+    height: 24px;
+    border: 2px solid #161b22;
+}
+/* Colores por posición */
+.rcw-rank-badge--1 {
+    background: linear-gradient(135deg, #ffd700, #daa520);
+    color: #000;
+}
+.rcw-rank-badge--2 {
+    background: linear-gradient(135deg, #e0e0e0, #9e9e9e);
+    color: #000;
+}
+.rcw-rank-badge--3 {
+    background: linear-gradient(135deg, #cd7f32, #8b4513);
+    color: #fff;
+}
+.rcw-rank-badge--4,
+.rcw-rank-badge--5 {
+    width: 22px;
+    height: 22px;
+    left: -7px;
+    background: #30363d;
+    color: #94a3b8;
+    font-weight: 800;
+    font-size: 0.75rem;
+}
+
+/* Botón "Ver top completo" */
+.rcw-top-card-footer {
+    display: block;
+    text-align: center;
+    padding: 0.5rem 0;
+    text-decoration: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #fff;
+    background-color: #198754;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    border-top: 1px solid #198754;
+    transition: background-color 0.2s ease;
+}
+.rcw-top-card-footer:hover {
+    background-color: #157347;
+    color: #fff;
 }
 
 /* Estilo del checkbox de boostrap personalizado a verde */

@@ -42,7 +42,8 @@ function getSummary(): void
             (SELECT COUNT(*) FROM parks)          AS total_parks,
             (SELECT COUNT(*) FROM coaster_ratings) +
             (SELECT COUNT(*) FROM park_ratings)   AS total_reviews,
-            (SELECT COUNT(*) FROM coaster_photos) AS total_photos";
+            (SELECT COUNT(*) FROM coaster_photos) AS total_photos,
+            (SELECT COUNT(*) FROM forum_messages) AS total_forum_posts";
 
         $stmt = $db->prepare($sql);
         $stmt->execute();
@@ -68,7 +69,7 @@ function getGrowth(): void
     $type   = $_GET['type']   ?? 'users';
 
     // Whitelist allowed types
-    $allowedTypes = ['users', 'reviews', 'coasters', 'parks', 'photos'];
+    $allowedTypes = ['users', 'reviews', 'coasters', 'parks', 'photos', 'forum_posts'];
     if (!in_array($type, $allowedTypes)) {
         Response::error('Tipo no válido');
         return;
@@ -76,10 +77,11 @@ function getGrowth(): void
 
     // Regular table mapping (reviews handled separately as a UNION)
     $tableMap = [
-        'users'    => 'users',
-        'coasters' => 'coasters',
-        'parks'    => 'parks',
-        'photos'   => 'coaster_photos',
+        'users'       => 'users',
+        'coasters'    => 'coasters',
+        'parks'       => 'parks',
+        'photos'      => 'coaster_photos',
+        'forum_posts' => 'forum_messages',
     ];
     $isReviews = ($type === 'reviews');
     $dbTable   = $tableMap[$type] ?? null;
@@ -90,6 +92,64 @@ function getGrowth(): void
         'week'  => ['trunc' => 'week',  'interval' => '12 weeks',  'format' => 'IYYY-"W"IW'],
         'month' => ['trunc' => 'month', 'interval' => '12 months', 'format' => 'YYYY-MM'],
     ];
+
+    // Soporte para rango personalizado
+    if ($period === 'custom') {
+        $from = $_GET['from'] ?? null;
+        $to   = $_GET['to']   ?? null;
+        // Validar formato de fecha (YYYY-MM-DD)
+        if (!$from || !$to || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $from) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $to)) {
+            Response::error('Parámetros from/to inválidos para periodo personalizado');
+            return;
+        }
+        // Máximo 1 año de rango por seguridad
+        $daysDiff = (strtotime($to) - strtotime($from)) / 86400;
+        if ($daysDiff < 0 || $daysDiff > 366) {
+            Response::error('El rango máximo es de 1 año');
+            return;
+        }
+        try {
+            if ($isReviews) {
+                $sql = "
+                    WITH date_range AS (
+                        SELECT generate_series(:from_date::date, :to_date::date, INTERVAL '1 day') AS bucket
+                    ),
+                    all_reviews AS (
+                        SELECT id, created_at FROM coaster_ratings
+                        UNION ALL
+                        SELECT id, created_at FROM park_ratings
+                    )
+                    SELECT
+                        to_char(dr.bucket, 'YYYY-MM-DD') AS label,
+                        COUNT(r.id)::int                 AS count
+                    FROM date_range dr
+                    LEFT JOIN all_reviews r ON date_trunc('day', r.created_at) = dr.bucket
+                    GROUP BY dr.bucket
+                    ORDER BY dr.bucket ASC
+                ";
+            } else {
+                $sql = "
+                    WITH date_range AS (
+                        SELECT generate_series(:from_date::date, :to_date::date, INTERVAL '1 day') AS bucket
+                    )
+                    SELECT
+                        to_char(dr.bucket, 'YYYY-MM-DD') AS label,
+                        COUNT(t.id)::int                 AS count
+                    FROM date_range dr
+                    LEFT JOIN {$dbTable} t ON date_trunc('day', t.created_at) = dr.bucket
+                    GROUP BY dr.bucket
+                    ORDER BY dr.bucket ASC
+                ";
+            }
+            $stmt = $db->prepare($sql);
+            $stmt->execute([':from_date' => $from, ':to_date' => $to]);
+            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode(['success' => true, 'data' => $data]);
+            exit;
+        } catch (PDOException $e) {
+            Response::error('Error obteniendo rango personalizado: ' . $e->getMessage());
+        }
+    }
 
     if (!array_key_exists($period, $periodConfig)) {
         Response::error('Periodo no válido');

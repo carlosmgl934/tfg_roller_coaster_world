@@ -7,100 +7,183 @@ if (!isset($_SESSION['firebase_uid']) || !isset($_SESSION['user_rol']) || $_SESS
 }
 ?>
 
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/admin_dashboard.css">
-<!-- Chart.js CDN -->
+<link rel="stylesheet" href="<?= Router::asset('web/css/admin.css') ?>">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<main class="dash-container">
-    <header class="dash-header">
-        <div>
-            <h1 class="dash-title">Panel de Control</h1>
-            <p style="color:rgba(255,255,255,0.5);">Estadísticas generales y crecimiento de la plataforma</p>
+<main class="container-fluid px-lg-5 my-5">
+
+    <!-- Cabecera -->
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-3 border-bottom pb-3">
+            <h1 class="display-6 fw-bold text-success mb-0">
+                <i class="fa-solid fa-gauge-high me-3"></i>Panel de Control
+            </h1>
+            <!-- Selector de periodo -->
+            <div class="d-flex align-items-center flex-wrap gap-2">
+                <span class="text-muted small">Periodo:</span>
+                <div class="btn-group" role="group">
+                    <button class="btn btn-outline-success btn-sm rounded-0 dash-btn-toggle" data-period="day">Día</button>
+                    <button class="btn btn-outline-success btn-sm rounded-0 dash-btn-toggle" data-period="week">Semana</button>
+                    <button class="btn btn-success         btn-sm rounded-0 dash-btn-toggle" data-period="month">Mes</button>
+                    <button class="btn btn-outline-success btn-sm rounded-0 dash-btn-toggle" data-period="custom">
+                        <i class="fa-solid fa-calendar-days me-1"></i>Rango
+                    </button>
+                </div>
+            </div>
         </div>
-        <div class="dash-controls">
-            <span class="me-2" style="font-size:0.8rem; opacity:0.6;">Periodo global de crecimiento:</span>
-            <button class="dash-btn-toggle" data-period="day">Día</button>
-            <button class="dash-btn-toggle" data-period="week">Semana</button>
-            <button class="dash-btn-toggle active" data-period="month">Mes</button>
+    </div>
+
+    <!-- Fila de rango personalizado (oculta por defecto) -->
+    <div class="row mb-4 d-none" id="custom-range-row">
+        <div class="col-12">
+            <div class="card border-0 rounded-0 px-4 py-3 d-flex flex-row align-items-center flex-wrap gap-3" style="background:#161b22;">
+                <span class="text-muted small fw-semibold text-uppercase" style="letter-spacing:.04em;">
+                    <i class="fa-solid fa-calendar-days me-1 text-success"></i>Desde
+                </span>
+                <input type="date" id="range-from" class="form-control form-control-sm rounded-0 border-success" style="max-width:160px; background:#0d1117; color:#e6edf3; border-width:2px; color-scheme:dark;">
+                <span class="text-muted small fw-semibold text-uppercase" style="letter-spacing:.04em;">Hasta</span>
+                <input type="date" id="range-to"   class="form-control form-control-sm rounded-0 border-success" style="max-width:160px; background:#0d1117; color:#e6edf3; border-width:2px; color-scheme:dark;">
+                <button class="btn btn-success btn-sm rounded-0 fw-bold" id="btn-apply-range">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>Aplicar
+                </button>
+            </div>
         </div>
-    </header>
+    </div>
 
     <!-- KPI CARDS -->
-    <section class="dash-kpi-grid">
-        <div class="dash-kpi-card">
-            <div class="dash-kpi-label">Usuarios Totales</div>
-            <div class="dash-kpi-val" id="kpi-users">--</div>
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
+                <div class="card-body text-center py-4">
+                    <i class="fa-solid fa-users fa-xl text-success mb-2"></i>
+                    <div class="text-muted small fw-semibold text-uppercase mb-1" style="letter-spacing:.04em;">Usuarios</div>
+                    <div class="fw-bold fs-3 text-white" id="kpi-users">--</div>
+                </div>
+            </div>
         </div>
-        <div class="dash-kpi-card">
-            <div class="dash-kpi-label">Montañas Rusas</div>
-            <div class="dash-kpi-val" id="kpi-coasters">--</div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
+                <div class="card-body text-center py-4">
+                    <i class="fa-solid fa-bolt fa-xl text-warning mb-2"></i>
+                    <div class="text-muted small fw-semibold text-uppercase mb-1" style="letter-spacing:.04em;">Coasters</div>
+                    <div class="fw-bold fs-3 text-white" id="kpi-coasters">--</div>
+                </div>
+            </div>
         </div>
-        <div class="dash-kpi-card">
-            <div class="dash-kpi-label">Parques</div>
-            <div class="dash-kpi-val" id="kpi-parks">--</div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
+                <div class="card-body text-center py-4">
+                    <i class="fa-solid fa-map-location-dot fa-xl text-info mb-2"></i>
+                    <div class="text-muted small fw-semibold text-uppercase mb-1" style="letter-spacing:.04em;">Parques</div>
+                    <div class="fw-bold fs-3 text-white" id="kpi-parks">--</div>
+                </div>
+            </div>
         </div>
-        <div class="dash-kpi-card">
-            <div class="dash-kpi-label">Reseñas</div>
-            <div class="dash-kpi-val" id="kpi-reviews">--</div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
+                <div class="card-body text-center py-4">
+                    <i class="fa-solid fa-star fa-xl text-primary mb-2"></i>
+                    <div class="text-muted small fw-semibold text-uppercase mb-1" style="letter-spacing:.04em;">Reseñas</div>
+                    <div class="fw-bold fs-3 text-white" id="kpi-reviews">--</div>
+                </div>
+            </div>
         </div>
-        <div class="dash-kpi-card">
-            <div class="dash-kpi-label">Fotos</div>
-            <div class="dash-kpi-val" id="kpi-photos">--</div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
+                <div class="card-body text-center py-4">
+                    <i class="fa-solid fa-images fa-xl text-danger mb-2"></i>
+                    <div class="text-muted small fw-semibold text-uppercase mb-1" style="letter-spacing:.04em;">Fotos</div>
+                    <div class="fw-bold fs-3 text-white" id="kpi-photos">--</div>
+                </div>
+            </div>
         </div>
-    </section>
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
+                <div class="card-body text-center py-4">
+                    <i class="fa-solid fa-comments fa-xl text-warning mb-2"></i>
+                    <div class="text-muted small fw-semibold text-uppercase mb-1" style="letter-spacing:.04em;">Posts Foro</div>
+                    <div class="fw-bold fs-3 text-white" id="kpi-forum-posts">--</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- CHARTS GRID -->
-    <section class="dash-charts-grid">
-        <!-- Growth Chart (Line) -->
-        <div class="dash-chart-card">
-            <header class="dash-chart-header">
-                <span class="dash-chart-title">Crecimiento de Usuarios</span>
-                <i class="fa-solid fa-chart-line text-success"></i>
-            </header>
-            <div class="chart-wrapper">
-                <canvas id="chart-growth-users"></canvas>
+    <div class="row g-4">
+
+        <!-- Crecimiento de Usuarios (Line) -->
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
+                <div class="card-header border-0 d-flex justify-content-between align-items-center py-3 px-4" style="background:#161b22;">
+                    <span class="fw-bold text-white">Crecimiento de Usuarios</span>
+                    <i class="fa-solid fa-chart-line text-success"></i>
+                </div>
+                <div class="card-body px-4 pb-4" style="min-height:260px;">
+                    <canvas id="chart-growth-users"></canvas>
+                </div>
             </div>
         </div>
 
-        <!-- Reviews Growth (Bar) -->
-        <div class="dash-chart-card">
-            <header class="dash-chart-header">
-                <span class="dash-chart-title">Nuevas Reseñas</span>
-                <i class="fa-solid fa-comment-dots text-info"></i>
-            </header>
-            <div class="chart-wrapper">
-                <canvas id="chart-growth-reviews"></canvas>
+        <!-- Nuevas Reseñas (Bar) -->
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
+                <div class="card-header border-0 d-flex justify-content-between align-items-center py-3 px-4" style="background:#161b22;">
+                    <span class="fw-bold text-white">Nuevas Reseñas</span>
+                    <i class="fa-solid fa-comment-dots text-info"></i>
+                </div>
+                <div class="card-body px-4 pb-4" style="min-height:260px;">
+                    <canvas id="chart-growth-reviews"></canvas>
+                </div>
             </div>
         </div>
 
-        <!-- Coaster Status (Doughnut) -->
-        <div class="dash-chart-card">
-            <header class="dash-chart-header">
-                <span class="dash-chart-title">Estado de Coasters</span>
-                <i class="fa-solid fa-circle-info text-warning"></i>
-            </header>
-            <div class="chart-wrapper">
-                <canvas id="chart-dist-status"></canvas>
+        <!-- Estado de Coasters (Doughnut) -->
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
+                <div class="card-header border-0 d-flex justify-content-between align-items-center py-3 px-4" style="background:#161b22;">
+                    <span class="fw-bold text-white">Estado de Coasters</span>
+                    <i class="fa-solid fa-circle-info text-warning"></i>
+                </div>
+                <div class="card-body px-4 pb-4 d-flex justify-content-center align-items-center" style="min-height:260px;">
+                    <canvas id="chart-dist-status" style="max-height:220px;"></canvas>
+                </div>
             </div>
         </div>
 
-        <!-- Countries (Bar) -->
-        <div class="dash-chart-card">
-            <header class="dash-chart-header">
-                <span class="dash-chart-title">Usuarios por País</span>
-                <i class="fa-solid fa-globe text-primary"></i>
-            </header>
-            <div class="chart-wrapper">
-                <canvas id="chart-dist-country"></canvas>
+        <!-- Usuarios por País (Bar) -->
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
+                <div class="card-header border-0 d-flex justify-content-between align-items-center py-3 px-4" style="background:#161b22;">
+                    <span class="fw-bold text-white">Usuarios por País</span>
+                    <i class="fa-solid fa-globe text-primary"></i>
+                </div>
+                <div class="card-body px-4 pb-4" style="min-height:260px;">
+                    <canvas id="chart-dist-country"></canvas>
+                </div>
             </div>
         </div>
-    </section>
+
+        <!-- Actividad en Foros (Bar) - full width -->
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
+                <div class="card-header border-0 d-flex justify-content-between align-items-center py-3 px-4" style="background:#161b22;">
+                    <span class="fw-bold text-white">Actividad en Foros</span>
+                    <i class="fa-solid fa-comments text-warning"></i>
+                </div>
+                <div class="card-body px-4 pb-4" style="min-height:220px;">
+                    <canvas id="chart-growth-forum"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /row charts -->
+
 </main>
 
 <!-- Configuración del API pasada al JS externo -->
 <script>
     window.DASHBOARD_API = '<?= $base_url ?>/api/php/admin/get_stats.php';
 </script>
-<script src="<?= $base_url ?>/web/js/admin/dashboard.js"></script>
+<script src="<?= Router::asset('web/js/admin/dashboard.js') ?>"></script>
 
 <?php require_once __DIR__ . '/../partials/footer.php'; ?>

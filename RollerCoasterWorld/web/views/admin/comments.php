@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../partials/header.php';
 
 if (!isset($_SESSION['firebase_uid'])) {
@@ -15,4 +15,4 @@ if (!isset($_SESSION['firebase_uid'])) {
 </main>
 
 <?php require_once __DIR__ . '/../partials/footer.php'; ?>
-<script src="<?= $base_url ?>/web/js/admin/admin.js"></script>
+<script src="<?= Router::asset('web/js/admin/admin.js') ?>"></script>

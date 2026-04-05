@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Inicia sesión (si no está ya iniciada)
 if (session_status() === PHP_SESSION_NONE) {
   session_start();
@@ -113,11 +113,11 @@ header("Expires: 0"); // Proxies
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
   <!-- Firebase auth init (global) -->
-  <script src="<?= Router::asset('web/js/auth.js') ?>"></script>
+  <script src="<?= Router::asset('web/js/auth/auth.js') ?>"></script>
 
   <!-- Funciones Nav para búsqueda de comunidad -->
   <?php if ($is_logged): ?>
-    <script src="<?= Router::asset('web/js/header_friends.js') ?>"></script>
+    <script src="<?= Router::asset('web/js/social/header_friends.js') ?>"></script>
   <?php endif; ?>
 
   <!-- Design System globals (dark mode tokens + overrides) -->

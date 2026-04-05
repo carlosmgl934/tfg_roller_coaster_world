@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../partials/header.php';
 ?>
 
@@ -131,5 +131,5 @@ require_once __DIR__ . '/../partials/header.php';
 
 </main>
 
-<script src="<?= Router::asset('web/js/contact.js') ?>"></script>
+<script src="<?= Router::asset('web/js/shared/contact.js') ?>"></script>
 <?php require_once __DIR__ . '/../partials/footer.php'; ?>
