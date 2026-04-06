@@ -1,7 +1,8 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../partials/header.php';
 /** @var string $base_url */
 /** @var bool   $is_logged */
+$is_admin = !empty($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
 ?>
 
 <main class="index-container">
@@ -11,9 +12,9 @@ require_once __DIR__ . '/../partials/header.php';
         <!-- HERO CARRUSEL — full-width -->
         <div class="home-hero" id="home-hero-carousel">
 
-            <!-- Slide 1: Taron (Phantasialand) -->
+            <!-- Slide 1: (imagen configurable desde admin) -->
             <div class="home-hero-slide active"
-                 style="background-image:url('<?= $base_url ?>/web/img/taron_phanta_opt.jpg'); background-position: center 40%;"
+                 data-default-img=""
                  data-title="Bienvenido,&lt;br&gt;&lt;span style='color:var(--rcw-green)' id='hero-username'&gt;…&lt;/span&gt;"
                  data-sub="Bienvenido de nuevo a la comunidad de amantes de las montañas rusas. Sigue explorando y aumentando tus créditos."
                  data-tag="Tu Panel Personal"
@@ -24,6 +25,7 @@ require_once __DIR__ . '/../partials/header.php';
             <!-- Slide 2: Voltron (Europa-Park) -->
             <div class="home-hero-slide"
                  style="background-image:url('<?= $base_url ?>/web/img/voltron_ep_opt.jpg'); background-position: center 35%;"
+                 data-default-img="<?= $base_url ?>/web/img/voltron_ep_opt.jpg"
                  data-title="Bienvenido,&lt;br&gt;&lt;span style='color:var(--rcw-green)' id='hero-username'&gt;…&lt;/span&gt;"
                  data-sub="Bienvenido de nuevo a la comunidad de amantes de las montañas rusas. Sigue explorando y aumentando tus créditos."
                  data-tag="Tu Panel Personal"
@@ -34,6 +36,17 @@ require_once __DIR__ . '/../partials/header.php';
             <!-- Slide 3: Batman BGCE (Warner) -->
             <div class="home-hero-slide"
                  style="background-image:url('<?= $base_url ?>/web/img/bgce_warner_opt.jpg'); background-position: center 25%;"
+                 data-default-img="<?= $base_url ?>/web/img/bgce_warner_opt.jpg"
+                 data-title="Bienvenido,&lt;br&gt;&lt;span style='color:var(--rcw-green)' id='hero-username'&gt;…&lt;/span&gt;"
+                 data-sub="Bienvenido de nuevo a la comunidad de amantes de las montañas rusas. Sigue explorando y aumentando tus créditos."
+                 data-tag="Tu Panel Personal"
+                 data-btn1-url="<?= Router::url('coaster_search') ?>" data-btn1-label="Buscar coasters" data-btn1-icon="fa-magnifying-glass"
+                 data-btn2-url="<?= Router::url('forum_search') ?>"   data-btn2-label="Foros" data-btn2-icon="fa-users">
+            </div>
+
+            <!-- Slide 4: (imagen configurable desde admin) -->
+            <div class="home-hero-slide"
+                 data-default-img=""
                  data-title="Bienvenido,&lt;br&gt;&lt;span style='color:var(--rcw-green)' id='hero-username'&gt;…&lt;/span&gt;"
                  data-sub="Bienvenido de nuevo a la comunidad de amantes de las montañas rusas. Sigue explorando y aumentando tus créditos."
                  data-tag="Tu Panel Personal"
@@ -63,7 +76,15 @@ require_once __DIR__ . '/../partials/header.php';
                 <div class="home-hero-dot active" data-idx="0"></div>
                 <div class="home-hero-dot" data-idx="1"></div>
                 <div class="home-hero-dot" data-idx="2"></div>
+                <div class="home-hero-dot" data-idx="3"></div>
             </div>
+
+            <?php if ($is_admin): ?>
+            <!-- Botón admin: editar imágenes del carrusel -->
+            <button id="carousel-edit-btn" class="carousel-admin-edit-btn" title="Editar imágenes del carrusel">
+                <i class="fa-solid fa-pencil"></i>
+            </button>
+            <?php endif; ?>
 
 
         </div>
@@ -225,7 +246,74 @@ require_once __DIR__ . '/../partials/header.php';
                 </div>
             </div>
         </div>
-        <!-- FIN VISTA DASHBOARD -->
+        </div><!-- FIN VISTA DASHBOARD -->
+
+        <?php if ($is_admin): ?>
+        <!-- ===== MODAL: GESTIONAR IMÁGENES DEL CARRUSEL (solo admin) ===== -->
+        <div class="modal fade" id="carousel-admin-modal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+                <div class="modal-content rounded-0 border-0 shadow-lg" style="background:#161b22;">
+
+                    <div class="modal-header border-0 py-3 px-4" style="background:#0d1117;">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-images text-success fs-5"></i>
+                            <h5 class="modal-title fw-bold mb-0 text-white">Imágenes del carrusel</h5>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body px-4 py-4" style="background:#161b22;">
+
+                        <!-- Vista: 4 slots -->
+                        <div id="carousel-slots-view">
+                            <p class="text-muted small mb-3">
+                                <i class="fa-solid fa-circle-info text-success me-1"></i>
+                                Sube hasta 4 imágenes para el carrusel. La imagen se recortará al ratio del carrusel automáticamente. Se guardan en Supabase.
+                            </p>
+                            <div class="row g-3" id="carousel-slots-grid">
+                                <!-- Renderizado por JS -->
+                            </div>
+                        </div>
+
+                        <!-- Vista: editor de recorte -->
+                        <div id="carousel-cropper-view" class="d-none">
+                            <div class="d-flex align-items-center mb-3 gap-2">
+                                <button class="btn btn-sm btn-outline-secondary rounded-0" id="carousel-crop-cancel">
+                                    <i class="fa-solid fa-arrow-left me-1"></i>Volver
+                                </button>
+                                <span class="text-muted small">Ajusta el área de recorte — el ratio se fija al del carrusel</span>
+                            </div>
+                            <div style="max-height:420px;background:#000;overflow:hidden;">
+                                <img id="carousel-crop-img" src="" style="display:block;max-width:100%;">
+                            </div>
+                            <div class="d-flex justify-content-end gap-2 mt-3">
+                                <button class="btn btn-outline-secondary rounded-0 px-4" id="carousel-crop-cancel2">Cancelar</button>
+                                <button class="btn btn-success rounded-0 fw-bold px-5" id="carousel-crop-confirm">
+                                    <i class="fa-solid fa-crop me-2"></i>Aplicar y guardar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Progreso de subida -->
+                        <div id="carousel-upload-progress" class="d-none mt-3">
+                            <div class="d-flex align-items-center gap-2 text-success">
+                                <div class="spinner-border spinner-border-sm" role="status"></div>
+                                <span class="fw-semibold small">Subiendo imagen a Supabase…</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer border-0 px-4 pb-4 pt-0" style="background:#161b22;">
+                        <button type="button" class="btn btn-outline-secondary rounded-0 px-4" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- Input file oculto para seleccionar imagen -->
+        <input type="file" id="carousel-file-input" accept="image/*" class="d-none">
+        <?php endif; ?>
 
     <?php else: ?>
         <!-- ======================== VISTA GUEST ======================== -->
@@ -324,6 +412,9 @@ require_once __DIR__ . '/../partials/header.php';
 
 <link rel="stylesheet" href="<?= $base_url ?>/web/css/home.css">
 <script src="<?= Router::asset('web/js/shared/index.js') ?>" defer></script>
+<?php if ($is_admin): ?>
+<script src="<?= Router::asset('web/js/shared/carousel_admin.js') ?>" defer></script>
+<?php endif; ?>
 
 <?php
 require_once __DIR__ . '/../partials/footer.php';

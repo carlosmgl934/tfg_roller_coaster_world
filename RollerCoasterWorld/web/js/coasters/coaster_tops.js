@@ -123,6 +123,7 @@ $(document).ready(function () {
               </div>
             </div>
           </div>`;
+
       });
 
       // ── Tarjeta completa ──────────────────────────────────────────

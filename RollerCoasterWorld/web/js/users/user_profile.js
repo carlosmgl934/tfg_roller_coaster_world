@@ -261,7 +261,7 @@ $(document).ready(function () {
             : item.imagen_url
           : fallbackImage;
         const link = isCoaster
-          ? `${BASE_URL}/web/views/public/coasters/coaster.php?id=${item.id}`
+          ? `${BASE_URL}/web/views/public/coasters/coasters.php?id=${item.id}`
           : `${BASE_URL}/web/views/public/parks/parks.php?id=${item.id}`;
         const rank = parseInt(item.rank_position) || index + 1;
         const title = isCoaster ? item.coaster_name : item.park_name;

@@ -60,7 +60,7 @@ function initCarousel() {
 
     let current = 0;
     let timer   = null;
-    const INTERVAL = 5000;
+    const INTERVAL = 4000;
 
     function goTo(idx) {
         slides[current].classList.remove('active');
@@ -97,7 +97,10 @@ function initCarousel() {
         }
     }
 
-    function startAuto() { timer = setInterval(() => goTo(current + 1), INTERVAL); }
+    function startAuto() {
+        clearInterval(timer);   // Evita que se acumulen timers si se llama varias veces
+        timer = setInterval(() => goTo(current + 1), INTERVAL);
+    }
     function stopAuto()  { clearInterval(timer); }
 
     dots.forEach((dot, i) => dot.addEventListener('click', () => { stopAuto(); goTo(i); startAuto(); }));
@@ -157,6 +160,23 @@ async function loadDashboard() {
 
         // Noticias
         renderNews(news);
+
+        // Imágenes del carrusel (BD → override de defaults)
+        try {
+            const crRes  = await fetch(BASE_URL + '/api/php/admin/admin_carousel.php?action=get', { credentials: 'include' });
+            const crData = await crRes.json();
+            if (crData.success) {
+                crData.slides.forEach(function (s) {
+                    if (s.image_url && typeof window.updateSingleCarouselSlide === 'function') {
+                        window.updateSingleCarouselSlide(s.position, s.image_url);
+                    } else if (s.image_url) {
+                        var slides = document.querySelectorAll('.home-hero-slide');
+                        var slide  = slides[s.position - 1];
+                        if (slide) slide.style.backgroundImage = "url('" + s.image_url + "')";
+                    }
+                });
+            }
+        } catch (_) { /* silencioso */ }
 
     } catch (err) {
         console.error('Error cargando dashboard:', err);
@@ -271,6 +291,9 @@ function renderNews(news) {
                 </div>
                 <div class="home-news-title">${item.title}</div>
                 <div class="home-news-desc">${item.description}</div>
+                <span class="home-news-read-more">
+                    Leer más <i class="fa-solid fa-arrow-right" style="font-size:0.65rem;"></i>
+                </span>
                 <div class="home-news-date">
                     <i class="fa-regular fa-clock me-1"></i>${timeAgo(item.created_at)}
                 </div>`;
