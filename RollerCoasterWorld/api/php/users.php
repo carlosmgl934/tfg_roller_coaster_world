@@ -26,6 +26,8 @@ $router->register('accept_friend', 'acceptFriendRequest', 'POST');
 $router->register('reject_remove_friend', 'rejectOrRemoveFriend', 'POST');
 $router->register('get_friends_data', 'getFriendsData');
 $router->register('get_public_profile', 'getPublicProfile');
+$router->register('accept_forum_invite', 'acceptForumInvite', 'POST');
+$router->register('decline_forum_invite', 'declineForumInvite', 'POST');
 
 $router->dispatch();
 
@@ -204,7 +206,7 @@ function getFriendsData()
         $stmt->execute([':uid' => $current_user_id]);
         $friends = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Solicitudes recibidas
+        // Solicitudes de amistad recibidas
         $stmt = $db->prepare("
             SELECT u.id, u.username, u.profile_image, f.created_at
             FROM friendship f
@@ -214,7 +216,7 @@ function getFriendsData()
         $stmt->execute([':uid' => $current_user_id]);
         $received = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Solicitudes enviadas
+        // Solicitudes de amistad enviadas
         $stmt = $db->prepare("
             SELECT u.id, u.username, u.profile_image, f.created_at
             FROM friendship f
@@ -224,15 +226,84 @@ function getFriendsData()
         $stmt->execute([':uid' => $current_user_id]);
         $sent = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // Invitaciones de colaboración de foro recibidas (pendientes)
+        $stmtFI = $db->prepare("
+            SELECT fi.id as invite_id, fi.forum_id, fo.title as forum_title, fo.forum_subject,
+                   fo.forum_subject as forum_description,
+                   u.id as sender_id, u.username as sender_username, u.profile_image as sender_image,
+                   fi.created_at,
+                   (SELECT COUNT(*) FROM forum_collaborators fc WHERE fc.forum_id = fo.id) + 1 AS member_count
+            FROM forum_invitations fi
+            JOIN forums  fo ON fi.forum_id  = fo.id
+            JOIN users    u ON fi.sender_id  = u.id
+            WHERE fi.receiver_id = :uid AND fi.status = 'pending'
+            ORDER BY fi.created_at DESC
+        ");
+        $stmtFI->execute([':uid' => $current_user_id]);
+        $forum_invitations = $stmtFI->fetchAll(PDO::FETCH_ASSOC);
+
         Response::success([
             'data' => [
-                'friends' => $friends,
+                'friends'           => $friends,
                 'received_requests' => $received,
-                'sent_requests' => $sent
+                'sent_requests'     => $sent,
+                'forum_invitations' => $forum_invitations
             ]
         ]);
     } catch (Exception $e) {
         Response::error("Error en servidor", 500);
+    }
+}
+
+function acceptForumInvite()
+{
+    $db = getDb();
+    $current_user_id = getUserId();
+    if (!$current_user_id) Response::error("No autorizado", 401);
+
+    $body      = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+    $invite_id = (int)($body['invite_id'] ?? 0);
+    if (!$invite_id) Response::error("ID de invitación inválido");
+
+    try {
+        // Verificar que la invitación es para este usuario
+        $stmt = $db->prepare("SELECT forum_id FROM forum_invitations WHERE id = ? AND receiver_id = ? AND status = 'pending'");
+        $stmt->execute([$invite_id, $current_user_id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) Response::error("Invitación no encontrada o ya procesada");
+
+        $forum_id = $row['forum_id'];
+
+        // Marcar invitación como aceptada
+        $db->prepare("UPDATE forum_invitations SET status = 'accepted' WHERE id = ?")->execute([$invite_id]);
+
+        // Añadir al usuario como colaborador
+        $db->prepare("INSERT INTO forum_collaborators (forum_id, user_id) VALUES (?, ?) ON CONFLICT DO NOTHING")
+           ->execute([$forum_id, $current_user_id]);
+
+        Response::success(['message' => 'Invitación aceptada']);
+    } catch (Exception $e) {
+        Response::error("Error al aceptar la invitación", 500);
+    }
+}
+
+function declineForumInvite()
+{
+    $db = getDb();
+    $current_user_id = getUserId();
+    if (!$current_user_id) Response::error("No autorizado", 401);
+
+    $body      = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+    $invite_id = (int)($body['invite_id'] ?? 0);
+    if (!$invite_id) Response::error("ID de invitación inválido");
+
+    try {
+        $stmt = $db->prepare("UPDATE forum_invitations SET status = 'declined' WHERE id = ? AND receiver_id = ? AND status = 'pending'");
+        $stmt->execute([$invite_id, $current_user_id]);
+        if ($stmt->rowCount() === 0) Response::error("Invitación no encontrada o ya procesada");
+        Response::success(['message' => 'Invitación rechazada']);
+    } catch (Exception $e) {
+        Response::error("Error al rechazar la invitación", 500);
     }
 }
 

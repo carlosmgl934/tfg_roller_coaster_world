@@ -552,3 +552,45 @@ span.flatpickr-weekday {
   .tops-filters-grid { grid-template-columns: repeat(2, 1fr); }
   .tops-legend-card { position: static; }
 }
+
+/* ── FRIENDS MANAGER (from friends.php) ──────────────────────── */
+#requests-list .list-group-item,
+#sent-list .list-group-item {
+    background-color: transparent;
+    border-color: var(--rcw-border);
+    transition: background-color 0.2s ease;
+}
+
+#requests-list .list-group-item:hover,
+#sent-list .list-group-item:hover {
+    background-color: var(--rcw-bg-hover);
+}
+
+.accordion-button:not(.collapsed)::after {
+    filter: brightness(0) invert(1);
+}
+
+.accordion-button::after {
+    filter: brightness(0) invert(0.7);
+}
+
+/* ── FORUM INVITE BUTTONS HOVER ──────────────────────────────── */
+.rcw-forum-accept-btn {
+    background: #7c3aed !important;
+    color: #fff !important;
+    border: none !important;
+    transition: all 0.2s ease;
+}
+.rcw-forum-accept-btn:hover {
+    background: #6d28d9 !important;
+    transform: scale(1.05);
+}
+
+.rcw-forum-decline-btn {
+    transition: all 0.2s ease;
+}
+.rcw-forum-decline-btn:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #fff !important;
+    transform: scale(1.05);
+}

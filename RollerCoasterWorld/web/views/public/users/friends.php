@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 /** @var bool $is_logged */
@@ -144,32 +144,80 @@ if (!$is_logged) {
         </div>
       </div>
     </div>
+
+    <!-- Modal Info Foro (invitación colaborador) -->
+    <div class="modal fade" id="forumInviteInfoModal" tabindex="-1" aria-labelledby="forumInviteInfoModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+        <div class="modal-content" style="background: #0d1117; border: 1px solid #a78bfa; border-radius: 0;">
+          <!-- Header morado -->
+          <div class="modal-header border-0 px-4 pt-4 pb-2" style="border-bottom: 1px solid rgba(167,139,250,0.2) !important;">
+            <div class="d-flex align-items-center gap-3 w-100">
+              <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                   style="width:42px; height:42px; background:rgba(109,40,217,0.25); border:1px solid #a78bfa;">
+                <i class="fa-solid fa-comments" style="color:#a78bfa; font-size:1.1rem;"></i>
+              </div>
+              <div class="flex-grow-1 min-w-0">
+                <h5 class="modal-title fw-bold mb-0 text-white" id="forumInviteInfoModalLabel">
+                  Invitación a colaborar
+                </h5>
+                <small style="color:#a78bfa;" id="forumInviteModalSender"></small>
+              </div>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+          </div>
+
+          <!-- Body -->
+          <div class="modal-body px-4 py-3">
+            <!-- Título del foro -->
+            <div class="mb-3">
+              <label class="text-muted text-uppercase fw-bold mb-1" style="font-size:0.7rem; letter-spacing:0.06em;">
+                <i class="fa-solid fa-lock me-1" style="color:#a78bfa;"></i> Foro privado
+              </label>
+              <div class="fw-bold text-white" id="forumInviteModalTitle" style="font-size:1.05rem; word-break:break-word;"></div>
+            </div>
+
+            <!-- Descripción -->
+            <div class="mb-3" id="forumInviteModalDescWrap">
+              <label class="text-muted text-uppercase fw-bold mb-1" style="font-size:0.7rem; letter-spacing:0.06em;">
+                <i class="fa-solid fa-align-left me-1" style="color:#a78bfa;"></i> Descripción
+              </label>
+              <p class="text-secondary mb-0 small" id="forumInviteModalDesc"></p>
+            </div>
+
+            <!-- Detalles extras (members, created) -->
+            <div class="d-flex gap-3 mt-2 pt-2" style="border-top:1px solid rgba(255,255,255,0.06);">
+              <div class="text-center flex-fill">
+                <div class="fw-bold text-white" id="forumInviteModalMembers">—</div>
+                <small class="text-muted" style="font-size:0.7rem;">Miembros</small>
+              </div>
+              <div class="text-center flex-fill">
+                <div class="fw-bold text-white" id="forumInviteModalCreated">—</div>
+                <small class="text-muted" style="font-size:0.7rem;">Creación</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer con acciones -->
+          <div class="modal-footer border-0 px-4 pb-4 pt-2 gap-2" style="border-top:1px solid rgba(167,139,250,0.15) !important;">
+            <button type="button" class="btn btn-outline-secondary flex-fill" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn px-4 fw-bold flex-fill rcw-forum-invite-modal-action"
+                    style="background:#7c3aed; color:#fff; border:none;"
+                    data-action="decline" id="forumInviteModalDeclineBtn">
+              <i class="fa-solid fa-xmark me-1"></i> Rechazar
+            </button>
+            <button type="button" class="btn px-4 fw-bold flex-fill rcw-forum-invite-modal-action"
+                    style="background:#16a34a; color:#fff; border:none;"
+                    data-action="accept" id="forumInviteModalAcceptBtn">
+              <i class="fa-solid fa-check me-1"></i> Aceptar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 </main>
 
-<script src="<?= Router::asset('web/js/social/friends_manager.js') ?>"></script>
+<script src="<?= Router::asset('web/js/social/friends_manager.js') ?>?v=<?= time() ?>"></script>
 
-<!-- Add some quick inline styles to handle list-group inside dark cards properly if not fully covered globally -->
-<style>
-    /* Ajustes para listas dentro de las nuevas profile-cards para mantener estética oscura */
-    #requests-list .list-group-item,
-    #sent-list .list-group-item {
-        background-color: transparent;
-        border-color: var(--rcw-border);
-        transition: background-color 0.2s ease;
-    }
 
-    #requests-list .list-group-item:hover,
-    #sent-list .list-group-item:hover {
-        background-color: var(--rcw-bg-hover);
-    }
-
-    .accordion-button:not(.collapsed)::after {
-        filter: brightness(0) invert(1);
-    }
-
-    .accordion-button::after {
-        filter: brightness(0) invert(0.7);
-    }
-</style>
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>

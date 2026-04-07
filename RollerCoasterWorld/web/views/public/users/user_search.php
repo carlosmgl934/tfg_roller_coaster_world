@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../../partials/header.php';
 // Solo logueados (opcional basado en requerimientos, pero la sección Comunidad está restringida a logueados
 // en header.php, así que aseguramos aquí)
@@ -37,7 +37,7 @@ if (!$is_logged) {
     <div class="row justify-content-center">
         <div class="col-12 col-md-8 col-lg-6">
             <div id="page-user-search-results"
-                style="background:#161b22; border:1px solid #30363d; max-height: 480px; overflow-y: auto; overflow-x: hidden;">
+                style="background:var(--rcw-bg-card); border:1px solid #30363d; max-height: 480px; overflow-y: auto; overflow-x: hidden;">
                 <div class="text-center text-muted py-5 w-100">
                     <i class="fa-solid fa-magnifying-glass mb-3 d-block fa-3x opacity-25"></i>
                     <h5>Empieza a escribir para buscar...</h5>

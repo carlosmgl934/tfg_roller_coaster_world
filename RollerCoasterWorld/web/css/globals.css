@@ -326,3 +326,13 @@ a:not([class]) {
 .card-title  { color: #ffffff !important; }
 .card-text   { color: #e2e8f0 !important; }
 .card-subtitle { color: #94a3b8 !important; }
+
+/* ── USER SEARCH RESULTS SCROLLBAR ──────────────────────────── */
+#page-user-search-results {
+  scrollbar-width: thin;
+  scrollbar-color: #198754 var(--rcw-bg);
+}
+#page-user-search-results::-webkit-scrollbar { width: 6px; }
+#page-user-search-results::-webkit-scrollbar-track { background: var(--rcw-bg); }
+#page-user-search-results::-webkit-scrollbar-thumb { background: #198754; border-radius: 4px; }
+#page-user-search-results::-webkit-scrollbar-thumb:hover { background: var(--rcw-green-neon); }

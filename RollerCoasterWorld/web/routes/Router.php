@@ -39,9 +39,11 @@ class Router {
             'form_park_rating' => '/web/views/public/parks/form_park_rating.php',
 
             // Públicas - Foros
-            'forums' => '/web/views/public/forums/forum_search.php', // Redirige a search si forums.php está vacío
-            'forum_search' => '/web/views/public/forums/forum_search.php',
-            'forum_detail' => '/web/views/public/forums/forums.php', // Mantener por si acaso
+            'forums'        => '/web/views/public/forums/forum_search.php',
+            'forum_search'  => '/web/views/public/forums/forum_search.php',
+            'forum_detail'  => '/web/views/public/forums/forums.php',
+            'forum'         => '/web/views/public/forums/forums.php',
+            'forum_config'  => '/web/views/public/forums/forum_config.php',
 
             // Públicas - Legal/Info
             'contact' => '/web/views/public/contact.php',

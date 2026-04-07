@@ -98,7 +98,8 @@ $(document).ready(function () {
         const res = await fetch(`${BASE_URL}/api/php/users.php?action=get_friends_data`);
         const data = await res.json();
         if (data.success) {
-            const count = data.data.received_requests.length;
+            const count = (data.data.received_requests || []).length
+                        + (data.data.forum_invitations || []).length;
             if (count > 0) {
                 badge.text(count).removeClass("d-none");
             } else {

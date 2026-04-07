@@ -1,19 +1,17 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 
-$park_id     = $_GET['id'] ?? null;
-$forumId     = $_GET['forum_id'] ?? null;
-$privacy     = $_POST['privacy'] ?? 'public';
+$forumId = $_GET['forum_id'] ?? null;
+$privacy = $_POST['privacy'] ?? 'public';
 $hiddenStyle = ($privacy !== 'private') ? 'style="display:none"' : '';
-$is_logged   = isset($_SESSION['user_id']);
+$is_logged = isset($_SESSION['user_id']);
 ?>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
-<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <link rel="stylesheet" href="<?= $base_url ?>/web/css/forums.css">
 
-<main class="container py-5" style="max-width: 680px;" data-logged="<?= $is_logged ? 'true' : 'false' ?>" id="forum-main-container">
+<main class="container py-5" style="max-width: 680px;" data-logged="<?= $is_logged ? 'true' : 'false' ?>"
+    id="forum-main-container">
 
     <!-- Cabecera centrada -->
     <div class="text-center mb-4">
@@ -26,7 +24,7 @@ $is_logged   = isset($_SESSION['user_id']);
         <div class="card-body p-4 p-md-5">
             <form id="forum-form" action="#">
 
-                <input type="hidden" name="user_id"  value="<?= htmlspecialchars($_SESSION['user_id'] ?? '') ?>">
+                <input type="hidden" name="user_id" value="<?= htmlspecialchars($_SESSION['user_id'] ?? '') ?>">
                 <input type="hidden" name="forum_id" value="<?= htmlspecialchars($forumId ?? '') ?>">
 
                 <!-- SECCIÓN: Identidad -->
@@ -34,16 +32,15 @@ $is_logged   = isset($_SESSION['user_id']);
 
                 <div class="mb-4">
                     <label for="title" class="form-label">Nombre del foro</label>
-                    <input type="text" name="title" id="title"
-                           class="form-control form-control-lg"
-                           placeholder="Ej: Mejores montañas rusas 2026" required>
+                    <input type="text" name="title" id="title" class="form-control form-control-lg"
+                        placeholder="Ej: Mejores montañas rusas 2026" required>
+                    <div id="title-error" class="invalid-feedback">El título debe tener al menos 5 caracteres.</div>
                 </div>
 
                 <div class="mb-5">
                     <label for="form_subject" class="form-label">Descripción</label>
-                    <textarea name="form_subject" id="form_subject"
-                              class="form-control" rows="4" maxlength="255"
-                              placeholder="Describe brevemente de qué trata tu foro..." required></textarea>
+                    <textarea name="form_subject" id="form_subject" class="form-control" rows="4" maxlength="255"
+                        placeholder="Describe brevemente de qué trata tu foro..." required></textarea>
                 </div>
 
                 <!-- SECCIÓN: Visibilidad -->
@@ -51,19 +48,22 @@ $is_logged   = isset($_SESSION['user_id']);
 
                 <div class="mb-2">
                     <div class="privacy-toggle" role="group">
-                        <input type="radio" name="privacy" value="public"  id="privacy-public"  class="privacy-radio" <?= $privacy !== 'private' ? 'checked' : '' ?>>
+                        <input type="radio" name="privacy" value="public" id="privacy-public" class="privacy-radio"
+                            <?= $privacy !== 'private' ? 'checked' : '' ?>>
                         <label for="privacy-public" class="privacy-btn">
                             <i class="fa-solid fa-earth-europe me-2"></i>Público
                         </label>
 
-                        <input type="radio" name="privacy" value="private" id="privacy-private" class="privacy-radio" <?= $privacy === 'private' ? 'checked' : '' ?>>
+                        <input type="radio" name="privacy" value="private" id="privacy-private" class="privacy-radio"
+                            <?= $privacy === 'private' ? 'checked' : '' ?>>
                         <label for="privacy-private" class="privacy-btn">
                             <i class="fa-solid fa-lock me-2"></i>Privado
                         </label>
                     </div>
                     <p class="privacy-hint" id="privacy-hint">
                         <i class="fa-solid fa-circle-info me-1"></i>
-                        <span id="privacy-hint-text"><?= $privacy === 'private' ? 'Solo los colaboradores que designes pueden escribir, pero cualquiera puede leer el foro' : 'Cualquier usuario puede ver y escribir en el foro' ?></span>
+                        <span
+                            id="privacy-hint-text"><?= $privacy === 'private' ? 'Solo los colaboradores que designes pueden escribir, pero cualquiera puede leer el foro' : 'Cualquier usuario puede ver y escribir en el foro' ?></span>
                     </p>
                 </div>
 
@@ -74,18 +74,43 @@ $is_logged   = isset($_SESSION['user_id']);
                     <p class="form-section-title">Colaboradores</p>
 
                     <div class="mb-5">
-                        <label for="collaborators" class="form-label">
+                        <label class="form-label">
                             Selecciona colaboradores entre tus amigos
                             <span class="text-muted fw-normal ms-1">(opcional)</span>
                         </label>
-                        <select name="collaborators[]" id="collaborators" class="form-select" multiple> 
-                        </select>
+
+                        <!-- Widget selector de amigos (custom, sin dependencias externas) -->
+                        <div id="friend-picker" class="friend-picker">
+                            <!-- Tags de amigos seleccionados -->
+                            <div id="friend-tags" class="friend-tags">
+                                <input type="text" id="friend-search-input" class="friend-search-input"
+                                    placeholder="Busca un amigo..." autocomplete="off">
+                            </div>
+                            <!-- Dropdown con la lista -->
+                            <div id="friend-dropdown" class="friend-dropdown" style="display:none;">
+                                <div id="friend-list" class="friend-list">
+                                    <!-- Amigos inyectados por JS -->
+                                </div>
+                                <div id="friend-empty" class="friend-empty" style="display:none;">Sin resultados</div>
+                            </div>
+                        </div>
+
+                        <!-- Mensaje de aviso de límite -->
+                        <div id="collab-limit-msg"
+                            style="display:none; color:#ffd54f; font-size:0.85rem; margin-top:8px;">
+                            <i class="fa-solid fa-triangle-exclamation me-1"></i>Has alcanzado el máximo de 5
+                            colaboradores
+                        </div>
+
+                        <!-- Inputs ocultos para enviar los ids seleccionados -->
+                        <div id="collaborators-hidden"></div>
                     </div>
                 </div>
 
                 <!-- BOTÓN -->
                 <div class="d-grid">
-                    <div class="error-success-message" id="error-success-message" style="display: none; margin-bottom: 15px; text-align: center; font-weight: 500;">
+                    <div class="error-success-message" id="error-success-message"
+                        style="display: none; margin-bottom: 15px; text-align: center; font-weight: 500;">
                         <p id="error-success-message-text" class="mb-0"></p>
                     </div>
                     <button type="button" id="forum-submit-btn" class="btn btn-forum-submit">
@@ -105,7 +130,8 @@ $is_logged   = isset($_SESSION['user_id']);
                     <p class="mb-4" style="font-size:1rem;">Para crear un foro necesitas estar registrado</p>
                     <div class="d-flex gap-2 justify-content-center">
                         <button class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
-                        <a href="<?= $base_url ?>/web/views/auth/login.php?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn btn-success px-4">Ir al Login</a>
+                        <a href="<?= $base_url ?>/web/views/auth/login.php?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>"
+                            class="btn btn-success px-4">Ir al Login</a>
                     </div>
                 </div>
             </div>
@@ -114,9 +140,10 @@ $is_logged   = isset($_SESSION['user_id']);
 
 </main>
 
-<?php require_once __DIR__ . '/../../partials/footer.php'; ?>
-
 <script>
     window.BASE_URL = '<?= $base_url ?>';
 </script>
+
+<?php require_once __DIR__ . '/../../partials/footer.php'; ?>
+
 <script src="<?= Router::asset('web/js/forums/forums.js') ?>"></script>

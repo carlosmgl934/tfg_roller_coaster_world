@@ -31,7 +31,8 @@ $(document).ready(function () {
 
       if (payload.success) {
         allFriends = payload.data.friends || [];
-        renderReceived(payload.data.received_requests);
+        const forumInvites = payload.data.forum_invitations || [];
+        renderReceived(payload.data.received_requests, forumInvites);
         renderSent(payload.data.sent_requests);
         filterAndRenderFriends();
       } else {
@@ -115,21 +116,19 @@ $(document).ready(function () {
   searchInput.on("input", filterAndRenderFriends);
   sortSelect.on("change", filterAndRenderFriends);
 
-  function renderReceived(requests) {
+  function renderReceived(requests, forumInvites) {
     requestsList.empty();
-    requestsCount.text(requests.length);
+    forumInvites = forumInvites || [];
+    const totalCount = requests.length + forumInvites.length;
+    requestsCount.text(totalCount);
 
-    if (requests.length > 0) {
-      requestsCount
-        .removeClass("badge-profile-gray")
-        .addClass("badge-profile-danger");
+    if (totalCount > 0) {
+      requestsCount.removeClass("badge-profile-gray").addClass("badge-profile-danger");
     } else {
-      requestsCount
-        .removeClass("badge-profile-danger")
-        .addClass("badge-profile-gray");
+      requestsCount.removeClass("badge-profile-danger").addClass("badge-profile-gray");
     }
 
-    if (requests.length === 0) {
+    if (totalCount === 0) {
       requestsList.html(
         '<div class="p-4 text-center text-muted small"><i class="fa-solid fa-box-open d-block fs-3 mb-2 opacity-25"></i>No tienes solicitudes pendientes.</div>',
       );
@@ -137,30 +136,91 @@ $(document).ready(function () {
     }
 
     let html = "";
-    requests.forEach((req) => {
-      const avatarSrc = getAvatarUrl(
-        req.profile_image,
-        req.username,
-        "ffc107",
-        "000",
-      );
 
+    // ── Solicitudes de amistad ──────────────────────────────────
+    requests.forEach((req) => {
+      const avatarSrc = getAvatarUrl(req.profile_image, req.username, "ffc107", "000");
       html += `
-        <div class="list-group-item bg-transparent py-3 px-4 border-bottom border-secondary border-opacity-25" style="border-left: 3px solid var(--rcw-green-neon) !important;">
+        <div class="list-group-item bg-transparent py-3 px-4 border-bottom border-secondary border-opacity-25"
+             style="border-left: 3px solid var(--rcw-green-neon) !important;">
           <div class="d-flex align-items-center">
-            <img src="${avatarSrc}" alt="${req.username}" class="rounded-circle object-fit-cover me-4 shadow-sm border border-success border-opacity-50" style="width: 50px; height: 50px;" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(req.username)}&background=020617&color=10b981'">
+            <img src="${avatarSrc}" alt="${req.username}"
+                 class="rounded-circle object-fit-cover me-4 shadow-sm border border-success border-opacity-50"
+                 style="width: 50px; height: 50px;"
+                 onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(req.username)}&background=020617&color=10b981'">
             <div class="flex-grow-1 min-w-0">
-               <a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${req.id}" class="text-white text-decoration-none fw-bold d-block text-truncate fs-5 mb-1">${req.username}</a>
+               <a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${req.id}"
+                  class="text-white text-decoration-none fw-bold d-block text-truncate fs-5 mb-1">${req.username}</a>
                <small class="text-muted d-block"><i class="fa-solid fa-user-plus opacity-50 me-1"></i> Quiere ser tu amigo</small>
             </div>
-            <div class="d-flex flex-column gap-2 ms-2 position-relative" style="z-index: 2;">
-               <button class="btn btn-sm btn-success shadow-sm rcw-action-btn px-3 fw-bold" data-action="accept" data-id="${req.id}" title="Aceptar"><i class="fa-solid fa-check"></i></button>
-               <button class="btn btn-sm btn-outline-danger shadow-sm rcw-action-btn px-3 fw-bold" data-action="reject" data-id="${req.id}" title="Rechazar"><i class="fa-solid fa-xmark"></i></button>
+            <div class="d-flex flex-column gap-2 ms-2" style="z-index:2;">
+               <button class="btn btn-sm btn-success shadow-sm rcw-action-btn px-3 fw-bold"
+                       data-action="accept" data-id="${req.id}" title="Aceptar">
+                 <i class="fa-solid fa-check"></i>
+               </button>
+               <button class="btn btn-sm btn-outline-danger shadow-sm rcw-action-btn px-3 fw-bold"
+                       data-action="reject" data-id="${req.id}" title="Rechazar">
+                 <i class="fa-solid fa-xmark"></i>
+               </button>
             </div>
           </div>
-        </div>
-      `;
+        </div>`;
     });
+
+    // ── Invitaciones de colaboración de foro ─────────────────────
+    forumInvites.forEach((inv) => {
+      const avatarSrc = getAvatarUrl(inv.sender_image, inv.sender_username, "6d28d9", "fff");
+
+      // Compact short title for badge preview (max 40 chars)
+      const shortTitle = inv.forum_title && inv.forum_title.length > 40
+        ? inv.forum_title.substring(0, 40) + '…'
+        : (inv.forum_title || '—');
+
+      // Data JSON encoded for modal
+      const dataInv = JSON.stringify({
+        invite_id: inv.invite_id,
+        sender_username: inv.sender_username,
+        forum_title: inv.forum_title,
+        forum_description: inv.forum_description || '',
+        member_count: inv.member_count || null,
+        created_at: inv.created_at || null
+      }).replace(/'/g, '&apos;');
+
+      html += `
+        <div class="list-group-item bg-transparent py-3 px-4 border-bottom border-secondary border-opacity-25 rcw-forum-invite-info-btn"
+             style="border-left: 3px solid #a78bfa !important; cursor:pointer; transition: background 0.2s;"
+             onmouseover="this.style.background='rgba(109,40,217,0.07)'"
+             onmouseout="this.style.background=''"
+             data-inv='${dataInv}'>
+          <div class="d-flex align-items-center">
+            <img src="${avatarSrc}" alt="${inv.sender_username}"
+                 class="rounded-circle object-fit-cover me-4 shadow-sm flex-shrink-0"
+                 style="width: 50px; height: 50px; border: 2px solid #a78bfa;"
+                 onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(inv.sender_username)}&background=6d28d9&color=fff'">
+            <div class="flex-grow-1 min-w-0">
+               <span class="text-white fw-bold d-block text-truncate fs-5 mb-1">${inv.sender_username}</span>
+               <small class="d-block mb-1" style="color:#a78bfa;">
+                 <i class="fa-solid fa-comments me-1"></i>
+                 Te invita a colaborar en
+               </small>
+               <span class="badge text-white fw-semibold px-2 py-1" style="background:rgba(109,40,217,0.35); border:1px solid #a78bfa; white-space:normal; line-height:1.3; max-width:280px; text-align:left; display:inline-block;">
+                 <i class="fa-solid fa-lock me-1" style="font-size:0.7em;"></i>${shortTitle}
+               </span>
+            </div>
+            <div class="d-flex flex-column gap-2 ms-3 flex-shrink-0" style="z-index:2;">
+               <button class="btn btn-sm shadow-sm rcw-forum-invite-btn rcw-forum-accept-btn px-3 fw-bold"
+                       data-action="accept" data-invite-id="${inv.invite_id}" title="Aceptar">
+                 <i class="fa-solid fa-check"></i>
+               </button>
+               <button class="btn btn-sm btn-outline-secondary shadow-sm rcw-forum-invite-btn rcw-forum-decline-btn px-3 fw-bold"
+                       data-action="decline" data-invite-id="${inv.invite_id}" title="Rechazar">
+                 <i class="fa-solid fa-xmark"></i>
+               </button>
+            </div>
+          </div>
+        </div>`;
+    });
+
     requestsList.html(html);
   }
 
@@ -298,6 +358,111 @@ $(document).ready(function () {
     });
     sentList.html(html);
   }
+
+  // Forum invite actions (accept / decline)
+  $(document).on("click", ".rcw-forum-invite-btn", async function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const btn       = $(this);
+    const action    = btn.data("action");     // 'accept' | 'decline'
+    const inviteId  = btn.data("invite-id");
+    const endpoint  = action === "accept" ? "accept_forum_invite" : "decline_forum_invite";
+
+    const originalHtml = btn.html();
+    btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span>');
+
+    try {
+      const res  = await fetch(`${BASE_URL}/api/php/users.php?action=${endpoint}`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ invite_id: inviteId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchFriendsData();
+      } else {
+        alert("Error: " + (data.error || "Acción fallida"));
+        btn.prop("disabled", false).html(originalHtml);
+      }
+    } catch (err) {
+      console.error(err);
+      btn.prop("disabled", false).html(originalHtml);
+    }
+  });
+
+  // ── Abrir modal info foro al pulsar la tarjeta ───────────────
+  $(document).on("click", ".rcw-forum-invite-info-btn", function (e) {
+    // Ignore if an action button inside was clicked
+    if ($(e.target).closest(".rcw-forum-invite-btn").length) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Get data from the card div (might be on this or an ancestor)
+    const card = $(this).closest("[data-inv]");
+    const rawData = card.length ? card.attr("data-inv") : $(this).attr("data-inv");
+
+    let inv;
+    try { inv = JSON.parse(rawData); } catch(err) { return; }
+
+    // Populate modal fields
+    $("#forumInviteModalSender").text("Invitación de " + inv.sender_username);
+    $("#forumInviteModalTitle").text(inv.forum_title || '—');
+
+    const descWrap = $("#forumInviteModalDescWrap");
+    if (inv.forum_description && inv.forum_description.trim()) {
+      $("#forumInviteModalDesc").text(inv.forum_description);
+      descWrap.show();
+    } else {
+      descWrap.hide();
+    }
+
+    $("#forumInviteModalMembers").text(inv.member_count != null ? inv.member_count : '—');
+    if (inv.created_at) {
+      const d = new Date(inv.created_at);
+      $("#forumInviteModalCreated").text(d.toLocaleDateString('es-ES', {year:'numeric', month:'short', day:'numeric'}));
+    } else {
+      $("#forumInviteModalCreated").text('—');
+    }
+
+    // Store invite_id on modal action buttons
+    $("#forumInviteModalAcceptBtn").data('invite-id', inv.invite_id);
+    $("#forumInviteModalDeclineBtn").data('invite-id', inv.invite_id);
+
+    new bootstrap.Modal(document.getElementById('forumInviteInfoModal')).show();
+  });
+
+  // ── Botones de acción del modal de foro ──────────────────────
+  $(document).on("click", ".rcw-forum-invite-modal-action", async function (e) {
+    e.preventDefault();
+    const btn      = $(this);
+    const action   = btn.data("action");   // 'accept' | 'decline'
+    const inviteId = btn.data("invite-id");
+    const endpoint = action === "accept" ? "accept_forum_invite" : "decline_forum_invite";
+
+    const originalHtml = btn.html();
+    btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span>');
+
+    try {
+      const res  = await fetch(`${BASE_URL}/api/php/users.php?action=${endpoint}`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ invite_id: inviteId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        bootstrap.Modal.getInstance(document.getElementById('forumInviteInfoModal')).hide();
+        fetchFriendsData();
+      } else {
+        alert("Error: " + (data.error || "Acción fallida"));
+        btn.prop("disabled", false).html(originalHtml);
+      }
+    } catch (err) {
+      console.error(err);
+      btn.prop("disabled", false).html(originalHtml);
+    }
+  });
 
   // Bind Actions (Delegation on document)
   $(document).on("click", ".rcw-action-btn", async function (e) {

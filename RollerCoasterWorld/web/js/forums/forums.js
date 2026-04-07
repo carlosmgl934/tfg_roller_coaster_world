@@ -1,23 +1,7 @@
-// forums.js — Lógica del foro con Firebase Realtime Database
-// TODO: escuchar mensajes en tiempo real, enviar mensajes, crear hilos
+// forums.js — Lógica del foro (sin Choices.js)
 
 $(document).ready(function () {
-  // Inicializar Choices.js
-  const el = document.getElementById("collaborators");
-  if (el) {
-    new Choices(el, {
-      removeItemButton: true,
-      searchEnabled: true,
-      searchPlaceholderValue: "Buscar colaborador...",
-      placeholderValue: "Selecciona colaboradores entre tus amigos",
-      noResultsText: "Sin resultados",
-      noChoicesText: "No hay más opciones",
-      itemSelectText: "",
-      shouldSort: true,
-    });
-  }
-
-  // Controlar la visibilidad de los colaboradores según la privacidad
+  // ── Visibilidad sección colaboradores ────────────────────────────
   const radios = document.querySelectorAll('input[name="privacy"]');
   const collabsSection = document.getElementById("collaborators-section");
   const hintText = document.getElementById("privacy-hint-text");
@@ -36,20 +20,37 @@ $(document).ready(function () {
     });
   });
 
-  document
-    .getElementById("forum-submit-btn")
-    .addEventListener("click", function () {
-      // Comprobar si el usuario está logueado
+  // ── Validación en tiempo real (Blur) ─────────────────────────────
+  const titleInput = document.getElementById("title");
+
+  if (titleInput) {
+    titleInput.addEventListener("blur", function () {
+      const val = this.value.trim();
+      if (val.length > 0 && val.length < 5) {
+        this.classList.add("is-invalid");
+      }
+    });
+
+    titleInput.addEventListener("input", function () {
+      if (
+        this.classList.contains("is-invalid") &&
+        this.value.trim().length >= 5
+      ) {
+        this.classList.remove("is-invalid");
+      }
+    });
+  }
+
+  // ── Submit del formulario ────────────────────────────────────────
+  const submitBtn = document.getElementById("forum-submit-btn");
+  if (submitBtn) {
+    submitBtn.addEventListener("click", function () {
       const isLogged =
         document
           .getElementById("forum-main-container")
           .getAttribute("data-logged") === "true";
       if (!isLogged) {
-        // Mostrar el modal de Bootstrap
-        const loginModal = new bootstrap.Modal(
-          document.getElementById("loginModal"),
-        );
-        loginModal.show();
+        new bootstrap.Modal(document.getElementById("loginModal")).show();
         return;
       }
 
@@ -63,22 +64,17 @@ $(document).ready(function () {
 
       const titleInput = document.getElementById("title");
       const subjectInput = document.getElementById("form_subject");
-      const privacyRadios = document.querySelectorAll('input[name="privacy"]');
-
-      // Limpiar bordes rojos previos
       titleInput.classList.remove("is-invalid");
       subjectInput.classList.remove("is-invalid");
 
       let hasError = false;
-
       const title = titleInput.value.trim();
       const subject = subjectInput.value.trim();
 
-      if (!title) {
+      if (!title || title.length < 5) {
         titleInput.classList.add("is-invalid");
         hasError = true;
       }
-
       if (!subject) {
         subjectInput.classList.add("is-invalid");
         hasError = true;
@@ -87,7 +83,9 @@ $(document).ready(function () {
       if (hasError) {
         msgDiv.style.display = "block";
         msgText.textContent =
-          "Por favor, completa todos los campos marcados en rojo";
+          title.length > 0 && title.length < 5
+            ? "El título debe tener al menos 5 caracteres"
+            : "Por favor, completa todos los campos marcados en rojo";
         msgText.style.color = "red";
         return;
       }
@@ -117,7 +115,6 @@ $(document).ready(function () {
         return;
       }
 
-      // Remover clase is-invalid al escribir
       titleInput.addEventListener(
         "input",
         function () {
@@ -135,6 +132,7 @@ $(document).ready(function () {
 
       btn.disabled = true;
       btn.textContent = "Creando foro...";
+
       fetch(window.BASE_URL + "/api/php/forums.php?action=create_forum", {
         method: "POST",
         body: formData,
@@ -143,13 +141,27 @@ $(document).ready(function () {
         .then((data) => {
           if (data.success) {
             msgDiv.style.display = "block";
-            msgText.textContent = "Foro creado exitosamente";
+            msgText.textContent = "Foro creado exitosamente. Redirigiendo...";
             msgText.style.color = "green";
             form.reset();
+            // Limpiar tags del picker
+            document.querySelectorAll(".friend-tag").forEach((t) => t.remove());
+            document
+              .querySelectorAll("#collaborators-hidden input")
+              .forEach((i) => i.remove());
+            selectedFriends = {};
+            closeDropdown();
+
+            // Redirigir al nuevo foro pasados 2 segundos
+            setTimeout(() => {
+              window.location.href = `${window.BASE_URL}/web/views/public/forums/forums.php?id=${data.forum_id}`;
+            }, 2000);
           } else {
             msgDiv.style.display = "block";
             msgText.textContent = data.error;
             msgText.style.color = "red";
+            btn.disabled = false;
+            btn.textContent = "+ Crear foro";
           }
         })
         .catch((e) => {
@@ -157,83 +169,311 @@ $(document).ready(function () {
           msgDiv.style.display = "block";
           msgText.textContent = "Error al crear el foro";
           msgText.style.color = "red";
-        })
-        .finally(() => {
           btn.disabled = false;
-          btn.textContent = "Crear foro";
+          btn.textContent = "+ Crear foro";
         });
     });
+  }
 
-  // Cargar colaboradores solo la primera vez que se seleccione privacidad "privada"
+  // ── FRIEND PICKER (custom) ───────────────────────────────────────
+  let allFriends = [];
+  let selectedFriends = {};
   let friendsLoaded = false;
 
-  $("input[name='privacy']").on("change", function () {
-    const isLogged =
-      document
-        .getElementById("forum-main-container")
-        .getAttribute("data-logged") === "true";
+  function getAvatarUrl(img, username) {
+    const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=198754&color=fff&size=64`;
+    if (!img) return fallback;
+    if (img.startsWith("http://") || img.startsWith("https://")) return img;
+    return `https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/${img}`;
+  }
 
-    if ($(this).val() === "private") {
-      $("#collaborators-section").show();
+  function renderPickerDropdown(query) {
+    const list = document.getElementById("friend-list");
+    const empty = document.getElementById("friend-empty");
+    if (!list) return;
 
-      if (isLogged && !friendsLoaded) {
-        // friendsLoaded = true; // Removido para que intente cargar siempre si falló
-        fetch(window.BASE_URL + "/api/php/forums.php?action=get_friends")
-          .then((res) => {
-            if (!res.ok) throw new Error("Network response was not ok");
-            return res.json();
-          })
-          .then((data) => {
-            if (data.success && Array.isArray(data.friends)) {
-              friendsLoaded = true;
-              const collaborators = document.getElementById("collaborators");
-              data.friends.forEach((friend) => {
-                const option = document.createElement("option");
-                option.value = friend.id;
-                option.textContent = friend.username;
-                collaborators.appendChild(option);
-              });
-            } else {
-              friendsLoaded = true;
-              console.warn(
-                "No se pudieron cargar amigos o no hay amigos:",
-                data.error || "Respuesta sin datos",
-              );
-            }
-          })
-          .catch((e) => {
-            console.error("Fetch error:", e);
-            // Si el error es literal "no tengo amigos" o un fallo de red, silenciamos el error rojo para que no moleste.
-            // Marcamos como loaded para que no se quede bloqueado en bucle.
-            friendsLoaded = true;
-          });
-      } else if (isLogged && friendsLoaded) {
-        // Si ya están cargados exitosamente y cambiamos de "público" a "privado", no limpiamos mensajes aquí para no ocultar nada de validación de envío por accidente.
-      } else if (!isLogged) {
-        // Si no está logueado y es privado, mostramos el error (porque igual va a dar error al enviar)
-        const msgDiv = document.getElementById("error-success-message");
-        const msgText = document.getElementById("error-success-message-text");
-        if (msgDiv && msgText) {
-          msgDiv.style.display = "block";
-          msgText.textContent = "Inicia sesión para seleccionar amigos";
-          msgText.style.color = "red";
-        }
-      }
-    } else {
-      // Al cambiar a Público, limpiamos el mensaje SOLO si decía algo de los amigos o inicio de sesión
-      const msgDiv = document.getElementById("error-success-message");
-      const msgText = document.getElementById("error-success-message-text");
-      if (
-        msgDiv &&
-        msgText &&
-        (msgText.textContent === "Error al obtener los amigos" ||
-          msgText.textContent === "Inicia sesión para seleccionar amigos")
-      ) {
-        msgDiv.style.display = "none";
-        msgText.textContent = "";
-      }
+    const q = (query || "").toLowerCase().trim();
+    const filtered = allFriends.filter(
+      (f) => !q || f.username.toLowerCase().includes(q),
+    );
 
-      $("#collaborators-section").hide();
+    if (filtered.length === 0) {
+      list.innerHTML = "";
+      empty.style.display = "block";
+      return;
     }
-  });
+    empty.style.display = "none";
+
+    list.innerHTML = filtered
+      .map((f) => {
+        const isSel = !!selectedFriends[f.id];
+        const avatar = getAvatarUrl(f.profile_image, f.username);
+        const errSrc = getAvatarUrl(null, f.username);
+        return `
+        <div class="friend-item${isSel ? " is-selected" : ""}"
+             data-id="${f.id}" data-name="${f.username}" data-img="${f.profile_image || ""}">
+          <img src="${avatar}" alt="${f.username}"
+               onerror="this.src='${errSrc}'">
+          <span>${f.username}</span>
+        </div>`;
+      })
+      .join("");
+  }
+
+  function addFriendTag(id, username) {
+    if (selectedFriends[id]) return;
+
+    if (Object.keys(selectedFriends).length >= 5) {
+      const msg = document.getElementById("collab-limit-msg");
+      if (msg) {
+        msg.style.display = "block";
+        setTimeout(() => {
+          msg.style.display = "none";
+        }, 4000);
+      }
+      document.getElementById("friend-search-input").value = "";
+      return;
+    }
+
+    selectedFriends[id] = { id, username };
+
+    // Tag visual
+    const tagsDiv = document.getElementById("friend-tags");
+    const srchInp = document.getElementById("friend-search-input");
+    const tag = document.createElement("span");
+    tag.className = "friend-tag";
+    tag.dataset.id = id;
+    tag.innerHTML = `${username} <button class="remove-tag" type="button" aria-label="Quitar">&times;</button>`;
+    tag.querySelector(".remove-tag").addEventListener("click", (e) => {
+      e.stopPropagation();
+      removeFriendTag(id);
+    });
+    tagsDiv.insertBefore(tag, srchInp);
+
+    // Hidden input para el form
+    const inp = document.createElement("input");
+    inp.type = "hidden";
+    inp.name = "collaborators[]";
+    inp.value = id;
+    inp.id = `hidden-collab-${id}`;
+    document.getElementById("collaborators-hidden").appendChild(inp);
+
+    renderPickerDropdown(srchInp.value);
+    srchInp.value = "";
+    srchInp.focus();
+  }
+
+  function removeFriendTag(id) {
+    delete selectedFriends[id];
+    const tag = document.querySelector(`.friend-tag[data-id="${id}"]`);
+    if (tag) tag.remove();
+    const hidden = document.getElementById(`hidden-collab-${id}`);
+    if (hidden) hidden.remove();
+
+    // Ocultar aviso si bajamos de 5
+    if (Object.keys(selectedFriends).length < 5) {
+      const msg = document.getElementById("collab-limit-msg");
+      if (msg) msg.style.display = "none";
+    }
+
+    const srchInp = document.getElementById("friend-search-input");
+    renderPickerDropdown(srchInp ? srchInp.value : "");
+  }
+
+  function openDropdown() {
+    const dd = document.getElementById("friend-dropdown");
+    if (dd) dd.style.display = "block";
+  }
+
+  function closeDropdown() {
+    const dd = document.getElementById("friend-dropdown");
+    if (dd) dd.style.display = "none";
+  }
+
+  async function loadFriends() {
+    if (friendsLoaded) {
+      openDropdown();
+      return;
+    }
+    try {
+      const res = await fetch(
+        window.BASE_URL + "/api/php/forums.php?action=get_friends",
+      );
+      const data = await res.json();
+      if (data.success && Array.isArray(data.friends)) {
+        allFriends = data.friends;
+      }
+    } catch (e) {
+      console.warn("[friend-picker] Error cargando amigos:", e);
+    }
+    friendsLoaded = true;
+    renderPickerDropdown("");
+    openDropdown();
+  }
+
+  // Binds del picker
+  const pickerEl = document.getElementById("friend-picker");
+  const srchInput = document.getElementById("friend-search-input");
+  const friendListEl = document.getElementById("friend-list");
+
+  if (pickerEl && srchInput && friendListEl) {
+    // Abrir al clicar en cualquier parte del picker
+    pickerEl.addEventListener("click", () => {
+      srchInput.focus();
+      loadFriends();
+    });
+
+    // Filtrar mientras escribe
+    srchInput.addEventListener("input", () => {
+      if (!friendsLoaded) {
+        loadFriends();
+        return;
+      }
+      renderPickerDropdown(srchInput.value);
+      openDropdown();
+    });
+
+    // Seleccionar amigo
+    friendListEl.addEventListener("click", (e) => {
+      const item = e.target.closest(".friend-item");
+      if (!item || item.classList.contains("is-selected")) return;
+      addFriendTag(item.dataset.id, item.dataset.name);
+    });
+
+    // Cerrar dropdown al clicar fuera
+    document.addEventListener("click", (e) => {
+      const dd = document.getElementById("friend-dropdown");
+      if (dd && !pickerEl.contains(e.target) && !dd.contains(e.target)) {
+        closeDropdown();
+      }
+    });
+
+    // Cargar amigos al cambiar a privado
+    radios.forEach((r) =>
+      r.addEventListener("change", function () {
+        if (this.value === "private") loadFriends();
+        else closeDropdown();
+      }),
+    );
+  }
+
+  // ── Render lista de foros ────────────────────────────────────────
+  function listForums(forums) {
+    const container = document.getElementById("forum-list");
+    if (!container) return;
+
+    if (!forums || forums.length === 0) {
+      container.innerHTML = `
+        <div class="text-center text-muted py-5">
+          <i class="fa-solid fa-comments fa-3x mb-3 d-block opacity-25"></i>
+          <h5>No hay foros disponibles</h5>
+          <p class="small">Sé el primero en crear uno.</p>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = forums
+      .map((forum) => {
+        const privacyIcon =
+          forum.privacy === "private" ? "fa-lock" : "fa-earth-europe";
+        const privacyLabel =
+          forum.privacy === "private" ? "Privado" : "Público";
+        const privacyClass =
+          forum.privacy === "private" ? "text-warning" : "text-success";
+
+        const fecha = forum.created_at
+          ? new Date(forum.created_at).toLocaleDateString("es-ES", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })
+          : "";
+        let autor = "";
+        if (forum.author_name) {
+          autor = `<div class="d-flex align-items-center gap-1">
+                     <small class="text-muted"><i class="fa-solid fa-user me-1"></i>${forum.author_name}</small>`;
+                     
+          if (forum.privacy === "private" && forum.collaborators_json) {
+            try {
+               let collabs = typeof forum.collaborators_json === "string" ? JSON.parse(forum.collaborators_json) : forum.collaborators_json;
+               if (collabs && collabs.length > 0) {
+                 // Remove nulls if any
+                 collabs = collabs.filter(c => c && c.username);
+                 if (collabs.length > 0) {
+                   autor += `<small class="text-muted ms-1" style="font-size: 0.75rem;">colaborando con:</small><div class="d-flex ms-1">`;
+                   collabs.slice(0, 3).forEach(c => {
+                       const imgSrc = c.profile_image && c.profile_image.includes('http') ? c.profile_image : (c.profile_image ? window.BASE_URL + '/uploads/profiles/' + c.profile_image : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(c.username) + '&background=random');
+                       autor += `<img src="${imgSrc}" alt="${c.username}" title="${c.username}" class="rounded-circle border border-dark" style="width: 22px; height: 22px; object-fit: cover; margin-left: -5px; z-index: 1; position: relative;">`;
+                   });
+                   if (collabs.length > 3) {
+                       autor += `<div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center border border-dark" style="width: 22px; height: 22px; font-size: 0.6rem; margin-left: -5px; z-index: 1; position: relative;">+${collabs.length - 3}</div>`;
+                   }
+                   autor += `</div>`;
+                 }
+               }
+            } catch(e) { console.warn("Error parsing collabs", e); }
+          }
+          autor += `</div>`;
+        }
+
+        const href = `${window.BASE_URL}/web/views/public/forums/forums.php?id=${forum.id}`;
+
+        return `
+        <a href="${href}" class="forum-card-item">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0 text-white fw-bold d-flex align-items-center gap-2">
+              <span class="forum-icon-bg"><i class="fa-regular fa-comments"></i></span>
+              ${forum.title}
+            </h5>
+            <span class="forum-privacy-badge ${forum.privacy === "private" ? "private" : "public"}">
+              <i class="fa-solid ${privacyIcon} me-1"></i>${privacyLabel}
+            </span>
+          </div>
+          <p class="mb-3 text-white-50 text-truncate" style="max-width: 90%; font-size: 0.95rem;">
+            ${forum.forum_subject}
+          </p>
+          <div class="d-flex justify-content-between align-items-center mt-auto">
+            ${autor}
+            <span class="text-secondary small">
+              <i class="fa-regular fa-calendar me-1"></i>${fecha}
+            </span>
+          </div>
+        </a>`;
+      })
+      .join("");
+  }
+
+  // ── Buscador de foros ────────────────────────────────────────────
+  const buscador = document.getElementById("forum-search-input");
+  if (buscador) {
+    // Carga inicial
+    fetch(window.BASE_URL + "/api/php/forums.php?action=list")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) listForums(data.forums);
+        else console.warn("Error al cargar los foros");
+      });
+
+    // Búsqueda dinámica
+    buscador.addEventListener("input", function () {
+      const val = buscador.value.trim();
+      if (val.length > 2) {
+        fetch(
+          `${window.BASE_URL}/api/php/forums.php?action=search_forums&search=${encodeURIComponent(val)}`,
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.success) listForums(data.forums);
+            else console.warn("Error al cargar los foros");
+          });
+      } else if (val.length === 0) {
+        // Cargar todos si se ha vaciado el buscador
+        fetch(window.BASE_URL + "/api/php/forums.php?action=list")
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.success) listForums(data.forums);
+          });
+      }
+    });
+  }
 });
