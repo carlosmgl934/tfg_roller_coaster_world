@@ -21,7 +21,7 @@ if (isset($input['firebase_uid']) && isset($input['email'])) {
   try {
     require_once __DIR__ . '/../../database/db_conexion.php';
     $db = new DBConexion();
-    $stmt = $db->prepare("SELECT id, rol, username, profile_image FROM users WHERE firebase_uid = :uid LIMIT 1");
+    $stmt = $db->prepare("SELECT id, rol, username, profile_image, email FROM users WHERE firebase_uid = :uid LIMIT 1");
     $stmt->execute([':uid' => $input['firebase_uid']]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -30,6 +30,8 @@ if (isset($input['firebase_uid']) && isset($input['email'])) {
       $_SESSION['user_rol']      = $row['rol'] ?? 'user';
       $_SESSION['username']      = $row['username'] ?? '';
       $_SESSION['profile_image'] = $row['profile_image'] ?? null;
+      $_SESSION['user_email']    = $row['email'] ?? $input['email']; // Usa el correo de la bd si existe
+      
       file_put_contents($logFile, date('Y-m-d H:i:s') . " - Sesión guardada: UID=" . $input['firebase_uid'] . " | user_id=" . $row['id'] . "\n", FILE_APPEND);
       echo json_encode(['success' => true, 'message' => 'Sesión PHP actualizada', 'user_id' => $row['id']]);
     } else {

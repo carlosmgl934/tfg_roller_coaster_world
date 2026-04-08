@@ -1,4 +1,5 @@
 ﻿<?php
+$page_css = ['web/css/admin.css'];
 require_once __DIR__ . '/../partials/header.php';
 
 if (!isset($_SESSION['firebase_uid'])) {
@@ -6,9 +7,6 @@ if (!isset($_SESSION['firebase_uid'])) {
     exit;
 }
 ?>
-
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/admin.css">
-
 <main>
     <h1>Gestión de Comentarios</h1>
     <!-- TODO: listado de comentarios, opción de borrar los inapropiados -->

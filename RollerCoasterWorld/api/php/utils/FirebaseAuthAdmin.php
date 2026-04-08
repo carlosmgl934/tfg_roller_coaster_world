@@ -139,4 +139,53 @@ class FirebaseAuthAdmin
         error_log("FirebaseAuthAdmin: Error borrando usuario $uid. HTTP $httpCode - $errorMsg");
         return ['success' => false, 'error' => $errorMsg];
     }
+
+    /**
+     * Actualiza el correo de un usuario en Firebase Authentication usando su firebase_uid
+     */
+    public function updateUserEmail(string $uid, string $newEmail): array
+    {
+        if (!file_exists($this->keyFilePath)) {
+            return ['success' => false, 'error' => 'No se encuentra el archivo JSON de la Service Account.'];
+        }
+
+        $keyData = json_decode(file_get_contents($this->keyFilePath), true);
+        if (!$keyData || !isset($keyData['private_key'])) {
+            return ['success' => false, 'error' => 'Archivo de Service Account inválido.'];
+        }
+
+        $accessToken = $this->getAccessToken($keyData);
+        if (!$accessToken) {
+            return ['success' => false, 'error' => 'No se pudo obtener el token de acceso.'];
+        }
+
+        $projectId = $keyData['project_id'];
+        $updateUrl = "https://identitytoolkit.googleapis.com/v1/projects/{$projectId}/accounts:update";
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $updateUrl);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "Authorization: Bearer {$accessToken}",
+            "Content-Type: application/json"
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+            'localId' => $uid,
+            'email' => $newEmail
+        ]));
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if ($httpCode === 200) {
+            return ['success' => true, 'error' => ''];
+        }
+
+        $data = json_decode($response, true);
+        $errorMsg = $data['error']['message'] ?? $response ?? 'Error desconocido';
+
+        error_log("FirebaseAuthAdmin: Error actualizando email del usuario $uid. HTTP $httpCode - $errorMsg");
+        return ['success' => false, 'error' => $errorMsg];
+    }
 }

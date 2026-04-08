@@ -20,13 +20,12 @@ if ($id === 0) {
     Router::redirect('park_search');
 }
 
+$page_css = ['https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css', 'web/css/coasters.css'];
 require_once __DIR__ . '/../../partials/header.php';
 ?>
 <!-- Librerias para poder usar select múltiples-->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
-<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-<link rel="stylesheet" href="<?= Router::asset('web/css/coasters.css') ?>">
 
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <main class="container my-5">
     <div class="row justify-content-center">
         <div class="col-12 col-md-8 col-lg-7">

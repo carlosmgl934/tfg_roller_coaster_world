@@ -257,7 +257,6 @@ $(document).ready(function () {
             data:        JSON.stringify({
                 id:       $('#edit-user-id').val(),
                 username: $('#edit-username').val().trim(),
-                email:    $('#edit-email').val().trim(),
                 rol:      $('#edit-rol').val()
             }),
             contentType: 'application/json',
@@ -320,7 +319,36 @@ $(document).ready(function () {
         if (typeof window.showModalNotification === 'function') {
             window.showModalNotification(msg);
         } else {
-            alert(msg);
+            const modalId = 'alertModal-' + Date.now();
+            const isError = msg.toLowerCase().includes('error') || msg.toLowerCase().includes('ya está en uso');
+            const icon = isError ? '<i class="fa-solid fa-circle-exclamation text-danger fs-3"></i>' : '<i class="fa-solid fa-circle-check text-success fs-3"></i>';
+            const title = isError ? 'Error' : 'Notificación';
+            
+            const html = `
+                <div class="modal fade" id="${modalId}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-sm">
+                        <div class="modal-content" style="background:#161b22; border:1px solid #30363d;">
+                            <div class="modal-header border-0 pb-0 justify-content-center mt-3">
+                                ${icon}
+                            </div>
+                            <div class="modal-body text-center text-white pb-4 pt-3">
+                                <h6 class="mb-2">${title}</h6>
+                                <p class="text-muted small mb-0" style="white-space: pre-wrap;">${msg}</p>
+                            </div>
+                            <div class="modal-footer border-0 p-0 justify-content-center pb-3">
+                                <button type="button" class="btn btn-sm btn-secondary w-75" data-bs-dismiss="modal" style="background:#21262d; border:1px solid #30363d; color:#c9d1d9;">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            $('body').append(html);
+            const $modal = $('#' + modalId);
+            const modalInstance = new bootstrap.Modal($modal[0]);
+            $modal.on('hidden.bs.modal', function() {
+                $modal.remove();
+            });
+            modalInstance.show();
         }
     }
 });

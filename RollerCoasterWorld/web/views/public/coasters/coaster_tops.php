@@ -1,9 +1,8 @@
 <?php
+$page_css = ['web/css/coasters.css'];
 require_once __DIR__ . '/../../partials/header.php';
 // if (!$is_logged) { Router::redirect('login'); } // Descomentar si es privado
 ?>
-
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/coasters.css">
 <main class="container-fluid px-lg-5 my-5 min-vh-100">
     <div class="row mb-5">
         <div class="col-12 text-center">

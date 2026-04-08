@@ -1,10 +1,10 @@
 ﻿<?php
+$page_css = ['web/css/coasters.css'];
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 ?>
 
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/coasters.css"> <!-- Reutilizamos el mismo CSS -->
-
+ <!-- Reutilizamos el mismo CSS -->
 <main class="container-fluid px-lg-5 my-5">
   <div class="row mb-4">
     <div class="col-12">

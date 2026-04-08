@@ -1,10 +1,8 @@
 <?php
+$page_css = ['web/css/privacy.css'];
 require_once __DIR__ . '/../partials/header.php';
 /** @var string $base_url */
 ?>
-
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/privacy.css">
-
 <main>
 
     <!-- Hero -->

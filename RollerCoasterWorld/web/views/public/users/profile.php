@@ -1,4 +1,5 @@
 ﻿<?php
+$page_css = ['web/css/profile.css', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css'];
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 
@@ -10,8 +11,6 @@ if (!isset($_SESSION['firebase_uid'])) {
 $user_email = $_SESSION['user_email'] ?? 'Desconocido';
 $user_uid = $_SESSION['firebase_uid'];
 ?>
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/profile.css">
-
 <main class="container-fluid px-4 px-xl-5 my-5" style="max-width: 1400px;">
   <div class="row g-4">
     <!-- Columna Izquierda: Perfil y Menú Lateral -->
@@ -676,7 +675,7 @@ $user_uid = $_SESSION['firebase_uid'];
 </main>
 
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>

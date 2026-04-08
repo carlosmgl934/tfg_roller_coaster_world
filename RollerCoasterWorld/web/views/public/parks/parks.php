@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../../../routes/Router.php';
 
 $id = intval($_GET['id'] ?? 0);
@@ -6,15 +6,13 @@ if ($id === 0) {
     Router::redirect('park_search');
 }
 
+$page_css = ['web/css/coasters.css', 'web/css/parks.css'];
 require_once __DIR__ . '/../../partials/header.php';
 ?>
 
 <!-- Estilos base de coasters para consistencia visual -->
-<link rel="stylesheet" href="<?= Router::asset('web/css/coasters.css') ?>">
+
 <!-- Estilos específicos de parques -->
-<link rel="stylesheet" href="<?= Router::asset('web/css/parks.css') ?>">
-<!-- CropperJS para recortar imágenes al subir fotos -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 
 <main class="container-fluid px-lg-5 my-5" data-logged="<?= $is_logged ? 'true' : 'false' ?>">
 
@@ -186,71 +184,6 @@ require_once __DIR__ . '/../../partials/header.php';
         </div>
     </div>
 
-
-    <!-- FOTOS -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="section-card card">
-                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="fa-solid fa-images"></i>
-                            <span class="fw-semibold text-white">Fotos del Parque</span>
-                        </div>
-                        <span class="badge badge-dark-green rounded-pill px-2 py-1 shadow-sm fs-6" id="photos-count">0</span>
-                    </div>
-                    <button class="btn btn-sm btn-outline-light rounded-0 px-3"
-                        <?php if ($is_logged): ?>
-                          id="upload-photo" data-bs-toggle="modal" data-bs-target="#upload-photo-modal"
-                        <?php else: ?>
-                          id="upload-photo" data-bs-toggle="modal" data-bs-target="#loginModal"
-                        <?php endif; ?>>
-                        <i class="fa-solid fa-upload me-1"></i>Subir foto
-                    </button>
-                </div>
-                <div class="card-body p-3">
-                    <div class="row g-2" id="photos-grid">
-                        <div class="col-12 text-center py-4 text-muted">
-                            <i class="fa-regular fa-image fa-2x d-block mb-2"></i>
-                            Aún no hay fotos de este parque
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL PARA SUBIR FOTO -->
-    <div class="modal fade" id="upload-photo-modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content rounded-0 border-0 shadow" style="background:#161b22; color:#e6edf3;">
-                <div class="modal-header bg-success text-white border-0">
-                    <h5 class="modal-title" id="upload-photo-title">Subir foto del parque</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <form id="upload-photo-form">
-                        <div class="mb-3">
-                            <label for="photo" class="form-label fw-bold small text-uppercase text-muted">Selecciona una foto</label>
-                            <input class="form-control rounded-0 border-success" style="background:#0d1117; color:#e6edf3;" type="file" id="photo" accept="image/*" required>
-                        </div>
-                        <div id="crop-container" class="mb-3 border border-secondary" style="display:none; overflow:hidden; max-height:400px; background:#000;">
-                            <img id="crop-preview" style="max-width:100%; display:block;">
-                        </div>
-                        <div class="mb-3">
-                            <label for="photo-caption" class="form-label fw-bold small text-uppercase text-muted">Descripción (opcional)</label>
-                            <textarea class="form-control rounded-0 border-secondary" style="background:#0d1117; color:#e6edf3;" id="photo-caption" rows="2"
-                                placeholder="¿Qué vemos en esta foto?"></textarea>
-                        </div>
-                        <button type="button" class="btn btn-success w-100 rounded-0 fw-bold py-2" id="upload-photo-btn">
-                            SUBIR FOTO <i class="fa-solid fa-upload ms-1"></i>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- MODAL DE NOTIFICACIÓN -->
     <div class="modal fade" id="notify-modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-sm modal-dialog-centered">
@@ -264,31 +197,6 @@ require_once __DIR__ . '/../../partials/header.php';
                 </div>
                 <div class="modal-footer border-secondary pt-0">
                     <button type="button" class="btn btn-success btn-sm rounded-0 px-4" data-bs-dismiss="modal">Aceptar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- IG LIGHTBOX MODAL (Para previsualizar fotos) -->
-    <div class="modal fade" id="ig-lightbox-modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
-            <div class="modal-content bg-dark text-white border-secondary rounded-0 overflow-hidden">
-                <div class="modal-header border-secondary d-flex align-items-center py-2 px-3">
-                    <img id="ig-modal-avatar" src="" alt="Avatar" class="rounded-circle me-2" style="width:32px; height:32px; object-fit:cover;">
-                    <span id="ig-modal-username" class="fw-bold fs-6"></span>
-                    <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-0 position-relative">
-                    <button id="ig-modal-prev" class="btn text-white position-absolute start-0 top-50 translate-middle-y bg-dark bg-opacity-50 border-0 rounded-end px-3 py-2" style="z-index: 10; display: none;"><i class="fa-solid fa-chevron-left"></i></button>
-                    <button id="ig-modal-next" class="btn text-white position-absolute end-0 top-50 translate-middle-y bg-dark bg-opacity-50 border-0 rounded-start px-3 py-2" style="z-index: 10; display: none;"><i class="fa-solid fa-chevron-right"></i></button>
-                    <img id="ig-modal-img" src="" alt="Foto" class="w-100" style="aspect-ratio: 1/1; object-fit:cover;">
-                </div>
-                <div class="modal-footer border-secondary flex-column align-items-start py-3 px-3">
-                    <div class="fw-bold mb-2 pb-2 w-100 border-bottom border-secondary" id="ig-modal-likes" style="font-size: 0.95rem;">0 me gusta</div>
-                    <div class="w-100 mt-1" style="font-size: 0.95rem;">
-                        <span id="ig-modal-caption-user" class="fw-bold text-success me-2"></span>
-                        <span id="ig-modal-caption" class="text-light"></span>
-                    </div>
                 </div>
             </div>
         </div>
@@ -343,7 +251,3 @@ require_once __DIR__ . '/../../partials/login_modal.php';
 <?php require_once __DIR__ . '/../../partials/footer.php';?>
 
 <script src="<?= Router::asset('web/js/parks/parks.js') ?>"></script>
-
-<!-- CropperJS para recortar imágenes -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
-</main>

@@ -1,13 +1,11 @@
 ﻿<?php
+$page_css = ['web/css/profile.css'];
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 
 // Perfil público de otro usuario — no requiere login
 $user_id = $_GET['id'] ?? null;
 ?>
-
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/profile.css">
-
 <main class="container-fluid px-3 px-lg-5 my-5" id="profile-content" style="display:none;">
 
     <!-- Título Principal -->

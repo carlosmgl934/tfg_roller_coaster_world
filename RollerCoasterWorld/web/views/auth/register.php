@@ -1,10 +1,10 @@
 <?php
+$page_css = ['web/css/login.css'];
 require_once __DIR__ . '/../partials/header.php';
 ?>
 
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/login.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <main class="login-page">
 
   <!-- Panel izquierdo: decorativo -->

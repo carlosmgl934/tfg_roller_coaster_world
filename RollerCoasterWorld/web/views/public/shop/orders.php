@@ -1,4 +1,5 @@
 ﻿<?php
+$page_css = ['web/css/carrito.css'];
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 
@@ -7,9 +8,6 @@ if (!isset($_SESSION['firebase_uid'])) {
     exit;
 }
 ?>
-
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/carrito.css">
-
 <main>
     <h1>Mis Pedidos</h1>
     <!-- TODO: historial de pedidos, descargar PDF de entradas -->

@@ -144,8 +144,7 @@ if (!$is_logged || !$is_admin) {
                                 <span class="input-group-text rounded-0 border-success" style="background:#0d1117;border-width:2px;color:#198754;border-right:none;">
                                     <i class="fa-solid fa-envelope"></i>
                                 </span>
-                                <input type="email" id="edit-email" class="form-control rounded-0" required
-                                    style="border-width:2px;border-color:#198754;background:#0d1117;color:#e6edf3;border-left:none;box-shadow:none;">
+                                <input type="email" id="edit-email" class="form-control rounded-0 text-muted" required readonly style="border-width:2px;border-color:#198754;background:#21262d;color:#8b949e;border-left:none;box-shadow:none; cursor:not-allowed;" title="El correo electrónico no se puede editar">
                             </div>
                         </div>
 

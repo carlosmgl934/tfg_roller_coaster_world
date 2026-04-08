@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // Inicia sesión (si no está ya iniciada)
 if (session_status() === PHP_SESSION_NONE) {
   session_start();
@@ -124,6 +124,17 @@ header("Expires: 0"); // Proxies
   <link rel="stylesheet" href="<?= Router::asset('web/css/globals.css') ?>">
   <!-- Navbar + layout -->
   <link rel="stylesheet" href="<?= Router::asset('web/css/header.css') ?>">
+
+  <!-- Page specific CSS -->
+  <?php if (isset($page_css)): ?>
+    <?php foreach((array)$page_css as $css): ?>
+      <?php if(strpos($css, 'http') === 0): ?>
+        <link rel="stylesheet" href="<?= htmlspecialchars($css) ?>">
+      <?php else: ?>
+        <link rel="stylesheet" href="<?= Router::asset($css) ?>">
+      <?php endif; ?>
+    <?php endforeach; ?>
+  <?php endif; ?>
 
 </head>
 

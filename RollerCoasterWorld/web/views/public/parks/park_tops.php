@@ -1,4 +1,5 @@
 ﻿<?php
+$page_css = ['web/css/coasters.css'];
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 
@@ -13,8 +14,7 @@ $pageTitle = $isGlobal ? 'Ranking Global de Parques' : 'Tops de Parques de Usuar
 $pageSubtitle = $isGlobal ? 'Los mejores parques del mundo según valoraciones' : 'Descubre los parques favoritos de la comunidad y tus amigos';
 ?>
 
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/coasters.css"> <!-- Reutilizamos el mismo CSS -->
-
+ <!-- Reutilizamos el mismo CSS -->
 <main class="container-fluid px-lg-5 my-5">
     <input type="hidden" id="initial-filter" value="<?= htmlspecialchars($filter) ?>">
     

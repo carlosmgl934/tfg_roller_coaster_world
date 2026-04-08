@@ -71,7 +71,7 @@ $(document).ready(function () {
       sortFilter.addEventListener("change", function () {
          const val = this.value;
          let defaultDir = "ASC"; // Cambiado a ascendente por defecto general
-         if (["stars", "height", "speed"].includes(val)) {
+         if (["height", "speed"].includes(val)) {
              defaultDir = "DESC";
          }
          

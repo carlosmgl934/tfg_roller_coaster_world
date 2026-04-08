@@ -1,4 +1,5 @@
 ﻿<?php
+$page_css = ['web/css/coasters.css', 'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css'];
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 
@@ -8,10 +9,8 @@ if ($id === 0) {
     exit;
 }
 ?>
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/coasters.css">
-<!-- CropperJS para recortar imágenes al subir fotos -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 
+<!-- CropperJS para recortar imágenes al subir fotos -->
 <main class="container-fluid px-lg-5 my-5" data-logged="<?= $is_logged ? 'true' : 'false' ?>">
 
     <!-- HERO -->

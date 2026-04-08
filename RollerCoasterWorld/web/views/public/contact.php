@@ -1,9 +1,7 @@
 ﻿<?php
+$page_css = ['web/css/contact.css'];
 require_once __DIR__ . '/../partials/header.php';
 ?>
-
-<link rel="stylesheet" href="<?= Router::asset('web/css/contact.css') ?>">
-
 <main>
 
     <!-- Hero -->

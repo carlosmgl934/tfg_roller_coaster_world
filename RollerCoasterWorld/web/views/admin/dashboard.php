@@ -1,4 +1,5 @@
 <?php
+$page_css = ['web/css/admin.css'];
 require_once __DIR__ . '/../partials/header.php';
 
 if (!isset($_SESSION['firebase_uid']) || !isset($_SESSION['user_rol']) || $_SESSION['user_rol'] !== 'admin') {
@@ -7,13 +8,12 @@ if (!isset($_SESSION['firebase_uid']) || !isset($_SESSION['user_rol']) || $_SESS
 }
 ?>
 
-<link rel="stylesheet" href="<?= Router::asset('web/css/admin.css') ?>">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<main class="container-fluid px-lg-5 my-5">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<main class="container-fluid px-lg-5 pt-0 pb-5 mb-5">
 
     <!-- Cabecera -->
-    <div class="row mb-4">
+    <div class="row pt-4 mb-4">
         <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-3 border-bottom pb-3">
             <h1 class="display-6 fw-bold text-success mb-0">
                 <i class="fa-solid fa-gauge-high me-3"></i>Panel de Control

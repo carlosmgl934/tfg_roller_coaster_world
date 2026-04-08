@@ -1,11 +1,8 @@
 ﻿<?php
+$page_css = ['web/css/coasters.css'];
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
-
-
 ?>
-
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/coasters.css">
 <main class="container-fluid px-lg-5 my-5">
     <div class="row mb-4">
         <div class="col-12">
@@ -13,7 +10,6 @@ require_once __DIR__ . '/../../partials/header.php';
             </h1>
         </div>
     </div>
-
     <div class="row g-4">
         <!-- IZQUIERDA: Filtros -->
         <aside class="col-12 col-lg-3 sidebar-filter" id="sidebar-filter">
@@ -22,57 +18,48 @@ require_once __DIR__ . '/../../partials/header.php';
                     <h5 class="mb-0"><i class="fa-solid fa-filter me-2"></i>Filtros</h5>
                 </div>
                 <div class="card-body">
-
                     <div class="form-check form-switch mb-2">
                         <input class="form-check-input" type="checkbox" id="status-filter">
                         <label class="form-check-label" for="status-filter">Sólo Abiertas</label>
                     </div>
-
                     <div class="form-check form-switch mb-4">
                         <input class="form-check-input" type="checkbox" id="ridden-filter">
                         <label class="form-check-label" for="ridden-filter">Ya montadas</label>
                     </div>
-
                     <div class="mb-3">
                         <label for="height-filter" class="form-label d-flex justify-content-between">
                             Altura mínima <span class="badge bg-success" id="height-val">0m</span>
                         </label>
                         <input type="range" class="form-range" id="height-filter" min="0" max="200" value="0">
                     </div>
-
                     <div class="mb-3">
                         <label for="speed-filter" class="form-label d-flex justify-content-between">
                             Velocidad mínima <span class="badge bg-success" id="speed-val">0km/h</span>
                         </label>
                         <input type="range" class="form-range" id="speed-filter" min="0" max="300" value="0">
                     </div>
-
                     <div class="mb-3">
                         <label for="length-filter" class="form-label d-flex justify-content-between">
                             Longitud mínima <span class="badge bg-success" id="length-val">0m</span>
                         </label>
                         <input type="range" class="form-range" id="length-filter" min="0" max="5000" value="0">
                     </div>
-
                     <div class="mb-4">
                         <label for="inversions-filter" class="form-label d-flex justify-content-between">
                             Inversiones mínimas <span class="badge bg-success" id="inversions-val">0</span>
                         </label>
                         <input type="range" class="form-range" id="inversions-filter" min="0" max="20" value="0">
                     </div>
-
                     <div class="mb-3">
                         <select class="form-select shadow-sm rounded-0" id="manufacter-filter">
                             <option value="">Fabricante</option>
                         </select>
                     </div>
-
                     <div class="mb-3">
                         <select class="form-select shadow-sm rounded-0" id="country-filter">
                             <option value="">País</option>
                         </select>
                     </div>
-
                     <div class="mb-4">
                         <select class="form-select shadow-sm rounded-0" name="year-select" id="year-select">
                             <option value="">Fecha de Apertura</option>
@@ -83,7 +70,6 @@ require_once __DIR__ . '/../../partials/header.php';
                             <?php } ?>
                         </select>
                     </div>
-
                     <div class="d-grid gap-2">
                         <button type="button" class="btn btn-success fw-bold shadow-sm rounded-0" id="btn-filtrar">
                             <i class="fa-solid fa-filter me-2"></i>Filtrar
@@ -95,7 +81,6 @@ require_once __DIR__ . '/../../partials/header.php';
                 </div>
             </div>
         </aside>
-
         <!-- CENTRO: Lista -->
         <div class="col-12 col-lg-6">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -114,12 +99,9 @@ require_once __DIR__ . '/../../partials/header.php';
                     <input type="hidden" id="sort-direction" value="DESC">
                 </div>
             </div>
-            
             <div class="list-group shadow-sm rounded-0" id="coaster-list" style="border-radius: 0;"></div>
-           
             <div class="pagination mt-4 justify-content-center" id="pagination"></div>
         </div>
-
         <!-- DERECHA: Buscador -->
         <div class="col-12 col-lg-3">
             <div class="sticky-top" style="top: 90px; z-index: 100;">
@@ -129,7 +111,6 @@ require_once __DIR__ . '/../../partials/header.php';
                         style="border-width: 2px;">
                     <i id="search-icon" class="fa-solid fa-magnifying-glass text-muted position-absolute"
                         style="right: 15px; top: 50%; transform: translateY(-50%); cursor: text;"></i>
-
                     <!-- Resultados Flotantes -->
                     <div id="search-results" class="list-group position-absolute w-100 shadow-lg mt-1"
                         style="z-index: 1050; text-align: left; display: none; max-height: 400px; overflow-y: auto;">
@@ -139,7 +120,5 @@ require_once __DIR__ . '/../../partials/header.php';
         </div>
     </div>
 </main>
-
-
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 <script src="<?= Router::asset('web/js/coasters/coasters.js') ?>"></script>

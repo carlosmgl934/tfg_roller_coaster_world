@@ -66,7 +66,7 @@ $(document).ready(function () {
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title text-success fw-bold text-truncate">${photo.username}</h5>
                     <p class="card-text text-muted mb-1 small"><i class="fa-solid fa-user me-1"></i> Subido por: <strong>${photo.username}</strong></p>
-                    <p class="card-text text-muted mb-3 small"><i class="fa-solid fa-train-tram me-1"></i> Destino: <strong>${photo.coaster_name}</strong></p>
+                    <p class="card-text text-muted mb-3 small"><i class="fa-solid fa-angles-right me-1"></i> Destino: <strong>${photo.coaster_name}</strong></p>
                     ${captionHtml}
                     <div class="d-flex gap-2 mt-auto">
                         <button class="btn btn-success flex-grow-1 btn-approve rounded-0" data-id="${photo.id}">
@@ -221,6 +221,8 @@ $(document).ready(function () {
   }
 
   // ── Render rows ─────────────────────────────────────────
+  let selectedCoasters = new Set();
+
   function renderRows(coasters) {
     const $list = $("#admin-coaster-list");
     $list.empty();
@@ -233,11 +235,15 @@ $(document).ready(function () {
       return;
     }
     coasters.forEach((c) => {
+      const isChecked = selectedCoasters.has(c.id.toString()) ? "checked" : "";
       $list.append(`
         <div class="list-group-item list-group-item-action d-flex align-items-center justify-content-between p-3">
-          <div class="flex-grow-1">
-            <h6 class="mb-0 fw-bold text-success">${c.coaster_name}</h6>
-            <small class="text-muted">
+          <div class="form-check me-3 mb-0 flex-shrink-0">
+            <input class="form-check-input coaster-select-checkbox" type="checkbox" value="${c.id}" ${isChecked} style="transform: scale(1.3); cursor: pointer;">
+          </div>
+          <div class="flex-grow-1 text-truncate">
+            <h6 class="mb-0 fw-bold text-success text-truncate">${c.coaster_name}</h6>
+            <small class="text-muted text-truncate d-block">
               ${c.coaster_manufacter || "Desconocido"} &bull;
               ${c.park_name || "Desconocido"} &bull;
               ${c.park_country || "—"} &bull;
@@ -569,6 +575,82 @@ $(document).ready(function () {
       new bootstrap.Modal(
         document.getElementById("modal-delete-coaster"),
       ).show();
+    });
+
+    // ── Bulk delete (selección) ──────────────────────────────
+    $(document).on("change", ".coaster-select-checkbox", function() {
+        const id = $(this).val();
+        if ($(this).is(":checked")) selectedCoasters.add(id);
+        else selectedCoasters.delete(id);
+        
+        const count = selectedCoasters.size;
+        if (count > 0) {
+            $("#bulk-delete-count").text(count);
+            $("#btn-bulk-delete").removeClass("d-none");
+        } else {
+            $("#btn-bulk-delete").addClass("d-none");
+        }
+    });
+
+    $("#btn-bulk-delete").on("click", function() {
+        $("#bulk-delete-coaster-count").text(selectedCoasters.size);
+        new bootstrap.Modal(document.getElementById("modal-bulk-delete-coaster")).show();
+    });
+
+    $("#confirm-bulk-delete-coaster").on("click", async function() {
+        const btn = $(this);
+        btn.prop("disabled", true).html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Eliminando...');
+        
+        try {
+            const res = await fetch(`${BASE_URL}/api/php/admin/admin_coasters.php?action=bulkDeleteCoasters`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ coasterIds: Array.from(selectedCoasters) })
+            });
+            const data = await res.json();
+            if (data.success) {
+                selectedCoasters.clear();
+                $("#btn-bulk-delete").addClass("d-none");
+                bootstrap.Modal.getInstance(document.getElementById("modal-bulk-delete-coaster")).hide();
+                window.loadAdminCoasters(1);
+            } else {
+                alert(data.error || "Error al eliminar montañas rusas");
+            }
+        } catch(e) {
+            alert("Error de conexión");
+        }
+        btn.prop("disabled", false).html('<i class="fa-solid fa-trash-can me-1"></i>Eliminar Todo');
+    });
+
+    // ── Eliminar coaster (confirmación simple) ────────────────
+    $("#confirm-delete-coaster").on("click", async function () {
+      const btn = $(this);
+      const id = btn.data("id");
+      btn.prop("disabled", true).html('<i class="fa-solid fa-spinner fa-spin"></i>');
+      try {
+        const res = await fetch(
+          `${BASE_URL}/api/php/admin/admin_coasters.php?action=deleteCoaster`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ coasterId: id }),
+          },
+        );
+        const data = await res.json();
+        if (data.success) {
+          bootstrap.Modal.getInstance(
+            document.getElementById("modal-delete-coaster"),
+          ).hide();
+          window.loadAdminCoasters(1); // recargar misma pág o pág 1
+        } else {
+          alert(data.error || "Error al eliminar");
+        }
+      } catch (err) {
+        alert("Error de red.");
+      }
+      btn
+        .prop("disabled", false)
+        .html('<i class="fa-solid fa-trash me-1"></i>Eliminar');
     });
 
     // ── Modal duplicar (delegado) ──────────────────────────────

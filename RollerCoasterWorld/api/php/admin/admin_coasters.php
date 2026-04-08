@@ -16,6 +16,7 @@ $router->register('filterCoasters', 'filterCoasters', 'GET');
 $router->register('listModels', 'listModels', 'GET');
 $router->register('addCoaster', 'addCoaster', 'POST');
 $router->register('deleteCoaster', 'deleteCoaster', 'POST');
+$router->register('bulkDeleteCoasters', 'bulkDeleteCoasters', 'POST');
 $router->register('updateCoaster', 'updateCoaster', 'POST');
 $router->dispatch();
 
@@ -298,6 +299,54 @@ function deleteCoaster(): void
         Response::success(['coaster_name' => $coasterName]);
     } catch (PDOException $e) {
         Response::error('Error eliminando coaster: ' . $e->getMessage());
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// bulkDeleteCoasters — eliminar seleccionadas
+// ─────────────────────────────────────────────────────────────
+function bulkDeleteCoasters(): void
+{
+    requireAdmin();
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true);
+    $ids = isset($data['coasterIds']) && is_array($data['coasterIds']) ? $data['coasterIds'] : [];
+    
+    if (empty($ids)) {
+        Response::error('No se seleccionaron coasters válidas.');
+        return;
+    }
+    
+    // Filter integer ids
+    $cleanIds = array_map('intval', $ids);
+    $cleanIds = array_filter($cleanIds, fn($id) => $id > 0);
+    
+    if (empty($cleanIds)) {
+        Response::error('IDs inválidos.');
+        return;
+    }
+
+    try {
+        global $db;
+        $inQuery = implode(',', array_fill(0, count($cleanIds), '?'));
+        
+        // Grab park IDs affected
+        $stmtPark = $db->prepare("SELECT DISTINCT park_id FROM coasters WHERE id IN ($inQuery)");
+        $stmtPark->execute($cleanIds);
+        $parksToUpdate = $stmtPark->fetchAll(PDO::FETCH_COLUMN);
+
+        $stmt = $db->prepare("DELETE FROM coasters WHERE id IN ($inQuery)");
+        $stmt->execute($cleanIds);
+        
+        foreach ($parksToUpdate as $pid) {
+            if ($pid) {
+                StatsHelper::updateParkStats((int)$pid);
+            }
+        }
+
+        Response::success(['deleted' => count($cleanIds)]);
+    } catch (PDOException $e) {
+        Response::error('Error eliminando coasters en masa: ' . $e->getMessage());
     }
 }
 

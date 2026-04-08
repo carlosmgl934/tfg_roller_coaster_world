@@ -379,7 +379,7 @@ function getPublicProfile()
         $stmtFriends->execute([':tid' => $target_id]);
         $friends_count = $stmtFriends->fetchColumn() ?: 0;
 
-        $stmtPhotosCount = $db->prepare("SELECT COUNT(*) FROM coaster_photos WHERE user_id = :tid AND status != 'rejected'");
+        $stmtPhotosCount = $db->prepare("SELECT COUNT(*) FROM coaster_photos WHERE user_id = :tid AND status = 'approved'");
         $stmtPhotosCount->execute([':tid' => $target_id]);
         $photos_count = $stmtPhotosCount->fetchColumn() ?: 0;
 
@@ -499,7 +499,7 @@ function getPublicProfile()
             FROM coaster_photos cp 
             JOIN coasters c ON cp.coaster_id = c.id 
             JOIN parks p ON c.park_id = p.id
-            WHERE cp.user_id = :tid AND cp.status != 'rejected'
+            WHERE cp.user_id = :tid AND cp.status = 'approved'
             ORDER BY cp.created_at DESC
         ");
         $stmtPhotos->execute([':tid' => $target_id]);

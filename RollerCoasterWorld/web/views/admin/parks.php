@@ -1,4 +1,5 @@
 <?php
+$page_css = ['web/css/coasters.css', 'web/css/admin.css'];
 require_once __DIR__ . '/../partials/header.php';
 
 if (!$is_logged || !$is_admin) {
@@ -6,14 +7,10 @@ if (!$is_logged || !$is_admin) {
     exit;
 }
 ?>
-
-<link rel="stylesheet" href="<?= Router::asset('web/css/coasters.css') ?>">
-<link rel="stylesheet" href="<?= Router::asset('web/css/admin.css') ?>">
-
-<main class="container-fluid px-lg-5 my-5">
+<main class="container-fluid px-lg-5 pt-0 pb-5 mb-5">
 
     <!-- Cabecera -->
-    <div class="row mb-4">
+    <div class="row pt-4 mb-4">
         <div class="col-12 d-flex justify-content-between align-items-center border-bottom pb-3">
             <h1 class="display-6 fw-bold text-success mb-0">
                 Gestión de Parques

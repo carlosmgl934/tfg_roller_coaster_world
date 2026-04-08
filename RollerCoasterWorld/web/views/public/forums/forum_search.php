@@ -1,9 +1,7 @@
 <?php
+$page_css = ['web/css/forums.css'];
 require_once __DIR__ . '/../../partials/header.php';
 ?>
-
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/forums.css">
-
 <main class="container my-5">
     <div class="row mb-4">
         <div

@@ -119,16 +119,23 @@ function updateUser(): void
     try {
         global $db;
 
+        // Validar si el usuario existe para evitar errores
+        $stmtFetch = $db->prepare("SELECT id FROM users WHERE id = :id");
+        $stmtFetch->execute([':id' => $id]);
+        if (!$stmtFetch->fetch()) {
+            Response::error('Usuario no encontrado.', 404);
+            return;
+        }
+
+        // Actualizar la base de datos local (SIN cambiar el email)
         $sql = "UPDATE users SET 
                     username = :username,
-                    email    = :email,
                     rol      = :rol
                 WHERE id = :id";
 
         $stmt = $db->prepare($sql);
         $stmt->execute([
             ':username' => trim($data['username']),
-            ':email'    => trim($data['email']),
             ':rol'      => $data['rol'] ?? 'user',
             ':id'       => $id
         ]);

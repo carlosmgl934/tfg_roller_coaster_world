@@ -1,4 +1,5 @@
 <?php
+$page_css = ['web/css/forums.css'];
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 
@@ -7,9 +8,6 @@ $privacy = $_POST['privacy'] ?? 'public';
 $hiddenStyle = ($privacy !== 'private') ? 'style="display:none"' : '';
 $is_logged = isset($_SESSION['user_id']);
 ?>
-
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/forums.css">
-
 <main class="container py-5" style="max-width: 680px;" data-logged="<?= $is_logged ? 'true' : 'false' ?>"
     id="forum-main-container">
 

@@ -1,4 +1,5 @@
 <?php
+$page_css = ['web/css/coasters.css', 'web/css/admin.css'];
 require_once __DIR__ . '/../partials/header.php';
 
 if (!$is_logged || !$is_admin) {
@@ -6,21 +7,22 @@ if (!$is_logged || !$is_admin) {
     exit;
 }
 ?>
-
-<link rel="stylesheet" href="<?= Router::asset('web/css/coasters.css') ?>">
-<link rel="stylesheet" href="<?= Router::asset('web/css/admin.css') ?>">
-
-<main class="container-fluid px-lg-5 my-5">
+<main class="container-fluid px-lg-5 pt-0 pb-5 mb-5">
 
     <!-- Cabecera -->
-    <div class="row mb-4">
+    <div class="row pt-4 mb-4">
         <div class="col-12 d-flex justify-content-between align-items-center border-bottom pb-3">
             <h1 class="display-6 fw-bold text-success mb-0">
                 Gestión de Coasters
             </h1>
-            <a href="#" class="btn btn-success fw-bold rounded-0 shadow-sm px-4" id="btn-add-coaster">
-                <i class="fa-solid fa-plus me-2"></i>Añadir coaster
-            </a>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-danger fw-bold rounded-0 shadow-sm px-4 d-none" id="btn-bulk-delete">
+                    <i class="fa-solid fa-trash-can me-2"></i>Eliminar (<span id="bulk-delete-count">0</span>)
+                </button>
+                <a href="#" class="btn btn-success fw-bold rounded-0 shadow-sm px-4" id="btn-add-coaster">
+                    <i class="fa-solid fa-plus me-2"></i>Añadir coaster
+                </a>
+            </div>
         </div>
     </div>
 
@@ -156,6 +158,33 @@ if (!$is_logged || !$is_admin) {
                 <button type="button" class="btn btn-danger rounded-0 fw-bold"
                     id="confirm-delete-coaster" data-id="">
                     <i class="fa-solid fa-trash me-1"></i>Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== MODAL ELIMINAR SELECCIONADAS ===================== -->
+<div class="modal fade" id="modal-bulk-delete-coaster" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-0 border-0 shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>Eliminar seleccionadas
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-1">¿Estás seguro de que quieres eliminar las <span class="fw-bold text-danger" id="bulk-delete-coaster-count">0</span> montañas rusas seleccionadas?</p>
+                <p class="text-muted small mt-2"><i class="fa-solid fa-circle-info me-1"></i>Esta acción es irreversible y borrará permanentemente todo su historial.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-danger rounded-0 fw-bold"
+                    id="confirm-bulk-delete-coaster">
+                    <i class="fa-solid fa-trash-can me-1"></i>Eliminar Todo
                 </button>
             </div>
         </div>

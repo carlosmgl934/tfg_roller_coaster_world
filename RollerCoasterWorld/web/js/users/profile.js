@@ -1464,6 +1464,38 @@ $(document).ready(function () {
     },
   );
 
+  // === RECUPERAR CONTRASEÑA EN PERFIL ===
+  const btnForgotProfile = document.getElementById("forgotPasswordProfileBtn");
+  if (btnForgotProfile) {
+    btnForgotProfile.addEventListener("click", function (e) {
+      e.preventDefault();
+      const email = document.getElementById("config-user-email").value || window.auth?.currentUser?.email;
+      
+      if (!email) {
+        if (typeof showAlert === 'function') showAlert("No se ha podido obtener tu correo electrónico. Cierra sesión y vuelve a entrar.");
+        else alert("No se ha podido obtener tu correo electrónico. Cierra sesión y vuelve a entrar.");
+        return;
+      }
+
+      window.auth.sendPasswordResetEmail(email)
+        .then(() => {
+          if (typeof showAlert === 'function') {
+            showAlert("¡Listo! Hemos enviado un enlace a " + email + " para que puedas restablecer tu contraseña. Revisa también la carpeta de SPAM.");
+          } else {
+            alert("¡Listo! Hemos enviado un enlace a " + email + " para restablecer tu contraseña.");
+          }
+        })
+        .catch((error) => {
+          let txt = "Error al restablecer contraseña: ";
+          if (error.code === 'auth/user-not-found') txt = "No hay ninguna cuenta vinculada con este correo en nuestro proveedor (Google/Firebase).";
+          else txt += error.message;
+
+          if (typeof showAlert === 'function') showAlert(txt);
+          else alert(txt);
+        });
+    });
+  }
+
   // === OCULTAR DROPDOWNS AL CLICAR FUERA ===
   $(document).on("click", function (e) {
     if (

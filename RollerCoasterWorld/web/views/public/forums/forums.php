@@ -1,4 +1,5 @@
 <?php
+$page_css = ['web/css/forums.css'];
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 
@@ -21,7 +22,7 @@ $isAdmin = $userRole === 'admin';
     <meta name="description" content="Chat del foro en RollerCoaster World">
 </head>
 
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/forums.css">
+
 
 <div class="forum-chat-wrapper" data-forum-id="<?= $forumId ?>" data-user-id="<?= htmlspecialchars($userId ?? '') ?>"
     data-is-admin="<?= $isAdmin ? 'true' : 'false' ?>" id="forum-chat-wrapper">

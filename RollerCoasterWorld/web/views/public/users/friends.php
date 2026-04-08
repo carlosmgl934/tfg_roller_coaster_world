@@ -1,4 +1,5 @@
 <?php
+$page_css = ['web/css/profile.css'];
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 /** @var bool $is_logged */
@@ -8,9 +9,6 @@ if (!$is_logged) {
     Router::redirect('login');
 }
 ?>
-
-<link rel="stylesheet" href="<?= $base_url ?>/web/css/profile.css">
-
 <main class="container-fluid px-3 px-lg-5 my-5">
 
     <!-- Encabezado -->

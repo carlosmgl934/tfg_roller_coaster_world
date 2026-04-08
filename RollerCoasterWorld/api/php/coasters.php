@@ -126,7 +126,6 @@ function listCoasters()
 
     $sortMap = [
         'name' => ['col' => 'coasters.coaster_name', 'default' => 'ASC'],
-        'stars' => ['col' => '(SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = coasters.id)', 'default' => 'DESC'],
         'height' => ['col' => 'coasters.height', 'default' => 'DESC'],
         'speed' => ['col' => 'coasters.speed', 'default' => 'DESC'],
         'year' => ['col' => 'NULLIF(coasters.opening_year, 0)', 'default' => 'ASC'],
@@ -283,7 +282,6 @@ function applyFilters()
 
     $sortMap = [
         'name' => ['col' => 'coasters.coaster_name', 'default' => 'ASC'],
-        'stars' => ['col' => '(SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = coasters.id)', 'default' => 'DESC'],
         'height' => ['col' => 'coasters.height', 'default' => 'DESC'],
         'speed' => ['col' => 'coasters.speed', 'default' => 'DESC'],
         'year' => ['col' => 'NULLIF(coasters.opening_year, 0)', 'default' => 'ASC'],
@@ -663,6 +661,7 @@ function getUserCoasterTops()
     $orderBy = match ($sort) {
         'alpha_asc'    => 'username ASC',
         'credits_desc' => 'total_coasters DESC',
+        'date_desc'    => 'last_modified DESC',
         default        => 'RANDOM()',
     };
 
