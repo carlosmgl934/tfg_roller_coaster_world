@@ -438,7 +438,13 @@ $(document).ready(function () {
   // ── Restablecer Contraseña ────────────────────────────────────────────────────
   function resetPassword(e) {
     if (e) e.preventDefault();
-    const email = document.getElementById("email").value;
+    const emailNode = document.getElementById("email");
+    let email = emailNode ? emailNode.value : null;
+
+    // Fallback if we are in profile and already have a logged in user
+    if (!email && window.auth.currentUser) {
+      email = window.auth.currentUser.email;
+    }
 
     if (!email) {
       showAlert("Por favor, introduce tu correo electrónico en el campo superior primero antes de hacer clic en recuperar contraseña.");

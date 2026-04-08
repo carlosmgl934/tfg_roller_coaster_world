@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $page_css = ['web/css/profile.css', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css'];
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
@@ -398,11 +398,7 @@ $user_uid = $_SESSION['firebase_uid'];
                 <input type="password" id="confirmar-password" class="form-control square-box"
                   placeholder="Repite la contraseña">
               </div>
-              <div class="col-12 mt-4 d-flex align-items-center">
-                <button id="cambiarPassword" class="btn btn-success me-2 px-4 fw-bold shadow-sm square-box"><i
-                    class="fa-solid fa-check me-2"></i>Guardar cambios</button>
-                <button id="btn-cancelar-password" class="btn btn-outline-secondary px-4 fw-bold square-box border-rcw text-rcw">Cancelar</button>
-              </div>
+              <div class="col-12 mt-4 d-flex flex-wrap justify-content-between align-items-center gap-3"><div class="d-flex align-items-center"><button id="cambiarPassword" class="btn btn-success me-2 px-4 fw-bold shadow-sm square-box"><i class="fa-solid fa-check me-2"></i>Guardar cambios</button><button id="btn-cancelar-password" class="btn btn-outline-secondary px-4 fw-bold square-box border-rcw text-rcw">Cancelar</button></div><a href="#" id="forgotPasswordBtn" class="text-success small fw-medium text-decoration-none"><i class="fa-solid fa-envelope me-1"></i>¿Has olvidado tu contraseña?</a></div>
               <div class="col-12 mt-2">
                 <p id="msg-password" class="mb-0 fw-medium small"></p>
               </div>
