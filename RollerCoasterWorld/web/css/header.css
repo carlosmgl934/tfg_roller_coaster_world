@@ -256,6 +256,7 @@
 .rcw-nav-admin {
   color: var(--rcw-text-secondary) !important;
   border: 1px solid rgba(255, 152, 0, 0.3) !important;
+  border-radius: 0 !important;
 }
 .rcw-nav-admin:hover {
   background-color: rgba(255, 152, 0, 0.08) !important;

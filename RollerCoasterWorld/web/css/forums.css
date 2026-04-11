@@ -542,6 +542,7 @@
 
 /* ── MENSAJE WRAP ─────────────────────────────────────────── */
 .forum-msg-wrap {
+  position: relative;
   display: flex; align-items: flex-end; gap: 8px;
   max-width: 78%;
   animation: msgIn 0.18s ease;
@@ -656,15 +657,30 @@
 
 /* ── ACCIONES DE MENSAJE ──────────────────────────────────── */
 .msg-actions {
-  display: none;
+  display: flex !important;
+  position: absolute;
+  top: -12px;
+  right: 12px;
   gap: 4px;
-  margin-top: 5px;
-  justify-content: flex-end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  transform: translateY(4px);
+  background: var(--rcw-bg-card-alt);
+  border: 1px solid var(--rcw-border);
+  padding: 3px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  z-index: 10;
 }
-.forum-msg-wrap.mine  .msg-actions { justify-content: flex-end; }
-.forum-msg-wrap.theirs .msg-actions { justify-content: flex-start; }
+.forum-msg-wrap.mine .msg-actions {
+  right: auto; left: 12px;
+}
+.forum-msg-wrap:hover .msg-actions {
+  opacity: 1; pointer-events: auto;
+  transform: translateY(0);
+}
 
-.forum-msg-wrap:hover .msg-actions { display: flex; }
 
 .msg-action-btn {
   background: rgba(255,255,255,0.06);

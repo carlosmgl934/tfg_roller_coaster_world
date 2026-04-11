@@ -21,6 +21,8 @@
   let pollTimer    = null;
   let lastMsgTime  = null;      // ISO string del último msg cargado
   let pendingDeleteId = null;
+  let pendingBanTargetId = null;
+  let pendingBanTargetName = null;
   let pendingRemoveCollabId = null;
   let pendingRemoveCollabName = null;
   let rateLimitEnd = 0;         // timestamp ms en que termina el cooldown
@@ -388,7 +390,7 @@
             // Flip el botón
             btn.dataset.hidden = hidden === 1 ? 0 : 1;
             btn.querySelector('i').className = hidden === 1 ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
-            btn.title = hidden === 1 ? 'Mostrar mensaje' : 'Ocultar mensaje';
+            btn.setAttribute('data-tooltip', hidden === 1 ? 'Mostrar mensaje' : 'Ocultar mensaje');
           }
         }
       });
@@ -398,22 +400,41 @@
     document.querySelectorAll('.ban-btn').forEach(btn => {
       if (btn.dataset.bound) return;
       btn.dataset.bound = '1';
-      btn.addEventListener('click', async () => {
-        const targetId = parseInt(btn.dataset.userId);
-        const uname    = btn.dataset.username;
-        if (!confirm(`¿Banear a "${uname}" de este foro?`)) return;
+      btn.addEventListener('click', () => {
+        pendingBanTargetId = parseInt(btn.dataset.userId);
+        pendingBanTargetName = btn.dataset.username;
+        const nameEl = el('ban-user-name');
+        if (nameEl) nameEl.textContent = pendingBanTargetName;
+        
+        const modalEl = el('banModal');
+        if (modalEl) {
+            const m = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            m.show();
+        }
+      });
+    });
+
+    // Confirm ban message
+    const confirmBanBtn = el('confirm-ban-btn');
+    if (confirmBanBtn && !confirmBanBtn.dataset.bound) {
+      confirmBanBtn.dataset.bound = '1';
+      confirmBanBtn.addEventListener('click', async () => {
+        if (!pendingBanTargetId) return;
         const fd = new FormData();
         fd.append('forum_id',       FORUM_ID);
-        fd.append('target_user_id', targetId);
+        fd.append('target_user_id', pendingBanTargetId);
         const res  = await fetch(`${BASE}/api/php/forums.php?action=ban_user`, { method: 'POST', body: fd });
         const data = await res.json();
+        
+        bootstrap.Modal.getInstance(el('banModal'))?.hide();
+        
         if (data.success) {
-          showToast(`Usuario "${uname}" baneado`, 'success');
+          showToast(`Usuario "${pendingBanTargetName}" baneado`, 'success');
         } else {
           showToast(data.error || 'Error al banear', 'error');
         }
       });
-    });
+    }
 
     // Confirm delete message
     const confirmBtn = el('confirm-delete-btn');
@@ -531,33 +552,29 @@
   }
 
   /* ══════════════════════════════════════════════════════════
-     SUBIDA A SUPABASE STORAGE
+     SUBIDA DE ARCHIVOS (Vía PHP para no exponer la KEY)
   ══════════════════════════════════════════════════════════ */
   async function uploadToSupabase(file) {
     try {
       // Comprimir si es imagen
       const fileToUpload = await compressIfImage(file);
-      const ext      = fileToUpload.name.split('.').pop();
-      const filename = `${FORUM_ID}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-      const url      = `${SUP_URL}/storage/v1/object/forum-attachments/${filename}`;
+      
+      const fd = new FormData();
+      fd.append('file', fileToUpload, fileToUpload.name); // Mantiene el nombre del archivo
+      fd.append('bucket', 'forum-attachments');
+      fd.append('path', String(FORUM_ID));
 
-      const res = await fetch(url, {
-        method:  'POST',
-        headers: {
-          'Authorization': `Bearer ${SUP_KEY}`,
-          'Content-Type':  fileToUpload.type || 'application/octet-stream',
-          'x-upsert':      'false',
-        },
-        body: fileToUpload,
+      const res = await fetch(`${BASE}/api/php/upload.php`, {
+        method: 'POST',
+        body: fd,
       });
 
-      if (!res.ok) {
-        const err = await res.text();
-        return { ok: false, error: err };
+      const data = await res.json();
+      if (!data.success) {
+        return { ok: false, error: data.error };
       }
-
-      const publicUrl = `${SUP_URL}/storage/v1/object/public/forum-attachments/${filename}`;
-      return { ok: true, url: publicUrl };
+      
+      return { ok: true, url: data.url };
     } catch (e) {
       return { ok: false, error: e.message };
     }
@@ -949,6 +966,12 @@
     const fb = avatarFallback(username);
     if (!img) return fb;
     if (img.startsWith('http')) return img;
+    if (img.startsWith('/')) {
+        if (img.includes('/web/img/uploads/')) {
+            return window.BASE_URL + '/web/img/uploads/' + img.split('/web/img/uploads/')[1];
+        }
+        return window.BASE_URL + img;
+    }
     return `${SUP_URL}/storage/v1/object/public/avatars/${img}`;
   }
 

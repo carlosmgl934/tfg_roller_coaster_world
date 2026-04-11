@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $page_css = ['web/css/coasters.css'];
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
@@ -16,7 +16,7 @@ require_once __DIR__ . '/../../partials/header.php';
 
   <div class="row g-4">
     <!-- IZQUIERDA: Filtros -->
-    <aside class="col-12 col-lg-3 sidebar-filter" id="sidebar-filter">
+    <aside class="col-12 col-lg-3 sidebar-filter order-1 order-lg-1" id="sidebar-filter">
       <div class="card shadow-sm border-0 sticky-top rounded-0" style="top: 90px; z-index: 1;">
         <div class="card-header bg-success text-white rounded-0">
           <h5 class="mb-0"><i class="fa-solid fa-filter me-2"></i>Filtros</h5>
@@ -65,7 +65,7 @@ require_once __DIR__ . '/../../partials/header.php';
     </aside>
 
     <!-- CENTRO: Lista -->
-    <div class="col-12 col-lg-6">
+    <div class="col-12 col-lg-6 order-3 order-lg-2">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div id="park-count" class="text-muted fw-bold"></div>
         <div class="d-flex align-items-center">
@@ -95,7 +95,7 @@ require_once __DIR__ . '/../../partials/header.php';
     </div>
 
     <!-- DERECHA: Buscador -->
-    <div class="col-12 col-lg-3">
+    <div class="col-12 col-lg-3 order-2 order-lg-3">
       <div class="sticky-top" style="top: 90px; z-index: 100;">
         <div class="position-relative mb-3">
           <input type="text" id="park-search" name="park-search"

@@ -166,6 +166,22 @@ $isAdmin = $userRole === 'admin';
     </div>
 </div>
 
+<!-- ── MODAL CONFIRMAR BANEAR USUARIO ──────────────────── -->
+<div class="modal fade" id="banModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
+                <i class="fa-solid fa-gavel fa-2x text-danger mb-3"></i>
+                <p>¿Banear a <strong id="ban-user-name"></strong> de este foro?<br><small class="text-muted">No podrá ver ni escribir mensajes.</small></p>
+                <div class="d-flex gap-2 justify-content-center mt-3">
+                    <button class="btn btn-outline-secondary px-4 rounded-0 fw-bold border-1" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-danger px-4 rounded-0 fw-bold border-1" id="confirm-ban-btn">Banear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ── MODAL CONFIRMAR EXPULSAR COLABORADOR ──────────────────────── -->
 <div class="modal fade" id="removeCollabModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
@@ -253,6 +269,7 @@ $isAdmin = $userRole === 'admin';
     window.FORUM_ID = <?= $forumId ?>;
     window.CURRENT_USER = <?= json_encode($userId) ?>;
     window.IS_ADMIN = <?= $isAdmin ? 'true' : 'false' ?>;
+    <?php require_once __DIR__ . '/../../../../api/database/db_conexion.php'; ?>
     window.SUPABASE_URL = '<?= $_ENV['SUPABASE_URL'] ?? '' ?>';
     window.SUPABASE_KEY = '<?= $_ENV['SUPABASE_ANON_KEY'] ?? '' ?>';
 </script>

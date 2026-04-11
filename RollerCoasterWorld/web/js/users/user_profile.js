@@ -427,31 +427,33 @@ $(document).ready(function () {
       let detailsHtml = details.length > 0 ? details.join('<span class="mx-2 opacity-25">&bull;</span>') : 'Miembro RCW';
 
       html += `
-        <div class="d-flex align-items-center gap-3 px-4 py-3 position-relative"
+        <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 px-3 px-sm-4 py-3 position-relative"
              style="border-bottom: 1px solid var(--rcw-border); transition: background 0.2s;"
              onmouseover="this.style.background='rgba(25,135,84,0.06)'"
              onmouseout="this.style.background='transparent'">
 
-          <!-- Avatar -->
-          <img src="${avatarSrc}"
-               alt="${friend.username}"
-               class="rounded-circle object-fit-cover flex-shrink-0"
-               style="width: 46px; height: 46px; border: 2px solid rgba(25,135,84,0.4);"
-               onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(friend.username)}&background=198754&color=fff&size=128'">
+          <div class="d-flex align-items-center gap-3 w-100 flex-grow-1 min-w-0">
+            <!-- Avatar -->
+            <img src="${avatarSrc}"
+                 alt="${friend.username}"
+                 class="rounded-circle object-fit-cover flex-shrink-0"
+                 style="width: 46px; height: 46px; border: 2px solid rgba(25,135,84,0.4);"
+                 onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(friend.username)}&background=198754&color=fff&size=128'">
 
-          <!-- Nombre -->
-          <div class="flex-grow-1 min-w-0">
-            <div class="fw-bold text-white text-truncate" style="font-size: 0.95rem;">${friend.username}</div>
-            <small class="text-muted d-block text-truncate mt-1" style="font-size: 0.75rem;">${detailsHtml}</small>
+            <!-- Nombre -->
+            <div class="flex-grow-1 min-w-0">
+              <div class="fw-bold text-white text-truncate" style="font-size: 0.95rem;">${friend.username}</div>
+              <small class="text-muted d-block text-truncate mt-1" style="font-size: 0.75rem;">${detailsHtml}</small>
+            </div>
           </div>
 
           <!-- Acciones -->
-          <div class="d-flex gap-2 flex-shrink-0 position-relative" style="z-index: 2;">
+          <div class="d-flex gap-2 position-relative w-100 mt-2 mt-sm-0 justify-content-start justify-content-sm-end" style="z-index: 2;">
             <a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${friend.id}"
-               class="btn btn-sm btn-outline-secondary px-3" style="border-radius: 20px; font-size: 0.78rem;">
+               class="btn btn-sm btn-outline-secondary px-3 flex-grow-1 flex-sm-grow-0" style="border-radius: 20px; font-size: 0.78rem;">
               <i class="fa-solid fa-eye me-1"></i>Ver perfil
             </a>
-            <button class="btn btn-sm btn-success px-3 rcw-add-from-profile-btn"
+            <button class="btn btn-sm btn-success px-3 rcw-add-from-profile-btn flex-grow-1 flex-sm-grow-0"
                     data-id="${friend.id}"
                     style="border-radius: 20px; font-size: 0.78rem; display: none;">
               <i class="fa-solid fa-user-plus me-1"></i>Añadir

@@ -129,8 +129,20 @@ function createForum()
 
 function listForums()
 {
+    $mine = isset($_GET['mine']) && $_GET['mine'] === 'true';
+    if ($mine && empty($_SESSION['user_id'])) {
+        Response::unauthorized('Debes iniciar sesión para usar este filtro');
+    }
+
     try {
         global $db;
+        
+        $where = "";
+        if ($mine) {
+            $userId = (int)$_SESSION['user_id'];
+            $where = "WHERE f.author_id = $userId OR f.id IN (SELECT forum_id FROM forum_collaborators WHERE user_id = $userId)";
+        }
+        
         $sql = "
             SELECT f.id, f.title, f.forum_subject, f.privacy, f.created_at,
                    u.username AS author_name, u.profile_image AS author_image,
@@ -142,6 +154,7 @@ function listForums()
                    ) AS collaborators_json
             FROM forums f
             JOIN users u ON f.author_id = u.id
+            $where
             ORDER BY f.created_at DESC
         ";
 
@@ -161,9 +174,21 @@ function searchForums()
     }
 
     $search = '%' . $_GET['search'] . '%';
+    
+    $mine = isset($_GET['mine']) && $_GET['mine'] === 'true';
+    if ($mine && empty($_SESSION['user_id'])) {
+        Response::unauthorized('Debes iniciar sesión para usar este filtro');
+    }
 
     try {
         global $db;
+        
+        $where = "WHERE (f.title ILIKE :search OR f.forum_subject ILIKE :search)";
+        if ($mine) {
+            $userId = (int)$_SESSION['user_id'];
+            $where .= " AND (f.author_id = $userId OR f.id IN (SELECT forum_id FROM forum_collaborators WHERE user_id = $userId))";
+        }
+        
         $sql = "
             SELECT f.id, f.title, f.forum_subject, f.privacy, f.created_at,
                    u.username AS author_name, u.profile_image AS author_image,
@@ -175,7 +200,7 @@ function searchForums()
                    ) AS collaborators_json
             FROM forums f
             JOIN users u ON f.author_id = u.id
-            WHERE f.title ILIKE :search OR f.forum_subject ILIKE :search
+            $where
             ORDER BY f.created_at DESC
         ";
 

@@ -196,15 +196,93 @@ $(document).ready(function () {
 
     function renderPagination(total) {
       if (!paginationContainer.length) return;
+      paginationContainer.empty();
       const totalPages = Math.ceil(total / itemsPerPage);
       if (totalPages <= 1) {
-        paginationContainer.empty();
         return;
       }
-      paginationContainer.empty();
+      
       const pageBtn = document.createElement("div");
       pageBtn.classList.add("page-buttons");
-      // (Brevity: assuming identical logic but simplified slightly)
+
+      const prevBtn = document.createElement("button");
+      prevBtn.className = "btn btn-outline-success mx-1";
+      prevBtn.textContent = "«";
+      if (currentPage === 1) prevBtn.disabled = true;
+      prevBtn.addEventListener("click", function () {
+        window.scrollTo({ top: 10, behavior: "smooth" });
+        loadParks(getFilters(), currentPage - 1);
+      });
+      pageBtn.appendChild(prevBtn);
+
+      const btnFirst = document.createElement("button");
+      if (currentPage === 1) {
+        btnFirst.className = "btn btn-success mx-1 text-white";
+      } else {
+        btnFirst.className = "btn btn-light text-success border mx-1";
+      }
+      btnFirst.textContent = "1";
+      btnFirst.addEventListener("click", function () {
+        window.scrollTo({ top: 10, behavior: "smooth" });
+        loadParks(getFilters(), 1);
+      });
+      pageBtn.appendChild(btnFirst);
+
+      const btnDots = document.createElement("button");
+      btnDots.className = "btn border-0 text-secondary mx-1";
+      btnDots.textContent = "...";
+      btnDots.disabled = true;
+      pageBtn.appendChild(btnDots);
+
+      let start = Math.max(2, currentPage - 1);
+      let end = Math.min(totalPages - 1, start + 2);
+      start = Math.max(2, end - 2); 
+
+      for (let i = start; i <= end; i++) {
+        const pageButton = document.createElement("button");
+        pageButton.className = "btn btn-light text-success border mx-1";
+        pageButton.textContent = i;
+        if (i === currentPage) {
+          pageButton.classList.remove("btn-light", "text-success", "border");
+          pageButton.classList.add("btn-success", "text-white");
+        }
+        pageButton.addEventListener("click", function () {
+          window.scrollTo({ top: 10, behavior: "smooth" });
+          loadParks(getFilters(), i);
+        });
+        pageBtn.appendChild(pageButton);
+      }
+
+      const btnDots2 = document.createElement("button");
+      btnDots2.className = "btn border-0 text-secondary mx-1";
+      btnDots2.textContent = "...";
+      btnDots2.disabled = true;
+      pageBtn.appendChild(btnDots2);
+
+      const btnLast = document.createElement("button");
+      if (currentPage === totalPages) {
+        btnLast.className = "btn btn-success mx-1 text-white";
+      } else {
+        btnLast.className = "btn btn-light text-success border mx-1";
+      }
+      btnLast.textContent = `${totalPages}`;
+      btnLast.addEventListener("click", function () {
+        window.scrollTo({ top: 10, behavior: "smooth" });
+        loadParks(getFilters(), totalPages);
+      });
+      pageBtn.appendChild(btnLast);
+
+      const nextBtn = document.createElement("button");
+      nextBtn.className = "btn btn-outline-success mx-1";
+      nextBtn.textContent = "»";
+      if (currentPage === totalPages) nextBtn.disabled = true;
+      nextBtn.addEventListener("click", function () {
+        window.scrollTo({ top: 10, behavior: "smooth" });
+        loadParks(getFilters(), currentPage + 1);
+      });
+      pageBtn.appendChild(nextBtn);
+
+      paginationContainer.append(pageBtn);
     }
 
     async function loadFilters() {
@@ -372,7 +450,7 @@ $(document).ready(function () {
           }
 
           // 2x2 Stats (Coaster style)
-          $("#global-ranking").text(park.ranking || "—");
+          $("#global-ranking").text(park.ranking ? '#' + park.ranking : "—");
           $("#park-score").text(
             park.stars ? parseFloat(park.stars).toFixed(2) : "0.00",
           );

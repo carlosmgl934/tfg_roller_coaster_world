@@ -1296,9 +1296,20 @@ $(document).ready(function () {
             );
           } else {
             data.forEach(function (coaster) {
+              let statusText = coaster.coaster_status || "Operativa";
+              if (statusText === 'Operating' || statusText === 'Operativa') statusText = 'Operativa';
+              else if (statusText === 'Defunct' || statusText === 'Closed' || statusText === 'Cerrada') statusText = 'Cerrada';
+              else if (statusText === 'Construction' || statusText === 'En Construcción' || statusText === 'En construcción') statusText = 'En Construcción';
+              else statusText = statusText.toUpperCase();
+
               dropdown.append(
-                `<li class="list-group-item list-group-item-action bg-dark text-white border-secondary" style="cursor:pointer;" data-id="${coaster.id}">
-                  <strong>${coaster.coaster_name}</strong> <small class="text-secondary text-nowrap ms-2">en ${coaster.park_name}</small>
+                `<li class="list-group-item list-group-item-action bg-dark text-white border-secondary d-flex justify-content-between align-items-center" style="cursor:pointer;" data-id="${coaster.id}">
+                  <div class="text-truncate">
+                    <strong>${coaster.coaster_name}</strong> <small class="text-secondary ms-2">en ${coaster.park_name}</small>
+                  </div>
+                  <div class="opacity-50 text-nowrap ms-3 text-end" style="font-size: 0.8em; min-width: max-content;">
+                    ${statusText} • ${coaster.park_country || 'Desconocido'}
+                  </div>
                 </li>`,
               );
             });

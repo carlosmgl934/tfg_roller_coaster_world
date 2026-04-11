@@ -24,8 +24,8 @@ require_once __DIR__ . '/../../partials/header.php';
     </div>
 
     <div class="row mb-4">
-        <div class="col-12 col-lg-8 mx-auto">
-            <div class="input-group shadow-sm">
+        <div class="col-12 col-lg-8 mx-auto d-flex gap-2">
+            <div class="input-group shadow-sm flex-grow-1">
                 <span class="input-group-text bg-success border-success text-white rounded-0" id="search-addon"
                     style="border-width: 2px;">
                     <i class="fa-solid fa-magnifying-glass"></i>
@@ -34,6 +34,11 @@ require_once __DIR__ . '/../../partials/header.php';
                     placeholder="Buscar título o descripción del foro..." aria-label="Buscar foros"
                     aria-describedby="search-addon" style="border-width: 2px;">
             </div>
+            <?php if ($is_logged): ?>
+                <button type="button" class="btn btn-outline-success shadow-sm rounded-0 fw-bold d-flex align-items-center text-nowrap" id="filter-mine-btn" data-mine="false">
+                    <i class="fa-solid fa-filter me-sm-2"></i> <span class="d-none d-sm-inline">Mis Foros</span>
+                </button>
+            <?php endif; ?>
         </div>
     </div>
 

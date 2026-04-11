@@ -56,55 +56,55 @@ $(document).ready(function () {
     const sortFilter = document.getElementById("sort-filter");
     const sortDirectionBtn = document.getElementById("sort-direction-btn");
     const sortDirectionInput = document.getElementById("sort-direction");
-    
+
     // Cargar orden guardado o usar ASC por defecto
     if (sortFilter && sortDirectionInput) {
       const savedSort = localStorage.getItem("coasters_sort");
       const savedDir = localStorage.getItem("coasters_sort_dir") || "ASC";
-      
+
       if (savedSort) {
         sortFilter.value = savedSort;
       }
       sortDirectionInput.value = savedDir;
       if (sortDirectionBtn) updateSortIcon(savedDir);
-      
+
       sortFilter.addEventListener("change", function () {
-         const val = this.value;
-         let defaultDir = "ASC"; // Cambiado a ascendente por defecto general
-         if (["height", "speed"].includes(val)) {
-             defaultDir = "DESC";
-         }
-         
-         sortDirectionInput.value = defaultDir;
-         if (sortDirectionBtn) updateSortIcon(defaultDir);
-         
-         localStorage.setItem("coasters_sort", val);
-         localStorage.setItem("coasters_sort_dir", defaultDir);
-         
-         loadCoasters(1);
+        const val = this.value;
+        let defaultDir = "ASC"; // Cambiado a ascendente por defecto general
+        if (["height", "speed"].includes(val)) {
+          defaultDir = "DESC";
+        }
+
+        sortDirectionInput.value = defaultDir;
+        if (sortDirectionBtn) updateSortIcon(defaultDir);
+
+        localStorage.setItem("coasters_sort", val);
+        localStorage.setItem("coasters_sort_dir", defaultDir);
+
+        loadCoasters(1);
       });
     }
 
     if (sortDirectionBtn && sortDirectionInput) {
-        sortDirectionBtn.addEventListener("click", function() {
-            const currentDir = sortDirectionInput.value;
-            const newDir = currentDir === "ASC" ? "DESC" : "ASC";
-            sortDirectionInput.value = newDir;
-            updateSortIcon(newDir);
-            
-            localStorage.setItem("coasters_sort_dir", newDir);
-            
-            loadCoasters(1);
-        });
+      sortDirectionBtn.addEventListener("click", function () {
+        const currentDir = sortDirectionInput.value;
+        const newDir = currentDir === "ASC" ? "DESC" : "ASC";
+        sortDirectionInput.value = newDir;
+        updateSortIcon(newDir);
+
+        localStorage.setItem("coasters_sort_dir", newDir);
+
+        loadCoasters(1);
+      });
     }
 
     function updateSortIcon(dir) {
-        const icon = sortDirectionBtn.querySelector("i");
-        if (dir === "ASC") {
-            icon.className = "fa-solid fa-arrow-up-wide-short";
-        } else {
-            icon.className = "fa-solid fa-arrow-down-wide-short";
-        }
+      const icon = sortDirectionBtn.querySelector("i");
+      if (dir === "ASC") {
+        icon.className = "fa-solid fa-arrow-up-wide-short";
+      } else {
+        icon.className = "fa-solid fa-arrow-down-wide-short";
+      }
     }
 
     let searchDebounce = null;
@@ -154,8 +154,14 @@ $(document).ready(function () {
 
     function loadCoasters(page) {
       currentPage = page;
-      const sort = document.getElementById("sort-filter")?.value || localStorage.getItem("coasters_sort") || "id";
-      const orderDir = document.getElementById("sort-direction")?.value || localStorage.getItem("coasters_sort_dir") || "ASC";
+      const sort =
+        document.getElementById("sort-filter")?.value ||
+        localStorage.getItem("coasters_sort") ||
+        "id";
+      const orderDir =
+        document.getElementById("sort-direction")?.value ||
+        localStorage.getItem("coasters_sort_dir") ||
+        "ASC";
 
       if (isAdvancedFiltering) {
         let opened = document.getElementById("status-filter").checked;
@@ -166,24 +172,40 @@ $(document).ready(function () {
         let inversions = document.getElementById("inversions-filter").value;
         let manufacter = document.getElementById("manufacter-filter").value;
         let country = document.getElementById("country-filter").value;
+        let parkId = document.getElementById("park-filter").value;
         let year = document.getElementById("year-select").value;
         let search = document.getElementById("coaster-search").value;
 
         const params = new URLSearchParams({
           action: "apply_filters",
-          page, opened, ridden, height, speed, length,
-          inversions, manufacter, country, year, search, sort, order_dir: orderDir
+          page,
+          opened,
+          ridden,
+          height,
+          speed,
+          length,
+          inversions,
+          manufacter,
+          country,
+          park_id: parkId,
+          year,
+          search,
+          sort,
+          order_dir: orderDir,
         });
         fetch(`${BASE_URL}/api/php/coasters.php?${params}`)
           .then((r) => r.json())
           .then((data) => {
             if (data.success) {
               let totalMsg = data.total || 0;
-              $("#coaster-count").text(`Mostrando ${totalMsg} montaña${totalMsg !== 1 ? "s" : ""} rusa${totalMsg !== 1 ? "s" : ""}`);
+              $("#coaster-count").text(
+                `Mostrando ${totalMsg} montaña${totalMsg !== 1 ? "s" : ""} rusa${totalMsg !== 1 ? "s" : ""}`,
+              );
               displayCoasters(data.coasters);
               displayPagination(data.total, page);
             } else {
-              document.getElementById("coaster-list").innerHTML = "<p style='color:red;'>Error cargando montañas rusas</p>";
+              document.getElementById("coaster-list").innerHTML =
+                "<p style='color:red;'>Error cargando montañas rusas</p>";
             }
           })
           .catch((e) => console.warn("Error apply_filters:", e));
@@ -203,11 +225,14 @@ $(document).ready(function () {
         .then((data) => {
           if (data.success) {
             let totalMsg = data.total || 0;
-            $("#coaster-count").text(`Mostrando ${totalMsg} montaña${totalMsg !== 1 ? "s" : ""} rusa${totalMsg !== 1 ? "s" : ""}`);
+            $("#coaster-count").text(
+              `Mostrando ${totalMsg} montaña${totalMsg !== 1 ? "s" : ""} rusa${totalMsg !== 1 ? "s" : ""}`,
+            );
             displayCoasters(data.coasters);
             displayPagination(data.total, page);
           } else {
-            document.getElementById("coaster-list").innerHTML = "<p style='color:red;'>Error cargando montañas rusas</p>";
+            document.getElementById("coaster-list").innerHTML =
+              "<p style='color:red;'>Error cargando montañas rusas</p>";
           }
         })
         .catch((e) => console.warn("Error loadCoasters:", e));
@@ -239,6 +264,28 @@ $(document).ready(function () {
             document.querySelector("#country-filter").appendChild(option);
           });
         }
+        
+        // Inicializar autocompletado de parques (sustituye a la carga masiva)
+        initAutocomplete({
+          inputId: "filter-park-search",
+          dropdownId: "filter-park-results",
+          fetchItems: async (q) => {
+            const url = `${BASE_URL}/api/php/parks.php?action=list&limit=50${q ? "&q=" + encodeURIComponent(q) : "&sort=name"}`;
+            const res = await fetch(url);
+            const data = await res.json();
+            if (!data.success) return [];
+            return data.data.map((p) => ({
+              label: p.park_name,
+              sublabel: p.park_country || "",
+              value: p.park_name,
+              id: p.id,
+            }));
+          },
+          onSelect: (item) => {
+            document.getElementById("park-filter").value = item.id;
+          },
+        });
+
       } catch (e) {
         console.warn("Error cargando filtros:", e);
       }
@@ -258,6 +305,8 @@ $(document).ready(function () {
       document.getElementById("inversions-filter").value = 0;
       document.getElementById("status-filter").checked = false;
       document.getElementById("ridden-filter").checked = false;
+      document.getElementById("park-filter").value = "";
+      document.getElementById("filter-park-search").value = "";
       document.getElementById("year-select").value = "";
       document.getElementById("manufacter-filter").value = "";
       document.getElementById("country-filter").value = "";
@@ -297,7 +346,8 @@ $(document).ready(function () {
 
         let validImgUrl = coaster.imagen_url;
         if (validImgUrl && !validImgUrl.startsWith("http")) {
-            validImgUrl = BASE_URL + (validImgUrl.startsWith("/") ? "" : "/") + validImgUrl;
+          validImgUrl =
+            BASE_URL + (validImgUrl.startsWith("/") ? "" : "/") + validImgUrl;
         }
 
         const img = validImgUrl
@@ -558,7 +608,7 @@ $(document).ready(function () {
           if (positionRank)
             positionRank.textContent = coaster.global_rank
               ? "#" + coaster.global_rank
-              : "#" + coaster.id;
+              : "—";
           if (puntuacion)
             puntuacion.textContent = parseFloat(coaster.score || 0).toFixed(2);
           if (personalRanking)
@@ -567,32 +617,63 @@ $(document).ready(function () {
               : "—";
 
           if (currentState) {
-              let statusText = coaster.coaster_status || "Operativa";
-              $(currentState).removeClass('text-success text-danger text-warning text-info text-secondary');
-              if (statusText === 'Operating' || statusText === 'Operativa') {
-                  currentState.textContent = 'Operativa';
-                  $(currentState).addClass('text-success');
-              } else if (statusText === 'Defunct') {
-                  currentState.textContent = 'Cerrada';
-                  $(currentState).addClass('text-danger');
-              } else if (statusText === 'SBNO') {
-                  currentState.textContent = 'SBNO';
-                  $(currentState).addClass('text-warning');
-              } else {
-                  currentState.textContent = statusText.toUpperCase();
-                  $(currentState).addClass('text-info');
-              }
+            let statusText = coaster.coaster_status || "Operativa";
+            $(currentState).removeClass(
+              "text-success text-danger text-warning text-info text-secondary",
+            );
+            if (statusText === "Operating" || statusText === "Operativa") {
+              currentState.textContent = "Operativa";
+              $(currentState).addClass("text-success");
+            } else if (
+              statusText === "Defunct" ||
+              statusText === "Closed" ||
+              statusText === "Cerrada"
+            ) {
+              currentState.textContent = "Cerrada";
+              $(currentState).addClass("text-danger");
+            } else if (statusText === "SBNO") {
+              currentState.textContent = "SBNO";
+              $(currentState).addClass("text-warning");
+            } else if (
+              statusText === "Construction" ||
+              statusText === "En Construcción" ||
+              statusText === "En construcción"
+            ) {
+              currentState.textContent = "En Construcción";
+              $(currentState).addClass("text-info");
+            } else {
+              currentState.textContent = statusText.toUpperCase();
+              $(currentState).addClass("text-info");
+            }
           }
           if (currentStateTable) {
-              let statusText = coaster.coaster_status || "Operativa";
-              currentStateTable.textContent = statusText === 'Operating' || statusText === 'Operativa' ? 'Operativa' : statusText === 'Defunct' ? 'Cerrada' : statusText;
+            let statusText = coaster.coaster_status || "Operativa";
+            let finalStatus = statusText;
+            if (statusText === "Operating" || statusText === "Operativa")
+              finalStatus = "Operativa";
+            else if (
+              statusText === "Defunct" ||
+              statusText === "Closed" ||
+              statusText === "Cerrada"
+            )
+              finalStatus = "Cerrada";
+            else if (
+              statusText === "Construction" ||
+              statusText === "En Construcción" ||
+              statusText === "En construcción"
+            )
+              finalStatus = "En Construcción";
+            currentStateTable.textContent = finalStatus;
           }
 
           // --- Multimedia ---
           if (coaster.imagen_url) {
             let validImgUrl = coaster.imagen_url;
             if (!validImgUrl.startsWith("http")) {
-                validImgUrl = BASE_URL + (validImgUrl.startsWith("/") ? "" : "/") + validImgUrl;
+              validImgUrl =
+                BASE_URL +
+                (validImgUrl.startsWith("/") ? "" : "/") +
+                validImgUrl;
             }
             $("#coaster-hero-img")
               .attr("src", validImgUrl)
@@ -672,9 +753,10 @@ $(document).ready(function () {
           const coasterName = coasterNameEl ? coasterNameEl.textContent : "";
 
           data.photos.forEach((photo, index) => {
-            const hasLiked = localStorage.getItem("liked_photo_" + photo.id) === "true";
+            const hasLiked =
+              localStorage.getItem("liked_photo_" + photo.id) === "true";
             const heartClass = hasLiked ? "fa-solid text-danger" : "fa-regular";
-            
+
             const col = document.createElement("div");
             col.className = "col-6 col-sm-4 col-md-3 col-lg-2 mb-4";
             col.innerHTML = `
@@ -686,7 +768,7 @@ $(document).ready(function () {
                        data-url="${photo.photo_url}"
                        data-username="${photo.username}"
                        data-avatar="${window.rcwGetAvatarPath(photo.profile_image, photo.username)}"
-                       data-caption="${photo.caption || ''}"
+                       data-caption="${photo.caption || ""}"
                        data-likes="${photo.likes || 0}">
                       <img src="${photo.photo_url}" alt="${photo.caption || "Foto"}" class="position-absolute w-100 h-100" style="object-fit: cover; top:0; left:0; transition: transform 0.3s ease;">
                   </div>
@@ -710,33 +792,78 @@ $(document).ready(function () {
     let currentPhotoIndex = 0;
 
     function updateModalContent(index) {
-        const allPhotosList = $(".photo-square-container");
-        if (index < 0 || index >= allPhotosList.length) return;
-        currentPhotoIndex = index;
-        const el = $(allPhotosList[index]);
+      const allPhotosList = $(".photo-square-container");
+      if (index < 0 || index >= allPhotosList.length) return;
+      currentPhotoIndex = index;
+      const el = $(allPhotosList[index]);
 
-        const id = el.data("id");
-        const url = el.data("url");
-        const username = el.data("username");
-        const avatar = el.data("avatar");
-        const caption = el.data("caption");
-        const likes = el.data("likes");
+      const id = el.data("id");
+      const url = el.data("url");
+      const username = el.data("username");
+      const avatar = el.data("avatar");
+      const caption = el.data("caption");
+      const likes = el.data("likes");
+      const hasLiked = localStorage.getItem("liked_photo_" + id) === "true";
+
+      $("#ig-modal-img").attr("src", url);
+      $("#ig-modal-avatar").attr("src", avatar);
+      $("#ig-modal-username").text(username);
+
+      if (caption) {
+        $("#ig-modal-caption-user").text(username);
+        $("#ig-modal-caption").html(
+          `<span class="text-muted opacity-50 mx-1">&bull;</span> ${caption}`,
+        );
+      } else {
+        $("#ig-modal-caption-user").text("");
+        $("#ig-modal-caption").text("");
+      }
+
+      $("#ig-modal-likes").text(likes + " me gusta");
+
+      const btn = $("#ig-modal-like-btn");
+      btn.data("id", id);
+      if (hasLiked) {
+        btn.html('<i class="fa-solid fa-heart text-danger"></i>');
+      } else {
+        btn.html('<i class="fa-regular fa-heart"></i>');
+      }
+
+      $("#ig-modal-prev").toggle(index > 0);
+      $("#ig-modal-next").toggle(index < allPhotosList.length - 1);
+    }
+
+    $("#photos-grid").on("click", ".photo-square-container", function () {
+      const index = $(this).data("index");
+      // Fallback in case index is not present (although we added it above)
+      if (index !== undefined) {
+        updateModalContent(index);
+      } else {
+        // Backward compatibility behavior if needed, but it should be set
+        const id = $(this).data("id");
+        const url = $(this).data("url");
+        const username = $(this).data("username");
+        const avatar = $(this).data("avatar");
+        const caption = $(this).data("caption");
+        const likes = $(this).data("likes");
         const hasLiked = localStorage.getItem("liked_photo_" + id) === "true";
 
         $("#ig-modal-img").attr("src", url);
         $("#ig-modal-avatar").attr("src", avatar);
         $("#ig-modal-username").text(username);
-        
+
         if (caption) {
           $("#ig-modal-caption-user").text(username);
-          $("#ig-modal-caption").html(`<span class="text-muted opacity-50 mx-1">&bull;</span> ${caption}`);
+          $("#ig-modal-caption").html(
+            `<span class="text-muted opacity-50 mx-1">&bull;</span> ${caption}`,
+          );
         } else {
           $("#ig-modal-caption-user").text("");
           $("#ig-modal-caption").text("");
         }
 
         $("#ig-modal-likes").text(likes + " me gusta");
-        
+
         const btn = $("#ig-modal-like-btn");
         btn.data("id", id);
         if (hasLiked) {
@@ -744,76 +871,42 @@ $(document).ready(function () {
         } else {
           btn.html('<i class="fa-regular fa-heart"></i>');
         }
-
-        $("#ig-modal-prev").toggle(index > 0);
-        $("#ig-modal-next").toggle(index < allPhotosList.length - 1);
-    }
-
-    $("#photos-grid").on("click", ".photo-square-container", function() {
-      const index = $(this).data("index");
-      // Fallback in case index is not present (although we added it above)
-      if (index !== undefined) {
-          updateModalContent(index);
-      } else {
-          // Backward compatibility behavior if needed, but it should be set
-          const id = $(this).data("id");
-          const url = $(this).data("url");
-          const username = $(this).data("username");
-          const avatar = $(this).data("avatar");
-          const caption = $(this).data("caption");
-          const likes = $(this).data("likes");
-          const hasLiked = localStorage.getItem("liked_photo_" + id) === "true";
-
-          $("#ig-modal-img").attr("src", url);
-          $("#ig-modal-avatar").attr("src", avatar);
-          $("#ig-modal-username").text(username);
-          
-          if (caption) {
-            $("#ig-modal-caption-user").text(username);
-            $("#ig-modal-caption").html(`<span class="text-muted opacity-50 mx-1">&bull;</span> ${caption}`);
-          } else {
-            $("#ig-modal-caption-user").text("");
-            $("#ig-modal-caption").text("");
-          }
-
-          $("#ig-modal-likes").text(likes + " me gusta");
-          
-          const btn = $("#ig-modal-like-btn");
-          btn.data("id", id);
-          if (hasLiked) {
-            btn.html('<i class="fa-solid fa-heart text-danger"></i>');
-          } else {
-            btn.html('<i class="fa-regular fa-heart"></i>');
-          }
-          $("#ig-modal-prev").hide();
-          $("#ig-modal-next").hide();
+        $("#ig-modal-prev").hide();
+        $("#ig-modal-next").hide();
       }
 
       new bootstrap.Modal(document.getElementById("ig-lightbox-modal")).show();
     });
 
-    $("#ig-modal-prev").off("click").on("click", function() {
+    $("#ig-modal-prev")
+      .off("click")
+      .on("click", function () {
         updateModalContent(currentPhotoIndex - 1);
-    });
+      });
 
-    $("#ig-modal-next").off("click").on("click", function() {
+    $("#ig-modal-next")
+      .off("click")
+      .on("click", function () {
         updateModalContent(currentPhotoIndex + 1);
-    });
+      });
 
-    $("#ig-modal-like-btn").on("click", async function() {
+    $("#ig-modal-like-btn").on("click", async function () {
       const id = $(this).data("id");
       if (!id) return;
       const hasLiked = localStorage.getItem("liked_photo_" + id) === "true";
-      
+
       try {
         const formData = new FormData();
         formData.append("photo_id", id);
         formData.append("unlike", hasLiked);
-        
-        const res = await fetch(`${BASE_URL}/api/php/coasters.php?action=like_photo`, {
-          method: "POST",
-          body: formData
-        });
+
+        const res = await fetch(
+          `${BASE_URL}/api/php/coasters.php?action=like_photo`,
+          {
+            method: "POST",
+            body: formData,
+          },
+        );
         const data = await res.json();
         if (data.success) {
           if (hasLiked) {
@@ -824,17 +917,23 @@ $(document).ready(function () {
             $(this).html('<i class="fa-solid fa-heart text-danger"></i>');
           }
           $("#ig-modal-likes").text(data.likes + " me gusta");
-          
+
           // Actualizar el data attribute en el DOM
           const sqContainer = $(`.photo-square-container[data-id='${id}']`);
           sqContainer.data("likes", data.likes);
-          
+
           // Actualizar el DOM visible del grid si existe
           const gridBtn = sqContainer.closest(".h-100").find(".grid-like-btn");
           if (hasLiked) {
-             gridBtn.find("i").removeClass("fa-solid text-danger").addClass("fa-regular");
+            gridBtn
+              .find("i")
+              .removeClass("fa-solid text-danger")
+              .addClass("fa-regular");
           } else {
-             gridBtn.find("i").removeClass("fa-regular").addClass("fa-solid text-danger");
+            gridBtn
+              .find("i")
+              .removeClass("fa-regular")
+              .addClass("fa-solid text-danger");
           }
           gridBtn.find(".grid-likes-count").text(data.likes);
         }
@@ -844,34 +943,46 @@ $(document).ready(function () {
     });
 
     // Lógica para dar a like directamente desde el grid
-    $("#photos-grid").on("click", ".grid-like-btn", async function() {
+    $("#photos-grid").on("click", ".grid-like-btn", async function () {
       const id = $(this).data("id");
       if (!id) return;
-      
+
       const hasLiked = localStorage.getItem("liked_photo_" + id) === "true";
-      
+
       try {
         const formData = new FormData();
         formData.append("photo_id", id);
         formData.append("unlike", hasLiked);
-        
-        const res = await fetch(`${BASE_URL}/api/php/coasters.php?action=like_photo`, {
-          method: "POST",
-          body: formData
-        });
+
+        const res = await fetch(
+          `${BASE_URL}/api/php/coasters.php?action=like_photo`,
+          {
+            method: "POST",
+            body: formData,
+          },
+        );
         const data = await res.json();
         if (data.success) {
           if (hasLiked) {
             localStorage.removeItem("liked_photo_" + id);
-            $(this).find("i").removeClass("fa-solid text-danger").addClass("fa-regular");
+            $(this)
+              .find("i")
+              .removeClass("fa-solid text-danger")
+              .addClass("fa-regular");
           } else {
             localStorage.setItem("liked_photo_" + id, "true");
-            $(this).find("i").removeClass("fa-regular").addClass("fa-solid text-danger");
+            $(this)
+              .find("i")
+              .removeClass("fa-regular")
+              .addClass("fa-solid text-danger");
           }
           $(this).find(".grid-likes-count").text(data.likes);
-          
+
           // Actualizar los datos del contenedor para que el lightbox también se actualice si se abre después
-          $(this).closest(".h-100").find(".photo-square-container").data("likes", data.likes);
+          $(this)
+            .closest(".h-100")
+            .find(".photo-square-container")
+            .data("likes", data.likes);
         }
       } catch (err) {
         console.error("Error al modificar like:", err);
@@ -944,15 +1055,15 @@ $(document).ready(function () {
     if (coasterIdInput) {
       const cId = coasterIdInput.value;
       fetch(`${BASE_URL}/api/php/coasters.php?action=check_review&id=${cId}`)
-        .then(r => r.json())
-        .then(data => {
-           if (data.success && data.hasReviewed) {
-              rf.classList.add("d-none");
-              const msg = document.getElementById("already-reviewed-msg");
-              if (msg) msg.classList.remove("d-none");
-           }
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.success && data.hasReviewed) {
+            rf.classList.add("d-none");
+            const msg = document.getElementById("already-reviewed-msg");
+            if (msg) msg.classList.remove("d-none");
+          }
         })
-        .catch(e => console.error("Error check review:", e));
+        .catch((e) => console.error("Error check review:", e));
     }
 
     new Choices("#pros-select", {
@@ -1052,7 +1163,11 @@ $(document).ready(function () {
     // Al pulsar subir
     uploadBtn.addEventListener("click", async function () {
       if (!cropper) {
-        showNotify("Selecciona una foto", "Por favor selecciona y recorta una foto primero.", true);
+        showNotify(
+          "Selecciona una foto",
+          "Por favor selecciona y recorta una foto primero.",
+          true,
+        );
         return;
       }
 
@@ -1114,12 +1229,24 @@ $(document).ready(function () {
                   cropper.destroy();
                   cropper = null;
                 }
-                showNotify("¡Foto enviada!", "Tu foto está esperando aprobación del administrador. La verás publicada pronto.");
+                showNotify(
+                  "¡Foto enviada!",
+                  "Tu foto está esperando aprobación del administrador. La verás publicada pronto.",
+                );
               } else {
-                showNotify("Error al guardar", "Error al guardar la foto: " + (saveData.error || "Desconocido"), true);
+                showNotify(
+                  "Error al guardar",
+                  "Error al guardar la foto: " +
+                    (saveData.error || "Desconocido"),
+                  true,
+                );
               }
             } catch (saveErr) {
-              showNotify("Error de conexión", "Error en la conexión con la API.", true);
+              showNotify(
+                "Error de conexión",
+                "Error en la conexión con la API.",
+                true,
+              );
               console.error(saveErr);
             } finally {
               uploadBtn.disabled = false;
@@ -1132,11 +1259,115 @@ $(document).ready(function () {
         ); // Exportar en JPG con calidad 85%
       } catch (err) {
         console.error("Error subiendo foto:", err);
-        showNotify("Error inesperado", "Ocurrió un error al subir la foto.", true);
+        showNotify(
+          "Error inesperado",
+          "Ocurrió un error al subir la foto.",
+          true,
+        );
         uploadBtn.disabled = false;
         uploadBtn.innerHTML =
           'Subir foto <i class="fa-solid fa-upload ms-1"></i>';
       }
+    });
+  }
+
+  function initAutocomplete({ inputId, dropdownId, fetchItems, onSelect }) {
+    const input = document.getElementById(inputId);
+    const dropdown = document.getElementById(dropdownId);
+    if (!input || !dropdown) return;
+
+    let debounce = null;
+    let activeIdx = -1;
+    let items = [];
+
+    function renderItems(list) {
+      items = list;
+      activeIdx = -1;
+      if (!list.length) {
+        dropdown.innerHTML = '<div class="ac-empty">Sin resultados</div>';
+        dropdown.classList.remove("d-none");
+        return;
+      }
+      dropdown.innerHTML = list
+        .map(
+          (item, i) =>
+            `<div class="ac-item" data-idx="${i}">${item.label}${item.sublabel ? `<span class="ac-sublabel">${item.sublabel}</span>` : ""}</div>`,
+        )
+        .join("");
+      dropdown.classList.remove("d-none");
+      dropdown.querySelectorAll(".ac-item").forEach((el) => {
+        el.addEventListener("mousedown", (e) => {
+          e.preventDefault();
+          selectItem(parseInt(el.dataset.idx));
+        });
+      });
+    }
+
+    function selectItem(idx) {
+      const item = items[idx];
+      if (!item) return;
+      input.value = item.label;
+      onSelect(item);
+      closeDropdown();
+    }
+
+    function closeDropdown() {
+      dropdown.classList.add("d-none");
+      dropdown.innerHTML = "";
+      activeIdx = -1;
+      items = [];
+    }
+
+    input.addEventListener("input", () => {
+      clearTimeout(debounce);
+      debounce = setTimeout(async () => {
+        const q = input.value.trim();
+        const list = await fetchItems(q);
+        if (document.activeElement === input) renderItems(list);
+      }, 200);
+    });
+
+    input.addEventListener("click", async () => {
+      const list = await fetchItems(input.value.trim());
+      renderItems(list);
+    });
+
+    input.addEventListener("keydown", (e) => {
+      const visibleItems = dropdown.querySelectorAll(".ac-item");
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        activeIdx = Math.min(activeIdx + 1, visibleItems.length - 1);
+        visibleItems.forEach((el, i) =>
+          el.classList.toggle("ac-active", i === activeIdx),
+        );
+        if (visibleItems[activeIdx])
+          visibleItems[activeIdx].scrollIntoView({ block: "nearest" });
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        activeIdx = Math.max(activeIdx - 1, 0);
+        visibleItems.forEach((el, i) =>
+          el.classList.toggle("ac-active", i === activeIdx),
+        );
+        if (visibleItems[activeIdx])
+          visibleItems[activeIdx].scrollIntoView({ block: "nearest" });
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (activeIdx >= 0) selectItem(activeIdx);
+        else if (items.length === 1) selectItem(0);
+        else closeDropdown();
+      } else if (e.key === "Escape") {
+        closeDropdown();
+        input.blur();
+      }
+    });
+
+    input.addEventListener("blur", () => {
+      setTimeout(() => closeDropdown(), 150);
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!input.contains(e.target) && !dropdown.contains(e.target))
+        closeDropdown();
     });
   }
 });

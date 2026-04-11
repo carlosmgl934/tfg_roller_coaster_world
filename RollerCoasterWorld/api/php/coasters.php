@@ -96,10 +96,10 @@ function searchCoasters()
         }
 
         $sql = "SELECT 
-    coasters.id, coasters.coaster_name, parks.park_name
+    coasters.id, coasters.coaster_name, coasters.coaster_status, parks.park_name, parks.park_country
     FROM coasters
     INNER JOIN parks ON coasters.park_id = parks.id
-    WHERE coasters.coaster_name ILIKE :name " . $limitClause;
+    WHERE unaccent(coasters.coaster_name) ILIKE unaccent(:name) " . $limitClause;
 
         $stmt = $db->prepare($sql);
 
@@ -192,10 +192,10 @@ function filterCoasters()
         (SELECT ROUND(AVG(note)::numeric, 1) FROM coaster_ratings WHERE coaster_id = coasters.id) AS score
         FROM coasters
         INNER JOIN parks ON coasters.park_id = parks.id
-        WHERE coasters.coaster_name ILIKE :name
+        WHERE unaccent(coasters.coaster_name) ILIKE unaccent(:name)
         LIMIT :limit OFFSET :offset";
 
-        $sql_2 = "SELECT COUNT(*) as total FROM coasters WHERE coasters.coaster_name ILIKE :name";
+        $sql_2 = "SELECT COUNT(*) as total FROM coasters WHERE unaccent(coasters.coaster_name) ILIKE unaccent(:name)";
 
         $stmt = $db->prepare($sql);
         $stmt_2 = $db->prepare($sql_2);
@@ -225,7 +225,7 @@ function applyFilters()
 
     // Search por nombre
     if (!empty($_GET['search'])) {
-        $conditions[] = "coasters.coaster_name ILIKE :search";
+        $conditions[] = "unaccent(coasters.coaster_name) ILIKE unaccent(:search)";
         $params[':search'] = "%" . $_GET['search'] . "%";
     }
 
@@ -357,10 +357,29 @@ function getCoasters()
         global $db;
         $sql = "SELECT coasters.*, parks.park_name,
         parks.park_country, parks.id AS park_id,
-        (SELECT ROUND(AVG(note)::numeric, 1) FROM coaster_ratings WHERE coaster_id = coasters.id) AS score,
-        (SELECT COUNT(*) + 1 FROM coasters AS c2 
-            WHERE (SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = c2.id) 
-                > (SELECT AVG(note) FROM coaster_ratings WHERE coaster_id = coasters.id)) AS global_rank,
+        coasters.stars AS score,
+        CASE WHEN coasters.stars IS NULL OR coasters.stars = 0 THEN NULL
+             ELSE (SELECT COUNT(*) + 1 FROM coasters AS c2 
+                   WHERE c2.stars > 0 
+                     AND (c2.stars > coasters.stars OR 
+                         (c2.stars = coasters.stars AND 
+                          (SELECT COUNT(*) FROM coaster_ratings WHERE coaster_id = c2.id AND note = 5) > 
+                          (SELECT COUNT(*) FROM coaster_ratings WHERE coaster_id = coasters.id AND note = 5)
+                         ) OR
+                         (c2.stars = coasters.stars AND 
+                          (SELECT COUNT(*) FROM coaster_ratings WHERE coaster_id = c2.id AND note = 5) = 
+                          (SELECT COUNT(*) FROM coaster_ratings WHERE coaster_id = coasters.id AND note = 5) AND
+                          c2.reviews_count > coasters.reviews_count
+                         ) OR
+                         (c2.stars = coasters.stars AND 
+                          (SELECT COUNT(*) FROM coaster_ratings WHERE coaster_id = c2.id AND note = 5) = 
+                          (SELECT COUNT(*) FROM coaster_ratings WHERE coaster_id = coasters.id AND note = 5) AND
+                          c2.reviews_count = coasters.reviews_count AND
+                          c2.id < coasters.id
+                         )
+                     )
+                  )
+        END AS global_rank,
         (SELECT rank_position FROM user_credits WHERE coaster_id = coasters.id AND user_id = :user_id LIMIT 1) AS personal_ranking,
         coasters.reviews_count
     FROM coasters

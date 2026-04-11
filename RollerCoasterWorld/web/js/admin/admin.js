@@ -490,14 +490,17 @@ $(document).ready(function () {
         }));
         return [
           { label: "Todos los parques", value: "", id: "", unknown: false },
-          { label: "Desconocido", value: "Desconocido", id: "__null__", unknown: true },
+          {
+            label: "Desconocido",
+            value: "Desconocido",
+            id: "__null__",
+            unknown: true,
+          },
           ...parks,
         ];
       },
       onSelect: (item) => {
         document.getElementById("filter-park").value = item.id;
-        // Si el usuario selecciona algo, disparamos la carga automáticamente o esperamos al botón de filtrar
-        // window.loadAdminCoasters(1); 
       },
     });
 
@@ -578,55 +581,68 @@ $(document).ready(function () {
     });
 
     // ── Bulk delete (selección) ──────────────────────────────
-    $(document).on("change", ".coaster-select-checkbox", function() {
-        const id = $(this).val();
-        if ($(this).is(":checked")) selectedCoasters.add(id);
-        else selectedCoasters.delete(id);
-        
-        const count = selectedCoasters.size;
-        if (count > 0) {
-            $("#bulk-delete-count").text(count);
-            $("#btn-bulk-delete").removeClass("d-none");
+    $(document).on("change", ".coaster-select-checkbox", function () {
+      const id = $(this).val();
+      if ($(this).is(":checked")) selectedCoasters.add(id);
+      else selectedCoasters.delete(id);
+
+      const count = selectedCoasters.size;
+      if (count > 0) {
+        $("#bulk-delete-count").text(count);
+        $("#btn-bulk-delete").removeClass("d-none");
+      } else {
+        $("#btn-bulk-delete").addClass("d-none");
+      }
+    });
+
+    $("#btn-bulk-delete").on("click", function () {
+      $("#bulk-delete-coaster-count").text(selectedCoasters.size);
+      new bootstrap.Modal(
+        document.getElementById("modal-bulk-delete-coaster"),
+      ).show();
+    });
+
+    $("#confirm-bulk-delete-coaster").on("click", async function () {
+      const btn = $(this);
+      btn
+        .prop("disabled", true)
+        .html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Eliminando...');
+
+      try {
+        const res = await fetch(
+          `${BASE_URL}/api/php/admin/admin_coasters.php?action=bulkDeleteCoasters`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ coasterIds: Array.from(selectedCoasters) }),
+          },
+        );
+        const data = await res.json();
+        if (data.success) {
+          selectedCoasters.clear();
+          $("#btn-bulk-delete").addClass("d-none");
+          bootstrap.Modal.getInstance(
+            document.getElementById("modal-bulk-delete-coaster"),
+          ).hide();
+          window.loadAdminCoasters(1);
         } else {
-            $("#btn-bulk-delete").addClass("d-none");
+          alert(data.error || "Error al eliminar montañas rusas");
         }
-    });
-
-    $("#btn-bulk-delete").on("click", function() {
-        $("#bulk-delete-coaster-count").text(selectedCoasters.size);
-        new bootstrap.Modal(document.getElementById("modal-bulk-delete-coaster")).show();
-    });
-
-    $("#confirm-bulk-delete-coaster").on("click", async function() {
-        const btn = $(this);
-        btn.prop("disabled", true).html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Eliminando...');
-        
-        try {
-            const res = await fetch(`${BASE_URL}/api/php/admin/admin_coasters.php?action=bulkDeleteCoasters`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ coasterIds: Array.from(selectedCoasters) })
-            });
-            const data = await res.json();
-            if (data.success) {
-                selectedCoasters.clear();
-                $("#btn-bulk-delete").addClass("d-none");
-                bootstrap.Modal.getInstance(document.getElementById("modal-bulk-delete-coaster")).hide();
-                window.loadAdminCoasters(1);
-            } else {
-                alert(data.error || "Error al eliminar montañas rusas");
-            }
-        } catch(e) {
-            alert("Error de conexión");
-        }
-        btn.prop("disabled", false).html('<i class="fa-solid fa-trash-can me-1"></i>Eliminar Todo');
+      } catch (e) {
+        alert("Error de conexión");
+      }
+      btn
+        .prop("disabled", false)
+        .html('<i class="fa-solid fa-trash-can me-1"></i>Eliminar Todo');
     });
 
     // ── Eliminar coaster (confirmación simple) ────────────────
     $("#confirm-delete-coaster").on("click", async function () {
       const btn = $(this);
       const id = btn.data("id");
-      btn.prop("disabled", true).html('<i class="fa-solid fa-spinner fa-spin"></i>');
+      btn
+        .prop("disabled", true)
+        .html('<i class="fa-solid fa-spinner fa-spin"></i>');
       try {
         const res = await fetch(
           `${BASE_URL}/api/php/admin/admin_coasters.php?action=deleteCoaster`,
@@ -656,31 +672,44 @@ $(document).ready(function () {
     // ── Modal duplicar (delegado) ──────────────────────────────
     $(document).on("click", ".btn-duplicate-coaster", function () {
       const btn = $(this);
-      
+
       // Limpiar errores previos
       clearErrors();
-      
+
       // Poblamos los campos del modal de AÑADIR (modal-add-coaster)
-      document.getElementById("add-coaster-name").value = btn.attr("data-name") + " (Copia)";
-      document.getElementById("add-coaster-manufacturer").value = btn.attr("data-manufacturer") || "Desconocido";
-      document.getElementById("add-coaster-manufacturer").dataset.selected = "true";
-      
-      document.getElementById("add-coaster-model").value = btn.attr("data-model") || "Desconocido";
+      document.getElementById("add-coaster-name").value =
+        btn.attr("data-name") + " (Copia)";
+      document.getElementById("add-coaster-manufacturer").value =
+        btn.attr("data-manufacturer") || "Desconocido";
+      document.getElementById("add-coaster-manufacturer").dataset.selected =
+        "true";
+
+      document.getElementById("add-coaster-model").value =
+        btn.attr("data-model") || "Desconocido";
       document.getElementById("add-coaster-model").dataset.selected = "true";
-      
-      document.getElementById("add-coaster-park").value = btn.attr("data-park") || "Desconocido";
+
+      document.getElementById("add-coaster-park").value =
+        btn.attr("data-park") || "Desconocido";
       document.getElementById("add-coaster-park").dataset.selected = "true";
-      document.getElementById("add-coaster-park-id").value = btn.attr("data-park-id") || "";
-      
-      document.getElementById("add-coaster-country").value = btn.attr("data-country") || "Desconocido";
+      document.getElementById("add-coaster-park-id").value =
+        btn.attr("data-park-id") || "";
+
+      document.getElementById("add-coaster-country").value =
+        btn.attr("data-country") || "Desconocido";
       document.getElementById("add-coaster-country").dataset.selected = "true";
-      
-      document.getElementById("add-coaster-year").value = btn.attr("data-year") || "";
-      document.getElementById("add-coaster-height").value = btn.attr("data-height") || "";
-      document.getElementById("add-coaster-speed").value = btn.attr("data-speed") || "";
-      document.getElementById("add-coaster-length").value = btn.attr("data-length") || "";
-      document.getElementById("add-coaster-inversions").value = btn.attr("data-inversions") || "";
-      document.getElementById("add-coaster-status").value = btn.attr("data-status") || "";
+
+      document.getElementById("add-coaster-year").value =
+        btn.attr("data-year") || "";
+      document.getElementById("add-coaster-height").value =
+        btn.attr("data-height") || "";
+      document.getElementById("add-coaster-speed").value =
+        btn.attr("data-speed") || "";
+      document.getElementById("add-coaster-length").value =
+        btn.attr("data-length") || "";
+      document.getElementById("add-coaster-inversions").value =
+        btn.attr("data-inversions") || "";
+      document.getElementById("add-coaster-status").value =
+        btn.attr("data-status") || "";
 
       // Guardar la URL original en el campo oculto
       const imageUrl = btn.attr("data-image");
@@ -692,16 +721,20 @@ $(document).ready(function () {
         if (imageUrl) {
           let validImgUrl = imageUrl;
           if (!validImgUrl.startsWith("http")) {
-            validImgUrl = BASE_URL + (validImgUrl.startsWith("/") ? "" : "/") + validImgUrl;
+            validImgUrl =
+              BASE_URL + (validImgUrl.startsWith("/") ? "" : "/") + validImgUrl;
           }
           preview.innerHTML = `<img src="${validImgUrl}" style="width:100%;height:100%;object-fit:cover;">`;
         } else {
-          preview.innerHTML = '<div class="text-center text-muted"><i class="fa-regular fa-image fa-3x d-block mb-3" style="opacity:0.2;"></i><span style="font-size:0.85rem; letter-spacing:1px; text-transform:uppercase;">Vista previa</span></div>';
+          preview.innerHTML =
+            '<div class="text-center text-muted"><i class="fa-regular fa-image fa-3x d-block mb-3" style="opacity:0.2;"></i><span style="font-size:0.85rem; letter-spacing:1px; text-transform:uppercase;">Vista previa</span></div>';
         }
       }
 
       // Abrimos el modal de AÑADIR
-      const addModal = new bootstrap.Modal(document.getElementById("modal-add-coaster"));
+      const addModal = new bootstrap.Modal(
+        document.getElementById("modal-add-coaster"),
+      );
       addModal.show();
     });
   }
@@ -712,8 +745,9 @@ $(document).ready(function () {
       // Resetear campos previos al abrir para añadir normal
       document.getElementById("add-coaster-form").reset();
       document.getElementById("add-coaster-image-url").value = "";
-      document.getElementById("add-coaster-preview").innerHTML = '<div class="text-center text-muted"><i class="fa-regular fa-image fa-3x d-block mb-3" style="opacity:0.2;"></i><span style="font-size:0.85rem; letter-spacing:1px; text-transform:uppercase;">Vista previa</span></div>';
-      
+      document.getElementById("add-coaster-preview").innerHTML =
+        '<div class="text-center text-muted"><i class="fa-regular fa-image fa-3x d-block mb-3" style="opacity:0.2;"></i><span style="font-size:0.85rem; letter-spacing:1px; text-transform:uppercase;">Vista previa</span></div>';
+
       const modal = new bootstrap.Modal(
         document.getElementById("modal-add-coaster"),
       );
@@ -888,9 +922,9 @@ $(document).ready(function () {
       input.blur();
       const focusable = Array.from(
         document.querySelectorAll(
-          'input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled])'
-        )
-      ).filter(el => el.offsetParent !== null);
+          'input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled])',
+        ),
+      ).filter((el) => el.offsetParent !== null);
       const idx2 = focusable.indexOf(input);
       if (idx2 >= 0 && focusable[idx2 + 1]) focusable[idx2 + 1].focus();
     }
@@ -997,27 +1031,40 @@ $(document).ready(function () {
         const country = document
           .getElementById("add-coaster-country")
           .value.trim();
-        const unknownYear       = document.getElementById("unknown-year").checked;
-        const unknownHeight     = document.getElementById("unknown-height").checked;
-        const unknownSpeed      = document.getElementById("unknown-speed").checked;
-        const unknownLength     = document.getElementById("unknown-length").checked;
-        const unknownInversions = document.getElementById("unknown-inversions").checked;
+        const unknownYear = document.getElementById("unknown-year").checked;
+        const unknownHeight = document.getElementById("unknown-height").checked;
+        const unknownSpeed = document.getElementById("unknown-speed").checked;
+        const unknownLength = document.getElementById("unknown-length").checked;
+        const unknownInversions =
+          document.getElementById("unknown-inversions").checked;
 
-        const year = unknownYear ? "" : document.getElementById("add-coaster-year").value.trim();
-        let height     = unknownHeight     ? "" : document.getElementById("add-coaster-height").value.trim();
-        let speed      = unknownSpeed      ? "" : document.getElementById("add-coaster-speed").value.trim();
-        let length     = unknownLength     ? "" : document.getElementById("add-coaster-length").value.trim();
-        let inversions = unknownInversions ? "" : document.getElementById("add-coaster-inversions").value.trim();
+        const year = unknownYear
+          ? ""
+          : document.getElementById("add-coaster-year").value.trim();
+        let height = unknownHeight
+          ? ""
+          : document.getElementById("add-coaster-height").value.trim();
+        let speed = unknownSpeed
+          ? ""
+          : document.getElementById("add-coaster-speed").value.trim();
+        let length = unknownLength
+          ? ""
+          : document.getElementById("add-coaster-length").value.trim();
+        let inversions = unknownInversions
+          ? ""
+          : document.getElementById("add-coaster-inversions").value.trim();
 
-        if (!unknownHeight     && height === "")     height = "0";
-        if (!unknownSpeed      && speed === "")      speed = "0";
-        if (!unknownLength     && length === "")     length = "0";
+        if (!unknownHeight && height === "") height = "0";
+        if (!unknownSpeed && speed === "") speed = "0";
+        if (!unknownLength && length === "") length = "0";
         if (!unknownInversions && inversions === "") inversions = "0";
         const status = document
           .getElementById("add-coaster-status")
           .value.trim();
         const image = document.getElementById("add-coaster-image").files[0];
-        const existingImageUrl = document.getElementById("add-coaster-image-url").value;
+        const existingImageUrl = document.getElementById(
+          "add-coaster-image-url",
+        ).value;
 
         if (!name) {
           showModalError("El nombre de la coaster es obligatorio.");
@@ -1215,7 +1262,9 @@ $(document).ready(function () {
         formData.append("status", status);
 
         const imageFile = document.getElementById("add-coaster-image").files[0];
-        const existingImg = document.getElementById("add-coaster-image-url").value;
+        const existingImg = document.getElementById(
+          "add-coaster-image-url",
+        ).value;
 
         if (imageFile) {
           const uploadForm = new FormData();
@@ -1263,12 +1312,18 @@ $(document).ready(function () {
 
         if (data.success) {
           showModalSuccess("Coaster añadida correctamente");
-          if (typeof window.loadAdminCoasters === 'function') window.loadAdminCoasters(1);
+          if (typeof window.loadAdminCoasters === "function")
+            window.loadAdminCoasters(1);
           setTimeout(() => {
-            bootstrap.Modal.getInstance(document.getElementById("modal-add-coaster"))?.hide();
+            bootstrap.Modal.getInstance(
+              document.getElementById("modal-add-coaster"),
+            )?.hide();
           }, 2000);
         } else {
-          showModalError("Error al añadir coaster: " + (data.error || data.message || "Error desconocido"));
+          showModalError(
+            "Error al añadir coaster: " +
+              (data.error || data.message || "Error desconocido"),
+          );
         }
       } catch (error) {
         console.error("Error al añadir coaster:", error);
@@ -1443,9 +1498,11 @@ $(document).ready(function () {
       const acMap = {
         "edit-coaster-manufacturer":
           button.getAttribute("data-manufacturer") || "Desconocido",
-        "edit-coaster-model": button.getAttribute("data-model") || "Desconocido",
+        "edit-coaster-model":
+          button.getAttribute("data-model") || "Desconocido",
         "edit-coaster-park": button.getAttribute("data-park") || "Desconocido",
-        "edit-coaster-country": button.getAttribute("data-country") || "Desconocido",
+        "edit-coaster-country":
+          button.getAttribute("data-country") || "Desconocido",
       };
       Object.entries(acMap).forEach(([id, val]) => {
         const el = document.getElementById(id);
@@ -1459,7 +1516,8 @@ $(document).ready(function () {
       if (preview) {
         let validImgUrl = imageUrl;
         if (validImgUrl && !validImgUrl.startsWith("http")) {
-            validImgUrl = BASE_URL + (validImgUrl.startsWith("/") ? "" : "/") + validImgUrl;
+          validImgUrl =
+            BASE_URL + (validImgUrl.startsWith("/") ? "" : "/") + validImgUrl;
         }
         preview.innerHTML = validImgUrl
           ? `<img src="${validImgUrl}" style="width:100%;height:100%;object-fit:cover;">`
@@ -1468,42 +1526,49 @@ $(document).ready(function () {
     });
 
     // Auto-open modal if URL has ?edit_coaster=ID
-    const editCoasterId = new URLSearchParams(window.location.search).get('edit_coaster');
+    const editCoasterId = new URLSearchParams(window.location.search).get(
+      "edit_coaster",
+    );
     if (editCoasterId) {
-      fetch(`${BASE_URL}/api/php/coasters.php?action=coaster&id=${editCoasterId}`)
-        .then(res => res.json())
-        .then(data => {
+      fetch(
+        `${BASE_URL}/api/php/coasters.php?action=coaster&id=${editCoasterId}`,
+      )
+        .then((res) => res.json())
+        .then((data) => {
           if (data.success && data.coaster) {
             const c = data.coaster;
-            const btn = document.createElement('button');
-            btn.setAttribute('data-bs-toggle', 'modal');
-            btn.setAttribute('data-bs-target', '#modal-edit-coaster');
-            btn.setAttribute('data-id', c.id);
-            btn.setAttribute('data-name', c.coaster_name || "");
-            btn.setAttribute('data-year', c.opening_year || "");
-            btn.setAttribute('data-height', c.height || "");
-            btn.setAttribute('data-speed', c.speed || "");
-            btn.setAttribute('data-length', c.coaster_length || "");
-            btn.setAttribute('data-inversions', c.inversions || "");
-            btn.setAttribute('data-status', c.coaster_status || "");
-            btn.setAttribute('data-manufacturer', c.coaster_manufacter || "Desconocido");
-            btn.setAttribute('data-model', c.coaster_model || "Desconocido");
-            btn.setAttribute('data-park', c.park_name || "Desconocido");
-            btn.setAttribute('data-park-id', c.park_id || "");
-            btn.setAttribute('data-country', c.park_country || "Desconocido");
-            btn.setAttribute('data-image', c.imagen_url || "");
-            
+            const btn = document.createElement("button");
+            btn.setAttribute("data-bs-toggle", "modal");
+            btn.setAttribute("data-bs-target", "#modal-edit-coaster");
+            btn.setAttribute("data-id", c.id);
+            btn.setAttribute("data-name", c.coaster_name || "");
+            btn.setAttribute("data-year", c.opening_year || "");
+            btn.setAttribute("data-height", c.height || "");
+            btn.setAttribute("data-speed", c.speed || "");
+            btn.setAttribute("data-length", c.coaster_length || "");
+            btn.setAttribute("data-inversions", c.inversions || "");
+            btn.setAttribute("data-status", c.coaster_status || "");
+            btn.setAttribute(
+              "data-manufacturer",
+              c.coaster_manufacter || "Desconocido",
+            );
+            btn.setAttribute("data-model", c.coaster_model || "Desconocido");
+            btn.setAttribute("data-park", c.park_name || "Desconocido");
+            btn.setAttribute("data-park-id", c.park_id || "");
+            btn.setAttribute("data-country", c.park_country || "Desconocido");
+            btn.setAttribute("data-image", c.imagen_url || "");
+
             document.body.appendChild(btn);
             btn.click();
             btn.remove();
-            
+
             // Clean URL
             const url = new URL(window.location);
-            url.searchParams.delete('edit_coaster');
+            url.searchParams.delete("edit_coaster");
             window.history.replaceState({}, document.title, url);
           }
         })
-        .catch(err => console.error("Error fetching coaster for edit:", err));
+        .catch((err) => console.error("Error fetching coaster for edit:", err));
     }
   }
 
@@ -1869,7 +1934,9 @@ $(document).ready(function () {
     const addParkPreviewContainer = document.getElementById(
       "add-park-preview-container",
     );
-    const addParkDropzoneText = document.getElementById("add-park-dropzone-text");
+    const addParkDropzoneText = document.getElementById(
+      "add-park-dropzone-text",
+    );
 
     addParkImage?.addEventListener("change", function () {
       const file = this.files[0];
@@ -2256,15 +2323,25 @@ if (_confirmEditCoaster) {
         "edit-unknown-inversions",
       ).checked;
 
-      const year       = unknownYear       ? "" : document.getElementById("edit-coaster-year").value.trim();
-      let height       = unknownHeight     ? "" : document.getElementById("edit-coaster-height").value.trim();
-      let speed        = unknownSpeed      ? "" : document.getElementById("edit-coaster-speed").value.trim();
-      let length       = unknownLength     ? "" : document.getElementById("edit-coaster-length").value.trim();
-      let inversions   = unknownInversions ? "" : document.getElementById("edit-coaster-inversions").value.trim();
+      const year = unknownYear
+        ? ""
+        : document.getElementById("edit-coaster-year").value.trim();
+      let height = unknownHeight
+        ? ""
+        : document.getElementById("edit-coaster-height").value.trim();
+      let speed = unknownSpeed
+        ? ""
+        : document.getElementById("edit-coaster-speed").value.trim();
+      let length = unknownLength
+        ? ""
+        : document.getElementById("edit-coaster-length").value.trim();
+      let inversions = unknownInversions
+        ? ""
+        : document.getElementById("edit-coaster-inversions").value.trim();
 
-      if (!unknownHeight     && height === "")     height = "0";
-      if (!unknownSpeed      && speed === "")      speed = "0";
-      if (!unknownLength     && length === "")     length = "0";
+      if (!unknownHeight && height === "") height = "0";
+      if (!unknownSpeed && speed === "") speed = "0";
+      if (!unknownLength && length === "") length = "0";
       if (!unknownInversions && inversions === "") inversions = "0";
 
       // Validaciones
@@ -2506,246 +2583,304 @@ if (_confirmEditCoaster) {
   });
 }
 
-  /****************************************
+/****************************************
         NOTICIAS (NEWS)
   ****************************************/
-  
-  // Función global para cargar noticias
-  window.loadAdminNews = async function (page) {
-    const $list = $("#admin-news-list");
-    const $count = $("#admin-news-count");
-    if (!$list.length) return;
 
-    page = page || 1;
-    const search = $("#admin-news-search").val() || "";
-    const tag = $("#filter-news-tag").val() || "";
-    const featured = $("#filter-news-featured").is(":checked");
+// Función global para cargar noticias
+window.loadAdminNews = async function (page) {
+  const $list = $("#admin-news-list");
+  const $count = $("#admin-news-count");
+  if (!$list.length) return;
 
-    $list.html(
-      '<div class="list-group-item text-center text-muted py-4">' +
-        '<div class="spinner-border spinner-border-sm text-success me-2"></div>Cargando noticias...</div>'
+  page = page || 1;
+  const search = $("#admin-news-search").val() || "";
+  const tag = $("#filter-news-tag").val() || "";
+  const featured = $("#filter-news-featured").is(":checked");
+
+  $list.html(
+    '<div class="list-group-item text-center text-muted py-4">' +
+      '<div class="spinner-border spinner-border-sm text-success me-2"></div>Cargando noticias...</div>',
+  );
+
+  try {
+    const params = new URLSearchParams({
+      action: "filterNews",
+      page: page,
+      search: search.trim(),
+      tag: tag,
+      featured: featured,
+    });
+
+    const res = await fetch(
+      `${BASE_URL}/api/php/admin/admin_news.php?${params}`,
+      {
+        credentials: "include",
+      },
     );
+    const data = await res.json();
 
-    try {
-      const params = new URLSearchParams({
-        action: "filterNews",
-        page: page,
-        search: search.trim(),
-        tag: tag,
-        featured: featured
-      });
-
-      const res = await fetch(`${BASE_URL}/api/php/admin/admin_news.php?${params}`, {
-        credentials: "include"
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        const total = data.total || 0;
-        $count.text("Mostrando " + total + " noticia" + (total !== 1 ? "s" : ""));
-        renderNewsRows(data.news);
-        renderNewsPagination(total, page);
-      } else {
-        $list.html('<div class="list-group-item text-center text-danger py-4">' + (data.error || "Error al cargar") + '</div>');
-      }
-    } catch (err) {
-      console.error("Error cargando noticias:", err);
-      $list.html('<div class="list-group-item text-center text-danger py-4">Error de conexión con la API</div>');
+    if (data.success) {
+      const total = data.total || 0;
+      $count.text("Mostrando " + total + " noticia" + (total !== 1 ? "s" : ""));
+      renderNewsRows(data.news);
+      renderNewsPagination(total, page);
+    } else {
+      $list.html(
+        '<div class="list-group-item text-center text-danger py-4">' +
+          (data.error || "Error al cargar") +
+          "</div>",
+      );
     }
-  };
+  } catch (err) {
+    console.error("Error cargando noticias:", err);
+    $list.html(
+      '<div class="list-group-item text-center text-danger py-4">Error de conexión con la API</div>',
+    );
+  }
+};
 
-  function renderNewsRows(news) {
-    const $list = $("#admin-news-list");
-    $list.empty();
-    if (!news || news.length === 0) {
-      $list.html('<div class="list-group-item text-center text-muted py-4">No se han encontrado noticias que coincidan.</div>');
+function renderNewsRows(news) {
+  const $list = $("#admin-news-list");
+  $list.empty();
+  if (!news || news.length === 0) {
+    $list.html(
+      '<div class="list-group-item text-center text-muted py-4">No se han encontrado noticias que coincidan.</div>',
+    );
+    return;
+  }
+  news.forEach(function (n) {
+    const featuredBadge = n.is_featured
+      ? '<span class="badge bg-warning text-dark ms-2">Destacada</span>'
+      : "";
+    $list.append(
+      '<div class="list-group-item list-group-item-action d-flex align-items-center justify-content-between p-3">' +
+        '<div class="flex-grow-1">' +
+        '<h6 class="mb-0 fw-bold text-success">' +
+        n.title +
+        " " +
+        featuredBadge +
+        "</h6>" +
+        '<small class="text-muted">' +
+        (n.tag || "Sin categoría") +
+        " &bull; " +
+        n.created_at +
+        "</small>" +
+        "</div>" +
+        '<div class="d-flex gap-2 ms-3 flex-shrink-0">' +
+        '<button class="btn btn-sm btn-outline-primary rounded-0 btn-edit-news" ' +
+        'data-id="' +
+        n.id +
+        '" ' +
+        'data-title="' +
+        n.title.replace(/"/g, "&quot;") +
+        '" ' +
+        'data-tag="' +
+        (n.tag || "").replace(/"/g, "&quot;") +
+        '" ' +
+        'data-link="' +
+        (n.external_link || "").replace(/"/g, "&quot;") +
+        '" ' +
+        'data-image="' +
+        (n.image_url || "").replace(/"/g, "&quot;") +
+        '" ' +
+        'data-featured="' +
+        n.is_featured +
+        '" ' +
+        'data-description="' +
+        n.description.replace(/"/g, "&quot;") +
+        '">' +
+        '<i class="fa-solid fa-pen"></i> Editar</button>' +
+        '<button class="btn btn-sm btn-outline-danger rounded-0 btn-delete-news" ' +
+        'data-id="' +
+        n.id +
+        '" data-title="' +
+        n.title.replace(/"/g, "&quot;") +
+        '">' +
+        '<i class="fa-solid fa-trash"></i></button>' +
+        "</div>" +
+        "</div>",
+    );
+  });
+}
+
+function renderNewsPagination(total, page) {
+  const $pagination = $("#admin-news-pagination");
+  const ITEMS_PAGE = 15;
+  $pagination.empty();
+  const totalPages = Math.ceil(total / ITEMS_PAGE);
+  if (totalPages <= 1) return;
+
+  const nav = $("<nav></nav>");
+  const ul = $('<ul class="pagination pagination-sm mb-0"></ul>');
+  for (let i = 1; i <= totalPages; i++) {
+    ul.append(
+      '<li class="page-item ' +
+        (i === page ? "active" : "") +
+        '"><button class="page-link rounded-0" data-page="' +
+        i +
+        '">' +
+        i +
+        "</button></li>",
+    );
+  }
+  nav.append(ul);
+  $pagination.append(nav);
+}
+
+// --- Inicialización y Eventos News ---
+if ($("#admin-news-list").length) {
+  console.log("Admin News JS Loaded");
+  window.loadAdminNews(1);
+
+  // Búsqueda y Filtros
+  $(document).on("click", "#btn-news-filtrar", function () {
+    window.loadAdminNews(1);
+  });
+  $(document).on("click", "#btn-news-borrar", function () {
+    $("#admin-news-search").val("");
+    $("#filter-news-tag").val("");
+    $("#filter-news-featured").prop("checked", false);
+    window.loadAdminNews(1);
+  });
+
+  // Paginación
+  $(document).on("click", "#admin-news-pagination button", function () {
+    window.loadAdminNews(parseInt($(this).data("page")));
+  });
+
+  // Abrir Modal Añadir
+  $(document).on("click", "#btn-add-news", function () {
+    $("#modal-news-title-header").text("Añadir Noticia");
+    $("#news-form-id").val("");
+    $("#news-form-title").val("");
+    $("#news-form-tag").val("");
+    $("#news-form-link").val("");
+    $("#news-form-desc").val("");
+    $("#news-form-image").val("");
+    $("#news-form-file").val(""); // Limpiar archivo
+    $("#news-form-image-preview").addClass("d-none");
+    $("#news-form-featured").prop("checked", false);
+    const modalEl = document.getElementById("modal-news-form");
+    if (modalEl) {
+      const m = bootstrap.Modal.getOrCreateInstance(modalEl);
+      m.show();
+    }
+  });
+
+  // Abrir Modal Editar
+  $(document).on("click", ".btn-edit-news", function () {
+    const b = $(this);
+    $("#modal-news-title-header").text("Editar Noticia");
+    $("#news-form-id").val(b.data("id"));
+    $("#news-form-title").val(b.data("title"));
+    $("#news-form-tag").val(b.data("tag"));
+    $("#news-form-link").val(b.data("link"));
+    $("#news-form-desc").val(b.data("description"));
+    $("#news-form-image").val(b.data("image"));
+    $("#news-form-file").val(""); // Limpiar archivo previo
+
+    const currentImg = b.data("image");
+    if (currentImg) {
+      $("#news-image-path-text").text(currentImg);
+      $("#news-form-image-preview").removeClass("d-none");
+    } else {
+      $("#news-form-image-preview").addClass("d-none");
+    }
+
+    $("#news-form-featured").prop("checked", b.data("featured") == 1);
+    const modalEl = document.getElementById("modal-news-form");
+    if (modalEl) {
+      const m = bootstrap.Modal.getOrCreateInstance(modalEl);
+      m.show();
+    }
+  });
+
+  // Guardar / Actualizar (Usando FormData para archivos)
+  $(document).on("click", "#btn-save-news", async function () {
+    const btn = $(this);
+    const id = $("#news-form-id").val();
+    const action = id ? "updateNews" : "addNews";
+
+    const formData = new FormData();
+    formData.append("id", id);
+    formData.append("title", $("#news-form-title").val().trim());
+    formData.append("tag", $("#news-form-tag").val().trim());
+    formData.append("external_link", $("#news-form-link").val().trim());
+    formData.append("description", $("#news-form-desc").val().trim());
+    formData.append("image_url", $("#news-form-image").val().trim());
+    formData.append("is_featured", $("#news-form-featured").is(":checked"));
+
+    const fileInput = document.getElementById("news-form-file");
+    if (fileInput.files.length > 0) {
+      formData.append("image", fileInput.files[0]);
+    }
+
+    if (
+      !$("#news-form-title").val().trim() ||
+      !$("#news-form-desc").val().trim()
+    ) {
+      alert("Título y descripción son obligatorios");
       return;
     }
-    news.forEach(function(n) {
-      const featuredBadge = n.is_featured ? '<span class="badge bg-warning text-dark ms-2">Destacada</span>' : '';
-      $list.append(
-        '<div class="list-group-item list-group-item-action d-flex align-items-center justify-content-between p-3">' +
-          '<div class="flex-grow-1">' +
-            '<h6 class="mb-0 fw-bold text-success">' + n.title + ' ' + featuredBadge + '</h6>' +
-            '<small class="text-muted">' + (n.tag || "Sin categoría") + ' &bull; ' + n.created_at + '</small>' +
-          '</div>' +
-          '<div class="d-flex gap-2 ms-3 flex-shrink-0">' +
-            '<button class="btn btn-sm btn-outline-primary rounded-0 btn-edit-news" ' +
-              'data-id="' + n.id + '" ' +
-              'data-title="' + n.title.replace(/"/g, '&quot;') + '" ' +
-              'data-tag="' + (n.tag || '').replace(/"/g, '&quot;') + '" ' +
-              'data-link="' + (n.external_link || '').replace(/"/g, '&quot;') + '" ' +
-              'data-image="' + (n.image_url || '').replace(/"/g, '&quot;') + '" ' +
-              'data-featured="' + n.is_featured + '" ' +
-              'data-description="' + n.description.replace(/"/g, '&quot;') + '">' +
-              '<i class="fa-solid fa-pen"></i> Editar</button>' +
-            '<button class="btn btn-sm btn-outline-danger rounded-0 btn-delete-news" ' +
-              'data-id="' + n.id + '" data-title="' + n.title.replace(/"/g, '&quot;') + '">' +
-              '<i class="fa-solid fa-trash"></i></button>' +
-          '</div>' +
-        '</div>'
+
+    btn.prop("disabled", true).text("Guardando...");
+
+    try {
+      const res = await fetch(
+        `${BASE_URL}/api/php/admin/admin_news.php?action=${action}`,
+        {
+          method: "POST",
+          body: formData,
+        },
       );
-    });
-  }
-
-  function renderNewsPagination(total, page) {
-    const $pagination = $("#admin-news-pagination");
-    const ITEMS_PAGE = 15;
-    $pagination.empty();
-    const totalPages = Math.ceil(total / ITEMS_PAGE);
-    if (totalPages <= 1) return;
-
-    const nav = $('<nav></nav>');
-    const ul = $('<ul class="pagination pagination-sm mb-0"></ul>');
-    for (let i = 1; i <= totalPages; i++) {
-        ul.append('<li class="page-item ' + (i === page ? 'active' : '') + '"><button class="page-link rounded-0" data-page="' + i + '">' + i + '</button></li>');
-    }
-    nav.append(ul);
-    $pagination.append(nav);
-  }
-
-  // --- Inicialización y Eventos News ---
-  if ($("#admin-news-list").length) {
-    console.log("Admin News JS Loaded");
-    window.loadAdminNews(1);
-
-    // Búsqueda y Filtros
-    $(document).on("click", "#btn-news-filtrar", function() { window.loadAdminNews(1); });
-    $(document).on("click", "#btn-news-borrar", function() {
-        $("#admin-news-search").val("");
-        $("#filter-news-tag").val("");
-        $("#filter-news-featured").prop("checked", false);
+      const data = await res.json();
+      if (data.success) {
+        const modalEl = document.getElementById("modal-news-form");
+        const m = bootstrap.Modal.getInstance(modalEl);
+        if (m) m.hide();
         window.loadAdminNews(1);
-    });
-    
-    // Paginación
-    $(document).on("click", "#admin-news-pagination button", function() {
-        window.loadAdminNews(parseInt($(this).data("page")));
-    });
+      } else {
+        alert(data.error || "Error al guardar noticia");
+      }
+    } catch (err) {
+      console.error("Error saving news:", err);
+      alert("Error de conexión al servidor");
+    } finally {
+      btn.prop("disabled", false).text("Guardar noticia");
+    }
+  });
 
-    // Abrir Modal Añadir
-    $(document).on("click", "#btn-add-news", function() {
-        $("#modal-news-title-header").text("Añadir Noticia");
-        $("#news-form-id").val("");
-        $("#news-form-title").val("");
-        $("#news-form-tag").val("");
-        $("#news-form-link").val("");
-        $("#news-form-desc").val("");
-        $("#news-form-image").val("");
-        $("#news-form-file").val(""); // Limpiar archivo
-        $("#news-form-image-preview").addClass("d-none");
-        $("#news-form-featured").prop("checked", false);
-        const modalEl = document.getElementById("modal-news-form");
-        if (modalEl) {
-            const m = bootstrap.Modal.getOrCreateInstance(modalEl);
-            m.show();
-        }
-    });
+  // Modal Eliminar
+  $(document).on("click", ".btn-delete-news", function () {
+    const id = $(this).data("id");
+    const title = $(this).data("title");
+    $("#delete-news-title").text(title);
+    $("#confirm-delete-news").attr("data-id", id);
+    const modalEl = document.getElementById("modal-delete-news");
+    if (modalEl) {
+      const m = bootstrap.Modal.getOrCreateInstance(modalEl);
+      m.show();
+    }
+  });
 
-    // Abrir Modal Editar
-    $(document).on("click", ".btn-edit-news", function() {
-        const b = $(this);
-        $("#modal-news-title-header").text("Editar Noticia");
-        $("#news-form-id").val(b.data("id"));
-        $("#news-form-title").val(b.data("title"));
-        $("#news-form-tag").val(b.data("tag"));
-        $("#news-form-link").val(b.data("link"));
-        $("#news-form-desc").val(b.data("description"));
-        $("#news-form-image").val(b.data("image"));
-        $("#news-form-file").val(""); // Limpiar archivo previo
-        
-        const currentImg = b.data("image");
-        if (currentImg) {
-            $("#news-image-path-text").text(currentImg);
-            $("#news-form-image-preview").removeClass("d-none");
-        } else {
-            $("#news-form-image-preview").addClass("d-none");
-        }
-
-        $("#news-form-featured").prop("checked", b.data("featured") == 1);
-        const modalEl = document.getElementById("modal-news-form");
-        if (modalEl) {
-            const m = bootstrap.Modal.getOrCreateInstance(modalEl);
-            m.show();
-        }
-    });
-
-    // Guardar / Actualizar (Usando FormData para archivos)
-    $(document).on("click", "#btn-save-news", async function() {
-        const btn = $(this);
-        const id = $("#news-form-id").val();
-        const action = id ? "updateNews" : "addNews";
-        
-        const formData = new FormData();
-        formData.append("id", id);
-        formData.append("title", $("#news-form-title").val().trim());
-        formData.append("tag", $("#news-form-tag").val().trim());
-        formData.append("external_link", $("#news-form-link").val().trim());
-        formData.append("description", $("#news-form-desc").val().trim());
-        formData.append("image_url", $("#news-form-image").val().trim());
-        formData.append("is_featured", $("#news-form-featured").is(":checked"));
-
-        const fileInput = document.getElementById("news-form-file");
-        if (fileInput.files.length > 0) {
-            formData.append("image", fileInput.files[0]);
-        }
-
-        if (!$("#news-form-title").val().trim() || !$("#news-form-desc").val().trim()) {
-            alert("Título y descripción son obligatorios");
-            return;
-        }
-
-        btn.prop("disabled", true).text("Guardando...");
-
-        try {
-            const res = await fetch(`${BASE_URL}/api/php/admin/admin_news.php?action=${action}`, {
-                method: "POST",
-                body: formData
-            });
-            const data = await res.json();
-            if (data.success) {
-                const modalEl = document.getElementById("modal-news-form");
-                const m = bootstrap.Modal.getInstance(modalEl);
-                if (m) m.hide();
-                window.loadAdminNews(1);
-            } else {
-                alert(data.error || "Error al guardar noticia");
-            }
-        } catch (err) {
-            console.error("Error saving news:", err);
-            alert("Error de conexión al servidor");
-        } finally {
-            btn.prop("disabled", false).text("Guardar noticia");
-        }
-    });
-
-    // Modal Eliminar
-    $(document).on("click", ".btn-delete-news", function() {
-        const id = $(this).data("id");
-        const title = $(this).data("title");
-        $("#delete-news-title").text(title);
-        $("#confirm-delete-news").attr("data-id", id);
+  $(document).on("click", "#confirm-delete-news", async function () {
+    const btn = $(this);
+    const id = btn.attr("data-id");
+    try {
+      const res = await fetch(
+        `${BASE_URL}/api/php/admin/admin_news.php?action=deleteNews&id=${id}`,
+        { method: "POST" },
+      );
+      const data = await res.json();
+      if (data.success) {
         const modalEl = document.getElementById("modal-delete-news");
-        if (modalEl) {
-            const m = bootstrap.Modal.getOrCreateInstance(modalEl);
-            m.show();
-        }
-    });
-
-    $(document).on("click", "#confirm-delete-news", async function() {
-        const btn = $(this);
-        const id = btn.attr("data-id");
-        try {
-            const res = await fetch(`${BASE_URL}/api/php/admin/admin_news.php?action=deleteNews&id=${id}`, { method: "POST" });
-            const data = await res.json();
-            if (data.success) {
-                const modalEl = document.getElementById("modal-delete-news");
-                const m = bootstrap.Modal.getInstance(modalEl);
-                if (m) m.hide();
-                window.loadAdminNews(1);
-            }
-        } catch (err) {
-            console.error("Error deleting news:", err);
-        }
-    });
-  }
+        const m = bootstrap.Modal.getInstance(modalEl);
+        if (m) m.hide();
+        window.loadAdminNews(1);
+      }
+    } catch (err) {
+      console.error("Error deleting news:", err);
+    }
+  });
+}

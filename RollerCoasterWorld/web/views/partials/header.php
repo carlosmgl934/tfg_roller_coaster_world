@@ -301,8 +301,21 @@ header("Expires: 0"); // Proxies
                   <li>
                     <hr class="dropdown-divider">
                   </li>
-                  <li><a class="dropdown-item py-2" href="<?= Router::url('admin_coasters') ?>"><i
-                        class="fa-solid fa-train-tram w-20px text-center me-2 text-success"></i> Coasters</a></li>
+                  <li><a class="dropdown-item py-2 d-flex align-items-center" href="<?= Router::url('admin_coasters') ?>">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="18" height="18" class="text-success flex-shrink-0" style="margin-right: 0.5rem;">
+                      <path d="M4 48 C 20 48, 24 16, 40 16 C 52 16, 56 32, 60 48" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+                      <path d="M4 56 C 24 56, 28 24, 40 24 C 50 24, 54 38, 60 56" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+                      <line x1="16" y1="42" x2="16" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                      <line x1="32" y1="20" x2="32" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                      <line x1="48" y1="24" x2="48" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                      <line x1="24" y1="28" x2="16" y2="60" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6" />
+                      <line x1="40" y1="16" x2="32" y2="60" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6" />
+                      <rect x="23" y="10" width="10" height="6" rx="2" fill="currentColor" />
+                      <circle cx="25" cy="18" r="2" fill="currentColor" />
+                      <circle cx="31" cy="18" r="2" fill="currentColor" />
+                      <rect x="11" y="24" width="10" height="6" rx="2" fill="currentColor" transform="rotate(-40 16 27)" />
+                    </svg>
+                    Coasters</a></li>
                   <li><a class="dropdown-item py-2" href="<?= Router::url('admin_parks') ?>"><i
                         class="fa-solid fa-tree-city w-20px text-center me-2 text-success"></i> Parques</a></li>
                   <li><a class="dropdown-item py-2" href="<?= Router::url('admin_forums') ?>"><i

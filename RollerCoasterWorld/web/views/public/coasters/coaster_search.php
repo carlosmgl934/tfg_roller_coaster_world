@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $page_css = ['web/css/coasters.css'];
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
@@ -12,7 +12,7 @@ require_once __DIR__ . '/../../partials/header.php';
     </div>
     <div class="row g-4">
         <!-- IZQUIERDA: Filtros -->
-        <aside class="col-12 col-lg-3 sidebar-filter" id="sidebar-filter">
+        <aside class="col-12 col-lg-3 sidebar-filter order-1 order-lg-1" id="sidebar-filter">
             <div class="card shadow-sm border-0 sticky-top rounded-0" style="top: 90px; z-index: 1;">
                 <div class="card-header bg-success text-white rounded-0">
                     <h5 class="mb-0"><i class="fa-solid fa-filter me-2"></i>Filtros</h5>
@@ -50,6 +50,13 @@ require_once __DIR__ . '/../../partials/header.php';
                         </label>
                         <input type="range" class="form-range" id="inversions-filter" min="0" max="20" value="0">
                     </div>
+                    <div class="mb-3 position-relative">
+                        <input type="text" id="filter-park-search" class="form-control shadow-sm rounded-0 border-success ac-input-select" 
+                            placeholder="Parque" 
+                            style="border-width: 1px; box-shadow: none; background-color: var(--rcw-bg-card-alt); color: var(--rcw-text-primary);">
+                        <input type="hidden" id="park-filter" name="park_id" value="">
+                        <div id="filter-park-results" class="ac-dropdown d-none"></div>
+                    </div>
                     <div class="mb-3">
                         <select class="form-select shadow-sm rounded-0" id="manufacter-filter">
                             <option value="">Fabricante</option>
@@ -82,19 +89,21 @@ require_once __DIR__ . '/../../partials/header.php';
             </div>
         </aside>
         <!-- CENTRO: Lista -->
-        <div class="col-12 col-lg-6">
+        <div class="col-12 col-lg-6 order-3 order-lg-2">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <p class="mb-0 text-muted fw-bold" id="coaster-count"></p>
                 <div class="d-flex align-items-center">
-                    <select class="form-select shadow-sm rounded-0 w-auto border-success me-2" id="sort-filter" style="cursor: pointer; font-weight: 500;">
+                    <select class="form-select shadow-sm rounded-0 w-auto border-success me-2" id="sort-filter"
+                        style="cursor: pointer; font-weight: 500;">
                         <option value="id" selected>Por defecto</option>
                         <option value="name">Nombre</option>
                         <option value="height">Altura</option>
                         <option value="speed">Velocidad</option>
                         <option value="year">Año de apertura</option>
                     </select>
-                    <button id="sort-direction-btn" class="btn btn-outline-success shadow-sm rounded-0" type="button" title="Cambiar orden">
-                         <i class="fa-solid fa-arrow-down-wide-short"></i>
+                    <button id="sort-direction-btn" class="btn btn-outline-success shadow-sm rounded-0" type="button"
+                        title="Cambiar orden">
+                        <i class="fa-solid fa-arrow-down-wide-short"></i>
                     </button>
                     <input type="hidden" id="sort-direction" value="DESC">
                 </div>
@@ -103,7 +112,7 @@ require_once __DIR__ . '/../../partials/header.php';
             <div class="pagination mt-4 justify-content-center" id="pagination"></div>
         </div>
         <!-- DERECHA: Buscador -->
-        <div class="col-12 col-lg-3">
+        <div class="col-12 col-lg-3 order-2 order-lg-3">
             <div class="sticky-top" style="top: 90px; z-index: 100;">
                 <div class="position-relative">
                     <input type="text" id="coaster-search" name="coaster-search"

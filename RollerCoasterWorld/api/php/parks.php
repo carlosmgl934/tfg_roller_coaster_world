@@ -78,7 +78,7 @@ function listParks()
     $bind = [];
 
     if (!empty($_GET['q'])) {
-        $where[] = "(park_name ILIKE :q OR park_location ILIKE :q OR park_country ILIKE :q)";
+        $where[] = "(unaccent(park_name) ILIKE unaccent(:q) OR unaccent(park_location) ILIKE unaccent(:q) OR unaccent(park_country) ILIKE unaccent(:q))";
         $bind[':q'] = '%' . trim($_GET['q']) . '%';
     }
 
@@ -179,7 +179,26 @@ function getParkDetails()
 
     $stmt = $db->prepare("
         SELECT p.*, 
-               (SELECT COUNT(*) FROM coasters WHERE park_id = p.id) as real_coasters_count
+               (SELECT COUNT(*) FROM coasters WHERE park_id = p.id) as real_coasters_count,
+               CASE WHEN p.stars IS NULL OR p.stars = 0 THEN NULL
+                    ELSE (SELECT COUNT(*) + 1 FROM parks AS p2
+                          WHERE p2.stars > 0 
+                            AND (p2.stars > p.stars OR
+                                (p2.stars = p.stars AND
+                                 (SELECT COUNT(*) FROM park_ratings WHERE park_id = p2.id AND note = 5) >
+                                 (SELECT COUNT(*) FROM park_ratings WHERE park_id = p.id AND note = 5)) OR
+                                (p2.stars = p.stars AND
+                                 (SELECT COUNT(*) FROM park_ratings WHERE park_id = p2.id AND note = 5) =
+                                 (SELECT COUNT(*) FROM park_ratings WHERE park_id = p.id AND note = 5) AND
+                                 p2.reviews_count > p.reviews_count) OR
+                                (p2.stars = p.stars AND
+                                 (SELECT COUNT(*) FROM park_ratings WHERE park_id = p2.id AND note = 5) =
+                                 (SELECT COUNT(*) FROM park_ratings WHERE park_id = p.id AND note = 5) AND
+                                 p2.reviews_count = p.reviews_count AND
+                                 p2.id < p.id)
+                                )
+                         )
+               END AS ranking
         FROM parks p
         WHERE p.id = :id
     ");
@@ -491,7 +510,9 @@ function getTopGlobalParks()
             SELECT id, park_name, park_location, park_country, imagen_url, stars, num_coasters
             FROM parks
             WHERE stars > 0
-            ORDER BY stars DESC, id ASC
+            ORDER BY stars DESC, 
+                     (SELECT COUNT(*) FROM park_ratings WHERE park_id = parks.id AND note = 5) DESC,
+                     id ASC
             LIMIT 10
         ");
         $stmt->execute();

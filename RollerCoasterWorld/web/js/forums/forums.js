@@ -402,7 +402,12 @@ $(document).ready(function () {
                  if (collabs.length > 0) {
                    autor += `<small class="text-muted ms-1" style="font-size: 0.75rem;">colaborando con:</small><div class="d-flex ms-1">`;
                    collabs.slice(0, 3).forEach(c => {
-                       const imgSrc = c.profile_image && c.profile_image.includes('http') ? c.profile_image : (c.profile_image ? window.BASE_URL + '/uploads/profiles/' + c.profile_image : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(c.username) + '&background=random');
+                       let imgSrc = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(c.username) + '&background=random';
+                       if (c.profile_image) {
+                           if (c.profile_image.startsWith('http://') || c.profile_image.startsWith('https://')) { imgSrc = c.profile_image; }
+                           else if (c.profile_image.startsWith('/')) { imgSrc = c.profile_image.includes('/web/img/uploads/') ? window.BASE_URL + '/web/img/uploads/' + c.profile_image.split('/web/img/uploads/')[1] : window.BASE_URL + c.profile_image; }
+                           else { imgSrc = 'https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/' + c.profile_image; }
+                       }
                        autor += `<img src="${imgSrc}" alt="${c.username}" title="${c.username}" class="rounded-circle border border-dark" style="width: 22px; height: 22px; object-fit: cover; margin-left: -5px; z-index: 1; position: relative;">`;
                    });
                    if (collabs.length > 3) {
@@ -445,35 +450,55 @@ $(document).ready(function () {
 
   // ── Buscador de foros ────────────────────────────────────────────
   const buscador = document.getElementById("forum-search-input");
+  const btnMine = document.getElementById("filter-mine-btn");
+  let isMineFilterActive = false;
+
+  if (btnMine) {
+      btnMine.addEventListener("click", function () {
+          isMineFilterActive = !isMineFilterActive;
+          if (isMineFilterActive) {
+             btnMine.classList.remove("btn-outline-success");
+             btnMine.classList.add("btn-success");
+             btnMine.classList.add("text-white");
+          } else {
+             btnMine.classList.remove("btn-success");
+             btnMine.classList.remove("text-white");
+             btnMine.classList.add("btn-outline-success");
+          }
+          triggerSearch();
+      });
+  }
+
+  function triggerSearch() {
+      const val = buscador ? buscador.value.trim() : "";
+      let url = window.BASE_URL + "/api/php/forums.php?";
+
+      if (val.length > 2) {
+          url += "action=search_forums&search=" + encodeURIComponent(val);
+      } else {
+          url += "action=list";
+      }
+
+      if (isMineFilterActive) {
+          url += "&mine=true";
+      }
+
+      fetch(url)
+        .then((res) => res.json())
+        .then((data) => {
+            if (data.success) listForums(data.forums);
+            else console.warn("Error al cargar los foros");
+        })
+        .catch(e => console.error("Error connecting to API", e));
+  }
+
   if (buscador) {
     // Carga inicial
-    fetch(window.BASE_URL + "/api/php/forums.php?action=list")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) listForums(data.forums);
-        else console.warn("Error al cargar los foros");
-      });
+    triggerSearch();
 
     // Búsqueda dinámica
     buscador.addEventListener("input", function () {
-      const val = buscador.value.trim();
-      if (val.length > 2) {
-        fetch(
-          `${window.BASE_URL}/api/php/forums.php?action=search_forums&search=${encodeURIComponent(val)}`,
-        )
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.success) listForums(data.forums);
-            else console.warn("Error al cargar los foros");
-          });
-      } else if (val.length === 0) {
-        // Cargar todos si se ha vaciado el buscador
-        fetch(window.BASE_URL + "/api/php/forums.php?action=list")
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.success) listForums(data.forums);
-          });
-      }
+       triggerSearch();
     });
   }
 });

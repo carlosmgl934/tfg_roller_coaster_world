@@ -540,3 +540,64 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
     background-color: #198754 !important;
     border-color: #198754 !important;
 }
+
+/* ============================================================
+   CUSTOM AUTOCOMPLETE DROPDOWN (Adaptado de Admin)
+   ============================================================ */
+.ac-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: var(--rcw-bg-card-alt);
+  border: 1px solid var(--rcw-green-neon);
+  border-top: none;
+  max-height: 220px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rcw-green-neon) var(--rcw-bg);
+}
+.ac-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+.ac-dropdown::-webkit-scrollbar-track {
+  background: var(--rcw-bg);
+}
+.ac-dropdown::-webkit-scrollbar-thumb {
+  background: var(--rcw-green-neon);
+  border-radius: 0;
+}
+
+.ac-item {
+  padding: 0.55rem 1rem;
+  color: var(--rcw-text-primary);
+  cursor: pointer;
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.15s;
+}
+.ac-item:hover,
+.ac-item.ac-active {
+  background: rgba(0, 230, 118, 0.15);
+  color: #fff;
+}
+.ac-empty {
+  padding: 0.6rem 1rem;
+  color: var(--rcw-text-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+.ac-input-select {
+  padding-right: 2.25rem !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff80' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+}
+.ac-sublabel {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--rcw-text-muted);
+  margin-top: 1px;
+}
