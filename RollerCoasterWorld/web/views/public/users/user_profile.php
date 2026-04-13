@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $page_css = ['web/css/profile.css'];
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
@@ -335,6 +335,6 @@ $user_id = $_GET['id'] ?? null;
     <p class="mt-3 text-muted fw-bold text-uppercase" style="letter-spacing: 0.05em;">Cargando perfil...</p>
 </div>
 
-<script src="<?= Router::asset('web/js/users/user_profile.js') ?>"></script>
+<script src="<?= Router::asset('web/js/users/user_profile.js') ?>?v=<?= time() ?>"></script>
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>

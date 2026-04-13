@@ -407,7 +407,6 @@ function getPublicProfile()
                 ) ucp
                 JOIN parks p ON ucp.park_id = p.id
                 ORDER BY p.park_name ASC
-                LIMIT 5
             ");
             $stmtFallback->execute([':tid' => $target_id]);
             $top_parks = $stmtFallback->fetchAll(PDO::FETCH_ASSOC);
@@ -425,7 +424,7 @@ function getPublicProfile()
         $stmtTopCoasters->execute([':tid' => $target_id]);
         $top_coasters = $stmtTopCoasters->fetchAll(PDO::FETCH_ASSOC);
 
-        // Fallback para coasters: Si no hay, extraer hasta 5 aleatorias de sus credits list
+        // Fallback para coasters: Si no hay, extraer todas alfabéticamente de sus credits list
         if (empty($top_coasters)) {
             $stmtFallCoasters = $db->prepare("
                 SELECT ROW_NUMBER() OVER (ORDER BY c.coaster_name ASC) as rank_position,
@@ -435,7 +434,6 @@ function getPublicProfile()
                 JOIN parks p ON c.park_id = p.id
                 WHERE uc.user_id = :tid
                 ORDER BY c.coaster_name ASC
-                LIMIT 5
             ");
             $stmtFallCoasters->execute([':tid' => $target_id]);
             $top_coasters = $stmtFallCoasters->fetchAll(PDO::FETCH_ASSOC);

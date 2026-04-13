@@ -741,21 +741,23 @@ $(document).ready(function () {
         : `<div style="height:150px;background:#0d1117;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-image text-secondary fs-3"></i></div>`;
 
       if (isGrid) {
+        const detailUrl = `${BASE_URL}/web/views/public/parks/parks.php?id=${item.park_id}`;
         container.append(`
           <div class="${colClass}">
-            <div class="top-card position-relative">
+            <a href="${detailUrl}" class="top-card position-relative d-block text-decoration-none">
               ${img}
               <span class="rank-badge">#${item.rank_position}</span>
               <div class="p-2">
                 <div class="fw-bold text-white small text-truncate">${item.park_name}</div>
                 <div class="text-secondary" style="font-size:.75rem;">${item.country_name || ""}</div>
               </div>
-            </div>
+            </a>
           </div>`);
       } else {
+        const detailUrl = `${BASE_URL}/web/views/public/parks/parks.php?id=${item.park_id}`;
         container.append(`
           <div class="${colClass}">
-            <div class="top-card d-flex align-items-stretch" style="height:120px;">
+            <a href="${detailUrl}" class="top-card d-flex align-items-stretch text-decoration-none" style="height:120px;">
               <div style="width:120px;flex-shrink:0;position:relative;">
                 ${img.replace("height:150px", "height:120px")}
                 <span class="rank-badge">#${item.rank_position}</span>
@@ -770,7 +772,7 @@ $(document).ready(function () {
                   ${item.stars ? `<small class="text-warning"><i class="fa-solid fa-star me-1"></i>${parseFloat(item.stars).toFixed(1)}</small>` : ""}
                 </div>
               </div>
-            </div>
+            </a>
           </div>`);
       }
     });

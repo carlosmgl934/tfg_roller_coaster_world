@@ -169,7 +169,6 @@ require_once __DIR__ . '/../../partials/header.php';
                         <i class="fa-solid fa-train-tram"></i>
                         <span class="fw-semibold text-white">Montañas Rusas del Parque</span>
                     </div>
-                    <span class="badge badge-dark-green rounded-pill px-3 py-1 shadow-sm fs-6" id="operating-count-badge">0</span>
                 </div>
                 <div class="card-body p-3 pt-4">
                     <div class="row g-2" id="park-coasters-grid">
@@ -250,4 +249,4 @@ require_once __DIR__ . '/../../partials/login_modal.php';
 
 <?php require_once __DIR__ . '/../../partials/footer.php';?>
 
-<script src="<?= Router::asset('web/js/parks/parks.js') ?>"></script>
+<script src="<?= Router::asset('web/js/parks/parks.js') ?>?v=<?= time() ?>"></script>

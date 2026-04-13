@@ -25,6 +25,7 @@ $router->register('save_photo', 'savePhoto', 'POST');
 $router->register('like_photo', 'likePhoto', 'POST');
 $router->register('check_review', 'checkReview');
 $router->register('user_tops', 'getUserCoasterTops');
+$router->register('ranking', 'getRanking');
 
 
 $router->dispatch();
@@ -678,15 +679,15 @@ function getUserCoasterTops()
     // Ordenación
     $sort = $_GET['sort'] ?? 'random';
     $orderBy = match ($sort) {
-        'alpha_asc'    => 'username ASC',
+        'alpha_asc' => 'username ASC',
         'credits_desc' => 'total_coasters DESC',
-        'date_desc'    => 'last_modified DESC',
-        default        => 'RANDOM()',
+        'date_desc' => 'last_modified DESC',
+        default => 'RANDOM()',
     };
 
-    $limit  = $filterFriends ? 30 : 12;
-    $join   = '';
-    $where  = 'uc.rank_position IS NOT NULL AND uc.rank_position > 0';
+    $limit = 9999;
+    $join = '';
+    $where = 'uc.rank_position IS NOT NULL AND uc.rank_position > 0';
     $params = [];
 
     if ($filterFriends) {
@@ -694,7 +695,7 @@ function getUserCoasterTops()
                     (f.solicitante_id = :my_id AND f.solicitada_id = u.id)
                  OR (f.solicitada_id = :my_id AND f.solicitante_id = u.id)
                  )";
-        $where  .= " AND f.estado_solicitud = 'ACEPTADA'";
+        $where .= " AND f.estado_solicitud = 'ACEPTADA'";
         $params[':my_id'] = $currentUserId;
     }
 
@@ -759,6 +760,54 @@ function getUserCoasterTops()
     } catch (Exception $e) {
         error_log('getUserCoasterTops error: ' . $e->getMessage());
         Response::error('Error al obtener los tops de coasters: ' . $e->getMessage(), 500);
+    }
+}
+
+function getRanking()
+{
+
+    $limit = 15;
+    $page = (max(1, intval($_GET['page'] ?? 1)));
+    $offset = ($page - 1) * $limit;
+
+    try {
+        global $db;
+
+        $stmtTotal = $db->prepare("
+            SELECT COUNT(*) FROM coasters
+            INNER JOIN parks ON coasters.park_id = parks.id
+            WHERE coasters.stars IS NOT NULL AND coasters.stars > 0
+        ");
+        $stmtTotal->execute();
+        $total = min((int) $stmtTotal->fetchColumn(), 1000);
+
+
+        $sql = "SELECT
+        coasters.id, coasters.coaster_name, coasters.imagen_url, parks.park_name, coasters.coaster_manufacter AS manufacter,
+        coasters.coaster_model AS modelo,
+        coasters.opening_year, coasters.stars
+        FROM coasters
+        INNER JOIN parks ON coasters.park_id = parks.id
+        WHERE coasters.stars IS NOT NULL AND coasters.stars > 0
+        ORDER BY 
+            coasters.stars DESC, 
+            (SELECT COUNT(*) FROM coaster_ratings WHERE coaster_id = coasters.id AND note = 5) DESC,
+            coasters.reviews_count DESC,
+            coasters.id ASC
+        LIMIT :limit OFFSET :offset";
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        $coasters = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        Response::success([
+            'coasters' => $coasters,
+            'total' => $total
+        ]);
+    } catch (PDOException $e) {
+        Response::error('Error mostrando montañas rusas: ' . $e->getMessage());
     }
 }
 

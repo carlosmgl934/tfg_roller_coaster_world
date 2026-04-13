@@ -1,62 +1,59 @@
-﻿<?php
+<?php
 $page_css = ['web/css/coasters.css'];
 require_once __DIR__ . '/../../partials/header.php';
-/** @var string $base_url */
-
-$isLoggedIn = isset($_SESSION['firebase_uid']);
+// if (!$is_logged) { Router::redirect('login'); } // Descomentar si es privado
 ?>
-
-<?php
-$filter = rtrim($_GET['filter'] ?? 'global', '/');
-$isGlobal = ($filter === 'global');
-
-$pageTitle = $isGlobal ? 'Ranking Global de Parques' : 'Tops de Parques de Usuarios';
-$pageSubtitle = $isGlobal ? 'Los mejores parques del mundo según valoraciones' : 'Descubre los parques favoritos de la comunidad y tus amigos';
-?>
-
- <!-- Reutilizamos el mismo CSS -->
-<main class="container-fluid px-lg-5 my-5">
-    <input type="hidden" id="initial-filter" value="<?= htmlspecialchars($filter) ?>">
-    
+<main class="container-fluid px-lg-5 my-5 min-vh-100">
     <div class="row mb-5">
         <div class="col-12 text-center">
-            <h1 class="display-6 fw-bold text-success"><?= $pageTitle ?></h1>
-            <p class="lead text-muted mt-3"><?= $pageSubtitle ?></p>
+            <h1 class="display-6 fw-bold border-bottom border-light border-opacity-50 pb-2 text-success">
+                <i class="fa-solid fa-ranking-star me-2"></i> Tops de la Comunidad
+            </h1>
+            <p class="text-muted text-uppercase fw-bold mt-3" style="letter-spacing: 0.1em; font-size: 0.85rem;">
+                Descubre los parques favoritos de otros enthusiasts
+            </p>
         </div>
     </div>
 
-    <!-- Filtros rápidos -->
-    <?php if (!$isGlobal): ?>
+    <!-- Controles de búsqueda y filtrado -->
     <div class="row justify-content-center mb-5">
-        <div class="col-12 text-center">
-            <div class="d-inline-flex gap-3 align-items-center bg-dark p-3 rounded-4 shadow-lg border border-success border-opacity-25">
-                <label for="top-type" class="text-white fw-bold mb-0 ms-2"><i class="fa-solid fa-ranking-star text-warning me-2"></i>Ver Ranking:</label>
-                <select class="form-select w-auto fw-semibold border-0 shadow-none bg-success text-white" id="top-type" style="cursor: pointer; min-width: 250px;">
-                    <option value="users" class="bg-dark text-white" <?= $filter === 'users' ? 'selected' : '' ?>>👥 Top de Usuarios (Comunidad)</option>
-                    <?php if ($isLoggedIn): ?>
-                        <option value="friends" class="bg-dark text-white" <?= $filter === 'friends' ? 'selected' : '' ?>>🤝 Tops de tus Amigos</option>
-                    <?php endif; ?>
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="d-flex flex-wrap gap-3 align-items-center justify-content-center bg-dark p-3 border border-secondary border-opacity-25" style="border-radius: 0;">
+                
+                <!-- Buscador -->
+                <div class="flex-grow-1 position-relative" style="min-width: 200px;">
+                    <input type="text" id="top-search" class="form-control bg-transparent text-white border-success rounded-0 ps-3 pe-5 py-2 shadow-sm" placeholder="Buscar usuario..." style="border-width: 2px;">
+                    <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="right: 14px; top: 50%; transform: translateY(-50%);"></i>
+                </div>
+                
+                <!-- Ordenar por -->
+                <select id="sort-select" class="form-select bg-transparent text-white border-success rounded-0 py-2 shadow-sm w-auto" style="border-width: 2px;">
+                    <option value="date_desc" style="background: #212529;" selected>Última modificación</option>
+                    <option value="parks_desc" style="background: #212529;">Mayor nº de parques</option>
+                    <option value="alpha_asc" style="background: #212529;">Orden alfabético</option>
                 </select>
-                <div class="spinner-border spinner-border-sm text-success ms-2 d-none" role="status" id="top-loading-spinner"></div>
+
+                <!-- Filtro Amigos -->
+                <?php if (isset($is_logged) && $is_logged): ?>
+                <div class="form-check form-switch fs-5 d-flex align-items-center ms-md-3">
+                    <input class="form-check-input rounded-0 bg-transparent border-success focus-ring focus-ring-success mt-0" type="checkbox" role="switch" id="filterFriends" style="width: 2.5em; height: 1.2em; border-width: 2px; cursor: pointer;">
+                    <label class="form-check-label ms-2 text-white" for="filterFriends" style="font-size: 0.95rem; cursor: pointer;"><i class="fa-solid fa-user-group text-success me-1"></i> Solo amigos</label>
+                </div>
+                <?php endif; ?>
+
             </div>
         </div>
     </div>
-    <?php endif; ?>
 
-    <!-- Podio (Top 3) -->
-    <div class="row justify-content-center mb-5" id="top-podium">
-        <div class="col-12 text-center py-5">
+    <!-- Grid de Tops — rellenado dinámicamente por park_tops.js -->
+    <div class="row g-4 justify-content-center" id="tops-grid">
+        <div class="col-12 text-center py-5" id="tops-loading">
             <div class="spinner-border text-success" role="status"></div>
             <p class="mt-3 text-muted">Cargando tops...</p>
         </div>
     </div>
-
-    <!-- Listado completo de ranking -->
-    <div class="row g-4" id="tops-list">
-        <!-- Rankings cargados dinámicamente -->
-    </div>
 </main>
 
-<?php require_once __DIR__ . '/../../partials/footer.php'; ?>
+<script src="<?= Router::asset('web/js/parks/park_tops.js') ?>?v=<?= time() ?>"></script>
 
-<script src="<?= Router::asset('web/js/parks/park_tops.js') ?>"></script>
+<?php require_once __DIR__ . '/../../partials/footer.php'; ?>

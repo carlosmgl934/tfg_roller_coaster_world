@@ -37,6 +37,7 @@ class Router {
             'park_tops' => '/web/views/public/parks/park_tops.php',
             'park_reviews' => '/web/views/public/parks/park_reviews.php',
             'form_park_rating' => '/web/views/public/parks/form_park_rating.php',
+            'park_ranking' => '/web/views/public/parks/ranking.php',
 
             // Públicas - Foros
             'forums'        => '/web/views/public/forums/forum_search.php',

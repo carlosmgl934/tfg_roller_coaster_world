@@ -541,7 +541,6 @@ $(document).ready(function () {
              }
           });
 
-          $("#operating-count-badge").text(data.coasters.length); // Total coasters in the park
           $("#operating-coasters-val").text(operatingList.length); // Only operating for the stat block
 
           if (data.coasters.length > 0) {
@@ -591,41 +590,32 @@ $(document).ready(function () {
                if (c.coaster_type) subtitleParts.push(`<span>${c.coaster_type}</span>`);
 
                return `
-               <div class="col-12 animate__animated animate__fadeIn mb-2">
-                 <a href="${window.BASE_URL || ""}/web/views/public/coasters/coasters.php?id=${c.id}" class="text-decoration-none">
-                     <div class="card park-coaster-row rounded-0" style="--card-bg: #1a1e24; background-color: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); transition: all 0.2s cubic-bezier(.4,0,.2,1);">
-                         <div class="row g-0 align-items-center position-relative">
-                             
-                             <!-- Imagen Izquierda (Cuadrada, fade perfecto usando CSS mask-image) -->
-                             <div class="col-auto">
-                                 <div style="width: 110px; height: 80px; position:relative; overflow: hidden;">
-                                    <img src="${img}" style="width:100%; height:100%; object-fit:cover; display:block; -webkit-mask-image: linear-gradient(to right, black 25%, transparent 100%); mask-image: linear-gradient(to right, black 25%, transparent 100%);" onerror="this.src='${fallback}'">
-                                 </div>
-                             </div>
+               <a href="${window.BASE_URL || ""}/web/views/public/coasters/coasters.php?id=${c.id}" class="list-group-item list-group-item-action bg-transparent border-bottom border-secondary border-opacity-25 px-0 py-3 text-decoration-none animate__animated animate__fadeIn" style="transition: all 0.2s ease-in-out;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.03)'" onmouseout="this.style.backgroundColor='transparent'">
+                   <div class="d-flex align-items-center gap-3 px-3">
+                       
+                       <!-- Imagen (Más grande, con border-radius) -->
+                       <img src="${img}" class="rounded-3 shadow-sm flex-shrink-0" style="width: 150px; height: 100px; object-fit: cover;" onerror="this.src='${fallback}'">
 
-                             <!-- Contenido central: nombre + subtítulo + stats -->
-                             <div class="col px-3 py-2 d-flex flex-column justify-content-center" style="min-width:0; position:relative; z-index:1;">
-                                 <div class="text-white fw-bold text-truncate" style="font-size:0.95rem; line-height: 1.2; margin-bottom: 2px;">${c.coaster_name}</div>
-                                 <div class="text-truncate" style="font-size:0.75rem; color: #8b949e; margin-bottom: 4px;">
-                                   ${subtitleParts.join(' <span class="mx-1 opacity-50">&bull;</span> ')}
-                                 </div>
-                                 <div class="d-flex flex-wrap" style="gap: 12px; font-size:0.75rem; color: #6e7681;">
-                                   ${statItems.length > 0 ? statItems.join('') : '<span class="fst-italic opacity-50">Sin datos estadísticos</span>'}
-                                 </div>
-                             </div>
+                       <!-- Contenido central: nombre + subtítulo + stats -->
+                       <div class="flex-grow-1 min-w-0 py-1">
+                           <h5 class="fw-bold text-white text-truncate mb-1" style="font-size:1.15rem;">${c.coaster_name}</h5>
+                           <div class="text-truncate" style="font-size:0.85rem; color: #8b949e; margin-bottom: 6px;">
+                             ${subtitleParts.join(' <span class="mx-1 opacity-50">&bull;</span> ')}
+                           </div>
+                           <div class="d-flex flex-wrap" style="gap: 12px; font-size:0.8rem; color: #6e7681;">
+                             ${statItems.length > 0 ? statItems.join('') : '<span class="fst-italic opacity-50">Sin datos estadísticos</span>'}
+                           </div>
+                       </div>
 
-                             <!-- Lado derecho: Estado como Texto -->
-                             <div class="col-auto px-4 text-end d-flex align-items-center">
-                                 <!-- Texto de estado real -->
-                                 <span style="color: ${statusColor}; font-weight: 800; font-size: 0.75rem; letter-spacing: 0.5px; text-transform: uppercase;">
-                                     ${statusLabel}
-                                 </span>
-                                 <i class="fa-solid fa-chevron-right ms-3" style="color: #495057; font-size: 0.8rem;"></i>
-                             </div>
-                         </div>
-                     </div>
-                 </a>
-               </div>`;
+                       <!-- Lado derecho: Estado como Texto -->
+                       <div class="px-3 text-end d-flex align-items-center flex-shrink-0">
+                           <span style="color: ${statusColor}; font-weight: 800; font-size: 0.8rem; letter-spacing: 0.5px; text-transform: uppercase;">
+                               ${statusLabel}
+                           </span>
+                           <i class="fa-solid fa-chevron-right ms-3" style="color: #495057; font-size: 0.9rem;"></i>
+                       </div>
+                   </div>
+               </a>`;
             };
 
             const separator = (title) => `
@@ -637,17 +627,17 @@ $(document).ready(function () {
 
             if (constructionList.length > 0) {
               html += separator("En Construcción");
-              html += constructionList.map(renderRow).join('');
+              html += `<div class="list-group list-group-flush w-100 bg-transparent px-2">` + constructionList.map(renderRow).join('') + `</div>`;
             }
 
             if (operatingList.length > 0) {
               html += separator("Operativas");
-              html += operatingList.map(renderRow).join('');
+              html += `<div class="list-group list-group-flush w-100 bg-transparent px-2">` + operatingList.map(renderRow).join('') + `</div>`;
             }
 
             if (closedList.length > 0) {
               html += separator("Cerradas / SBNO");
-              html += closedList.map(renderRow).join('');
+              html += `<div class="list-group list-group-flush w-100 bg-transparent px-2">` + closedList.map(renderRow).join('') + `</div>`;
             }
 
             grid.html(html);
@@ -708,26 +698,36 @@ $(document).ready(function () {
               tagsHtml = '<div class="d-flex flex-wrap gap-2 mt-2 mb-2">';
               review.tags.forEach((t) => {
                 const cls = t.type === "pro" ? "success" : "danger";
-                tagsHtml += `<span class="badge bg-${cls} bg-opacity-10 text-${cls} border border-${cls} border-opacity-25 rounded-pill px-3 py-1" style="font-weight:600;font-size:0.75rem;">${t.tag.replace(/_/g, " ").toUpperCase()}</span>`;
+                tagsHtml += `<span class="badge bg-${cls} text-white rounded-pill px-3 py-1" style="font-weight:600;font-size:0.75rem;">${t.tag.replace(/_/g, " ").toUpperCase()}</span>`;
               });
               tagsHtml += "</div>";
+            }
+
+            // Avatar premium: foto o círculo con iniciales (estilo rcw-user-avatar, igual que coasters)
+            let avatarHtml;
+            const fixedImg = review.profile_image
+              ? (review.profile_image.startsWith('/') ? BASE_URL + review.profile_image : review.profile_image)
+              : null;
+            if (fixedImg) {
+              avatarHtml = `<img src="${fixedImg}" alt="${review.username}" referrerpolicy="no-referrer"
+                style="width:40px;height:40px;object-fit:cover;border-radius:50%;border:2px solid var(--rcw-green-dim);flex-shrink:0;"
+                onerror="this.style.display='none'">`;
+            } else {
+              const nameParts = (review.username || "U").trim().split(/[\s_\-]+/);
+              const initials = (nameParts[0][0] + (nameParts[1] ? nameParts[1][0] : "")).toUpperCase();
+              avatarHtml = `<div class="rcw-user-avatar flex-shrink-0" style="width:40px;height:40px;font-size:0.95rem;"><span>${initials}</span></div>`;
             }
 
             container.append(`
               <div class="border-bottom pb-3 mb-3 animate__animated animate__fadeIn">
                 <div class="d-flex align-items-center gap-2 mb-1">
-                   ${review.profile_image 
-                     ? `<img src="${review.profile_image}" alt="${review.username}" class="review-avatar" style="width:40px; height:40px; object-fit:cover; border-radius:50%; border: 2px solid var(--rcw-green-dim);">`
-                     : `<div class="bg-success rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width:40px; height:40px; font-size:16px; border: 2px solid var(--rcw-green-dim);">
-                          ${(review.username || "U").charAt(0).toUpperCase()}
-                       </div>`
-                   }
-                   <strong>${review.username || "Usuario anónimo"}</strong>
-                   <span class="stars-display ms-2">${renderStars(review.note)}</span>
-                   <span class="text-muted small ms-2">• ${timeAgo(review.created_at)}</span>
+                  ${avatarHtml}
+                  <strong>${review.username || "Usuario anónimo"}</strong>
+                  <span class="stars-display ms-2">${renderStars(review.note)}</span>
+                  <span class="text-muted small ms-2">• ${timeAgo(review.created_at)}</span>
                 </div>
                 ${tagsHtml}
-                <p class="mb-0 mt-3 text-white-50" style="font-size:0.9rem; line-height:1.6;">${review.review || ""}</p>
+                ${review.review ? `<p class="mb-0 mt-3 text-white-50" style="font-size:0.9rem;line-height:1.6;">${review.review}</p>` : ""}
               </div>
             `);
           });

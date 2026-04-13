@@ -1,264 +1,204 @@
+/**
+ * park_tops.js
+ * Gestiona la página de Tops de la Comunidad (parques).
+ *
+ * Flujo general:
+ *  1. Al cargar: llama a fetchUserTops()
+ *  2. Al cambiar el select de orden: vuelve a llamar a fetchUserTops()
+ *  3. Al escribir en el buscador: filtra en cliente (sin nueva petición)
+ *  4. Al activar "Solo amigos": llama a fetchUserTops() con filter=friends
+ */
+
 $(document).ready(function () {
+  // ── Constantes ────────────────────────────────────────────────────────────
   const apiBase = (window.BASE_URL || "") + "/api/php/parks.php";
-  const topTypeSelect = $("#top-type");
-  const topPodium = $("#top-podium");
-  const topsList = $("#tops-list");
-  const loadingSpinner = $("#top-loading-spinner");
+  const defaultImg =
+    "https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png";
 
-  // Determinamos el filtro inicial a partir del input oculto
-  const initialFilter = $("#initial-filter").val() || "global";
+  // ── Referencias al DOM ────────────────────────────────────────────────────
+  const $grid = $("#tops-grid");
+  const $search = $("#top-search");
+  const $sortSelect = $("#sort-select");
+  const $filterFriends = $("#filterFriends");
 
-  if (topTypeSelect.length) {
-    // Modo Usuarios: Escuchar cambios en el selector
-    topTypeSelect.on("change", function () {
-      const type = $(this).val();
-      if (type === "users") {
-        fetchUserTops(false);
-      } else if (type === "friends") {
-        fetchUserTops(true);
-      }
-    });
+  // ── Estado ────────────────────────────────────────────────────────────────
+  let allTops = []; // Guarda los datos de la última petición para filtrar sin recargar
 
-    // Cargar inicialmente en base al selector
-    const currentVal = topTypeSelect.val();
-    if (currentVal === "friends") {
-      fetchUserTops(true);
-    } else {
-      fetchUserTops(false); // por defecto users
-    }
-  } else {
-    // Modo Global: No hay selector
-    fetchGlobalTop();
-  }
+  // ── Carga inicial ─────────────────────────────────────────────────────────
+  fetchUserTops();
 
-  function showLoading() {
-    if (loadingSpinner.length) loadingSpinner.removeClass("d-none");
-    topPodium.html("");
-    topsList.html(`
-      <div class="col-12 text-center py-5">
-          <div class="spinner-border text-success" role="status"></div>
-          <p class="mt-3 text-muted">Cargando tops...</p>
-      </div>
-    `);
-  }
+  // ── Eventos ───────────────────────────────────────────────────────────────
 
-  async function fetchGlobalTop() {
+  // Cambio en el select de ordenación → nueva petición al servidor
+  $sortSelect.on("change", function () {
+    fetchUserTops();
+  });
+
+  // Cambio en el toggle de amigos → nueva petición al servidor
+  $filterFriends.on("change", function () {
+    fetchUserTops();
+  });
+
+  // Escritura en el buscador → filtrar en cliente (sin petición)
+  $search.on("input", function () {
+    const query = $(this).val().toLowerCase().trim();
+    const filtered = allTops.filter((u) =>
+      u.username.toLowerCase().includes(query),
+    );
+    renderUserTops(filtered);
+  });
+
+  // ── Funciones principales ─────────────────────────────────────────────────
+  async function fetchUserTops() {
     showLoading();
-    try {
-      const res = await fetch(`${apiBase}?action=top_global`);
-      const data = await res.json();
 
-      if (data.success && data.data.length > 0) {
-        renderGlobalTop(data.data);
-      } else {
-        topsList.html(
-          '<div class="col-12 text-center py-5 text-muted">Aún no hay suficientes valoraciones de parques para mostrar el ranking global.</div>',
-        );
-      }
-    } catch (e) {
-      console.error(e);
-      topsList.html(
-        '<div class="col-12 text-center py-5 text-danger">Error conectando con el servidor.</div>',
-      );
-    } finally {
-      loadingSpinner.addClass("d-none");
+    const sort = $sortSelect.val();
+    let url = `${apiBase}?action=user_tops&sort=${sort}`;
+    if ($filterFriends.is(":checked")) {
+      url += "&filter=friends";
     }
-  }
 
-  async function fetchUserTops(isFriends = false) {
-    showLoading();
     try {
-      const url = isFriends
-        ? `${apiBase}?action=user_tops&filter=friends`
-        : `${apiBase}?action=user_tops`;
       const res = await fetch(url);
       const data = await res.json();
 
       if (data.success && data.data.length > 0) {
-        renderUserTops(data.data, isFriends);
+        allTops = data.data;
+        renderUserTops(allTops);
       } else {
-        const msg = isFriends
-          ? "Tus amigos aún no han organizado su top personal de parques o no tienes amigos agregados."
-          : "Ningún usuario ha creado todavía su top personal de parques.";
-        topsList.html(
-          `<div class="col-12 text-center py-5 text-muted">${msg}</div>`,
+        const isFriends = $filterFriends.is(":checked");
+        showEmpty(
+          isFriends
+            ? "Tus amigos aún no han organizado su top personal de parques o no tienes amigos agregados."
+            : "Ningún usuario ha creado todavía su top personal de parques.",
         );
       }
     } catch (e) {
-      console.error(e);
-      topsList.html(
-        '<div class="col-12 text-center py-5 text-danger">Error conectando con el servidor.</div>',
-      );
-    } finally {
-      loadingSpinner.addClass("d-none");
+      console.error("Error cargando tops:", e);
+      showError();
     }
   }
 
-  function renderGlobalTop(parks) {
-    topPodium.html("");
-    topsList.empty();
-
-    let podiumHtml = "";
-    let listHtml = "";
-
-    parks.forEach((park, index) => {
-      const pos = index + 1;
-      const fallbackImg =
-        "https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png";
-      const imgSrc = park.imagen_url
-        ? park.imagen_url.startsWith("/")
-          ? BASE_URL + park.imagen_url
-          : park.imagen_url
-        : fallbackImg;
-      const parkUrl =
-        BASE_URL + `/web/views/public/parks/parks.php?id=${park.id}`;
-
-      let medalIcon = "";
-      let borderClass = "";
-      if (pos === 1) {
-        medalIcon =
-          '<i class="fa-solid fa-trophy text-warning fa-2x mb-2 shadow-sm rounded-circle p-2" style="background: rgba(255,193,7,0.1);"></i>';
-        borderClass = "border-warning border-2";
-      } else if (pos === 2) {
-        medalIcon =
-          '<i class="fa-solid fa-medal fa-2x mb-2 p-2 rounded-circle" style="color: #c0c0c0; background: rgba(192,192,192,0.1);"></i>';
-        borderClass = "border-2" + ' style="border-color: #c0c0c0 !important;"';
-      } else if (pos === 3) {
-        medalIcon =
-          '<i class="fa-solid fa-award fa-2x mb-2 p-2 rounded-circle" style="color: #cd7f32; background: rgba(205,127,50,0.1);"></i>';
-        borderClass = "border-2" + ' style="border-color: #cd7f32 !important;"';
-      }
-
-      // Top 3 goes into podium, others into list
-      if (pos <= 3) {
-        podiumHtml += `
-          <div class="col-12 col-md-4 mb-4 animate__animated animate__fadeInUp" style="animation-delay: ${pos * 0.1}s">
-            <a href="${parkUrl}" class="text-decoration-none">
-              <div class="card h-100 bg-dark text-white shadow-lg flex-column text-center hover-scale ${borderClass}" style="transition: transform 0.3s ease;">
-                <div class="position-relative overflow-hidden" style="height: 200px; border-radius: inherit; border-bottom-left-radius: 0; border-bottom-right-radius: 0;">
-                  <img src="${imgSrc}" class="w-100 h-100 object-fit-cover" alt="${park.park_name}">
-                  <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(0deg, rgba(33,37,41,1) 0%, rgba(33,37,41,0) 50%);"></div>
-                </div>
-                <div class="card-body position-relative mt-n4 z-index-1">
-                  ${medalIcon}
-                  <h4 class="card-title fw-bold text-success mt-2">${park.park_name}</h4>
-                  <p class="card-text text-muted mb-3"><i class="fa-solid fa-location-dot me-1"></i>${park.park_location}, ${park.park_country}</p>
-                  <div class="d-flex justify-content-center align-items-center gap-3">
-                    <span class="fs-4 fw-bold text-white"><i class="fa-solid fa-star text-warning me-1"></i>${parseFloat(park.stars).toFixed(2)}</span>
-                    <span class="text-secondary small"><i class="fa-solid fa-chart-line me-1"></i>#${pos} Global</span>
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
-        `;
-      } else {
-        listHtml += `
-          <div class="col-12 col-md-6 col-lg-4 animate__animated animate__fadeIn" style="animation-delay: ${pos * 0.05}s">
-            <a href="${parkUrl}" class="text-decoration-none">
-              <div class="card bg-dark text-white h-100 hover-scale shadow-sm" style="transition: transform 0.2s ease;">
-                <div class="card-body d-flex align-items-center p-3">
-                  <div class="fw-bold fs-2 text-success opacity-50 me-3" style="min-width: 40px;">#${pos}</div>
-                  <img src="${imgSrc}" class="rounded-circle object-fit-cover me-3 shadow" style="width: 60px; height: 60px;">
-                  <div class="flex-grow-1 min-w-0">
-                    <h6 class="fw-bold text-truncate mb-1">${park.park_name}</h6>
-                    <small class="text-muted text-truncate d-block"><i class="fa-solid fa-map-pin me-1"></i>${park.park_country}</small>
-                  </div>
-                  <div class="ms-2 text-end">
-                    <div class="fw-bold text-warning"><i class="fa-solid fa-star me-1"></i>${parseFloat(park.stars).toFixed(2)}</div>
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
-        `;
-      }
-    });
-
-    topPodium.html(podiumHtml);
-    if (listHtml) {
-      topsList.html(listHtml);
-    }
-  }
-
-  function renderUserTops(users, isFriends = false) {
-    topPodium.html(""); // Hide podium for user tops
-    topsList.empty();
-
+  function renderUserTops(users) {
     let html = "";
-    users.forEach((user, index) => {
-      let ranksHtml = "";
 
-      // Render user's top parks
-      user.top_parks.forEach((parkItem) => {
-        const fall =
-          "https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png";
-        const img = parkItem.imagen_url
-          ? parkItem.imagen_url.startsWith("/")
-            ? BASE_URL + parkItem.imagen_url
-            : parkItem.imagen_url
-          : fall;
-        const pkUrl =
-          BASE_URL + `/web/views/public/parks/parks.php?id=${parkItem.park_id}`;
-
-        ranksHtml += `
-          <a href="${pkUrl}" class="text-decoration-none d-block mb-3 list-group-item-action rounded p-2" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(25,135,84,0.1);">
-            <div class="d-flex align-items-center">
-              <div class="fw-bold text-success me-3 fs-5">#${parkItem.rank_position}</div>
-              <img src="${img}" class="rounded object-fit-cover me-3 shadow-sm" style="width: 50px; height: 50px;">
-              <div class="flex-grow-1 min-w-0 text-white">
-                <div class="fw-semibold text-truncate" style="font-size: 0.95rem;">${parkItem.park_name}</div>
-                <small class="text-muted text-truncate d-block">${parkItem.park_country || ""}</small>
-              </div>
-              <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.8rem;"></i>
-            </div>
-          </a>
-        `;
-      });
-
-      // Resolver avatar con lógica defensiva (igual que el resto de la app)
+    users.forEach((user) => {
+      // ── Avatar (lógica defensiva) ─────────────────────────────────
+      const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=198754&color=fff`;
+      const raw = user.profile_image;
       let avatar;
-      const rawImg = user.profile_image;
-      const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=198754&color=fff`;
-      if (!rawImg) {
-        avatar = fallbackAvatar;
-      } else if (
-        rawImg.startsWith("http://") ||
-        rawImg.startsWith("https://")
-      ) {
-        avatar = rawImg; // URL absoluta (Supabase u otro CDN)
-      } else if (rawImg.startsWith("/")) {
-        // Ruta relativa: si es una subida local solo existe en quien la subió → iniciales
-        avatar = rawImg.includes("/web/img/uploads/")
-          ? fallbackAvatar
-          : BASE_URL + rawImg;
+      if (!raw) {
+        avatar = fallback;
+      } else if (raw.startsWith("http://") || raw.startsWith("https://")) {
+        avatar = raw;
+      } else if (raw.startsWith("/")) {
+        avatar = raw.includes("/web/img/uploads/") ? fallback : BASE_URL + raw;
       } else {
-        // Solo nombre de archivo → construir URL Supabase
         avatar =
           "https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/" +
-          rawImg;
+          raw;
       }
 
-      html += `
-        <div class="col-12 col-md-6 col-lg-4 animate__animated animate__zoomIn" style="animation-delay: ${index * 0.05}s">
-          <div class="card bg-dark text-white border-secondary h-100 shadow">
-            <div class="card-header bg-transparent border-bottom border-success border-opacity-25 pb-3 pt-4">
-              <div class="d-flex align-items-center">
-                <img src="${avatar}" class="rounded-circle shadow-sm border border-2 border-success p-1" style="width: 55px; height: 55px; object-fit: cover;">
-                <div class="ms-3">
-                  <h5 class="mb-0 fw-bold text-success">Top de ${user.username}</h5>
-                  <small class="text-muted"><i class="fa-solid fa-map-location-dot me-1"></i>${user.top_parks.length} parque${user.top_parks.length !== 1 ? "s" : ""} en el top</small>
-                </div>
+      // ── Filas de parques ──────────────────────────────────────────
+      let rowsHtml = "";
+      user.top_parks.forEach((p) => {
+        const rowClass =
+          p.rank_position === 1
+            ? "rcw-rank-row rcw-rank-row--first"
+            : "rcw-rank-row";
+        const imgH = p.rank_position === 1 ? 50 : 46;
+        const nameSize = p.rank_position <= 2 ? "0.9rem" : "0.85rem";
+
+        const imgSrc = p.imagen_url
+          ? p.imagen_url.startsWith("/")
+            ? BASE_URL + p.imagen_url
+            : p.imagen_url
+          : defaultImg;
+
+        rowsHtml += `
+          <div class="d-flex align-items-center position-relative w-100 ${rowClass}">
+            <div class="rcw-rank-badge rcw-rank-badge--${p.rank_position}">${p.rank_position}</div>
+            <img src="${imgSrc}"
+                 onerror="this.src='${defaultImg}'"
+                 style="width:60px;height:${imgH}px;">
+            <div class="ps-3 pe-2 py-1 flex-grow-1 min-w-0" style="padding-left:1.25rem !important;">
+              <div class="text-white fw-bold text-truncate" style="font-size:${nameSize};">${p.park_name}</div>
+              <div class="text-muted text-truncate" style="font-size:0.7rem;">
+                <i class="fa-solid fa-location-dot me-1 text-success opacity-75"></i>${p.park_country || ""}
               </div>
             </div>
-            <div class="card-body p-4">
-              ${ranksHtml}
+          </div>`;
+      });
+
+      // ── Tarjeta completa ──────────────────────────────────────────
+      const profileUrl = `${BASE_URL}/web/views/public/users/user_profile.php?id=${user.user_id}&tab=parks#tops`;
+      const parksCount = user.total_parks || user.top_parks.length;
+      html += `
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="card h-100 bg-transparent border-0 rcw-top-card">
+            <div class="card-body p-0 d-flex flex-column">
+
+              <div class="d-flex align-items-center p-3 rcw-top-card-header">
+                <img src="${avatar}"
+                     onerror="this.src='${fallback}'"
+                     class="rounded-circle object-fit-cover shadow-sm me-3"
+                     style="width:48px;height:48px;border:2px solid var(--bs-success);">
+                <div class="flex-grow-1 min-w-0">
+                  <h5 class="fw-bold text-white mb-0 text-truncate" style="font-size:1rem;">Top de ${user.username}</h5>
+                  <div class="d-flex align-items-baseline gap-2 mt-1" style="gap:0.4rem!important;">
+                    <span style="font-size:1.25rem;font-weight:800;color:#39ff14;line-height:1;">${parksCount}</span>
+                    <span class="text-muted" style="font-size:0.72rem;">en el top</span>
+                    ${user.last_modified ? `<span class="text-muted" style="font-size:0.68rem;">· <i class='fa-solid fa-clock-rotate-left'></i> ${formatDate(user.last_modified)}</span>` : ""}
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex-grow-1 p-3 d-flex flex-column gap-2 rcw-top-card-body">
+                ${rowsHtml}
+              </div>
+
+              <a href="${profileUrl}" class="rcw-top-card-footer">
+                <i class="fa-solid fa-eye me-1"></i> Ver top completo
+              </a>
+
             </div>
           </div>
         </div>
       `;
     });
 
-    topsList.html(html);
+    $grid.html(html);
+  }
+
+  // ── Helper: formato de fecha legible ───────────────────────────────────────
+  function formatDate(isoString) {
+    if (!isoString) return "";
+    const d = new Date(isoString);
+    return d.toLocaleDateString("es-ES", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  }
+
+  // ── Helpers de estado del grid ────────────────────────────────────────────
+
+  function showLoading() {
+    $grid.html(`
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-success" role="status"></div>
+                <p class="mt-3 text-muted">Cargando tops...</p>
+            </div>
+        `);
+  }
+
+  function showEmpty(msg) {
+    $grid.html(`<div class="col-12 text-center py-5 text-muted">${msg}</div>`);
+  }
+
+  function showError() {
+    $grid.html(
+      `<div class="col-12 text-center py-5 text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Error conectando con el servidor.</div>`,
+    );
   }
 });

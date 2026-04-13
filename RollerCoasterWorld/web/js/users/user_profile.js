@@ -287,8 +287,14 @@ $(document).ready(function () {
       });
     }
 
-    // Por defecto mostramos coasters
-    drawList(coasters, true);
+    const initialTab = urlParams.get("tab");
+    if (initialTab === "parks") {
+      selector.val("parks");
+      drawList(parks, false);
+    } else {
+      // Por defecto mostramos coasters
+      drawList(coasters, true);
+    }
 
     selector.off("change").on("change", function () {
       if ($(this).val() === "coasters") {

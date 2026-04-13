@@ -3,6 +3,7 @@ session_start();
 require_once __DIR__ . '/../database/db_conexion.php';
 require_once __DIR__ . '/utils/Response.php';
 require_once __DIR__ . '/utils/ApiRouter.php';
+require_once __DIR__ . '/utils/StatsHelper.php';
 
 header('Content-Type: application/json');
 
@@ -49,6 +50,7 @@ $router->register('reviews', 'getParkReviews');
 $router->register('save_review', 'saveReview', 'POST');
 $router->register('check_review', 'checkReview');
 $router->register('top_global', 'getTopGlobalParks');
+$router->register('ranking', 'getRanking');
 $router->register('user_tops', 'getUserParkTops');
 $router->register('get_photos', 'getParkPhotos');
 
@@ -236,7 +238,7 @@ function getParkReviews()
                 FROM park_review_tags pt WHERE pt.review_id = pr.id) AS tags
         FROM park_ratings pr
         JOIN users u ON pr.user_id = u.id
-        WHERE pr.park_id = :id AND pr.review IS NOT NULL AND pr.review != ''
+        WHERE pr.park_id = :id
         ORDER BY $orderBy
         LIMIT 50
     ");
@@ -527,56 +529,104 @@ function getTopGlobalParks()
 function getUserParkTops()
 {
     $db = getDb();
+
+    // Leer parámetros GET
+    $filterFriends = (isset($_GET['filter']) && $_GET['filter'] === 'friends');
+
+    // Si piden filtro de amigos pero no están logueados → error
+    if ($filterFriends && !isset($_SESSION['firebase_uid'])) {
+        Response::error('Debes iniciar sesión para ver los tops de tus amigos', 401);
+        return;
+    }
+
     $currentUserId = getUserId();
-    $filterFriends = (isset($_GET['filter']) && $_GET['filter'] === 'friends' && $currentUserId !== null);
+
+    // Ordenación
+    $sort = $_GET['sort'] ?? 'date_desc';
+    $orderBy = match ($sort) {
+        'alpha_asc'  => 'username ASC',
+        'parks_desc' => 'total_parks DESC',
+        default      => 'RANDOM()',   // date_desc u otros → aleatorio (no hay timestamp en user_park_credits)
+    };
+
+    // Sin límite real — mostrar TODOS los usuarios que tengan un top de parques
+    $limit  = $filterFriends ? 9999 : 9999;
+    $join   = '';
+    $where  = 'upc.rank_position IS NOT NULL AND upc.rank_position > 0';
+    $params = [];
+
+    if ($filterFriends && $currentUserId !== null) {
+        $join = "JOIN friendship f ON (
+                    (f.solicitante_id = :my_id AND f.solicitada_id = u.id)
+                 OR (f.solicitada_id = :my_id AND f.solicitante_id = u.id)
+                 )";
+        $where  = " AND f.estado_solicitud = 'ACEPTADA'";
+        $params[':my_id'] = $currentUserId;
+    } else {
+        $where = "";
+    }
 
     try {
-        error_log("getUserParkTops: filter=" . ($_GET['filter'] ?? 'none') . " | currentUserId=" . ($currentUserId ?? 'null'));
-        
-        $where = "upc.rank_position IS NOT NULL AND upc.rank_position > 0";
-        $join = "";
-        $orderBy = "RANDOM()";
-        $limit = 10;
-        $params = [];
-
-        if ($filterFriends) {
-            $join = "JOIN friendship f ON ((f.solicitante_id = :my_id AND f.solicitada_id = u.id) OR (f.solicitada_id = :my_id AND f.solicitante_id = u.id))";
-            $where .= " AND f.estado_solicitud = 'ACEPTADA'";
-            $orderBy = "username ASC";
-            $limit = 30; // Más margen para amigos
-            $params[':my_id'] = $currentUserId;
-        }
-
         $stmt = $db->prepare("
-            WITH UserTops AS (
+            WITH BaseParks AS (
+                -- 1. Usuarios con user_park_credits explícitos
                 SELECT 
                     upc.user_id,
+                    upc.park_id,
+                    upc.rank_position
+                FROM user_park_credits upc
+                WHERE upc.rank_position > 0 AND upc.rank_position IS NOT NULL
+
+                UNION ALL
+
+                -- 2. Fallback: Usuarios sin user_park_credits, con top generado desde sus credits (alfabético)
+                SELECT 
+                    uc.user_id,
+                    c.park_id,
+                    ROW_NUMBER() OVER(PARTITION BY uc.user_id ORDER BY pp.park_name ASC) as rank_position
+                FROM user_credits uc
+                JOIN coasters c ON uc.coaster_id = c.id
+                JOIN parks pp ON c.park_id = pp.id
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM user_park_credits upc2 WHERE upc2.user_id = uc.user_id AND upc2.rank_position > 0
+                )
+                GROUP BY uc.user_id, c.park_id, pp.park_name
+            ),
+            UserTops AS (
+                SELECT
+                    bp.user_id,
                     u.username,
                     u.profile_image,
-                    upc.park_id,
+                    -- Conteo total real_total dependiendo del source de BaseParks
+                    (SELECT COUNT(*) FROM BaseParks bp2 WHERE bp2.user_id = u.id) AS real_total,
+                    bp.park_id,
                     p.park_name,
                     p.park_country,
                     p.imagen_url,
-                    upc.rank_position,
-                    ROW_NUMBER() OVER(PARTITION BY upc.user_id ORDER BY upc.rank_position ASC) as rn
-                FROM user_park_credits upc
-                JOIN users u ON upc.user_id = u.id
-                JOIN parks p ON upc.park_id = p.id
+                    bp.rank_position,
+                    ROW_NUMBER() OVER(PARTITION BY bp.user_id ORDER BY bp.rank_position ASC) AS rn
+                FROM BaseParks bp
+                JOIN users u ON bp.user_id = u.id
+                JOIN parks p ON bp.park_id = p.id
                 $join
-                WHERE $where
+                WHERE 1=1 $where
             )
-            SELECT user_id, username, profile_image,
-                   json_agg(
-                       json_build_object(
-                           'park_id', park_id,
-                           'park_name', park_name,
-                           'park_country', park_country,
-                           'imagen_url', imagen_url,
-                           'rank_position', rank_position
-                       ) ORDER BY rank_position ASC
-                   ) as top_parks
+            SELECT
+                user_id,
+                username,
+                profile_image,
+                MAX(real_total) AS total_parks,
+                json_agg(
+                    json_build_object(
+                        'park_id',       park_id,
+                        'park_name',     park_name,
+                        'park_country',  park_country,
+                        'imagen_url',    imagen_url,
+                        'rank_position', rank_position
+                    ) ORDER BY rank_position ASC
+                ) AS top_parks
             FROM UserTops
-            WHERE rn <= 5 -- Máximo 5 parques por tarjeta
+            WHERE rn <= 5
             GROUP BY user_id, username, profile_image
             ORDER BY $orderBy
             LIMIT :limit
@@ -587,18 +637,21 @@ function getUserParkTops()
         }
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
+
         $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         foreach ($users as &$u) {
-            $u['top_parks'] = $u['top_parks'] ? json_decode($u['top_parks'], true) : [];
+            $u['top_parks']   = $u['top_parks'] ? json_decode($u['top_parks'], true) : [];
+            $u['total_parks'] = (int)($u['total_parks'] ?? 0);
         }
-        
+
         Response::success(['data' => $users]);
-        error_log("getUserParkTops returned " . count($users) . " users");
     } catch (Exception $e) {
-        Response::error("Error al obtener los tops: " . $e->getMessage(), 500);
+        error_log('getUserParkTops error: ' . $e->getMessage());
+        Response::error('Error al obtener los tops de parques: ' . $e->getMessage(), 500);
     }
 }
+
 
 // Obtener fotos de un parque
 function getParkPhotos()
@@ -662,6 +715,50 @@ function addParkPhoto()
         Response::success(['message' => 'Foto guardada correctamente.']);
     } catch (Exception $e) {
         Response::error('Error al guardar la foto: ' . $e->getMessage());
+    }
+}
+
+// Obtener Ranking Paginado de Parques (Público)
+function getRanking()
+{
+    $limit = 15;
+    $page = (max(1, intval($_GET['page'] ?? 1)));
+    $offset = ($page - 1) * $limit;
+
+    try {
+        $db = getDb();
+
+        $stmtTotal = $db->prepare("
+            SELECT COUNT(*) FROM parks
+            WHERE stars IS NOT NULL AND stars > 0
+        ");
+        $stmtTotal->execute();
+        $total = min((int) $stmtTotal->fetchColumn(), 1000);
+
+        $sql = "SELECT
+        id, park_name, park_location, park_country, imagen_url, stars, num_coasters, operating_coasters, opening_year
+        FROM parks
+        WHERE stars IS NOT NULL AND stars > 0
+        ORDER BY 
+            stars DESC, 
+            (SELECT COUNT(*) FROM park_ratings WHERE park_id = parks.id AND note = 5) DESC,
+            reviews_count DESC,
+            id ASC
+        LIMIT :limit OFFSET :offset";
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $parks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        Response::success([
+            'parks' => $parks,
+            'total' => $total
+        ]);
+    } catch (Exception $e) {
+        Response::error('Error al obtener el ranking global: ' . $e->getMessage(), 500);
     }
 }
 

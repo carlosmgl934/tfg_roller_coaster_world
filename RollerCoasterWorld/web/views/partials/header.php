@@ -31,6 +31,7 @@ $public_pages = [
   Router::getRoutePath('park_detail'),
   Router::getRoutePath('park_tops'),
   Router::getRoutePath('park_reviews'),
+  Router::getRoutePath('park_ranking'),
 
   // Foros — solo búsqueda/listado público (sin login)
   Router::getRoutePath('forum_search'),
@@ -214,10 +215,10 @@ header("Expires: 0"); // Proxies
               <li><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('park_search') ?>"><i
                     class="fa-solid fa-magnifying-glass w-20px text-center me-2 text-primary"></i> Buscar Parque</a>
               </li>
-              <li><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('park_tops') ?>?filter=global"><i
+              <li><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('park_ranking') ?>"><i
                     class="fa-solid fa-earth-europe w-20px text-center me-2 text-success"></i> Ranking Global</a></li>
               <li><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('park_tops') ?>?filter=users"><i
-                    class="fa-solid fa-users w-20px text-center me-2 text-info"></i> Top Usuarios</a></li>
+                    class="fa-solid fa-trophy w-20px text-center me-2 text-info"></i> Tops Usuarios</a></li>
             </ul>
           </li>
 

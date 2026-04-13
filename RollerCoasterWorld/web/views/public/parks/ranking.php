@@ -7,17 +7,17 @@ require_once __DIR__ . '/../../partials/header.php';
     <div class="row mb-5">
         <div class="col-12 text-center">
             <h1 class="display-6 fw-bold border-bottom border-light border-opacity-50 pb-2 text-success">
-                <i class="fa-solid fa-earth-europe me-2"></i> Ranking Global de Montañas Rusas
+                <i class="fa-solid fa-earth-europe me-2"></i> Ranking Global de Parques
             </h1>
             <p class="text-muted text-uppercase fw-bold mt-3" style="letter-spacing: 0.1em; font-size: 0.85rem;">
-                Las mejores atracciones valoradas por la comunidad
+                Los mejores parques valorados por la comunidad
             </p>
         </div>
     </div>
 
     <div class="row justify-content-center">
         <div class="col-12 col-md-10 col-lg-8">
-            <div class="list-group shadow-sm" id="coaster-list" style="border-radius: 0;">
+            <div class="list-group shadow-sm" id="park-list" style="border-radius: 0;">
                 <div class="text-center py-5">
                     <div class="spinner-border text-success mb-3" role="status"></div>
                     <p class="text-muted">Cargando el ranking global...</p>
@@ -29,4 +29,4 @@ require_once __DIR__ . '/../../partials/header.php';
 </main>
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
-<script src="<?= Router::asset('web/js/coasters/ranking.js') ?>?v=<?= time() ?>"></script>
+<script src="<?= Router::asset('web/js/parks/ranking.js') ?>?v=<?= time() ?>"></script>
