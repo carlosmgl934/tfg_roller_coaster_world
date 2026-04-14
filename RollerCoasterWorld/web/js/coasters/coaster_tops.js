@@ -35,7 +35,18 @@ $(document).ready(function () {
   });
 
   // Cambio en el toggle de amigos → nueva petición al servidor
-  $filterFriends.on("change", function () {
+  $filterFriends.on("change", function (e) {
+    if ($(this).is(":checked") && window.IS_LOGGED_IN !== true) {
+      e.preventDefault();
+      $(this).prop("checked", false);
+      if (document.getElementById('loginModal')) {
+         const m = new bootstrap.Modal(document.getElementById('loginModal'));
+         m.show();
+      } else {
+         alert("Debes iniciar sesión para filtrar los tops de tus amigos.");
+      }
+      return;
+    }
     fetchUserTops();
   });
 

@@ -34,12 +34,10 @@ require_once __DIR__ . '/../../partials/header.php';
                 </select>
 
                 <!-- Filtro Amigos -->
-                <?php if (isset($is_logged) && $is_logged): ?>
                 <div class="form-check form-switch fs-5 d-flex align-items-center ms-md-3">
                     <input class="form-check-input rounded-0 bg-transparent border-success focus-ring focus-ring-success mt-0" type="checkbox" role="switch" id="filterFriends" style="width: 2.5em; height: 1.2em; border-width: 2px; cursor: pointer;">
                     <label class="form-check-label ms-2 text-white" for="filterFriends" style="font-size: 0.95rem; cursor: pointer;"><i class="fa-solid fa-user-group text-success me-1"></i> Solo amigos</label>
                 </div>
-                <?php endif; ?>
 
             </div>
         </div>
@@ -54,6 +52,12 @@ require_once __DIR__ . '/../../partials/header.php';
     </div>
 </main>
 
+<?php 
+require_once __DIR__ . '/../../partials/login_modal.php';
+require_once __DIR__ . '/../../partials/footer.php'; 
+?>
+<script>
+    window.BASE_URL = '<?= $base_url ?>';
+    window.IS_LOGGED_IN = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;
+</script>
 <script src="<?= Router::asset('web/js/parks/park_tops.js') ?>?v=<?= time() ?>"></script>
-
-<?php require_once __DIR__ . '/../../partials/footer.php'; ?>

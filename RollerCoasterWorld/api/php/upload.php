@@ -27,6 +27,11 @@ if (empty($_FILES['file'])) {
     exit;
 }
 
+if ($_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+    echo json_encode(['success' => false, 'error' => 'Error de subida PHP: ' . $_FILES['file']['error']]);
+    exit;
+}
+
 // ── Leer credenciales de Supabase usando el cargador central ─────────────────────────────────
 require_once __DIR__ . '/../database/db_conexion.php';
 require_once __DIR__ . '/../utils/ImageHelper.php';
@@ -70,17 +75,29 @@ if ($is_image) {
 
 $objectPath = $subpath ? "{$subpath}/{$filename}" : $filename;
 
+// ── Determinar MIME type real según el formato final ─────────────────────────
+// Si la conversión a WebP tuvo éxito: image/webp
+// Si falló (sin soporte GD WebP) y el original era jpg/jpeg: image/jpeg
+// Para png sin optimizar: image/png, etc.
+$mimeTypeMap = ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'gif' => 'image/gif', 'webp' => 'image/webp'];
+$finalMime = $mimeTypeMap[$ext] ?? ($file['type'] ?: 'application/octet-stream');
+
 // ── Determinar URL y Almacenamiento ──────────────────────────────────────────────────
 $publicUrl = '';
 
 if ($supabaseUrl && $supabaseKey) {
     // ── Subir a Supabase Storage ──────────────────────────────────────────────────
     $uploadUrl = rtrim($supabaseUrl, '/') . "/storage/v1/object/{$bucket}/{$objectPath}";
-    $mimeType = $is_image ? 'image/webp' : ($file['type'] ?: 'application/octet-stream');
+    $mimeType = $finalMime;
     
     // Si se optimizó, leemos el nuevo archivo .webp
     $pathToUpload = ($is_image && isset($optimized) && $optimized) ? $optimized : $file['tmp_name'];
-    $fileData = file_get_contents($pathToUpload);
+    $fileData = @file_get_contents($pathToUpload);
+
+    if ($fileData === false) {
+        echo json_encode(['success' => false, 'error' => 'No se pudo leer el archivo local antes de enviarlo a Supabase.']);
+        exit;
+    }
 
     $ch = curl_init($uploadUrl);
     curl_setopt_array($ch, [

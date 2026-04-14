@@ -64,7 +64,7 @@
 
       // Avatar del autor y colaboradores
       const avatarEl = el('forum-header-avatar');
-      if (forum.author_image) {
+      if (forum.author_name) {
         let authorHtml = `
           <div class="d-flex align-items-center gap-2">
             <img src="${avatarUrl(forum.author_image, forum.author_name)}" class="rounded-circle" style="width: 48px; height: 48px; object-fit: cover; border: 2px solid var(--rcw-green-neon);" title="Creador: ${esc(forum.author_name)}">
@@ -72,7 +72,7 @@
           </div>`;
         
         let collabsHtml = '';
-        if (forum.privacy === 'private' && forum.collaborators_json) {
+        if (forum.collaborators_json) {
            try {
              let collabs = typeof forum.collaborators_json === 'string' ? JSON.parse(forum.collaborators_json) : forum.collaborators_json;
              collabs = collabs.filter(c => c && c.username);
@@ -101,7 +101,7 @@
         : `<span class="forum-privacy-badge public"><i class="fa-solid fa-earth-europe me-1"></i>Público</span>`;
 
       let ownerBtn = '';
-      if (role === 'owner' || IS_ADMIN) {
+      if (role === 'owner' || role === 'collaborator' || IS_ADMIN) {
         ownerBtn = `<button class="forum-mod-btn" id="open-mod-btn" title="Panel de moderación">
                       <i class="fa-solid fa-shield-halved"></i>
                     </button>`;
@@ -157,7 +157,7 @@
         const collabsList = el('forumInfoModalCollabsList');
         collabsContainer.style.display = 'none';
         collabsList.innerHTML = '';
-        if (isPrivate && forum.collaborators_json) {
+        if (forum.collaborators_json) {
            try {
              let collabs = typeof forum.collaborators_json === 'string' ? JSON.parse(forum.collaborators_json) : forum.collaborators_json;
              collabs = collabs.filter(c => c && c.username);
@@ -176,6 +176,8 @@
              }
            } catch(e) { console.warn("Error parsing collabs modal", e) }
         }
+
+        // (Los participantes se han movido exclusivamente al panel de moderación)
 
         new bootstrap.Modal(el('forumInfoModal')).show();
       };
@@ -255,7 +257,7 @@
   ══════════════════════════════════════════════════════════ */
   function renderMessage(m) {
     const isMine    = CURRENT_UID && (parseInt(m.user_id) === CURRENT_UID);
-    const isOwnerMsg = (forumRole === 'owner' || IS_ADMIN);
+    const isOwnerMsg = (forumRole === 'owner' || forumRole === 'collaborator' || IS_ADMIN);
     const sideClass = isMine ? 'mine' : 'theirs';
 
     const time = formatTime(m.created_at);
@@ -709,22 +711,41 @@
     const modal = new bootstrap.Modal(el('moderationModal'));
     modal.show();
 
-    // Mostrar sección de invitar solo si es foro privado
+    const canManage = (forumRole === 'owner' || IS_ADMIN);
+    const canCollaborate = (forumRole === 'collaborator');
+
+    // Mostrar sección de invitar solo si es owner o admin
     const inviteWrapper = el('invite-collab-wrapper');
     if (inviteWrapper) {
-       inviteWrapper.style.setProperty('display', forumPrivacy === 'private' ? 'flex' : 'none', 'important');
+       inviteWrapper.style.setProperty('display', canManage ? 'flex' : 'none', 'important');
     }
 
-    if (forumPrivacy === 'private') {
-        await loadCollaboratorsList(); // Fetch current collabs first
-        await loadFriendsForInvite();  // Fetch friends and populate exclude list
+    // Sección Participantes: solo en foros públicos y solo para owner/admin/collaborator
+    const participantsSection = el('participants-list-container');
+    const participantsTitle   = participantsSection?.previousElementSibling;
+    const showParticipants    = (forumPrivacy === 'public') && (canManage || canCollaborate);
+    if (participantsSection) participantsSection.parentElement && (participantsSection.style.display = showParticipants ? '' : 'none');
+    if (participantsTitle)   participantsTitle.style.display = showParticipants ? '' : 'none';
+
+    // Sección Baneados: solo visible para owner o admin
+    const bannedSection = el('banned-list-container');
+    const bannedTitle   = bannedSection?.previousElementSibling;
+    if (bannedSection) bannedSection.style.display = canManage ? '' : 'none';
+    if (bannedTitle)   bannedTitle.style.display   = canManage ? '' : 'none';
+
+    await loadCollaboratorsList(canManage);
+    if (canManage) {
+        await loadFriendsForInvite();
+        await loadBannedList();
     }
-    await loadBannedList();
+    if (showParticipants) {
+        await loadParticipants();
+    }
   }
 
   let currentCollaboratorsIds = []; // Stores IDs to exclude from friend invite list
 
-  async function loadCollaboratorsList() {
+  async function loadCollaboratorsList(canInvite) {
     const container = el('collaborators-list-container');
     if (!container) return;
     container.innerHTML = '<p class="text-muted small">Cargando...</p>';
@@ -744,14 +765,19 @@
 
       container.innerHTML = collaborators.map(c => `
         <div class="banned-user-row d-flex align-items-center justify-content-between gap-2 mb-2">
-          <div class="d-flex align-items-center gap-2">
+          <div class="d-flex align-items-center gap-2 min-w-0">
             <img src="${avatarUrl(c.profile_image, c.username)}" class="banned-avatar" alt="${esc(c.username)}"
                  onerror="this.src='${avatarFallback(c.username)}'">
-            <span class="fw-semibold">${esc(c.username)}</span>
+            <div class="d-flex flex-column lh-sm min-w-0">
+              <span class="fw-semibold text-truncate">${esc(c.username)}</span>
+              <span class="text-success" style="font-size:0.75rem;">Colaborador</span>
+            </div>
           </div>
-          <button class="btn btn-sm btn-outline-danger rounded-pill remove-collab-btn" data-user-id="${c.user_id}" data-username="${esc(c.username)}">
-            <i class="fa-solid fa-user-minus me-1"></i>Expulsar
+          ${canInvite ? `
+          <button class="btn btn-sm text-danger p-1 ms-2 remove-collab-btn flex-shrink-0" title="Expulsar" data-user-id="${c.user_id}" data-username="${esc(c.username)}" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">
+            <i class="fa-solid fa-user-xmark fs-5"></i>
           </button>
+          ` : ''}
         </div>
       `).join('');
 
@@ -762,6 +788,92 @@
           pendingRemoveCollabId = btn.dataset.userId;
           el('remove-collab-name').textContent = pendingRemoveCollabName;
           new bootstrap.Modal(el('removeCollabModal')).show();
+        });
+      });
+
+    } catch (e) {
+      container.innerHTML = '<p class="text-danger small">Error de red</p>';
+    }
+  }
+
+  async function loadParticipants() {
+    const container = el('participants-list-container');
+    if (!container) return;
+    container.innerHTML = '<p class="text-muted small">Cargando...</p>';
+
+    try {
+      const res  = await fetch(`${BASE}/api/php/forums.php?action=get_participants&forum_id=${FORUM_ID}`);
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); } catch(je) {
+        console.error('[participants] Respuesta no-JSON:', text.substring(0, 500));
+        container.innerHTML = `<p class="text-danger small">Error del servidor. Ver consola.</p>`;
+        return;
+      }
+      console.log('[participants] Respuesta API:', data);
+
+      if (!data.success) {
+        container.innerHTML = `<p class="text-danger small">Error: ${data.error || 'sin detalle'}</p>`;
+        return;
+      }
+
+      const participants = data.participants || [];
+      const canBan       = data.can_ban   || false;
+      const authorId     = data.author_id || 0;
+
+      if (!participants.length) {
+        container.innerHTML = '<p class="text-muted small">Aún no hay participantes.</p>';
+        return;
+      }
+
+      container.innerHTML = participants.map(p => {
+        const isSelf   = (CURRENT_UID && parseInt(p.user_id) === CURRENT_UID);
+        const isAuthor = parseInt(p.user_id) === authorId;
+        const isCollab = currentCollaboratorsIds.includes(parseInt(p.user_id));
+        const showBan  = canBan && !isSelf && !isAuthor;
+        const msgLabel = parseInt(p.message_count) === 1 ? 'mensaje' : 'mensajes';
+        const roleLabel = isCollab && !isAuthor ? '<span class="text-success fw-medium me-1">Colaborador &bull;</span>' : '';
+
+        return `
+          <div class="banned-user-row d-flex align-items-center justify-content-between gap-2 mb-2">
+            <div class="d-flex align-items-center gap-2 min-w-0">
+              <img src="${avatarUrl(p.profile_image, p.username)}" class="banned-avatar" alt="${esc(p.username)}"
+                   onerror="this.src='${avatarFallback(p.username)}'">
+              <div class="d-flex flex-column lh-sm min-w-0">
+                <span class="fw-semibold text-truncate">${esc(p.username)}</span>
+                <span class="text-muted" style="font-size:0.75rem;">${roleLabel}${p.message_count} ${msgLabel}</span>
+              </div>
+            </div>
+            ${showBan ? `
+            <button class="btn btn-sm text-danger p-1 ms-2 participant-ban-btn flex-shrink-0" title="Banear"
+              data-user-id="${p.user_id}" data-username="${esc(p.username)}" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">
+              <i class="fa-solid fa-user-slash fs-5"></i>
+            </button>` : (isAuthor ? '<span class="badge bg-success bg-opacity-25 text-success rounded-pill px-2 py-1" style="font-size:0.65rem;">Creador</span>' : '')}
+          </div>`;
+      }).join('');
+
+      // Bind botones banear
+      container.querySelectorAll('.participant-ban-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const targetId   = btn.dataset.userId;
+          const targetName = btn.dataset.username;
+          if (!confirm(`¿Banear a ${targetName} de este foro?`)) return;
+          btn.disabled = true;
+          try {
+            const fd = new FormData();
+            fd.append('forum_id', FORUM_ID);
+            fd.append('target_user_id', targetId);
+            const r = await fetch(`${BASE}/api/php/forums.php?action=ban_user`, { method: 'POST', body: fd });
+            const d = await r.json();
+            if (d.success) {
+              showToast(`${targetName} baneado del foro`, 'success');
+              await loadParticipants();
+              await loadBannedList();
+            } else {
+              showToast(d.error || 'Error al banear', 'error');
+              btn.disabled = false;
+            }
+          } catch { btn.disabled = false; }
         });
       });
 
@@ -862,13 +974,16 @@
 
       container.innerHTML = banned.map(b => `
         <div class="banned-user-row d-flex align-items-center justify-content-between gap-2 mb-2">
-          <div class="d-flex align-items-center gap-2">
+          <div class="d-flex align-items-center gap-2 min-w-0">
             <img src="${avatarUrl(b.profile_image, b.username)}" class="banned-avatar" alt="${esc(b.username)}"
                  onerror="this.src='${avatarFallback(b.username)}'">
-            <span class="fw-semibold">${esc(b.username)}</span>
+            <div class="d-flex flex-column lh-sm min-w-0">
+               <span class="fw-semibold text-truncate">${esc(b.username)}</span>
+               <span class="text-danger" style="font-size:0.75rem;">Baneado</span>
+            </div>
           </div>
-          <button class="btn btn-sm btn-outline-success rounded-pill unban-btn" data-user-id="${b.user_id}" data-username="${esc(b.username)}">
-            <i class="fa-solid fa-user-check me-1"></i>Desbanear
+          <button class="btn btn-sm text-success p-1 ms-2 unban-btn flex-shrink-0" title="Desbanear" data-user-id="${b.user_id}" data-username="${esc(b.username)}" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">
+            <i class="fa-solid fa-user-check fs-5"></i>
           </button>
         </div>
       `).join('');
@@ -892,6 +1007,9 @@
       container.innerHTML = '<p class="text-danger small">Error de red</p>';
     }
   }
+
+  /* ══════════════════════════════════════════════════════════
+
 
   /* ══════════════════════════════════════════════════════════
      POLLING

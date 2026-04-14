@@ -23,8 +23,8 @@
   border: 1px solid var(--rcw-border) !important;
   border-radius: 10px !important;
   box-shadow: var(--rcw-shadow-md);
-  overflow: hidden;
   background-color: var(--rcw-bg-card);
+  overflow: visible;
 }
 
 /* ── SECTION HEADERS inside the card ─────────────────────────── */

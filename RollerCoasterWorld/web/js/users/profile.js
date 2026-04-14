@@ -444,6 +444,11 @@ $(document).ready(function () {
       // Comprimir imagen antes de subir (max 400×400, calidad 85%)
       const compressedBlob = await comprimirImagen(file, 400, 400, 0.85);
 
+      if (!compressedBlob) {
+        showAvatarError("No se pudo procesar la imagen. El formato podría no estar soportado o la imagen está corrupta.");
+        return;
+      }
+
       // Preview inmediata con la imagen comprimida
       const previewUrl = URL.createObjectURL(compressedBlob);
       const avatarDiv = document.querySelector(".avatar-circle");
@@ -477,7 +482,11 @@ $(document).ready(function () {
         }
       } catch (err) {
         console.error("Error subiendo avatar:", err);
-        showAvatarError(err.message);
+        let errorMsg = err.message;
+        if (errorMsg.includes("the string did not match the expected pattern") || errorMsg.includes("is not of type 'Blob'")) {
+            errorMsg = "No se pudo procesar la imagen correctamente. Intenta con un archivo diferente (JPG o PNG válido).";
+        }
+        showAvatarError(errorMsg);
       }
     });
 
@@ -520,13 +529,18 @@ $(document).ready(function () {
         canvas.height = h;
         canvas.getContext("2d").drawImage(img, 0, 0, w, h);
         URL.revokeObjectURL(url);
-        canvas.toBlob(resolve, "image/jpeg", quality);
+        canvas.toBlob((blob) => resolve(blob), "image/jpeg", quality);
+      };
+      img.onerror = function() {
+        URL.revokeObjectURL(url);
+        resolve(null);
       };
       img.src = url;
     });
   }
 
   async function subirFoto(blob, originalName) {
+    if (!blob) throw new Error("Archivo inválido o corrupto");
     const formData = new FormData();
     const filename =
       (originalName || "avatar").replace(/\.[^.]+$/, "") + ".jpg";

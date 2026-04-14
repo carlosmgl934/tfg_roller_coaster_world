@@ -25,6 +25,7 @@ $router->register('get_banned',          'getBanned');
 $router->register('get_collaborators',   'getCollaborators');
 $router->register('remove_collaborator', 'removeCollaborator', 'POST');
 $router->register('invite_collaborator', 'inviteCollaborator', 'POST');
+$router->register('get_participants',    'getParticipants');
 $router->dispatch();
 
 /* ═══════════════════════════════════════════════════════════════
@@ -96,7 +97,7 @@ function createForum()
         $stmt->execute();
         $forumId = $stmt->fetchColumn();
 
-        if ($privacy === 'private' && is_array($collaborators) && count($collaborators) > 0) {
+        if (is_array($collaborators) && count($collaborators) > 0) {
             $collaborators = array_diff($collaborators, [$userId]);
 
             if (count($collaborators) > 0) {
@@ -488,19 +489,19 @@ function sendMessage()
 
         $isOwner        = (int)$forum['author_id'] === (int)$userId;
         $isAdmin        = isset($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
-        $isCollaborator = false;
+        
+        $stmtC = $db->prepare("SELECT 1 FROM forum_collaborators WHERE forum_id = :fid AND user_id = :uid");
+        $stmtC->bindValue(':fid', $forumId, PDO::PARAM_INT);
+        $stmtC->bindValue(':uid', $userId,  PDO::PARAM_INT);
+        $stmtC->execute();
+        $isCollaborator = (bool)$stmtC->fetchColumn();
 
         if (!$isOwner && !$isAdmin) {
             // Verificar colaborador en foros privados
             if ($forum['privacy'] === 'private') {
-                $stmtC = $db->prepare("SELECT 1 FROM forum_collaborators WHERE forum_id = :fid AND user_id = :uid");
-                $stmtC->bindValue(':fid', $forumId, PDO::PARAM_INT);
-                $stmtC->bindValue(':uid', $userId,  PDO::PARAM_INT);
-                $stmtC->execute();
-                if (!$stmtC->fetchColumn()) {
+                if (!$isCollaborator) {
                     Response::error('No tienes permiso para escribir en este foro', 403);
                 }
-                $isCollaborator = true;
             }
 
             // Rate-limit: 1 mensaje por minuto (excepto owner/admin/collaborator)
@@ -574,7 +575,13 @@ function deleteMessage()
         $isOwner   = (int)$msg['author_id'] === (int)$userId;
         $isAdmin   = isset($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
 
-        if (!$isAuthor && !$isOwner && !$isAdmin) {
+        $stmtC = $db->prepare("SELECT 1 FROM forum_collaborators WHERE forum_id = :fid AND user_id = :uid");
+        $stmtC->bindValue(':fid', $msg['forum_id'], PDO::PARAM_INT);
+        $stmtC->bindValue(':uid', $userId,  PDO::PARAM_INT);
+        $stmtC->execute();
+        $isCollaborator = (bool)$stmtC->fetchColumn();
+
+        if (!$isAuthor && !$isOwner && !$isAdmin && !$isCollaborator) {
             Response::error('Sin permiso para borrar este mensaje', 403);
         }
 
@@ -604,20 +611,26 @@ function hideMessage()
     global $db;
     try {
         $stmt = $db->prepare("
-            SELECT f.author_id FROM forum_messages m
+            SELECT f.author_id, f.id as forum_id FROM forum_messages m
             JOIN forums f ON m.forum_id = f.id
             WHERE m.id = :mid
         ");
         $stmt->bindValue(':mid', $msgId, PDO::PARAM_INT);
         $stmt->execute();
-        $authorId = $stmt->fetchColumn();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$authorId) Response::error('Mensaje no encontrado', 404);
+        if (!$row) Response::error('Mensaje no encontrado', 404);
 
-        $isOwner = (int)$authorId === (int)$userId;
+        $isOwner = (int)$row['author_id'] === (int)$userId;
         $isAdmin = isset($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
 
-        if (!$isOwner && !$isAdmin) Response::error('Sin permiso', 403);
+        $stmtC = $db->prepare("SELECT 1 FROM forum_collaborators WHERE forum_id = :fid AND user_id = :uid");
+        $stmtC->bindValue(':fid', $row['forum_id'], PDO::PARAM_INT);
+        $stmtC->bindValue(':uid', $userId,  PDO::PARAM_INT);
+        $stmtC->execute();
+        $isCollaborator = (bool)$stmtC->fetchColumn();
+
+        if (!$isOwner && !$isAdmin && !$isCollaborator) Response::error('Sin permiso', 403);
 
         $stmtU = $db->prepare("UPDATE forum_messages SET is_hidden = :h WHERE id = :mid");
         $stmtU->bindValue(':h',   (bool)$hidden, PDO::PARAM_BOOL);
@@ -655,7 +668,22 @@ function banUser()
 
         $isOwner = (int)$authorId === (int)$userId;
         $isAdmin = isset($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
-        if (!$isOwner && !$isAdmin) Response::error('Sin permiso para banear', 403);
+
+        $stmtC = $db->prepare("SELECT 1 FROM forum_collaborators WHERE forum_id = :fid AND user_id = :uid");
+        $stmtC->bindValue(':fid', $forumId, PDO::PARAM_INT);
+        $stmtC->bindValue(':uid', $userId,  PDO::PARAM_INT);
+        $stmtC->execute();
+        $isCollaborator = (bool)$stmtC->fetchColumn();
+
+        if (!$isOwner && !$isAdmin && !$isCollaborator) Response::error('Sin permiso para banear', 403);
+
+        if ((int)$targetUserId === (int)$authorId) Response::error('No puedes banear al propietario del foro');
+
+        if ($isCollaborator && !$isOwner && !$isAdmin) {
+            $stmtC->bindValue(':uid', $targetUserId, PDO::PARAM_INT);
+            $stmtC->execute();
+            if ($stmtC->fetchColumn()) Response::error('No puedes banear a otro colaborador');
+        }
 
         $stmtB = $db->prepare("
             INSERT INTO forum_banned (forum_id, user_id)
@@ -665,6 +693,12 @@ function banUser()
         $stmtB->bindValue(':fid', $forumId,      PDO::PARAM_INT);
         $stmtB->bindValue(':uid', $targetUserId, PDO::PARAM_INT);
         $stmtB->execute();
+
+        // Borrar todos los mensajes del usuario baneado en este foro
+        $stmtDel = $db->prepare("DELETE FROM forum_messages WHERE forum_id = :fid AND user_id = :uid");
+        $stmtDel->bindValue(':fid', $forumId, PDO::PARAM_INT);
+        $stmtDel->bindValue(':uid', $targetUserId, PDO::PARAM_INT);
+        $stmtDel->execute();
 
         Response::success(['message' => 'Usuario baneado']);
     } catch (PDOException $e) {
@@ -694,7 +728,14 @@ function unbanUser()
 
         $isOwner = (int)$authorId === (int)$userId;
         $isAdmin = isset($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
-        if (!$isOwner && !$isAdmin) Response::error('Sin permiso', 403);
+
+        $stmtC = $db->prepare("SELECT 1 FROM forum_collaborators WHERE forum_id = :fid AND user_id = :uid");
+        $stmtC->bindValue(':fid', $forumId, PDO::PARAM_INT);
+        $stmtC->bindValue(':uid', $userId,  PDO::PARAM_INT);
+        $stmtC->execute();
+        $isCollaborator = (bool)$stmtC->fetchColumn();
+
+        if (!$isOwner && !$isAdmin && !$isCollaborator) Response::error('Sin permiso', 403);
 
         $stmtD = $db->prepare("DELETE FROM forum_banned WHERE forum_id = :fid AND user_id = :uid");
         $stmtD->bindValue(':fid', $forumId,      PDO::PARAM_INT);
@@ -728,7 +769,14 @@ function getBanned()
 
         $isOwner = (int)$authorId === (int)$userId;
         $isAdmin = isset($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
-        if (!$isOwner && !$isAdmin) Response::error('Sin permiso', 403);
+        
+        $stmtC = $db->prepare("SELECT 1 FROM forum_collaborators WHERE forum_id = :fid AND user_id = :uid");
+        $stmtC->bindValue(':fid', $forumId, PDO::PARAM_INT);
+        $stmtC->bindValue(':uid', $userId,  PDO::PARAM_INT);
+        $stmtC->execute();
+        $isCollaborator = (bool)$stmtC->fetchColumn();
+
+        if (!$isOwner && !$isAdmin && !$isCollaborator) Response::error('Sin permiso', 403);
 
         $stmt = $db->prepare("
             SELECT fb.user_id, u.username, u.profile_image, fb.banned_at
@@ -748,17 +796,40 @@ function getBanned()
 }
 
 /**
- * Obtener la lista de colaboradores del foro (solo owner/admin)
+ * Obtener la lista de colaboradores del foro (solo owner/admin/collab)
  */
 function getCollaborators()
 {
     if (!isset($_SESSION['user_id'])) Response::unauthorized('No autenticado');
 
     $forumId = (int)($_GET['forum_id'] ?? 0);
+    $userId  = $_SESSION['user_id'];
     if (!$forumId) Response::error('forum_id requerido');
 
     global $db;
     try {
+        $stmtF = $db->prepare("SELECT author_id, privacy FROM forums WHERE id = :fid");
+        $stmtF->bindValue(':fid', $forumId, PDO::PARAM_INT);
+        $stmtF->execute();
+        $forum = $stmtF->fetch(PDO::FETCH_ASSOC);
+
+        if (!$forum) Response::error('Foro no encontrado', 404);
+
+        $authorId = $forum['author_id'];
+        $privacy = $forum['privacy'];
+
+        $isOwner = (int)$authorId === (int)$userId;
+        $isAdmin = isset($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
+
+        $stmtC = $db->prepare("SELECT 1 FROM forum_collaborators WHERE forum_id = :fid AND user_id = :uid");
+        $stmtC->bindValue(':fid', $forumId, PDO::PARAM_INT);
+        $stmtC->bindValue(':uid', $userId,  PDO::PARAM_INT);
+        $stmtC->execute();
+        $isCollaborator = (bool)$stmtC->fetchColumn();
+
+        if ($privacy !== 'public' && !$isOwner && !$isAdmin && !$isCollaborator) {
+            Response::error('Sin permiso', 403);
+        }
         $stmt = $db->prepare("
             SELECT u.id AS user_id, u.username, u.profile_image 
             FROM forum_collaborators fc
@@ -835,7 +906,6 @@ function inviteCollaborator()
         $forum = $stmtF->fetch(PDO::FETCH_ASSOC);
 
         if (!$forum) Response::error('Foro no encontrado', 404);
-        if ($forum['privacy'] !== 'private') Response::error('No se puede invitar a foros públicos');
 
         $isAdmin = isset($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
         if ((int)$forum['author_id'] !== (int)$userId && !$isAdmin) {
@@ -885,5 +955,64 @@ function inviteCollaborator()
         Response::success(['message' => 'Invitación enviada al usuario con éxito']);
     } catch (PDOException $e) {
         Response::error('Error de base de datos: ' . $e->getMessage());
+    }
+}
+
+/**
+ * Lista de usuarios que han participado en el foro, con conteo de mensajes.
+ * Accesible para owner/admin (que pueden banear), y colaboradores/cualquiera si es público (solo lectura).
+ */
+function getParticipants()
+{
+    if (!isset($_SESSION['user_id'])) Response::unauthorized('No autenticado');
+
+    $forumId = (int)($_GET['forum_id'] ?? 0);
+    $userId  = (int)$_SESSION['user_id'];
+    if (!$forumId) Response::error('forum_id requerido');
+
+    global $db;
+    try {
+        // Verificar que el foro existe y obtener privacidad
+        $stmtF = $db->prepare("SELECT author_id, privacy FROM forums WHERE id = :fid");
+        $stmtF->bindValue(':fid', $forumId, PDO::PARAM_INT);
+        $stmtF->execute();
+        $forum = $stmtF->fetch(PDO::FETCH_ASSOC);
+        if (!$forum) Response::error('Foro no encontrado', 404);
+
+        $isOwner = (int)$forum['author_id'] === $userId;
+        $isAdmin = isset($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
+
+        // Solo foros públicos se pueden ver sin ser owner/admin
+        if ($forum['privacy'] !== 'public' && !$isOwner && !$isAdmin) {
+            $stmtC = $db->prepare("SELECT 1 FROM forum_collaborators WHERE forum_id = :fid AND user_id = :uid");
+            $stmtC->bindValue(':fid', $forumId, PDO::PARAM_INT);
+            $stmtC->bindValue(':uid', $userId,  PDO::PARAM_INT);
+            $stmtC->execute();
+            if (!$stmtC->fetchColumn()) Response::error('Sin permiso', 403);
+        }
+
+        // Participantes con conteo de mensajes (excluir mensajes ocultos)
+        $stmt = $db->prepare("
+            SELECT u.id AS user_id, u.username, u.profile_image,
+                   COUNT(fm.id) AS message_count,
+                   MAX(fm.created_at) AS last_message_at
+            FROM forum_messages fm
+            JOIN users u ON fm.user_id = u.id
+            WHERE fm.forum_id = :fid AND fm.is_hidden = FALSE
+            GROUP BY u.id, u.username, u.profile_image
+            ORDER BY message_count DESC
+        ");
+        $stmt->bindValue(':fid', $forumId, PDO::PARAM_INT);
+        $stmt->execute();
+        $participants = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Incluir si el solicitante puede banear (owner o admin)
+        Response::success([
+            'participants' => $participants,
+            'can_ban'      => $isOwner || $isAdmin,
+            'author_id'    => (int)$forum['author_id'],
+        ]);
+    } catch (PDOException $e) {
+        Response::error('Error: ' . $e->getMessage());
     }
 }

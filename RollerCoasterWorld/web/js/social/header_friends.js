@@ -90,20 +90,30 @@ $(document).ready(function () {
   }
 
   // Actualizar el Badge del menú Comunidad
+  let globalCommCount = 0;
   async function updateCommBadge() {
-    const badge = $("#nav-comm-badge");
-    if (!badge.length) return;
+    const mainBadge = $("#nav-comm-badge");
+    const innerBadge = $("#nav-comm-inner-badge");
+    if (!mainBadge.length) return;
     
     try {
         const res = await fetch(`${BASE_URL}/api/php/users.php?action=get_friends_data`);
         const data = await res.json();
         if (data.success) {
-            const count = (data.data.received_requests || []).length
+            globalCommCount = (data.data.received_requests || []).length
                         + (data.data.forum_invitations || []).length;
-            if (count > 0) {
-                badge.text(count).removeClass("d-none");
+            if (globalCommCount > 0) {
+                mainBadge.text(globalCommCount);
+                innerBadge.text(globalCommCount);
+                
+                // Si el dropdown YA está abierto, no mostramos el badge principal superior
+                if (!mainBadge.closest('.nav-item.dropdown').hasClass('show')) {
+                     mainBadge.removeClass("d-none");
+                }
+                innerBadge.removeClass("d-none"); 
             } else {
-                badge.addClass("d-none");
+                mainBadge.addClass("d-none");
+                innerBadge.addClass("d-none");
             }
         }
     } catch (e) { /* ignore silently */ }
@@ -113,6 +123,22 @@ $(document).ready(function () {
   updateCommBadge();
   // Refrescar cada 60s
   setInterval(updateCommBadge, 60000);
+
+  // Escuchar eventos del dropdown de Comunidad para mover el badge al abrir/cerrar
+  const commNavItem = $("#nav-comm-badge").closest('.nav-item.dropdown');
+  if (commNavItem.length) {
+      // Necesitamos escuchar en el elemento con dropdown
+      commNavItem.on('show.bs.dropdown', function () {
+          if (globalCommCount > 0) {
+              $("#nav-comm-badge").addClass('d-none');
+          }
+      });
+      commNavItem.on('hide.bs.dropdown', function () {
+          if (globalCommCount > 0) {
+              $("#nav-comm-badge").removeClass('d-none');
+          }
+      });
+  }
 
   function bindNavFriendActions() {
     $(".rcw-add-friend-btn").off("click").on("click", async function (e) {

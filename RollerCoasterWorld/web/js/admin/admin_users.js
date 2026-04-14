@@ -182,9 +182,11 @@ window.openEditModal = function (user) {
         avatarWrap.innerHTML = `<img src="${_escUser(user.profile_image)}"
             class="rounded-circle" style="width:48px;height:48px;object-fit:cover;border:2px solid #198754;"
             onerror="this.replaceWith(buildInitialsAvatar('${initials}'))">` ;
+        $('#btn-delete-avatar').removeClass('d-none');
     } else {
         avatarWrap.innerHTML = '';
         avatarWrap.appendChild(buildInitialsAvatar(initials));
+        $('#btn-delete-avatar').addClass('d-none');
     }
 
     // Nombre y métadatos
@@ -278,6 +280,142 @@ $(document).ready(function () {
                 $btn.prop('disabled', false).html('<i class="fa-solid fa-floppy-disk me-2"></i>Guardar Cambios');
             }
         });
+    });
+
+    // Eliminar foto de perfil (abrir modal)
+    $('#btn-delete-avatar').on('click', function () {
+        new bootstrap.Modal($('#modal-delete-avatar')[0]).show();
+    });
+
+    // Confirmar eliminación de foto de perfil
+    $('#confirm-delete-avatar').on('click', function () {
+        const $btn = $(this);
+        const originalHtml = $btn.html();
+        $btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i>Eliminando...');
+
+        $.ajax({
+            url:         `${window.BASE_URL}/api/php/admin/gestion_users.php?action=delete_avatar`,
+            method:      'POST',
+            data:        JSON.stringify({ id: $('#edit-user-id').val() }),
+            contentType: 'application/json',
+            success(res) {
+                bootstrap.Modal.getInstance($('#modal-delete-avatar')[0]).hide();
+                if (res.success) {
+                    bootstrap.Modal.getInstance($('#editUserModal')[0]).hide();
+                    loadUsers();
+                    let msg = res.message || 'Foto de perfil eliminada correctamente.';
+                    if (res.supabase_warn) msg += `\n⚠️ ${res.supabase_warn}`;
+                    _showUserAlert(msg);
+                } else {
+                    _showUserInlineError('#edit-user-error', res.error || 'Error al eliminar foto');
+                    $('#edit-user-messages').removeClass('d-none');
+                }
+            },
+            error() {
+                bootstrap.Modal.getInstance($('#modal-delete-avatar')[0]).hide();
+                _showUserInlineError('#edit-user-error', 'Error de conexión al eliminar foto.');
+                $('#edit-user-messages').removeClass('d-none');
+            },
+            complete() {
+                $btn.prop('disabled', false).html(originalHtml);
+            }
+        });
+    });
+
+    // ─── Subir foto de perfil ───
+    $('#btn-edit-avatar').on('click', function () {
+        $('#admin-avatar-input').click();
+    });
+
+    // Comprime una imagen a un tamaño máximo antes de subirla
+    function comprimirImagen(file, maxW, maxH, quality) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            const url = URL.createObjectURL(file);
+            img.onload = function () {
+                let w = img.width, h = img.height;
+                if (w > maxW || h > maxH) {
+                    const ratio = Math.min(maxW / w, maxH / h);
+                    w = Math.round(w * ratio);
+                    h = Math.round(h * ratio);
+                }
+                const canvas = document.createElement("canvas");
+                canvas.width = w;
+                canvas.height = h;
+                canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+                URL.revokeObjectURL(url);
+                canvas.toBlob((blob) => resolve(blob), "image/jpeg", quality);
+            };
+            img.onerror = function () {
+                URL.revokeObjectURL(url);
+                resolve(null);
+            };
+            img.src = url;
+        });
+    }
+
+    $('#admin-avatar-input').on('change', async function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const $btn = $('#btn-edit-avatar');
+        const originalHtml = $btn.html();
+        $btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i>');
+        $('#edit-user-messages').addClass('d-none');
+
+        try {
+            // Comprimir imagen
+            const compressedBlob = await comprimirImagen(file, 400, 400, 0.85);
+            if (!compressedBlob) throw new Error("No se pudo procesar la imagen (formato no soportado o corrupta).");
+
+            // Subir a Supabase
+            const formData = new FormData();
+            const filename = (file.name || "avatar").replace(/\.[^.]+$/, "") + ".jpg";
+            formData.append("file", compressedBlob, filename);
+            formData.append("bucket", "avatars");
+
+            const uploadRes = await fetch(`${window.BASE_URL}/api/php/upload.php`, { method: "POST", body: formData });
+            const uploadData = await uploadRes.json();
+            
+            if (!uploadData.success) throw new Error(uploadData.error || "Error al subir la foto");
+
+            // Guardar en base de datos
+            $.ajax({
+                url: `${window.BASE_URL}/api/php/admin/gestion_users.php?action=update_avatar`,
+                method: 'POST',
+                data: JSON.stringify({ id: $('#edit-user-id').val(), photo_url: uploadData.url }),
+                contentType: 'application/json',
+                success(res) {
+                    if (res.success) {
+                        bootstrap.Modal.getInstance($('#editUserModal')[0]).hide();
+                        loadUsers();
+                        _showUserAlert('Foto de perfil actualizada correctamente.');
+                    } else {
+                        _showUserInlineError('#edit-user-error', res.error || 'Error al actualizar foto en base de datos');
+                        $('#edit-user-messages').removeClass('d-none');
+                    }
+                    $btn.prop('disabled', false).html(originalHtml);
+                },
+                error() {
+                    _showUserInlineError('#edit-user-error', 'Error de conexión al actualizar foto.');
+                    $('#edit-user-messages').removeClass('d-none');
+                    $btn.prop('disabled', false).html(originalHtml);
+                }
+            });
+
+        } catch (err) {
+            console.error("Error subiendo avatar:", err);
+            let errorMsg = err.message;
+            if (errorMsg.includes("the string did not match the expected pattern") || errorMsg.includes("is not of type 'Blob'")) {
+                errorMsg = "No se pudo procesar la imagen. Intenta con un archivo JPG o PNG válido.";
+            }
+            _showUserInlineError('#edit-user-error', errorMsg);
+            $('#edit-user-messages').removeClass('d-none');
+            $btn.prop('disabled', false).html(originalHtml);
+        } finally {
+            // Limpiar input para permitir seleccionar la misma de nuevo si hubo error
+            $(this).val('');
+        }
     });
 
     // Confirmar eliminación

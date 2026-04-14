@@ -9,11 +9,9 @@ $(document).ready(function () {
   radios.forEach((radio) => {
     radio.addEventListener("change", function () {
       if (this.value === "private") {
-        collabsSection.style.display = "block";
         hintText.textContent =
           "Solo los colaboradores que designes pueden escribir, pero cualquiera puede leer el foro";
       } else {
-        collabsSection.style.display = "none";
         hintText.textContent =
           "Cualquier usuario puede ver y escribir en el foro";
       }
@@ -347,14 +345,6 @@ $(document).ready(function () {
         closeDropdown();
       }
     });
-
-    // Cargar amigos al cambiar a privado
-    radios.forEach((r) =>
-      r.addEventListener("change", function () {
-        if (this.value === "private") loadFriends();
-        else closeDropdown();
-      }),
-    );
   }
 
   // ── Render lista de foros ────────────────────────────────────────
@@ -393,7 +383,7 @@ $(document).ready(function () {
           autor = `<div class="d-flex align-items-center gap-1">
                      <small class="text-muted"><i class="fa-solid fa-user me-1"></i>${forum.author_name}</small>`;
                      
-          if (forum.privacy === "private" && forum.collaborators_json) {
+          if (forum.collaborators_json) {
             try {
                let collabs = typeof forum.collaborators_json === "string" ? JSON.parse(forum.collaborators_json) : forum.collaborators_json;
                if (collabs && collabs.length > 0) {
@@ -421,10 +411,11 @@ $(document).ready(function () {
           autor += `</div>`;
         }
 
-        const href = `${window.BASE_URL}/web/views/public/forums/forums.php?id=${forum.id}`;
+        const href = window.IS_LOGGED_IN ? `${window.BASE_URL}/web/views/public/forums/forums.php?id=${forum.id}` : `#`;
+        const extraAttr = window.IS_LOGGED_IN ? '' : `data-bs-toggle="modal" data-bs-target="#loginModal" onclick="event.preventDefault();"`;
 
         return `
-        <a href="${href}" class="forum-card-item">
+        <a href="${href}" ${extraAttr} class="forum-card-item">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0 text-white fw-bold d-flex align-items-center gap-2">
               <span class="forum-icon-bg"><i class="fa-regular fa-comments"></i></span>

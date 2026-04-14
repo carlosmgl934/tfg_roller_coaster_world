@@ -5,7 +5,6 @@ require_once __DIR__ . '/../../partials/header.php';
 
 $forumId = $_GET['forum_id'] ?? null;
 $privacy = $_POST['privacy'] ?? 'public';
-$hiddenStyle = ($privacy !== 'private') ? 'style="display:none"' : '';
 $is_logged = isset($_SESSION['user_id']);
 ?>
 <main class="container py-5" style="max-width: 680px;" data-logged="<?= $is_logged ? 'true' : 'false' ?>"
@@ -67,8 +66,8 @@ $is_logged = isset($_SESSION['user_id']);
 
                 <div class="mb-5"></div>
 
-                <!-- SECCIÓN: Colaboradores (solo si privado) -->
-                <div id="collaborators-section" <?= $hiddenStyle ?>>
+                <!-- SECCIÓN: Colaboradores -->
+                <div id="collaborators-section">
                     <p class="form-section-title">Colaboradores</p>
 
                     <div class="mb-5">

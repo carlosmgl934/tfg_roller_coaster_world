@@ -57,5 +57,8 @@ require_once __DIR__ . '/../../partials/header.php';
 $login_msg = 'Para crear o participar en foros necesitas iniciar sesión.';
 require_once __DIR__ . '/../../partials/login_modal.php';
 ?>
-<script>window.BASE_URL = '<?= $base_url ?>';</script>
+<script>
+window.BASE_URL = '<?= $base_url ?>';
+window.IS_LOGGED_IN = <?= $is_logged ? 'true' : 'false' ?>;
+</script>
 <script src="<?= Router::asset('web/js/forums/forums.js') ?>"></script>

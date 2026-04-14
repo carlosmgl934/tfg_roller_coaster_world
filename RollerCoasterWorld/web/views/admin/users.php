@@ -43,15 +43,18 @@ if (!$is_logged || !$is_admin) {
 
                     <!-- País -->
                     <div class="mb-4">
-                        <input type="text" class="form-control shadow-sm rounded-0" id="filter-country" placeholder="Filtrar por país...">
+                        <input type="text" class="form-control shadow-sm rounded-0" id="filter-country"
+                            placeholder="Filtrar por país...">
                     </div>
 
                     <!-- Botones -->
                     <div class="d-grid gap-2">
-                        <button type="button" class="btn btn-success fw-bold shadow-sm rounded-0" id="btn-users-filtrar">
+                        <button type="button" class="btn btn-success fw-bold shadow-sm rounded-0"
+                            id="btn-users-filtrar">
                             <i class="fa-solid fa-filter me-2"></i>Filtrar
                         </button>
-                        <button type="button" class="btn btn-outline-secondary shadow-sm rounded-0" id="btn-users-borrar">
+                        <button type="button" class="btn btn-outline-secondary shadow-sm rounded-0"
+                            id="btn-users-borrar">
                             <i class="fa-solid fa-eraser me-2"></i>Limpiar filtros
                         </button>
                     </div>
@@ -65,10 +68,8 @@ if (!$is_logged || !$is_admin) {
             <!-- Barra de búsqueda -->
             <div class="d-flex gap-2 mb-3 flex-wrap">
                 <div class="flex-grow-1 position-relative">
-                    <input type="text" id="user-search"
-                        class="form-control shadow-sm pe-5 border-success rounded-0"
-                        placeholder="Buscar por nombre, email o usuario..."
-                        style="border-width: 2px;">
+                    <input type="text" id="user-search" class="form-control shadow-sm pe-5 border-success rounded-0"
+                        placeholder="Buscar por nombre, email o usuario..." style="border-width: 2px;">
                     <i id="user-search-icon" class="fa-solid fa-magnifying-glass text-muted position-absolute"
                         style="right: 14px; top: 50%; transform: translateY(-50%); cursor: default;"></i>
                 </div>
@@ -82,7 +83,7 @@ if (!$is_logged || !$is_admin) {
 
             <!-- Lista de usuarios -->
             <div class="list-group shadow-sm rounded-0" id="admin-users-list"
-                 style="max-height: 600px; overflow-y: auto; overflow-x: hidden;">
+                style="max-height: 600px; overflow-y: auto; overflow-x: hidden;">
                 <div class="list-group-item text-center text-muted py-5" id="admin-users-loading">
                     <i class="fa-solid fa-spinner fa-spin me-2 text-success"></i>Cargando usuarios...
                 </div>
@@ -112,11 +113,25 @@ if (!$is_logged || !$is_admin) {
             </div>
 
             <!-- Info de solo lectura: quién es el usuario -->
-            <div class="px-4 pt-4 pb-3 d-flex align-items-center gap-3" style="border-bottom:1px solid #30363d;">
+            <div class="px-4 pt-4 pb-3 d-flex align-items-center gap-3 position-relative"
+                style="border-bottom:1px solid #30363d;">
                 <div id="edit-user-avatar-wrap" class="flex-shrink-0"></div>
-                <div class="min-w-0">
+                <div class="min-w-0 flex-grow-1">
                     <div class="fw-bold text-white" id="edit-user-display-name" style="font-size:.95rem;"></div>
                     <div class="text-muted" style="font-size:.75rem;" id="edit-user-meta"></div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" id="btn-edit-avatar" class="btn btn-sm btn-success rounded-circle shadow-sm"
+                        style="width:32px; height:32px; padding:0; display:flex; align-items:center; justify-content:center;"
+                        title="Cambiar foto de perfil">
+                        <i class="fa-solid fa-camera"></i>
+                    </button>
+                    <button type="button" id="btn-delete-avatar" class="btn btn-sm btn-danger rounded-circle shadow-sm"
+                        style="width:32px; height:32px; padding:0; display:flex; align-items:center; justify-content:center;"
+                        title="Eliminar foto de perfil">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                    <input type="file" id="admin-avatar-input" accept="image/*" class="d-none">
                 </div>
             </div>
 
@@ -129,7 +144,8 @@ if (!$is_logged || !$is_admin) {
                         <div class="col-12">
                             <label class="form-label fw-semibold small text-uppercase text-muted mb-1">Username</label>
                             <div class="input-group">
-                                <span class="input-group-text rounded-0 border-success" style="background:#0d1117;border-width:2px;color:#198754;border-right:none;">
+                                <span class="input-group-text rounded-0 border-success"
+                                    style="background:#0d1117;border-width:2px;color:#198754;border-right:none;">
                                     <i class="fa-solid fa-at"></i>
                                 </span>
                                 <input type="text" id="edit-username" class="form-control rounded-0" required
@@ -141,18 +157,24 @@ if (!$is_logged || !$is_admin) {
                         <div class="col-12">
                             <label class="form-label fw-semibold small text-uppercase text-muted mb-1">Email</label>
                             <div class="input-group">
-                                <span class="input-group-text rounded-0 border-success" style="background:#0d1117;border-width:2px;color:#198754;border-right:none;">
+                                <span class="input-group-text rounded-0 border-success"
+                                    style="background:#0d1117;border-width:2px;color:#198754;border-right:none;">
                                     <i class="fa-solid fa-envelope"></i>
                                 </span>
-                                <input type="email" id="edit-email" class="form-control rounded-0 text-muted" required readonly style="border-width:2px;border-color:#198754;background:#21262d;color:#8b949e;border-left:none;box-shadow:none; cursor:not-allowed;" title="El correo electrónico no se puede editar">
+                                <input type="email" id="edit-email" class="form-control rounded-0 text-muted" required
+                                    readonly
+                                    style="border-width:2px;border-color:#198754;background:#21262d;color:#8b949e;border-left:none;box-shadow:none; cursor:not-allowed;"
+                                    title="El correo electrónico no se puede editar">
                             </div>
                         </div>
 
                         <!-- Rol -->
                         <div class="col-12">
-                            <label class="form-label fw-semibold small text-uppercase text-muted mb-1">Rol del usuario</label>
+                            <label class="form-label fw-semibold small text-uppercase text-muted mb-1">Rol del
+                                usuario</label>
                             <div class="input-group">
-                                <span class="input-group-text rounded-0 border-success" style="background:#0d1117;border-width:2px;color:#198754;border-right:none;">
+                                <span class="input-group-text rounded-0 border-success"
+                                    style="background:#0d1117;border-width:2px;color:#198754;border-right:none;">
                                     <i class="fa-solid fa-shield-halved"></i>
                                 </span>
                                 <select id="edit-rol" class="form-select rounded-0"
@@ -210,6 +232,32 @@ if (!$is_logged || !$is_admin) {
                 </button>
                 <button type="button" class="btn btn-danger rounded-0 fw-bold" id="confirm-delete-user" data-id="">
                     <i class="fa-solid fa-trash me-1"></i>Eliminar usuario
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== MODAL CONFIRMAR ELIMINAR AVATAR ===================== -->
+<div class="modal fade" id="modal-delete-avatar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-0 border-0 shadow" style="background:#161b22;">
+            <div class="modal-header bg-danger text-white border-0">
+                <h5 class="modal-title">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>Eliminar foto de perfil
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="background:#161b22; color:#e6edf3;">
+                <p class="mb-1">¿Estás seguro de que quieres eliminar la foto de perfil de este usuario?</p>
+                <p class="text-muted small mt-2 mb-0">Esta acción borrará la imagen definitivamente.</p>
+            </div>
+            <div class="modal-footer border-0" style="background:#161b22;">
+                <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-danger rounded-0 fw-bold" id="confirm-delete-avatar">
+                    <i class="fa-solid fa-trash me-1"></i>Eliminar foto
                 </button>
             </div>
         </div>

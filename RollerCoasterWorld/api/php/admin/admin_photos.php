@@ -87,7 +87,6 @@ function rejectPhoto()
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_HTTPHEADER     => [
                         "Authorization: Bearer {$supabaseKey}",
-                        'Content-Type: application/json',
                     ],
                 ]);
                 curl_exec($ch);

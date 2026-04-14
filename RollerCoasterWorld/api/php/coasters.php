@@ -26,6 +26,7 @@ $router->register('like_photo', 'likePhoto', 'POST');
 $router->register('check_review', 'checkReview');
 $router->register('user_tops', 'getUserCoasterTops');
 $router->register('ranking', 'getRanking');
+$router->register('all_reviews', 'getAllReviews');
 
 
 $router->dispatch();
@@ -811,3 +812,92 @@ function getRanking()
     }
 }
 
+function getAllReviews()
+{
+    $limit = 15;
+    $page = max(1, intval($_GET['page'] ?? 1));
+    $offset = ($page - 1) * $limit;
+    
+    $search = trim($_GET['search'] ?? '');
+    
+    // Controles de Ordenación y Filtros
+    $sort = $_GET['sort'] ?? 'date';
+    $order = strtolower($_GET['order'] ?? 'desc') === 'asc' ? 'ASC' : 'DESC';
+    $friends_only = filter_var($_GET['friends_only'] ?? 'false', FILTER_VALIDATE_BOOLEAN);
+
+    if ($friends_only && !isset($_SESSION['user_id'])) {
+        Response::error("Debes iniciar sesión para filtrar reseñas de amigos.", 401);
+        return;
+    }
+
+    try {
+        global $db;
+        $whereClause = "";
+        $params = [];
+
+        // Si han escrito algo en el buscador
+        if ($search !== "") {
+            $whereClause = "WHERE (unaccent(coasters.coaster_name) ILIKE unaccent(:search) 
+                               OR unaccent(users.username) ILIKE unaccent(:search))";
+            $params[':search'] = "%" . $search . "%";
+        }
+
+        $joinClause = "INNER JOIN users ON coaster_ratings.user_id = users.id 
+                       INNER JOIN coasters ON coaster_ratings.coaster_id = coasters.id 
+                       INNER JOIN parks ON coasters.park_id = parks.id";
+
+        // Filtro de Solo Amigos
+        if ($friends_only) {
+            $joinClause .= " INNER JOIN friendship f ON (
+                        (f.solicitante_id = :my_id AND f.solicitada_id = users.id)
+                     OR (f.solicitada_id = :my_id AND f.solicitante_id = users.id)
+                     )";
+            if ($whereClause === "") {
+                $whereClause = "WHERE f.estado_solicitud = 'ACEPTADA'";
+            } else {
+                $whereClause .= " AND f.estado_solicitud = 'ACEPTADA'";
+            }
+            $params[':my_id'] = $_SESSION['user_id'];
+        }
+
+        // 1) Calculamos el TOTAL exacto de elementos para Paginación
+        $sqlTotal = "SELECT COUNT(*) FROM coaster_ratings $joinClause $whereClause";
+        $stmtTotal = $db->prepare($sqlTotal);
+        foreach ($params as $param => $val) {
+            $stmtTotal->bindValue($param, $val);
+        }
+        $stmtTotal->execute();
+        $total = (int) $stmtTotal->fetchColumn();
+
+        // 2) Consulta Normal para la "Página"
+        $orderBy = "ORDER BY coaster_ratings.created_at $order";
+        if ($sort === 'rating') {
+            $orderBy = "ORDER BY coaster_ratings.note $order, coaster_ratings.created_at DESC";
+        }
+
+        $sql = "SELECT coaster_ratings.id, coaster_ratings.note, coaster_ratings.review, coaster_ratings.created_at, 
+                       users.username, users.profile_image, 
+                       coasters.coaster_name, coasters.id AS coaster_id, coasters.imagen_url, parks.park_name
+                FROM coaster_ratings 
+                $joinClause
+                $whereClause 
+                $orderBy 
+                LIMIT :limit OFFSET :offset";
+                
+        $stmt = $db->prepare($sql);
+        foreach ($params as $param => $val) {
+            $stmt->bindValue($param, $val);
+        }
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        Response::success([
+            'reviews' => $reviews,
+            'total'   => $total
+        ]);
+    } catch (PDOException $e) {
+        Response::error('Error mostrando reseñas: ' . $e->getMessage());
+    }
+}

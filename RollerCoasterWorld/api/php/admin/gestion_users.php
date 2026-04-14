@@ -12,6 +12,8 @@ $router = new ApiRouter();
 $router->register('list',   'listUsers',   'GET');
 $router->register('update', 'updateUser', 'POST');
 $router->register('delete', 'deleteUser', 'POST');
+$router->register('delete_avatar', 'deleteAvatar', 'POST');
+$router->register('update_avatar', 'updateAvatar', 'POST');
 $router->dispatch();
 
 function requireAdmin(): void
@@ -197,11 +199,14 @@ function deleteUser(): void
             }
 
             if ($filename) {
-                $deleteUrl = rtrim($supabaseUrl, '/') . "/storage/v1/object/avatars/{$filename}";
+                // La API de Supabase Storage para borrar usa POST /object/{bucket} con {"prefixes":[...]}
+                $deleteUrl = rtrim($supabaseUrl, '/') . "/storage/v1/object/avatars";
+                $bodyJson  = json_encode(['prefixes' => [$filename]]);
                 $ch = curl_init($deleteUrl);
                 curl_setopt_array($ch, [
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_CUSTOMREQUEST  => 'DELETE',
+                    CURLOPT_POSTFIELDS     => $bodyJson,
                     CURLOPT_HTTPHEADER     => [
                         "Authorization: Bearer {$supabaseKey}",
                         "Content-Type: application/json",
@@ -243,5 +248,147 @@ function deleteUser(): void
 
     } catch (PDOException $e) {
         Response::error('Error al eliminar usuario: ' . $e->getMessage());
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// deleteAvatar — eliminar avatar de usuario (BD + Supabase)
+// ─────────────────────────────────────────────────────────────
+function deleteAvatar(): void
+{
+    requireAdmin();
+
+    $raw  = file_get_contents('php://input');
+    $data = json_decode($raw, true);
+    $id   = intval($data['id'] ?? 0);
+
+    if ($id <= 0) {
+        Response::error('ID de usuario inválido.');
+        return;
+    }
+
+    try {
+        global $db;
+
+        // 1. Obtener profile_image
+        $stmtFetch = $db->prepare("SELECT profile_image FROM users WHERE id = :id");
+        $stmtFetch->execute([':id' => $id]);
+        $user = $stmtFetch->fetch(PDO::FETCH_ASSOC);
+
+        $profileImage = $user['profile_image'] ?? null;
+
+        if (!$profileImage) {
+            Response::success(['message' => 'El usuario no tiene foto de perfil.']);
+            return;
+        }
+
+        // 2. Borrar de Supabase Storage
+        $supabaseUrl = $_ENV['SUPABASE_URL'] ?? null;
+        $supabaseKey = $_ENV['SUPABASE_SERVICE_KEY'] ?? null;
+        $supabaseError = null;
+
+        if ($supabaseUrl && $supabaseKey) {
+            $filename = null;
+            if (str_starts_with($profileImage, 'http')) {
+                if (preg_match('#/avatars/(.+)$#', $profileImage, $matches)) {
+                    $filename = $matches[1];
+                }
+            } elseif (!str_starts_with($profileImage, '/')) {
+                $filename = $profileImage;
+            }
+
+            if ($filename) {
+                // La API de Supabase Storage para borrar usa DELETE /object/{bucket} con {"prefixes":[...]}
+                $deleteUrl = rtrim($supabaseUrl, '/') . "/storage/v1/object/avatars";
+                $bodyJson  = json_encode(['prefixes' => [$filename]]);
+                $ch = curl_init($deleteUrl);
+                curl_setopt_array($ch, [
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_CUSTOMREQUEST  => 'DELETE',
+                    CURLOPT_POSTFIELDS     => $bodyJson,
+                    CURLOPT_HTTPHEADER     => [
+                        "Authorization: Bearer {$supabaseKey}",
+                        "Content-Type: application/json",
+                    ],
+                ]);
+                curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+                if ($httpCode < 200 || $httpCode >= 300) {
+                    $supabaseError = "Avatar no eliminado de Supabase (HTTP {$httpCode})";
+                }
+            }
+        }
+
+        // 3. Quitar la referencia en la BD
+        $stmt = $db->prepare("UPDATE users SET profile_image = NULL WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+
+        if (isset($_SESSION['user_id']) && (int)$_SESSION['user_id'] === (int)$id) {
+            unset($_SESSION['profile_image']);
+        }
+
+        if ($supabaseError) {
+            Response::success([
+                'message' => 'Referencia de la foto eliminada, pero hubo un error en Supabase.',
+                'supabase_warn' => $supabaseError
+            ]);
+        } else {
+            Response::success(['message' => 'Foto de perfil eliminada correctamente.']);
+        }
+
+    } catch (PDOException $e) {
+        Response::error('Error al eliminar foto de perfil: ' . $e->getMessage());
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// updateAvatar — actualiza el avatar de un usuario (recibe URL desde frontend tras usar upload.php)
+// ─────────────────────────────────────────────────────────────
+function updateAvatar(): void
+{
+    requireAdmin();
+
+    $raw  = file_get_contents('php://input');
+    $data = json_decode($raw, true);
+
+    $id        = intval($data['id'] ?? 0);
+    $photo_url = trim($data['photo_url'] ?? '');
+
+    if ($id <= 0) {
+        Response::error('ID de usuario inválido.');
+        return;
+    }
+
+    if (!$photo_url) {
+        Response::error('No se proporcionó la URL de la foto.');
+        return;
+    }
+
+    try {
+        global $db;
+
+        // Validar si el usuario existe para evitar errores
+        $stmtFetch = $db->prepare("SELECT id FROM users WHERE id = :id");
+        $stmtFetch->execute([':id' => $id]);
+        if (!$stmtFetch->fetch()) {
+            Response::error('Usuario no encontrado.', 404);
+            return;
+        }
+
+        $stmt = $db->prepare("UPDATE users SET profile_image = :img WHERE id = :id");
+        $stmt->execute([
+            ':img' => $photo_url,
+            ':id'  => $id
+        ]);
+
+        if (isset($_SESSION['user_id']) && (int)$_SESSION['user_id'] === (int)$id) {
+            $_SESSION['profile_image'] = $photo_url;
+        }
+
+        Response::success(['message' => 'Foto de perfil actualizada correctamente.']);
+
+    } catch (PDOException $e) {
+        Response::error('Error al actualizar foto de perfil: ' . $e->getMessage());
     }
 }

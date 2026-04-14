@@ -140,6 +140,11 @@ $isAdmin = $userRole === 'admin';
                     <p class="text-muted small">Cargando...</p>
                 </div>
 
+                <!-- Lista de participantes -->
+                <p class="form-section-title">Participantes del foro</p>
+                <div id="participants-list-container" class="mb-4">
+                    <p class="text-muted small">Cargando...</p>
+                </div>
                 <!-- Lista de baneados -->
                 <p class="form-section-title">Usuarios baneados</p>
                 <div id="banned-list-container">
@@ -243,6 +248,8 @@ $isAdmin = $userRole === 'admin';
                     <div id="forumInfoModalCollabsList" class="d-flex flex-wrap gap-2 mt-1"></div>
                 </div>
 
+
+
                 <!-- Detalles extras (members, created) -->
                 <div class="d-flex gap-3 mt-2 pt-2" style="border-top:1px solid rgba(255,255,255,0.06);">
                     <div class="text-center flex-fill">
@@ -276,4 +283,4 @@ $isAdmin = $userRole === 'admin';
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 
-<script src="<?= Router::asset('web/js/forums/forum_chat.js') ?>"></script>
+<script src="<?= Router::asset('web/js/forums/forum_chat.js') ?>?v=<?= time() ?>"></script>

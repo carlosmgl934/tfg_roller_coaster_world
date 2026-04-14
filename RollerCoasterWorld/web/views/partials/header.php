@@ -263,8 +263,10 @@ header("Expires: 0"); // Proxies
                 <li><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('user_search') ?>"><i
                       class="fa-solid fa-magnifying-glass w-20px text-center me-2 text-primary"></i> Buscar usuarios</a>
                 </li>
-                <li><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('friends') ?>"><i 
-                      class="fa-solid fa-user-group w-20px text-center me-2 text-success"></i> Amistades</a>
+                <li><a class="dropdown-item py-2 fw-semibold d-flex align-items-center justify-content-between" href="<?= Router::url('friends') ?>">
+                        <span><i class="fa-solid fa-user-group w-20px text-center me-2 text-success"></i> Amistades</span>
+                        <span id="nav-comm-inner-badge" class="badge rounded-pill bg-danger d-none" style="font-size: 0.65rem;">0</span>
+                      </a>
                 </li>
               </ul>
             </li>
@@ -345,13 +347,22 @@ header("Expires: 0"); // Proxies
                 <div class="rcw-user-avatar" id="header-avatar">
                   <?php
                   $sessionImg = $_SESSION['profile_image'] ?? '';
-                  // Si es una ruta de upload local (/web/img/uploads/...) solo existe
-                  // en la máquina que la subió → no mostrar imagen rota, usar iniciales
-                  $isLocalUpload = !empty($sessionImg) && strpos($sessionImg, '/web/img/uploads/') !== false;
-                  $showImg = !empty($sessionImg) && !$isLocalUpload;
+                  $finalImgUrl = '';
+                  if (!empty($sessionImg)) {
+                      if (strpos($sessionImg, 'http') === 0) {
+                          $finalImgUrl = $sessionImg;
+                      } elseif (strpos($sessionImg, '/') === 0) {
+                          $finalImgUrl = $base_url . $sessionImg;
+                      } else {
+                          // Es un nombre de archivo subido a Supabase
+                          $supabaseUrl = $_ENV['SUPABASE_URL'] ?? 'https://ubtoaaawqdneblyvbelr.supabase.co';
+                          $finalImgUrl = rtrim($supabaseUrl, '/') . '/storage/v1/object/public/avatars/' . $sessionImg;
+                      }
+                  }
+                  $showImg = !empty($finalImgUrl);
                   ?>
                   <?php if ($showImg): ?>
-                    <img src="<?= htmlspecialchars($sessionImg) ?>" alt="Avatar"
+                    <img src="<?= htmlspecialchars($finalImgUrl) ?>" alt="Avatar"
                       style="width:100%;height:100%;object-fit:cover;border-radius:50%;"
                       onerror="this.style.display='none';this.parentElement.innerHTML='<span><?= htmlspecialchars($user_initials) ?></span>'">
                   <?php else: ?>
