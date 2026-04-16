@@ -370,7 +370,8 @@ $(document).ready(function () {
 
             // Subir a Supabase
             const formData = new FormData();
-            const filename = (file.name || "avatar").replace(/\.[^.]+$/, "") + ".jpg";
+            let safeName = (file.name || "avatar").replace(/[^a-zA-Z0-9.-]/g, "_");
+            const filename = safeName.replace(/\.[^.]+$/, "") + ".jpg";
             formData.append("file", compressedBlob, filename);
             formData.append("bucket", "avatars");
 

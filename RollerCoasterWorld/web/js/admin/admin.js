@@ -1268,7 +1268,8 @@ $(document).ready(function () {
 
         if (imageFile) {
           const uploadForm = new FormData();
-          uploadForm.append("file", imageFile);
+          const cleanName = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+          uploadForm.append("file", imageFile, cleanName);
           uploadForm.append("bucket", "coasters");
           uploadForm.append("path", "admin_uploads");
 
@@ -2519,7 +2520,8 @@ if (_confirmEditCoaster) {
 
       if (image) {
         const uploadForm = new FormData();
-        uploadForm.append("file", image);
+        const cleanName = image.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+        uploadForm.append("file", image, cleanName);
         uploadForm.append("bucket", "coasters");
         uploadForm.append("path", "admin_uploads");
 

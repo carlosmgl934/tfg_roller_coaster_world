@@ -350,6 +350,38 @@ $(document).ready(function () {
       }, 300);
     });
 
+    // Keyboard navigation
+    searchInput.on("keydown", function (e) {
+      const $dropdown = $("#search-results");
+      if (!$dropdown.is(":visible")) return;
+
+      const $items = $dropdown.find("a.list-group-item");
+      if (!$items.length) return;
+
+      let index = $items.index($items.filter(".active"));
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        index = (index + 1) % $items.length;
+        $items.removeClass("bg-secondary border-success active text-white");
+        $items.eq(index).addClass("bg-secondary border-success active text-white");
+        $items.eq(index)[0].scrollIntoView({ block: "nearest" });
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        index = index - 1 < 0 ? $items.length - 1 : index - 1;
+        $items.removeClass("bg-secondary border-success active text-white");
+        $items.eq(index).addClass("bg-secondary border-success active text-white");
+        $items.eq(index)[0].scrollIntoView({ block: "nearest" });
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (index >= 0) {
+          $items.eq(index)[0].click();
+        } else {
+          $items.first()[0].click();
+        }
+      }
+    });
+
     $("#clear-filters").click(function () {
       $("#country-filter, #location-filter").val("");
       $("#opening-year-min").val(1800);

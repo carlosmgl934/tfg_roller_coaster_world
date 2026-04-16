@@ -1,13 +1,16 @@
-﻿<?php
-$page_css = ['web/css/coasters.css', 'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css'];
-require_once __DIR__ . '/../../partials/header.php';
-/** @var string $base_url */
+<?php
+require_once __DIR__ . '/../../../routes/Router.php';
+Router::init();
 
 $id = intval($_GET['id'] ?? 0);
 if ($id === 0) {
-    header('Location: ' . $base_url . '/web/views/public/coasters/coaster_search.php');
+    Router::redirect('coaster_search');
     exit;
 }
+
+$page_css = ['web/css/coasters.css', 'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css'];
+require_once __DIR__ . '/../../partials/header.php';
+/** @var string $base_url */
 ?>
 
 <!-- CropperJS para recortar imágenes al subir fotos -->

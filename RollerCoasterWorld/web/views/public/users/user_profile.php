@@ -215,7 +215,7 @@ $user_id = $_GET['id'] ?? null;
                             <h5 class="fw-bold mb-0">Ranking Personal</h5>
                         </div>
                         <select id="tops-type-selector"
-                            class="form-select w-auto fw-bold bg-dark text-white border-success border-opacity-50">
+                            class="form-select w-auto fw-bold bg-dark text-white border-success border-opacity-50 rounded-0">
                             <option value="coasters">Tops Coasters</option>
                             <option value="parks">Tops Parques</option>
                         </select>

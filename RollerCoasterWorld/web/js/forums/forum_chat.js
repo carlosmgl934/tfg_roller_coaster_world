@@ -562,22 +562,37 @@
       const fileToUpload = await compressIfImage(file);
       
       const fd = new FormData();
-      fd.append('file', fileToUpload, fileToUpload.name); // Mantiene el nombre del archivo
+      // FIX Safari iOS BUG: "The string did not match the expected pattern" on non-ASCII filenames
+      const safeFilename = (fileToUpload.name || "img.webp").replace(/[^a-zA-Z0-9.-]/g, "_");
+      fd.append('file', fileToUpload, safeFilename);
       fd.append('bucket', 'forum-attachments');
       fd.append('path', String(FORUM_ID));
 
+      console.log("SUPER DEBUG FORUM: fetch a upload.php", [...fd.entries()]);
       const res = await fetch(`${BASE}/api/php/upload.php`, {
         method: 'POST',
         body: fd,
       });
 
-      const data = await res.json();
+      const rawText = await res.text();
+      console.log("SUPER DEBUG FORUM: Respuesta raw del servidor (status " + res.status + "):", rawText);
+
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch (parseErr) {
+        alert("SUPER DEBUG [JSON PARSE ERROR FORUM]\nStatus: " + res.status + "\nRespuesta cruda del servidor:\n" + rawText.substring(0, 500) + "...\nRevisa la consola y Network Tab.");
+        return { ok: false, error: "El servidor no devolvió respuesta JSON." };
+      }
+
       if (!data.success) {
+        alert("SUPER DEBUG [SERVER ERROR FORUM]\n" + (data.error || "Desconocido"));
         return { ok: false, error: data.error };
       }
       
       return { ok: true, url: data.url };
     } catch (e) {
+      alert("SUPER DEBUG [FETCH / NETWORK CATCH FORUM]\n" + e.message);
       return { ok: false, error: e.message };
     }
   }

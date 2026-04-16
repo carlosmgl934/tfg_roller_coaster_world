@@ -275,7 +275,7 @@ $(document).ready(function () {
         const html = `
             <a href="${link}" class="list-group-item list-group-item-action bg-transparent border-bottom border-secondary border-opacity-25 px-0 py-3" style="transition: all 0.2s ease-in-out;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.05)'" onmouseout="this.style.backgroundColor='transparent'">
                 <div class="d-flex align-items-center gap-3 px-3">
-                    <img src="${imgUrl}" alt="${title}" class="rounded shadow-sm" style="width: 120px; height: 80px; object-fit: cover;" onerror="this.src='${fallbackImage}'">
+                    <img src="${imgUrl}" alt="${title}" class="rounded-0 shadow-sm" style="width: 120px; height: 80px; object-fit: cover;" onerror="this.src='${fallbackImage}'">
                     <div class="flex-grow-1 min-w-0">
                         <h5 class="fw-bold mb-1 text-light fs-5"><span class="text-success me-2">${rank}</span> ${title}</h5>
                         <p class="mb-0 text-muted small">${subtitleHTML}</p>

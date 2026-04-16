@@ -147,6 +147,38 @@ $(document).ready(function () {
       }, 300);
     });
 
+    // Keyboard navigation
+    $("#coaster-search").on("keydown", function (e) {
+      const $dropdown = $("#search-results");
+      if (!$dropdown.is(":visible")) return;
+
+      const $items = $dropdown.find("a.list-group-item");
+      if (!$items.length) return;
+
+      let index = $items.index($items.filter(".active"));
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        index = (index + 1) % $items.length;
+        $items.removeClass("bg-secondary border-success active text-white");
+        $items.eq(index).addClass("bg-secondary border-success active text-white");
+        $items.eq(index)[0].scrollIntoView({ block: "nearest" });
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        index = index - 1 < 0 ? $items.length - 1 : index - 1;
+        $items.removeClass("bg-secondary border-success active text-white");
+        $items.eq(index).addClass("bg-secondary border-success active text-white");
+        $items.eq(index)[0].scrollIntoView({ block: "nearest" });
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (index >= 0) {
+          $items.eq(index)[0].click();
+        } else {
+          $items.first()[0].click();
+        }
+      }
+    });
+
     let currentPage = 1;
     let currentSearchQuery = "";
     let isFiltering = false;
@@ -1182,7 +1214,8 @@ $(document).ready(function () {
           async function (blob) {
             if (!blob) throw new Error("Error al recortar la imagen");
 
-            const ext = photoInput.files[0].name.split(".").pop();
+            const rawExt = photoInput.files[0].name.split(".").pop();
+            const ext = rawExt.replace(/[^a-zA-Z0-9]/g, ""); // Anti Safari exception
             const filename = `${Date.now()}_img.${ext}`;
 
             // 2. Subir a Supabase Storage via PHP proxy
@@ -1191,17 +1224,34 @@ $(document).ready(function () {
             uploadForm.append("bucket", "coasters");
             uploadForm.append("path", coasterId);
 
-            const uploadRes = await fetch(
-              `${window.BASE_URL}/api/php/upload.php`,
-              {
+            try {
+              console.log("SUPER DEBUG COASTERS: fetch a upload.php", [...uploadForm.entries()]);
+              const uploadRes = await fetch(`${window.BASE_URL}/api/php/upload.php`, {
                 method: "POST",
                 body: uploadForm,
-              },
-            );
-            const uploadData = await uploadRes.json();
-            if (!uploadData.success)
-              throw new Error(uploadData.error || "Error al subir la foto");
-            const url = uploadData.url;
+              });
+
+              const rawText = await uploadRes.text();
+              console.log("SUPER DEBUG COASTERS: raw response (status " + uploadRes.status + ")", rawText);
+              
+              let uploadData;
+              try {
+                uploadData = JSON.parse(rawText);
+              } catch (parseErr) {
+                alert("SUPER DEBUG [JSON ERROR en Coasters]\nStatus: " + uploadRes.status + "\nRespuesta:\n" + rawText.substring(0,500));
+                throw new Error("El servidor no devolvió una respuesta JSON válida.");
+              }
+
+              if (!uploadData.success) {
+                alert("SUPER DEBUG [SERVER ERROR en Coasters]\n" + (uploadData.error || "Desconocido"));
+                throw new Error(uploadData.error || "Error al subir la foto");
+              }
+              const url = uploadData.url;
+              
+            } catch (err) {
+              alert("SUPER DEBUG [CATCH GLOBAL EN COASTERS]\n" + err.message);
+              throw err;
+            }
 
             // 3. Guardar en PostgreSQL vía API PHP
             const captionVal = document.getElementById("photo-caption").value;

@@ -542,18 +542,42 @@ $(document).ready(function () {
   async function subirFoto(blob, originalName) {
     if (!blob) throw new Error("Archivo inválido o corrupto");
     const formData = new FormData();
-    const filename =
-      (originalName || "avatar").replace(/\.[^.]+$/, "") + ".jpg";
+    let safeName = (originalName || "avatar").replace(/[^a-zA-Z0-9.-]/g, "_");
+    const filename = safeName.replace(/\.[^.]+$/, "") + ".jpg";
     formData.append("file", blob, filename);
     formData.append("bucket", "avatars");
 
-    const res = await fetch(`${BASE_URL}/api/php/upload.php`, {
-      method: "POST",
-      body: formData,
-    });
-    const data = await res.json();
-    if (!data.success) throw new Error(data.error || "Error al subir la foto");
-    return data.url;
+    try {
+      console.log("SUPER DEBUG: Iniciando fetch a upload.php", [...formData.entries()]);
+      const res = await fetch(`${BASE_URL}/api/php/upload.php`, {
+        method: "POST",
+        body: formData,
+      });
+      
+      const rawText = await res.text();
+      console.log("SUPER DEBUG: Respuesta raw del servidor (status " + res.status + "):", rawText);
+
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch (parseErr) {
+        alert("SUPER DEBUG [JSON PARSE ERROR]\nStatus: " + res.status + "\nRespuesta cruda del servidor:\n" + rawText.substring(0, 500) + "...\nRevisa la consola y Network Tab.");
+        throw new Error("El servidor no devolvió una respuesta JSON válida.");
+      }
+
+      if (!data.success) {
+        alert("SUPER DEBUG [SERVER ERROR]\n" + (data.error || "Error desconocido"));
+        throw new Error(data.error || "Error al subir la foto");
+      }
+      
+      return data.url;
+    } catch (e) {
+      console.error("SUPER DEBUG: Promesa / Red falló:", e);
+      // No mostramos alert aquí de error de red normal a menos que el usuario lo pida, el throw lo pilla el front.
+      // Pero como es un super debug:
+      alert("SUPER DEBUG [FETCH CATCH]\n" + e.message);
+      throw e;
+    }
   }
 
   cargarParques();
@@ -1346,6 +1370,38 @@ $(document).ready(function () {
     }
   });
 
+  // Navigación por teclado
+  $("#top-coasters-search").on("keydown", function (e) {
+    const $dropdown = $("#top-coasters-dropdown");
+    if ($dropdown.hasClass("d-none")) return;
+
+    const $items = $dropdown.find("li.list-group-item-action");
+    if (!$items.length) return;
+
+    let index = $items.index($items.filter(".active"));
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      index = (index + 1) % $items.length;
+      $items.removeClass("bg-secondary border-success active").addClass("bg-dark");
+      $items.eq(index).removeClass("bg-dark").addClass("bg-secondary border-success active");
+      $items.eq(index)[0].scrollIntoView({ block: "nearest" });
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      index = index - 1 < 0 ? $items.length - 1 : index - 1;
+      $items.removeClass("bg-secondary border-success active").addClass("bg-dark");
+      $items.eq(index).removeClass("bg-dark").addClass("bg-secondary border-success active");
+      $items.eq(index)[0].scrollIntoView({ block: "nearest" });
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (index >= 0) {
+        $items.eq(index).trigger("click");
+      } else {
+        $items.first().trigger("click");
+      }
+    }
+  });
+
   $(document).on(
     "click",
     "#top-coasters-dropdown li.list-group-item-action",
@@ -1447,6 +1503,38 @@ $(document).ready(function () {
     if ($(this).hasClass("fa-xmark")) {
       $("#top-parks-search").val("").trigger("input").focus();
       $("#top-parks-dropdown").addClass("d-none").empty();
+    }
+  });
+
+  // Navigación por teclado
+  $("#top-parks-search").on("keydown", function (e) {
+    const $dropdown = $("#top-parks-dropdown");
+    if ($dropdown.hasClass("d-none")) return;
+
+    const $items = $dropdown.find("li.list-group-item-action");
+    if (!$items.length) return;
+
+    let index = $items.index($items.filter(".active"));
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      index = (index + 1) % $items.length;
+      $items.removeClass("bg-secondary border-success active").addClass("bg-dark");
+      $items.eq(index).removeClass("bg-dark").addClass("bg-secondary border-success active");
+      $items.eq(index)[0].scrollIntoView({ block: "nearest" });
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      index = index - 1 < 0 ? $items.length - 1 : index - 1;
+      $items.removeClass("bg-secondary border-success active").addClass("bg-dark");
+      $items.eq(index).removeClass("bg-dark").addClass("bg-secondary border-success active");
+      $items.eq(index)[0].scrollIntoView({ block: "nearest" });
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (index >= 0) {
+        $items.eq(index).trigger("click");
+      } else {
+        $items.first().trigger("click");
+      }
     }
   });
 
