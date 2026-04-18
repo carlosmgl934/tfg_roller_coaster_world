@@ -515,6 +515,25 @@ function getPublicProfile()
         $stmtFriendList->execute([':tid' => $target_id]);
         $friend_list = $stmtFriendList->fetchAll(PDO::FETCH_ASSOC);
 
+        // Reseñas del usuario (coaster_ratings y park_ratings)
+        $stmtReviews = $db->prepare("
+            SELECT 'coaster' as type, cr.coaster_id as item_id, c.coaster_name as title, p.park_name as subtitle, 
+                   cr.note, cr.review, cr.created_at, c.imagen_url
+            FROM coaster_ratings cr
+            JOIN coasters c ON cr.coaster_id = c.id
+            JOIN parks p ON c.park_id = p.id
+            WHERE cr.user_id = :tid
+            UNION ALL
+            SELECT 'park' as type, pr.park_id as item_id, p.park_name as title, p.park_country as subtitle, 
+                   pr.note, pr.review, pr.created_at, p.imagen_url
+            FROM park_ratings pr
+            JOIN parks p ON pr.park_id = p.id
+            WHERE pr.user_id = :tid
+            ORDER BY created_at DESC
+        ");
+        $stmtReviews->execute([':tid' => $target_id]);
+        $user_reviews = $stmtReviews->fetchAll(PDO::FETCH_ASSOC);
+
         Response::success([
             'data' => [
                 'user' => $user,
@@ -530,7 +549,8 @@ function getPublicProfile()
                 'top_parks' => $top_parks,
                 'top_coasters' => $top_coasters,
                 'photos' => $user_photos,
-                'friends' => $friend_list
+                'friends' => $friend_list,
+                'reviews' => $user_reviews
             ]
         ]);
 

@@ -52,8 +52,8 @@ require_once __DIR__ . '/../../partials/header.php';
                 </div>
                 <div class="col-6">
                     <div class="stat-card card text-center p-2">
-                        <div class="text-muted small mb-1">Puntuación</div>
-                        <div class="ranking-num text-success" id="coaster-score">—</div>
+                        <div class="text-muted small mb-1">Puntuación <span class="text-success opacity-75 ms-1" style="font-size: 0.65rem;">(<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>)</span></div>
+                        <div class="ranking-num text-success"><span id="coaster-score">—</span> <i class="fa-solid fa-star ms-1" style="font-size: 1.25rem; vertical-align: baseline;"></i></div>
                     </div>
                 </div>
                 <div class="col-6">

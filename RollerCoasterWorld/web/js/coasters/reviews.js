@@ -2,21 +2,28 @@ $(document).ready(function () {
   const reviewContainer = $("#reviews-container");
   const searchInput = $("#review_search");
   const textRev = $("#text-rev");
-  
+  const paginationEl = $("#pagination");
+
   // Controles de Ordenación y Filtros
   const sortSelect = $("#review_sort");
   const btnSortOrder = $("#btn_sort_order");
   const iconSortOrder = $("#icon_sort_order");
   const btnFriendsOnly = $("#btn_friends_only");
 
+  const LIMIT = 10;
+  let currentPage = 1;
+  let totalReviews = 0;
   let searchDebounce = null;
 
   searchInput.on("input", function () {
     clearTimeout(searchDebounce);
-    searchDebounce = setTimeout(loadReviews, 300);
+    searchDebounce = setTimeout(() => {
+      currentPage = 1;
+      loadReviews();
+    }, 300);
   });
 
-  sortSelect.on("change", loadReviews);
+  sortSelect.on("change", () => { currentPage = 1; loadReviews(); });
 
   btnSortOrder.on("click", function () {
     let currentOrder = $(this).attr("data-order");
@@ -27,21 +34,23 @@ $(document).ready(function () {
       $(this).attr("data-order", "desc");
       iconSortOrder.removeClass("fa-arrow-up-wide-short").addClass("fa-arrow-down-short-wide");
     }
+    currentPage = 1;
     loadReviews();
   });
 
-  btnFriendsOnly.on("change", function(e) {
+  btnFriendsOnly.on("change", function (e) {
     if ($(this).is(":checked") && window.IS_LOGGED_IN !== true) {
       e.preventDefault();
       $(this).prop("checked", false);
-      if (document.getElementById('loginModal')) {
-         const m = new bootstrap.Modal(document.getElementById('loginModal'));
-         m.show();
+      if (document.getElementById("loginModal")) {
+        const m = new bootstrap.Modal(document.getElementById("loginModal"));
+        m.show();
       } else {
-         alert("Debes iniciar sesión para filtrar las reseñas de tus amigos.");
+        alert("Debes iniciar sesión para filtrar las reseñas de tus amigos.");
       }
       return;
     }
+    currentPage = 1;
     loadReviews();
   });
 
@@ -56,6 +65,7 @@ $(document).ready(function () {
     } else if (valLength > 0 && valLength < 3) {
       textRev.text("Escribe al menos 3 caracteres para buscar.");
       reviewContainer.empty();
+      paginationEl.empty();
     } else {
       textRev.text("");
       fetchReviews();
@@ -69,26 +79,98 @@ $(document).ready(function () {
     const friendsOnly = btnFriendsOnly.is(":checked");
 
     fetch(
-      `${BASE_URL}/api/php/coasters.php?action=all_reviews&search=${searchTerm}&sort=${sort}&order=${order}&friends_only=${friendsOnly}`,
+      `${BASE_URL}/api/php/coasters.php?action=all_reviews&search=${searchTerm}&sort=${sort}&order=${order}&friends_only=${friendsOnly}&page=${currentPage}`,
     )
       .then((response) => response.json())
       .then((data) => {
         reviewContainer.empty();
         if (data.success) {
+          totalReviews = data.total ?? 0;
           if (data.reviews.length === 0) {
             textRev.text("No se han encontrado reseñas.");
+            paginationEl.empty();
           } else {
             data.reviews.forEach(function (review) {
               reviewContainer.append(createReviewCard(review));
             });
+            renderPagination();
           }
         } else {
           textRev.text("Error al cargar las reseñas.");
+          paginationEl.empty();
         }
       })
-      .catch((error) => {
+      .catch(() => {
         textRev.text("Error de conexión.");
+        paginationEl.empty();
       });
+  }
+
+  function renderPagination() {
+    paginationEl.empty();
+    const totalPages = Math.ceil(totalReviews / LIMIT);
+    if (totalPages <= 1) return;
+
+    const ul = $('<ul class="pagination mb-0"></ul>');
+
+    // Botón Anterior
+    const prevDisabled = currentPage === 1 ? "disabled" : "";
+    ul.append(`
+      <li class="page-item ${prevDisabled}">
+        <a class="page-link" href="#" data-page="${currentPage - 1}" aria-label="Anterior">
+          <i class="fa-solid fa-chevron-left"></i>
+        </a>
+      </li>
+    `);
+
+    // Páginas con ventana deslizante
+    const delta = 2;
+    const left = Math.max(1, currentPage - delta);
+    const right = Math.min(totalPages, currentPage + delta);
+
+    if (left > 1) {
+      ul.append(`<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`);
+      if (left > 2) ul.append(`<li class="page-item disabled"><span class="page-link">…</span></li>`);
+    }
+
+    for (let p = left; p <= right; p++) {
+      const active = p === currentPage ? "active" : "";
+      ul.append(`<li class="page-item ${active}"><a class="page-link" href="#" data-page="${p}">${p}</a></li>`);
+    }
+
+    if (right < totalPages) {
+      if (right < totalPages - 1) ul.append(`<li class="page-item disabled"><span class="page-link">…</span></li>`);
+      ul.append(`<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">${totalPages}</a></li>`);
+    }
+
+    // Botón Siguiente
+    const nextDisabled = currentPage === totalPages ? "disabled" : "";
+    ul.append(`
+      <li class="page-item ${nextDisabled}">
+        <a class="page-link" href="#" data-page="${currentPage + 1}" aria-label="Siguiente">
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+      </li>
+    `);
+
+    // Info de resultados
+    const start = (currentPage - 1) * LIMIT + 1;
+    const end = Math.min(currentPage * LIMIT, totalReviews);
+    const info = $(`<span class="text-secondary ms-3 align-self-center" style="font-size:0.85rem;">
+      Mostrando ${start}–${end} de ${totalReviews} reseñas
+    </span>`);
+
+    paginationEl.append(ul).append(info);
+
+    // Eventos de paginación
+    paginationEl.find("a.page-link[data-page]").on("click", function (e) {
+      e.preventDefault();
+      const page = parseInt($(this).data("page"));
+      if (isNaN(page) || page < 1 || page > totalPages) return;
+      currentPage = page;
+      fetchReviews();
+      $("html, body").animate({ scrollTop: reviewContainer.offset().top - 80 }, 300);
+    });
   }
 
   function createReviewCard(review) {
@@ -110,7 +192,6 @@ $(document).ready(function () {
       year: "numeric",
     });
 
-    // Fallback de avatar en caso de que rcwGetAvatarPath no esté accesible
     const avatarPath =
       typeof window.rcwGetAvatarPath === "function"
         ? window.rcwGetAvatarPath(review.profile_image, review.username)
@@ -124,26 +205,33 @@ $(document).ready(function () {
       ? `"${review.review}"`
       : '<span class="fst-italic text-secondary">El usuario dejó una puntuación sin reseña escrita.</span>';
 
+    const profileUrl = `${BASE_URL}/web/views/public/users/user_profile.php?id=${review.user_id}`;
+    const coasterUrl = `${BASE_URL}/web/views/public/coasters/coasters.php?id=${review.coaster_id}`;
+
     return `
       <div class="list-group-item p-4 mb-3 rounded-0 shadow border border-secondary border-opacity-25" style="background-color: #1a1e23;">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start mb-3 gap-3">
           
           <!-- Bloque de Usuario y Coaster Central -->
           <div class="d-flex align-items-center gap-3 flex-grow-1">
-            <img src="${avatarPath}" alt="${review.username}" class="rounded-circle shadow-sm" style="width: 55px; height: 55px; object-fit: cover; border: 2px solid var(--theme-color);">
+            <a href="${profileUrl}" title="Ver perfil de ${review.username}" style="flex-shrink:0;">
+              <img src="${avatarPath}" alt="${review.username}" class="rounded-circle shadow-sm" style="width: 55px; height: 55px; object-fit: cover; border: 2px solid var(--theme-color); transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+            </a>
             <div class="d-flex flex-column">
               <h6 class="mb-1 fw-bold d-flex align-items-center gap-2 text-white" style="font-size: 1.1rem;">
-                ${review.username}
+                <a href="${profileUrl}" class="text-white text-decoration-none hover-underline">${review.username}</a>
                 <span class="badge bg-success shadow-none border border-success border-opacity-50 text-white" style="font-size: 0.7rem; letter-spacing: 0.5px;">
                   <i class="fa-solid fa-map-pin me-1"></i>${review.park_name}
                 </span>
               </h6>
               <div class="d-flex align-items-center mt-1">
-                 <img src="${coasterPhoto}" alt="Foto de ${review.coaster_name}" class="rounded me-2 shadow-sm border border-secondary border-opacity-25" style="width: 40px; height: 40px; object-fit: cover;">
+                 <a href="${coasterUrl}" title="Ver ${review.coaster_name}">
+                   <img src="${coasterPhoto}" alt="Foto de ${review.coaster_name}" class="rounded me-2 shadow-sm border border-secondary border-opacity-25" style="width: 40px; height: 40px; object-fit: cover;">
+                 </a>
                  <small class="text-secondary d-flex flex-column justify-content-center">
                    <span>
                      <i class="fa-solid fa-roller-coaster me-1 opacity-75"></i> En 
-                     <a href="${BASE_URL}/web/views/public/coasters/coasters.php?id=${review.coaster_id}" class="text-white text-decoration-none fw-bold hover-underline">${review.coaster_name}</a> 
+                     <a href="${coasterUrl}" class="text-white text-decoration-none fw-bold hover-underline">${review.coaster_name}</a> 
                    </span>
                    <span class="opacity-100"><i class="fa-regular fa-clock me-1 mt-1"></i> ${date}</span>
                  </small>

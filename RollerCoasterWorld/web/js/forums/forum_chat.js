@@ -28,6 +28,7 @@
   let rateLimitEnd = 0;         // timestamp ms en que termina el cooldown
   let rateLimitInterval = null;
   let forumPrivacy = null;
+  let isBannedSelf = false;     // estado de baneo del usuario actual (sync en tiempo real)
 
   /* ── ELEMENTOS ───────────────────────────────────────────── */
   const el = id => document.getElementById(id);
@@ -65,12 +66,16 @@
       // Avatar del autor y colaboradores
       const avatarEl = el('forum-header-avatar');
       if (forum.author_name) {
+        const authorProfileUrl = `${BASE}/web/views/public/users/user_profile.php?id=${forum.author_id}`;
+
+        // Avatar del propietario → enlace a su perfil
         let authorHtml = `
-          <div class="d-flex align-items-center gap-2">
-            <img src="${avatarUrl(forum.author_image, forum.author_name)}" class="rounded-circle" style="width: 48px; height: 48px; object-fit: cover; border: 2px solid var(--rcw-green-neon);" title="Creador: ${esc(forum.author_name)}">
+          <a href="${authorProfileUrl}" class="d-flex align-items-center gap-2 text-decoration-none" title="Ver perfil de ${esc(forum.author_name)}" style="transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+            <img src="${avatarUrl(forum.author_image, forum.author_name)}" class="rounded-circle" style="width: 48px; height: 48px; object-fit: cover; border: 2px solid var(--rcw-green-neon);">
             <span class="badge bg-success bg-opacity-25 text-success rounded-pill d-none d-sm-inline" style="font-size: 0.65rem;">Propietario</span>
-          </div>`;
-        
+          </a>`;
+
+        // Avatares de colaboradores → cada uno enlaza a su perfil
         let collabsHtml = '';
         if (forum.collaborators_json) {
            try {
@@ -81,17 +86,22 @@
                                   <span class="text-muted small d-none d-sm-inline" style="font-size: 0.75rem;">Colaboradores</span>
                                   <div class="d-flex align-items-center gap-2">`;
                  collabs.slice(0, 4).forEach(c => {
-                    collabsHtml += `<img src="${avatarUrl(c.profile_image, c.username)}" alt="${esc(c.username)}" title="Colaborador: ${esc(c.username)}" class="rounded-circle border border-secondary" style="width: 32px; height: 32px; object-fit: cover; transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">`;
+                    const profileUrl = `${BASE}/web/views/public/users/user_profile.php?id=${c.id}`;
+                    collabsHtml += `<a href="${profileUrl}" title="Ver perfil de ${esc(c.username)}" style="transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                                      <img src="${avatarUrl(c.profile_image, c.username)}" alt="${esc(c.username)}" class="rounded-circle border border-secondary" style="width: 32px; height: 32px; object-fit: cover; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">
+                                    </a>`;
                  });
                  if (collabs.length > 4) {
-                     collabsHtml += `<div class="rounded-circle bg-dark text-muted d-flex align-items-center justify-content-center border border-secondary" style="width: 32px; height: 32px; font-size: 0.7rem; font-weight: bold;" title="+${collabs.length - 4} más">+${collabs.length - 4}</div>`;
+                     collabsHtml += `<div class="rounded-circle bg-dark text-muted d-flex align-items-center justify-content-center border border-secondary" style="width: 32px; height: 32px; font-size: 0.7rem; font-weight: bold; cursor: default;" title="+${collabs.length - 4} más">+${collabs.length - 4}</div>`;
                  }
                  collabsHtml += `</div></div>`;
              }
            } catch(e) { console.warn("Error parsing collabs", e) }
         }
-        
+
         avatarEl.innerHTML = `<div class="d-flex align-items-center">${authorHtml}${collabsHtml}</div>`;
+        // El área de avatar ya NO abre el modal (cada elemento tiene su propio enlace)
+        avatarEl.style.cursor = 'default';
       }
 
       // Zona derecha: badge + botón owner
@@ -182,11 +192,9 @@
         new bootstrap.Modal(el('forumInfoModal')).show();
       };
 
+      // Solo el área de texto (título + subtítulo) abre el modal de info
       textClickArea.style.cursor = 'pointer';
       textClickArea.addEventListener('click', openInfoModal);
-      
-      avatarClickArea.style.cursor = 'pointer';
-      avatarClickArea.addEventListener('click', openInfoModal);
 
     } catch (e) {
       console.error('[forum] Error cargando foro:', e);
@@ -206,9 +214,10 @@
       const res  = await fetch(url);
       const data = await res.json();
 
-      if (!data.success) return;
-
+      // Ocultar spinner siempre, independientemente del resultado
       el('forum-loading').style.display = 'none';
+
+      if (!data.success) return;
 
       const msgs = data.messages;
       if (!msgs || msgs.length === 0) {
@@ -378,22 +387,41 @@
       btn.dataset.bound = '1';
       btn.addEventListener('click', async () => {
         const msgId  = parseInt(btn.dataset.id);
-        const hidden = parseInt(btn.dataset.hidden);
+        const hidden = parseInt(btn.dataset.hidden); // 1 = ocultar ahora, 0 = mostrar ahora
         const fd = new FormData();
         fd.append('message_id', msgId);
         fd.append('hidden', hidden);
         const res  = await fetch(`${BASE}/api/php/forums.php?action=hide_message`, { method: 'POST', body: fd });
         const data = await res.json();
         if (data.success) {
-          // Refresca el wrap del mensaje
           const wrap = document.querySelector(`[data-msg-id="${msgId}"]`);
           if (wrap) {
             wrap.classList.toggle('is-hidden', hidden === 1);
+
+            // Añadir o quitar el banner "Mensaje ocultado por el moderador"
+            const bubble = wrap.querySelector('.msg-bubble');
+            if (bubble) {
+              if (hidden === 1) {
+                if (!bubble.querySelector('.msg-hidden-banner')) {
+                  const banner = document.createElement('div');
+                  banner.className = 'msg-hidden-banner';
+                  banner.innerHTML = '<i class="fa-solid fa-eye-slash me-1"></i>Mensaje ocultado por el moderador';
+                  const anchor = bubble.querySelector('.msg-author') || bubble.querySelector('.msg-reply-quote') || bubble.firstChild;
+                  bubble.insertBefore(banner, anchor?.nextSibling ?? bubble.firstChild);
+                }
+              } else {
+                bubble.querySelector('.msg-hidden-banner')?.remove();
+              }
+            }
+
             // Flip el botón
             btn.dataset.hidden = hidden === 1 ? 0 : 1;
             btn.querySelector('i').className = hidden === 1 ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
             btn.setAttribute('data-tooltip', hidden === 1 ? 'Mostrar mensaje' : 'Ocultar mensaje');
           }
+
+          // Propagar el cambio al resto de usuarios inmediatamente
+          await syncForumState();
         }
       });
     });
@@ -427,12 +455,38 @@
         fd.append('target_user_id', pendingBanTargetId);
         const res  = await fetch(`${BASE}/api/php/forums.php?action=ban_user`, { method: 'POST', body: fd });
         const data = await res.json();
-        
-        bootstrap.Modal.getInstance(el('banModal'))?.hide();
-        
+
         if (data.success) {
           showToast(`Usuario "${pendingBanTargetName}" baneado`, 'success');
+
+          const banModalEl = el('banModal');
+
+          // Esperar a que el modal de ban se cierre del todo antes de recargar listas
+          const afterHide = async () => {
+            banModalEl?.removeEventListener('hidden.bs.modal', afterHide);
+
+            // Sincronizar mensajes borrados en el DOM sin esperar el polling
+            await syncForumState();
+
+            // Recargar siempre las listas del panel (independientemente de si está visible)
+            const canManage = (forumRole === 'owner' || IS_ADMIN);
+            await loadCollaboratorsList(canManage);
+            if (canManage) await loadBannedList();
+            const participantsContainer = el('participants-list-container');
+            if (participantsContainer && participantsContainer.style.display !== 'none') {
+              await loadParticipants();
+            }
+          };
+
+          if (banModalEl) {
+            banModalEl.addEventListener('hidden.bs.modal', afterHide);
+            bootstrap.Modal.getInstance(banModalEl)?.hide();
+          } else {
+            // Si no hay modal, ejecutar directamente
+            await afterHide();
+          }
         } else {
+          bootstrap.Modal.getInstance(el('banModal'))?.hide();
           showToast(data.error || 'Error al banear', 'error');
         }
       });
@@ -867,28 +921,18 @@
           </div>`;
       }).join('');
 
-      // Bind botones banear
+      // Bind botones banear (usa banModal en vez de confirm())
       container.querySelectorAll('.participant-ban-btn').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          const targetId   = btn.dataset.userId;
-          const targetName = btn.dataset.username;
-          if (!confirm(`¿Banear a ${targetName} de este foro?`)) return;
-          btn.disabled = true;
-          try {
-            const fd = new FormData();
-            fd.append('forum_id', FORUM_ID);
-            fd.append('target_user_id', targetId);
-            const r = await fetch(`${BASE}/api/php/forums.php?action=ban_user`, { method: 'POST', body: fd });
-            const d = await r.json();
-            if (d.success) {
-              showToast(`${targetName} baneado del foro`, 'success');
-              await loadParticipants();
-              await loadBannedList();
-            } else {
-              showToast(d.error || 'Error al banear', 'error');
-              btn.disabled = false;
-            }
-          } catch { btn.disabled = false; }
+        btn.addEventListener('click', () => {
+          pendingBanTargetId   = parseInt(btn.dataset.userId);
+          pendingBanTargetName = btn.dataset.username;
+          const nameEl = el('ban-user-name');
+          if (nameEl) nameEl.textContent = pendingBanTargetName;
+          const modalEl = el('banModal');
+          if (modalEl) {
+            const m = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            m.show();
+          }
         });
       });
 
@@ -1030,15 +1074,121 @@
      POLLING
   ══════════════════════════════════════════════════════════ */
   function startPolling() {
-    pollTimer = setInterval(() => loadMessages(false), POLL_MS);
+    pollTimer = setInterval(async () => {
+      await syncForumState();
+      if (!isBannedSelf) await loadMessages(false);  // no llames a getMessages si estás baneado (evita 403 + spinner)
+    }, POLL_MS);
+
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         clearInterval(pollTimer);
       } else {
-        loadMessages(false);
-        pollTimer = setInterval(() => loadMessages(false), POLL_MS);
+        syncForumState().then(() => { if (!isBannedSelf) loadMessages(false); });
+        pollTimer = setInterval(async () => {
+          await syncForumState();
+          if (!isBannedSelf) await loadMessages(false);
+        }, POLL_MS);
       }
     });
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     SYNC ESTADO DEL FORO (borrados, ocultaciones, bans)
+  ══════════════════════════════════════════════════════════ */
+  async function syncForumState() {
+    try {
+      const res  = await fetch(`${BASE}/api/php/forums.php?action=get_forum_state&forum_id=${FORUM_ID}`);
+      const data = await res.json();
+      if (!data.success) return;
+
+      // ── 1. Ban / unban del usuario actual ─────────────────
+      const wasConsideredBanned = isBannedSelf || forumRole === 'banned';
+
+      if (data.banned && !wasConsideredBanned) {
+        // Acaban de banear al usuario actual
+        isBannedSelf = true;
+        forumRole    = 'banned';
+        el('forum-input-area')?.classList.add('d-none');
+        el('forum-banned-notice')?.classList.remove('d-none');
+        // Vaciar mensajes (el backend ya los borró)
+        const list = el('forum-messages-list');
+        if (list) list.innerHTML = '';
+
+      } else if (!data.banned && wasConsideredBanned) {
+        // Acaban de desbanear al usuario actual — restaurar sin recargar página
+        isBannedSelf = false;
+        forumRole    = 'reader';
+        el('forum-input-area')?.classList.remove('d-none');
+        el('forum-banned-notice')?.classList.add('d-none');
+        // Recargar mensajes completos (el usuario vuelve a tener acceso)
+        await loadMessages(true);
+        return; // Los mensajes ya se han cargado, no procesar borrados/ocultos
+      }
+
+      // ── 2. Mensajes borrados ───────────────────────────────
+      const existingIds = new Set(data.message_ids.map(Number));
+      document.querySelectorAll('[data-msg-id]').forEach(wrap => {
+        const msgId = parseInt(wrap.dataset.msgId);
+        if (!existingIds.has(msgId)) {
+          wrap.remove();
+        }
+      });
+
+      // Mostrar placeholder si no quedan mensajes
+      const list = el('forum-messages-list');
+      if (list && !list.querySelector('[data-msg-id]') && !list.querySelector('.forum-no-msgs')) {
+        list.innerHTML = `
+          <div class="forum-no-msgs">
+            <i class="fa-regular fa-comment-dots fa-3x mb-3 opacity-25"></i>
+            <p>Aún no hay mensajes. ¡Sé el primero!</p>
+          </div>`;
+      }
+
+      // ── 3. Ocultaciones / visibilidad ─────────────────────
+      const hiddenStates = data.hidden_states || {};
+      document.querySelectorAll('[data-msg-id]').forEach(wrap => {
+        const msgId   = parseInt(wrap.dataset.msgId);
+        const hidden  = hiddenStates[msgId];
+        if (hidden === undefined) return;
+
+        const isHiddenNow = wrap.classList.contains('is-hidden');
+
+        if (hidden && !isHiddenNow) {
+          // Ocultar
+          wrap.classList.add('is-hidden');
+          // Añadir banner si no existe
+          const bubble = wrap.querySelector('.msg-bubble');
+          if (bubble && !bubble.querySelector('.msg-hidden-banner')) {
+            const banner = document.createElement('div');
+            banner.className = 'msg-hidden-banner';
+            banner.innerHTML = '<i class="fa-solid fa-eye-slash me-1"></i>Mensaje ocultado por el moderador';
+            const firstChild = bubble.querySelector('.msg-author') || bubble.querySelector('.msg-reply-quote') || bubble.firstChild;
+            bubble.insertBefore(banner, firstChild?.nextSibling ?? bubble.firstChild);
+          }
+          // Actualizar botón hide si lo tiene (el moderador)
+          const hideBtn = wrap.querySelector('.hide-btn');
+          if (hideBtn) {
+            hideBtn.dataset.hidden = '0';
+            hideBtn.querySelector('i').className = 'fa-solid fa-eye';
+            hideBtn.setAttribute('data-tooltip', 'Mostrar mensaje');
+          }
+        } else if (!hidden && isHiddenNow) {
+          // Mostrar
+          wrap.classList.remove('is-hidden');
+          wrap.querySelector('.msg-hidden-banner')?.remove();
+          // Actualizar botón hide si lo tiene (el moderador)
+          const hideBtn = wrap.querySelector('.hide-btn');
+          if (hideBtn) {
+            hideBtn.dataset.hidden = '1';
+            hideBtn.querySelector('i').className = 'fa-solid fa-eye-slash';
+            hideBtn.setAttribute('data-tooltip', 'Ocultar mensaje');
+          }
+        }
+      });
+
+    } catch (e) {
+      console.warn('[forum] syncForumState error:', e);
+    }
   }
 
   /* ══════════════════════════════════════════════════════════

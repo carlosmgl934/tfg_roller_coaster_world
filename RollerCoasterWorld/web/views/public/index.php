@@ -365,12 +365,12 @@ $is_admin = !empty($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
                 <!-- Mini stats -->
                 <div class="d-flex flex-wrap justify-content-center gap-5 mt-5 pt-4 landing-stats-bar">
                     <div>
-                        <div class="fw-bold fs-3 text-neon" id="landing-cnt-coasters">+…</div>
+                        <div class="fw-bold fs-3 text-neon" id="landing-cnt-coasters"></div>
                         <div class="small text-light opacity-75">Montañas rusas</div>
                     </div>
                     <div class="landing-stat-sep"></div>
                     <div>
-                        <div class="fw-bold fs-3 text-neon" id="landing-cnt-parks">+…</div>
+                        <div class="fw-bold fs-3 text-neon" id="landing-cnt-parks"></div>
                         <div class="small text-light opacity-75">Parques</div>
                     </div>
                     <div class="landing-stat-sep"></div>

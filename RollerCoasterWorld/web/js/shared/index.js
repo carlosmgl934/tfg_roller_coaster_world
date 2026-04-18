@@ -218,8 +218,8 @@ async function loadLandingStats() {
             // Mini stats del hero
             const elCoasters = document.getElementById('landing-cnt-coasters');
             const elParks    = document.getElementById('landing-cnt-parks');
-            if (elCoasters) animateCount(elCoasters, s.coasters, '+');
-            if (elParks)    animateCount(elParks,    s.parks,    '+');
+            if (elCoasters) animateCount(elCoasters, s.coasters);
+            if (elParks)    animateCount(elParks,    s.parks);
 
             // Grid de features (necesita el total de coasters)
             renderFeatures(s.coasters);

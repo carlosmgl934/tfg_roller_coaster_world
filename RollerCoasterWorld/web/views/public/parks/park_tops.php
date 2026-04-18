@@ -10,7 +10,7 @@ require_once __DIR__ . '/../../partials/header.php';
                 <i class="fa-solid fa-ranking-star me-2"></i> Tops de la Comunidad
             </h1>
             <p class="text-muted text-uppercase fw-bold mt-3" style="letter-spacing: 0.1em; font-size: 0.85rem;">
-                Descubre los parques favoritos de otros enthusiasts
+                Descubre los parques favoritos de otros usuarios
             </p>
         </div>
     </div>
@@ -18,16 +18,22 @@ require_once __DIR__ . '/../../partials/header.php';
     <!-- Controles de búsqueda y filtrado -->
     <div class="row justify-content-center mb-5">
         <div class="col-12 col-md-10 col-lg-8">
-            <div class="d-flex flex-wrap gap-3 align-items-center justify-content-center bg-dark p-3 border border-secondary border-opacity-25" style="border-radius: 0;">
-                
+            <div class="d-flex flex-wrap gap-3 align-items-center justify-content-center bg-dark p-3 border border-secondary border-opacity-25"
+                style="border-radius: 0;">
+
                 <!-- Buscador -->
                 <div class="flex-grow-1 position-relative" style="min-width: 200px;">
-                    <input type="text" id="top-search" class="form-control bg-transparent text-white border-success rounded-0 ps-3 pe-5 py-2 shadow-sm" placeholder="Buscar usuario..." style="border-width: 2px;">
-                    <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="right: 14px; top: 50%; transform: translateY(-50%);"></i>
+                    <input type="text" id="top-search"
+                        class="form-control bg-transparent text-white border-success rounded-0 ps-3 pe-5 py-2 shadow-sm"
+                        placeholder="Buscar usuario..." style="border-width: 2px;">
+                    <i class="fa-solid fa-magnifying-glass position-absolute text-muted"
+                        style="right: 14px; top: 50%; transform: translateY(-50%);"></i>
                 </div>
-                
+
                 <!-- Ordenar por -->
-                <select id="sort-select" class="form-select bg-transparent text-white border-success rounded-0 py-2 shadow-sm w-auto" style="border-width: 2px;">
+                <select id="sort-select"
+                    class="form-select bg-transparent text-white border-success rounded-0 py-2 shadow-sm w-auto"
+                    style="border-width: 2px;">
                     <option value="date_desc" style="background: #212529;" selected>Última modificación</option>
                     <option value="parks_desc" style="background: #212529;">Mayor nº de parques</option>
                     <option value="alpha_asc" style="background: #212529;">Orden alfabético</option>
@@ -35,8 +41,13 @@ require_once __DIR__ . '/../../partials/header.php';
 
                 <!-- Filtro Amigos -->
                 <div class="form-check form-switch fs-5 d-flex align-items-center ms-md-3">
-                    <input class="form-check-input rounded-0 bg-transparent border-success focus-ring focus-ring-success mt-0" type="checkbox" role="switch" id="filterFriends" style="width: 2.5em; height: 1.2em; border-width: 2px; cursor: pointer;">
-                    <label class="form-check-label ms-2 text-white" for="filterFriends" style="font-size: 0.95rem; cursor: pointer;"><i class="fa-solid fa-user-group text-success me-1"></i> Solo amigos</label>
+                    <input
+                        class="form-check-input rounded-0 bg-transparent border-success focus-ring focus-ring-success mt-0"
+                        type="checkbox" role="switch" id="filterFriends"
+                        style="width: 2.5em; height: 1.2em; border-width: 2px; cursor: pointer;">
+                    <label class="form-check-label ms-2 text-white" for="filterFriends"
+                        style="font-size: 0.95rem; cursor: pointer;"><i
+                            class="fa-solid fa-user-group text-success me-1"></i> Solo amigos</label>
                 </div>
 
             </div>
@@ -52,9 +63,9 @@ require_once __DIR__ . '/../../partials/header.php';
     </div>
 </main>
 
-<?php 
+<?php
 require_once __DIR__ . '/../../partials/login_modal.php';
-require_once __DIR__ . '/../../partials/footer.php'; 
+require_once __DIR__ . '/../../partials/footer.php';
 ?>
 <script>
     window.BASE_URL = '<?= $base_url ?>';

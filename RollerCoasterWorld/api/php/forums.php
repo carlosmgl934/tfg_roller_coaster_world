@@ -26,6 +26,7 @@ $router->register('get_collaborators',   'getCollaborators');
 $router->register('remove_collaborator', 'removeCollaborator', 'POST');
 $router->register('invite_collaborator', 'inviteCollaborator', 'POST');
 $router->register('get_participants',    'getParticipants');
+$router->register('get_forum_state',     'getForumState');
 $router->dispatch();
 
 /* ═══════════════════════════════════════════════════════════════
@@ -700,6 +701,12 @@ function banUser()
         $stmtDel->bindValue(':uid', $targetUserId, PDO::PARAM_INT);
         $stmtDel->execute();
 
+        // Si era colaborador, quitarle ese rol también
+        $stmtDelCollab = $db->prepare("DELETE FROM forum_collaborators WHERE forum_id = :fid AND user_id = :uid");
+        $stmtDelCollab->bindValue(':fid', $forumId, PDO::PARAM_INT);
+        $stmtDelCollab->bindValue(':uid', $targetUserId, PDO::PARAM_INT);
+        $stmtDelCollab->execute();
+
         Response::success(['message' => 'Usuario baneado']);
     } catch (PDOException $e) {
         Response::error('Error: ' . $e->getMessage());
@@ -1011,6 +1018,78 @@ function getParticipants()
             'participants' => $participants,
             'can_ban'      => $isOwner || $isAdmin,
             'author_id'    => (int)$forum['author_id'],
+        ]);
+    } catch (PDOException $e) {
+        Response::error('Error: ' . $e->getMessage());
+    }
+}
+
+/**
+ * Devuelve el estado ligero del foro para sincronización en tiempo real:
+ * - Si el usuario actual está baneado
+ * - Lista de IDs de mensajes existentes en BD (para detectar borrados)
+ * - Mapa is_hidden por mensaje (para sincronizar ocultaciones)
+ */
+function getForumState()
+{
+    $forumId = (int)($_GET['forum_id'] ?? 0);
+    if (!$forumId) Response::error('forum_id requerido');
+
+    $userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
+
+    global $db;
+    try {
+        // ¿El usuario está baneado?
+        $isBanned = false;
+        if ($userId) {
+            $stmtB = $db->prepare("SELECT 1 FROM forum_banned WHERE forum_id = :fid AND user_id = :uid");
+            $stmtB->bindValue(':fid', $forumId, PDO::PARAM_INT);
+            $stmtB->bindValue(':uid', $userId,  PDO::PARAM_INT);
+            $stmtB->execute();
+            $isBanned = (bool)$stmtB->fetchColumn();
+        }
+
+        // ¿Es owner, admin o colaborador? (pueden ver mensajes ocultos)
+        $isPrivileged = false;
+        if ($userId) {
+            $stmtO = $db->prepare("SELECT author_id FROM forums WHERE id = :fid");
+            $stmtO->bindValue(':fid', $forumId, PDO::PARAM_INT);
+            $stmtO->execute();
+            $authorId = $stmtO->fetchColumn();
+            $isAdmin  = isset($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
+            $isOwner  = $authorId && ((int)$authorId === $userId);
+
+            if (!$isOwner && !$isAdmin) {
+                $stmtC = $db->prepare("SELECT 1 FROM forum_collaborators WHERE forum_id = :fid AND user_id = :uid");
+                $stmtC->bindValue(':fid', $forumId, PDO::PARAM_INT);
+                $stmtC->bindValue(':uid', $userId,  PDO::PARAM_INT);
+                $stmtC->execute();
+                $isPrivileged = (bool)$stmtC->fetchColumn();
+            } else {
+                $isPrivileged = true;
+            }
+        }
+
+        // IDs + estado is_hidden de todos los mensajes del foro
+        $hiddenClause = $isPrivileged ? '' : 'AND is_hidden = FALSE';
+        $sql = "SELECT id, is_hidden FROM forum_messages WHERE forum_id = :fid $hiddenClause ORDER BY id ASC";
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':fid', $forumId, PDO::PARAM_INT);
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $messageIds   = [];
+        $hiddenStates = [];
+        foreach ($rows as $row) {
+            $messageIds[]               = (int)$row['id'];
+            $hiddenStates[(int)$row['id']] = (bool)$row['is_hidden'];
+        }
+
+        Response::success([
+            'banned'        => $isBanned,
+            'message_ids'   => $messageIds,
+            'hidden_states' => $hiddenStates,
+            'privileged'    => $isPrivileged,
         ]);
     } catch (PDOException $e) {
         Response::error('Error: ' . $e->getMessage());

@@ -58,11 +58,11 @@
       <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
         <h6 class="text-uppercase fw-bold text-success mb-4">Conecta</h6>
         <p class="mb-3">
-          <a href="mailto:carxmgl934@gmail.com"
+          <a href="mailto:tfgrollercoaster@gmail.com"
             class="text-white text-decoration-none d-flex align-items-center justify-content-center justify-content-md-start"
             style="transition: color 0.3s;" onmouseover="this.style.color='#198754'"
             onmouseout="this.style.color='white'">
-            <i class="fa-solid fa-envelope me-2"></i>carxmgl934@gmail.com
+            <i class="fa-solid fa-envelope me-2"></i>tfgrollercoaster@gmail.com
           </a>
         </p>
         <div class="d-flex justify-content-center justify-content-md-start gap-4 fs-4 mt-4">
@@ -91,7 +91,7 @@
       </div>
       <div class="col-md-5 col-lg-4">
         <p class="text-md-end text-center mb-0 text-white-50">
-          &copy; 2026 RollerCoaster World.<br>Todos los derechos reservados.
+          &copy; <?= date("Y") ?> RollerCoaster World&trade; &reg;.<br>Todos los derechos reservados.
         </p>
       </div>
     </div>

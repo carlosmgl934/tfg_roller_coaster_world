@@ -56,6 +56,8 @@ $user_id = $_GET['id'] ?? null;
                             class="fa-solid fa-list-ol me-2 w-20px text-center"></i> Sus tops</a>
                     <a href="#" id="menu-photos" class="list-group-item list-group-item-action py-3"><i
                             class="fa-solid fa-images me-2 w-20px text-center"></i> Sus fotos</a>
+                    <a href="#" id="menu-reviews" class="list-group-item list-group-item-action py-3"><i
+                            class="fa-solid fa-star-half-stroke me-2 w-20px text-center"></i> Sus Reseñas</a>
                     <a href="#" id="menu-friends" class="list-group-item list-group-item-action py-3"><i
                             class="fa-solid fa-user-group me-2 w-20px text-center"></i> Sus Amigos</a>
                     <a href="<?= Router::url('trip_generator') ?>"
@@ -256,6 +258,29 @@ $user_id = $_GET['id'] ?? null;
                     </div>
                     <div class="card-body p-0">
                         <div id="friends-list-container">
+                            <!-- Inyectado via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: Sus Reseñas -->
+            <div class="content-section" id="section-reviews" style="display:none;">
+                <div class="card profile-card mb-4">
+                    <div class="card-header pt-3 pb-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-star-half-stroke fs-5 text-warning"></i>
+                            <h5 class="fw-bold mb-0">Reseñas de este usuario</h5>
+                        </div>
+                        <select id="reviews-sort-selector" class="form-select w-auto fw-bold bg-dark text-white border-success border-opacity-50 rounded-0" style="font-size: 0.9rem;">
+                            <option value="newest">Más recientes</option>
+                            <option value="oldest">Más antiguas</option>
+                            <option value="highest">Mejor valoradas</option>
+                            <option value="lowest">Peor valoradas</option>
+                        </select>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush bg-transparent tops-preview-scroll" id="reviews-list-container">
                             <!-- Inyectado via JS -->
                         </div>
                     </div>

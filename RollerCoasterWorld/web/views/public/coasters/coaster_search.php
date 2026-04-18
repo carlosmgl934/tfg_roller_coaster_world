@@ -24,7 +24,7 @@ require_once __DIR__ . '/../../partials/header.php';
                     </div>
                     <div class="form-check form-switch mb-4">
                         <input class="form-check-input" type="checkbox" id="ridden-filter">
-                        <label class="form-check-label" for="ridden-filter">Ya montadas</label>
+                        <label class="form-check-label" for="ridden-filter">Ya probadas</label>
                     </div>
                     <div class="mb-3">
                         <label for="height-filter" class="form-label d-flex justify-content-between">
@@ -51,8 +51,8 @@ require_once __DIR__ . '/../../partials/header.php';
                         <input type="range" class="form-range" id="inversions-filter" min="0" max="20" value="0">
                     </div>
                     <div class="mb-3 position-relative">
-                        <input type="text" id="filter-park-search" class="form-control shadow-sm rounded-0 border-success ac-input-select" 
-                            placeholder="Parque" 
+                        <input type="text" id="filter-park-search"
+                            class="form-control shadow-sm rounded-0 border-success ac-input-select" placeholder="Parque"
                             style="border-width: 1px; box-shadow: none; background-color: var(--rcw-bg-card-alt); color: var(--rcw-text-primary);">
                         <input type="hidden" id="park-filter" name="park_id" value="">
                         <div id="filter-park-results" class="ac-dropdown d-none"></div>
@@ -130,4 +130,4 @@ require_once __DIR__ . '/../../partials/header.php';
     </div>
 </main>
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
-<script src="<?= Router::asset('web/js/coasters/coasters.js') ?>"></script>
+<script src="<?= Router::asset('web/js/coasters/coasters.js') ?>?v=<?= time() ?>"></script>

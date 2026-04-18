@@ -814,7 +814,7 @@ function getRanking()
 
 function getAllReviews()
 {
-    $limit = 15;
+    $limit = 10;
     $page = max(1, intval($_GET['page'] ?? 1));
     $offset = ($page - 1) * $limit;
     
@@ -876,7 +876,7 @@ function getAllReviews()
         }
 
         $sql = "SELECT coaster_ratings.id, coaster_ratings.note, coaster_ratings.review, coaster_ratings.created_at, 
-                       users.username, users.profile_image, 
+                       users.id AS user_id, users.username, users.profile_image, 
                        coasters.coaster_name, coasters.id AS coaster_id, coasters.imagen_url, parks.park_name
                 FROM coaster_ratings 
                 $joinClause

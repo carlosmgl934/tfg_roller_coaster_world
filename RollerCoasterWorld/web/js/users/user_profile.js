@@ -135,6 +135,7 @@ $(document).ready(function () {
     renderTops(topCoasters, topParks);
     renderPhotos(userPhotos, user);
     renderFriendsList(data.friends || [], user.username);
+    renderReviews(data.reviews || []);
 
     setupTabs();
   }
@@ -153,6 +154,7 @@ $(document).ready(function () {
         "menu-tops":    "#section-tops",
         "menu-photos":  "#section-photos",
         "menu-friends": "#section-friends",
+        "menu-reviews": "#section-reviews",
       };
       if (map[menuId]) $(map[menuId]).show();
     }
@@ -167,6 +169,7 @@ $(document).ready(function () {
     if      (hash === "#tops")    activateSection("menu-tops");
     else if (hash === "#photos")  activateSection("menu-photos");
     else if (hash === "#friends") activateSection("menu-friends");
+    else if (hash === "#reviews") activateSection("menu-reviews");
     else                          activateSection("menu-profile");
   }
 
@@ -504,5 +507,88 @@ $(document).ready(function () {
     }
     btn.prop("disabled", false).text("Eliminar");
   });
+
+  // ─── Renderizar y Ordenar Reseñas ──────────────────────
+  function renderReviews(reviewsArray) {
+    const container = $("#reviews-list-container");
+    const sortSelect = $("#reviews-sort-selector");
+    
+    // Configurar estado inicial
+    let currentReviews = [...reviewsArray];
+
+    function drawReviews() {
+        container.empty();
+        if (currentReviews.length === 0) {
+            container.html('<div class="p-5 text-center text-muted"><i class="fa-solid fa-star-half-stroke fa-3x mb-3 d-block opacity-25"></i>Este usuario no ha escrito ninguna reseña.</div>');
+            return;
+        }
+
+        let html = '';
+        currentReviews.forEach(r => {
+            const dateStr = new Date(r.created_at).toLocaleDateString("es-ES", {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+            const link = r.type === "coaster"
+                ? `${BASE_URL}/web/views/public/coasters/coasters.php?id=${r.item_id}`
+                : `${BASE_URL}/web/views/public/parks/parks.php?id=${r.item_id}`;
+            const imgUrl = r.imagen_url && r.imagen_url.startsWith("/") ? BASE_URL + r.imagen_url : 
+                           (r.imagen_url || 'https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png');
+
+            let starsHtml = '';
+            const fullStars = Math.floor(r.note);
+            const hasHalfStar = (r.note % 1 !== 0);
+            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+            for(let i=0; i<fullStars; i++) starsHtml += '<i class="fa-solid fa-star text-success"></i>';
+            if(hasHalfStar) starsHtml += '<i class="fa-solid fa-star-half-stroke text-success"></i>';
+            for(let i=0; i<emptyStars; i++) starsHtml += '<i class="fa-regular fa-star text-success opacity-50"></i>';
+
+            html += `
+            <a href="${link}" class="list-group-item list-group-item-action bg-transparent px-3 py-3" style="border-bottom: 1px solid var(--rcw-border); transition: background 0.2s;" onmouseover="this.style.background='rgba(25,135,84,0.06)'" onmouseout="this.style.background='transparent'">
+                <div class="row g-3">
+                    <div class="col-sm-2 col-3">
+                        <img src="${imgUrl}" alt="${r.title}" class="w-100 rounded shadow-sm object-fit-cover" style="aspect-ratio: 4/3;">
+                    </div>
+                    <div class="col-sm-10 col-9 d-flex flex-column justify-content-between">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="fw-bold mb-1 text-light">${r.title} <span class="badge ${r.type === 'coaster' ? 'bg-primary' : 'bg-success'} fw-normal ms-2" style="font-size: 0.70rem;">${r.type === 'coaster' ? 'Coaster' : 'Parque'}</span></h6>
+                                <p class="mb-1 text-muted small"><i class="fa-solid fa-location-dot me-1"></i>${r.subtitle}</p>
+                            </div>
+                            <div class="text-end">
+                                <div class="mb-1 d-flex justify-content-end align-items-center gap-1" style="font-size: 0.9rem;">
+                                    ${starsHtml}
+                                    <span class="ms-1 fw-bold text-success">${Number(r.note).toFixed(1)}</span>
+                                </div>
+                                <small class="text-muted d-block" style="font-size: 0.75rem;">${dateStr}</small>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-white opacity-75" style="font-size: 0.9rem;">
+                            ${r.review ? r.review : '<i>Valoración sin reseña escrita.</i>'}
+                        </div>
+                    </div>
+                </div>
+            </a>`;
+        });
+        container.html(html);
+    }
+
+    sortSelect.off("change").on("change", function() {
+        const order = $(this).val();
+        if (order === "newest") {
+            currentReviews.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        } else if (order === "oldest") {
+            currentReviews.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        } else if (order === "highest") {
+            currentReviews.sort((a, b) => b.note - a.note);
+        } else if (order === "lowest") {
+            currentReviews.sort((a, b) => a.note - b.note);
+        }
+        drawReviews();
+    });
+
+    // Estado inicial: ordenar por más reciente (newest)
+    sortSelect.val("newest").trigger("change");
+  }
 
 });

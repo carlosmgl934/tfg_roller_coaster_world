@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -123,4 +123,4 @@ require_once __DIR__ . '/../../partials/header.php';
 </main>
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
-<script src="<?= Router::asset('web/js/coasters/coasters.js') ?>"></script>
+<script src="<?= Router::asset('web/js/coasters/coasters.js') ?>?v=<?= time() ?>"></script>

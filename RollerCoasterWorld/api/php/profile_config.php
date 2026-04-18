@@ -350,6 +350,9 @@ function getTopCoasters()
                 c.imagen_url,
                 c.height,
                 c.speed,
+                c.inversions,
+                c.coaster_length,
+                c.opening_year,
                 c.coaster_manufacter AS manufacter,
                 p.park_name,
                 p.park_country AS country_name

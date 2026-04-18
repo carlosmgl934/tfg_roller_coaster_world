@@ -1208,10 +1208,10 @@ $(document).ready(function () {
       uploadBtn.innerHTML =
         'Subiendo... <i class="fa-solid fa-spinner fa-spin ms-2"></i>';
 
-      try {
-        // 1. Obtener imagen recortada como Blob
-        cropper.getCroppedCanvas({ width: 1080, height: 1080 }).toBlob(
-          async function (blob) {
+      // 1. Obtener imagen recortada como Blob
+      cropper.getCroppedCanvas({ width: 1080, height: 1080 }).toBlob(
+        async function (blob) {
+          try {
             if (!blob) throw new Error("Error al recortar la imagen");
 
             const rawExt = photoInput.files[0].name.split(".").pop();
@@ -1224,34 +1224,24 @@ $(document).ready(function () {
             uploadForm.append("bucket", "coasters");
             uploadForm.append("path", coasterId);
 
+            const uploadRes = await fetch(`${window.BASE_URL}/api/php/upload.php`, {
+              method: "POST",
+              body: uploadForm,
+            });
+
+            // Leer como texto primero para detectar errores del servidor
+            const rawText = await uploadRes.text();
+            let uploadData;
             try {
-              console.log("SUPER DEBUG COASTERS: fetch a upload.php", [...uploadForm.entries()]);
-              const uploadRes = await fetch(`${window.BASE_URL}/api/php/upload.php`, {
-                method: "POST",
-                body: uploadForm,
-              });
-
-              const rawText = await uploadRes.text();
-              console.log("SUPER DEBUG COASTERS: raw response (status " + uploadRes.status + ")", rawText);
-              
-              let uploadData;
-              try {
-                uploadData = JSON.parse(rawText);
-              } catch (parseErr) {
-                alert("SUPER DEBUG [JSON ERROR en Coasters]\nStatus: " + uploadRes.status + "\nRespuesta:\n" + rawText.substring(0,500));
-                throw new Error("El servidor no devolvió una respuesta JSON válida.");
-              }
-
-              if (!uploadData.success) {
-                alert("SUPER DEBUG [SERVER ERROR en Coasters]\n" + (uploadData.error || "Desconocido"));
-                throw new Error(uploadData.error || "Error al subir la foto");
-              }
-              const url = uploadData.url;
-              
-            } catch (err) {
-              alert("SUPER DEBUG [CATCH GLOBAL EN COASTERS]\n" + err.message);
-              throw err;
+              uploadData = JSON.parse(rawText);
+            } catch (e) {
+              throw new Error("El servidor devolvió una respuesta inválida: " + rawText.substring(0, 200));
             }
+
+            if (!uploadData.success) {
+              throw new Error(uploadData.error || "Error al subir la foto");
+            }
+            const url = uploadData.url;
 
             // 3. Guardar en PostgreSQL vía API PHP
             const captionVal = document.getElementById("photo-caption").value;
@@ -1261,63 +1251,50 @@ $(document).ready(function () {
             photoForm.append("photo_url", url);
             photoForm.append("caption", captionVal);
 
-            try {
-              const saveRes = await fetch(
-                `${window.BASE_URL}/api/php/coasters.php?action=save_photo`,
-                {
-                  method: "POST",
-                  body: photoForm,
-                },
-              );
-              const saveData = await saveRes.json();
-              if (saveData.success) {
-                const modalEl = document.getElementById("upload-photo-modal");
-                bootstrap.Modal.getInstance(modalEl).hide();
-                document.getElementById("upload-photo-form").reset();
-                cropContainer.style.display = "none";
-                if (cropper) {
-                  cropper.destroy();
-                  cropper = null;
-                }
-                showNotify(
-                  "¡Foto enviada!",
-                  "Tu foto está esperando aprobación del administrador. La verás publicada pronto.",
-                );
-              } else {
-                showNotify(
-                  "Error al guardar",
-                  "Error al guardar la foto: " +
-                    (saveData.error || "Desconocido"),
-                  true,
-                );
+            const saveRes = await fetch(
+              `${window.BASE_URL}/api/php/coasters.php?action=save_photo`,
+              {
+                method: "POST",
+                body: photoForm,
+              },
+            );
+            const saveData = await saveRes.json();
+            if (saveData.success) {
+              const modalEl = document.getElementById("upload-photo-modal");
+              bootstrap.Modal.getInstance(modalEl).hide();
+              document.getElementById("upload-photo-form").reset();
+              cropContainer.style.display = "none";
+              if (cropper) {
+                cropper.destroy();
+                cropper = null;
               }
-            } catch (saveErr) {
               showNotify(
-                "Error de conexión",
-                "Error en la conexión con la API.",
+                "¡Foto enviada!",
+                "Tu foto está esperando aprobación del administrador. La verás publicada pronto.",
+              );
+            } else {
+              showNotify(
+                "Error al guardar",
+                "Error al guardar la foto: " + (saveData.error || "Desconocido"),
                 true,
               );
-              console.error(saveErr);
-            } finally {
-              uploadBtn.disabled = false;
-              uploadBtn.innerHTML =
-                'Subir foto <i class="fa-solid fa-upload ms-1"></i>';
             }
-          },
-          "image/jpeg",
-          0.85,
-        ); // Exportar en JPG con calidad 85%
-      } catch (err) {
-        console.error("Error subiendo foto:", err);
-        showNotify(
-          "Error inesperado",
-          "Ocurrió un error al subir la foto.",
-          true,
-        );
-        uploadBtn.disabled = false;
-        uploadBtn.innerHTML =
-          'Subir foto <i class="fa-solid fa-upload ms-1"></i>';
-      }
+          } catch (err) {
+            console.error("Error subiendo foto:", err);
+            showNotify(
+              "Error al subir",
+              err.message || "Ocurrió un error inesperado.",
+              true,
+            );
+          } finally {
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML =
+              'Subir foto <i class="fa-solid fa-upload ms-1"></i>';
+          }
+        },
+        "image/jpeg",
+        0.85,
+      ); // Exportar en JPG con calidad 85%
     });
   }
 

@@ -991,6 +991,126 @@ $(document).ready(function () {
     });
   }
 
+  // ── Modal Estadísticas Ampliadas ─────────────────────────────────
+  $("#tops-stats-sidebar").on("click", function () {
+    const coasters = topsData.coasters || [];
+    const parks = topsData.parks || [];
+
+    // 1. Contadores Globales
+    $("#modal-stat-total-coasters").text(coasters.length);
+    $("#modal-stat-total-parks").text(parks.length);
+    
+    const allCountries = new Set();
+    coasters.forEach(c => c.country_name && allCountries.add(c.country_name));
+    parks.forEach(p => p.country_name && allCountries.add(p.country_name));
+    $("#modal-stat-total-countries").text(allCountries.size);
+
+    // 2. Coasters por País (Completo)
+    const countryCounts = {};
+    coasters.forEach((c) => {
+      const country = c.country_name || "Desconocido";
+      countryCounts[country] = (countryCounts[country] || 0) + 1;
+    });
+    const sortedCountries = Object.entries(countryCounts).sort((a, b) => b[1] - a[1]);
+    const maxCountry = sortedCountries.length ? sortedCountries[0][1] : 1;
+
+    const $modalCountries = $("#modal-list-countries").empty();
+    sortedCountries.forEach(([name, count], idx) => {
+      const pct = Math.round((count / maxCountry) * 100);
+      $modalCountries.append(`
+        <div class="px-4 py-3 d-flex align-items-center" style="border-bottom: 1px solid rgba(255,255,255,0.06); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+          <div class="flex-shrink-0 d-flex align-items-center justify-content-center fw-bold me-3" style="width:28px;height:28px;background:rgba(16,185,129,0.1);color:#10b981;font-size:0.75rem;">${idx + 1}</div>
+          <div class="flex-grow-1 pe-3">
+            <div class="d-flex justify-content-between align-items-end mb-2">
+              <span class="fw-bold text-white small text-truncate" title="${name}">${name}</span>
+              <span class="fw-bold text-success" style="font-size:0.85rem;">${count}</span>
+            </div>
+            <div style="height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:linear-gradient(90deg, #059669, #10b981);border-radius:2px;box-shadow:0 0 5px rgba(16,185,129,0.5);"></div>
+            </div>
+          </div>
+        </div>
+      `);
+    });
+    if(!sortedCountries.length) $modalCountries.append('<div class="p-4 text-center text-muted" style="font-size:0.8rem;">No hay datos</div>');
+
+    // 3. Coasters por Fabricante (Completo)
+    const mfrCounts = {};
+    coasters.forEach((c) => {
+      const mfr = c.manufacter || "Desconocido";
+      mfrCounts[mfr] = (mfrCounts[mfr] || 0) + 1;
+    });
+    const sortedMfrs = Object.entries(mfrCounts).sort((a, b) => b[1] - a[1]);
+    const maxMfr = sortedMfrs.length ? sortedMfrs[0][1] : 1;
+
+    const $modalMfrs = $("#modal-list-manufacturers").empty();
+    sortedMfrs.forEach(([name, count], idx) => {
+      const pct = Math.round((count / maxMfr) * 100);
+      $modalMfrs.append(`
+        <div class="px-4 py-3 d-flex align-items-center" style="border-bottom: 1px solid rgba(255,255,255,0.06); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+          <div class="flex-shrink-0 d-flex align-items-center justify-content-center fw-bold me-3" style="width:28px;height:28px;background:rgba(16,185,129,0.1);color:#10b981;font-size:0.75rem;">${idx + 1}</div>
+          <div class="flex-grow-1 pe-3">
+            <div class="d-flex justify-content-between align-items-end mb-2">
+              <span class="fw-bold text-white small text-truncate" title="${name}">${name}</span>
+              <span class="fw-bold text-success" style="font-size:0.85rem;">${count}</span>
+            </div>
+            <div style="height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:linear-gradient(90deg, #059669, #10b981);border-radius:2px;box-shadow:0 0 5px rgba(16,185,129,0.5);"></div>
+            </div>
+          </div>
+        </div>
+      `);
+    });
+    if(!sortedMfrs.length) $modalMfrs.append('<div class="p-4 text-center text-muted" style="font-size:0.8rem;">No hay datos</div>');
+
+    // 4. TOP RECORDS PERSONALES
+    let maxHeight = 0; let maxHeightCoaster = null;
+    let maxSpeed = 0; let maxSpeedCoaster = null;
+    let maxLength = 0; let maxLengthCoaster = null;
+    let maxInvers = 0; let maxInversCoaster = null;
+    let minYear = Infinity; let minYearCoaster = null;
+
+    coasters.forEach(c => {
+      const h = parseFloat(c.height);
+      if (h > maxHeight) { maxHeight = h; maxHeightCoaster = c.coaster_name; }
+      
+      const s = parseFloat(c.speed);
+      if (s > maxSpeed) { maxSpeed = s; maxSpeedCoaster = c.coaster_name; }
+
+      const l = parseFloat(c.coaster_length);
+      if (l > maxLength) { maxLength = l; maxLengthCoaster = c.coaster_name; }
+
+      const inv = parseInt(c.inversions);
+      if (inv > maxInvers) { maxInvers = inv; maxInversCoaster = c.coaster_name; }
+
+      const y = parseInt(c.opening_year);
+      if (y > 0 && y < minYear) { minYear = y; minYearCoaster = c.coaster_name; }
+    });
+
+    $("#max-stat-height").text(maxHeight > 0 ? `${maxHeight} m` : '—');
+    $("#max-stat-height-name").text(maxHeightCoaster || '—').attr("title", maxHeightCoaster || '');
+
+    $("#max-stat-speed").text(maxSpeed > 0 ? `${maxSpeed} km/h` : '—');
+    $("#max-stat-speed-name").text(maxSpeedCoaster || '—').attr("title", maxSpeedCoaster || '');
+
+    $("#max-stat-length").text(maxLength > 0 ? `${maxLength} m` : '—');
+    $("#max-stat-length-name").text(maxLengthCoaster || '—').attr("title", maxLengthCoaster || '');
+
+    $("#max-stat-inversions").text(maxInvers > 0 ? maxInvers : '—');
+    $("#max-stat-inversions-name").text(maxInversCoaster || '—').attr("title", maxInversCoaster || '');
+
+    $("#max-stat-year").text(minYear !== Infinity ? minYear : '—');
+    $("#max-stat-year-name").text(minYearCoaster || '—').attr("title", minYearCoaster || '');
+
+    // Mostrar modal
+    const modalEl = document.getElementById('statsExpandedModal');
+    if(modalEl) {
+      new bootstrap.Modal(modalEl).show();
+    }
+  });
+
+
+
   // ── Helper: cambiar entre modos ──────────────────────────────────
 
   function setTopsMode(mode) {

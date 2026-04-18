@@ -227,41 +227,74 @@
   color: #000 !important;
 }
 
-/* ── BOTÓN CTA: MI AGENDA DE PARQUES ────────────────────────── */
+/* ── BOTÓN CTA: MI AGENDA DE PARQUES (3D Dark) ───────────────────── */
 .rcw-btn-agenda {
   display: inline-flex !important;
   align-items: center;
-  padding: 0.5rem 1.1rem !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  color: var(--rcw-green-neon) !important;
-  font-weight: 600 !important;
-  font-size: 0.9rem !important;
-  border: 1px solid rgba(0, 200, 83, 0.4) !important;
-  transition: var(--rcw-transition) !important;
+  padding: 0.45rem 1.1rem !important;
+  border-radius: 6px !important;
+  background: linear-gradient(180deg, #1e2a3b 0%, #0f1520 100%) !important;
+  color: #e2e8f0 !important;
+  font-weight: 700 !important;
+  font-size: 0.88rem !important;
+  border: 1px solid #1e40af !important;
+  border-bottom: 3px solid #1e3a8a !important;
+  transition: all 0.15s ease !important;
   white-space: nowrap;
   letter-spacing: 0.01em;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05) !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  cursor: pointer;
 }
 .rcw-btn-agenda:hover {
-  background: rgba(0, 200, 83, 0.08) !important;
-  border-color: var(--rcw-green-neon) !important;
-  color: var(--rcw-green-neon) !important;
-  box-shadow: 0 0 12px rgba(0, 200, 83, 0.15) !important;
+  background: linear-gradient(180deg, #28384e 0%, #172133 100%) !important;
+  border-color: #2563eb !important;
+  border-bottom: 3px solid #1d4ed8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1) !important;
+  transform: translateY(-1px);
+}
+.rcw-btn-agenda:active {
+  background: linear-gradient(180deg, #0f1520 0%, #0b0f19 100%) !important;
+  border-bottom: 1px solid #1e3a8a !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.6), inset 0 2px 4px rgba(0,0,0,0.3) !important;
+  transform: translateY(2px);
 }
 .rcw-btn-agenda i {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+  color: #60a5fa !important;
 }
 
-/* ── ADMIN BADGE NAV ────────────────────────────────────────── */
+/* ── ADMIN BADGE NAV (3D Dark) ───────────────────────────────────── */
 .rcw-nav-admin {
-  color: var(--rcw-text-secondary) !important;
-  border: 1px solid rgba(255, 152, 0, 0.3) !important;
-  border-radius: 0 !important;
+  background: linear-gradient(180deg, #1e2a3b 0%, #0f1520 100%) !important;
+  color: #e2e8f0 !important;
+  border: 1px solid #1e40af !important;
+  border-bottom: 3px solid #1e3a8a !important;
+  border-radius: 6px !important;
+  font-weight: 700 !important;
+  font-size: 0.88rem !important;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05) !important;
+  transition: all 0.15s ease !important;
+  padding: 0.45rem 1rem !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 .rcw-nav-admin:hover {
-  background-color: rgba(255, 152, 0, 0.08) !important;
-  border-color: rgba(255, 152, 0, 0.6) !important;
-  color: #ff9800 !important;
+  background: linear-gradient(180deg, #28384e 0%, #172133 100%) !important;
+  border-color: #2563eb !important;
+  border-bottom: 3px solid #1d4ed8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1) !important;
+  transform: translateY(-1px);
+}
+.rcw-nav-admin:active {
+  background: linear-gradient(180deg, #0f1520 0%, #0b0f19 100%) !important;
+  border-bottom: 1px solid #1e3a8a !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.6), inset 0 2px 4px rgba(0,0,0,0.3) !important;
+  transform: translateY(2px);
+}
+.rcw-nav-admin i {
+  color: #60a5fa !important;
 }
 
 /* ── USER AVATAR (foto de perfil derecha) ───────────────────── */
