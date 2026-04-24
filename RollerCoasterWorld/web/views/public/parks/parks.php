@@ -81,6 +81,12 @@ require_once __DIR__ . '/../../partials/header.php';
                 <button id="btn-share" class="btn btn-outline-secondary" style="border-radius:0; padding:10px 14px;" title="Compartir">
                     <i class="fa-solid fa-share-nodes fs-5"></i>
                 </button>
+                <?php if (isset($is_admin) && $is_admin): ?>
+                <a href="<?= Router::url('admin_parks') ?>?edit_park=<?= $id ?>"
+                   class="btn btn-outline-primary" style="border-radius:0; padding:10px 14px;" title="Editar parque (Admin)">
+                    <i class="fa-solid fa-pen-to-square fs-5"></i>
+                </a>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -149,10 +155,7 @@ require_once __DIR__ . '/../../partials/header.php';
                                 <td class="text-uppercase align-middle ficha-table-label"><i class="fa-solid fa-euro-sign me-2 opacity-50"></i>Precio orientativo</td>
                                 <td class="fw-semibold text-end align-middle text-white" id="park-price-table">—</td>
                             </tr>
-                            <tr>
-                                <td class="text-uppercase align-middle ficha-table-label"><i class="fa-solid fa-compass me-2 opacity-50"></i>Coordenadas</td>
-                                <td class="fw-semibold text-end align-middle text-white" id="park-coords-table">N/A</td>
-                            </tr>
+
                         </tbody>
                     </table>
                 </div>

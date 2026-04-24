@@ -17,20 +17,19 @@ function _escUser(str) {
         .replace(/'/g, '&#39;');
 }
 
-function _initialsDiv(initials) {
-    return `<div class="d-flex align-items-center justify-content-center rounded-circle fw-bold text-white flex-shrink-0"
-                style="width:42px;height:42px;background:#198754;font-size:.85rem;letter-spacing:.5px;">
-                ${initials}
-            </div>`;
+function _defaultAvatarImg(size) {
+    size = size || 42;
+    return `<img src="${window.BASE_URL}/web/img/avatars/default_avatar.svg"
+                alt="Avatar"
+                class="rounded-circle flex-shrink-0"
+                style="width:${size}px;height:${size}px;object-fit:cover;border:2px solid #198754;background:#2d333b;">`;
 }
 
 // Llamada desde onerror de <img>
-window.buildInitialsAvatar = function (initials) {
-    const div = document.createElement('div');
-    div.className = 'd-flex align-items-center justify-content-center rounded-circle fw-bold text-white flex-shrink-0';
-    div.style.cssText = 'width:42px;height:42px;background:#198754;font-size:.85rem;letter-spacing:.5px;';
-    div.textContent = initials;
-    return div;
+window.buildDefaultAvatar = function (el) {
+    const size = el.style.width || '42px';
+    el.src = `${window.BASE_URL}/web/img/avatars/default_avatar.svg`;
+    el.onerror = null;
 };
 
 // ─── Render list-group ────────────────────────────────────────────────────────
@@ -52,13 +51,13 @@ function _renderUsersTable(users) {
         const initials  = (user.username || '?').substring(0, 2).toUpperCase();
         const safeInits = _escUser(initials);
 
-        const avatarHtml = user.profile_image
-            ? `<img src="${_escUser(user.profile_image)}"
+        const defaultAvatarUrl = `${window.BASE_URL}/web/img/avatars/default_avatar.svg`;
+        const avatarSrc = user.profile_image ? _escUser(user.profile_image) : defaultAvatarUrl;
+        const avatarHtml = `<img src="${avatarSrc}"
                     alt="${safeInits}"
                     class="rounded-circle flex-shrink-0"
-                    style="width:42px;height:42px;object-fit:cover;border:2px solid #198754;"
-                    onerror="this.replaceWith(buildInitialsAvatar('${safeInits}'))">`
-            : _initialsDiv(initials);
+                    style="width:42px;height:42px;object-fit:cover;border:2px solid #198754;background:#2d333b;"
+                    onerror="buildDefaultAvatar(this)">`;
 
         const roleBadge = user.rol === 'admin'
             ? `<span class="badge text-uppercase fw-semibold" style="background:rgba(239,68,68,.18);color:#ef4444;border:1px solid rgba(239,68,68,.35);letter-spacing:.5px;">Admin</span>`
@@ -178,14 +177,14 @@ window.openEditModal = function (user) {
     // ── Franja de info de solo lectura ──
     const initials = (user.username || '?').substring(0, 2).toUpperCase();
     const avatarWrap = document.getElementById('edit-user-avatar-wrap');
+    const defaultAvatarUrl = `${window.BASE_URL}/web/img/avatars/default_avatar.svg`;
     if (user.profile_image) {
         avatarWrap.innerHTML = `<img src="${_escUser(user.profile_image)}"
-            class="rounded-circle" style="width:48px;height:48px;object-fit:cover;border:2px solid #198754;"
-            onerror="this.replaceWith(buildInitialsAvatar('${initials}'))">` ;
+            class="rounded-circle" style="width:48px;height:48px;object-fit:cover;border:2px solid #198754;background:#2d333b;"
+            onerror="buildDefaultAvatar(this)">`;
         $('#btn-delete-avatar').removeClass('d-none');
     } else {
-        avatarWrap.innerHTML = '';
-        avatarWrap.appendChild(buildInitialsAvatar(initials));
+        avatarWrap.innerHTML = `<img src="${defaultAvatarUrl}" class="rounded-circle" style="width:48px;height:48px;object-fit:cover;border:2px solid #198754;background:#2d333b;">`;
         $('#btn-delete-avatar').addClass('d-none');
     }
 

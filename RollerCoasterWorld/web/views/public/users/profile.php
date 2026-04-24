@@ -1,5 +1,11 @@
 <?php
-$page_css = ['web/css/profile.css', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css'];
+$page_css = [
+  'web/css/profile.css',
+  'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css',
+  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
+  'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css',
+  'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css',
+];
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 
@@ -694,13 +700,133 @@ $user_uid = $_SESSION['firebase_uid'];
 
     </div><!-- /section-tops-content -->
 
+    <div class="col-lg-8 col-md-7 d-none" id="section-reviews-content">
+      <div class="card profile-card mb-4">
+        <div class="card-header rounded-0 pt-3 pb-3 d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-pen-to-square fs-5"></i>
+            <h5 class="fw-bold mb-0">Mis Reseñas</h5>
+          </div>
+          <span class="tops-counter-pill" id="reviews-total-pill" style="display:none;">
+            <i class="fa-solid fa-pen-to-square me-1"></i>
+            <span id="reviews-total-count">0</span> reseñas
+          </span>
+        </div>
+        <div class="card-body p-3">
+          <!-- Filtros -->
+          <div class="d-flex align-items-end gap-3 mb-3">
+            <div style="flex:1;min-width:120px;">
+              <label class="tops-filter-label"><i class="fa-solid fa-filter me-1"></i>Tipo</label>
+              <select id="reviews-type-filter" class="tops-filter-select w-100">
+                <option value="">Todas</option>
+                <option value="coaster">Coasters</option>
+                <option value="park">Parques</option>
+              </select>
+            </div>
+            <div style="flex:1;min-width:120px;">
+              <label class="tops-filter-label"><i class="fa-solid fa-sort me-1"></i>Ordenar</label>
+              <select id="reviews-sort" class="tops-filter-select w-100">
+                <option value="date_desc">Más recientes</option>
+                <option value="date_asc">Más antiguas</option>
+                <option value="rating_desc">Mejor valoradas</option>
+                <option value="rating_asc">Peor valoradas</option>
+              </select>
+            </div>
+          </div>
+          <!-- Lista y paginación -->
+          <div id="reviews-list"></div>
+          <div id="reviews-pagination" class="d-flex justify-content-center gap-2 mt-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección Mi Mapa -->
+    <div class="col-lg-8 col-md-7 d-none" id="section-map-content">
+      <div class="card profile-card mb-4">
+        <div class="card-header rounded-0 pt-3 pb-3 d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-map-location-dot fs-5"></i>
+            <h5 class="fw-bold mb-0">Mi Mapa</h5>
+          </div>
+          <span class="tops-counter-pill" id="map-parks-pill" style="display:none;">
+            <i class="fa-solid fa-map-pin me-1"></i>
+            <span id="map-parks-count">0</span> parques
+          </span>
+        </div>
+        <div class="card-body p-0 position-relative">
+          <!-- Barra de progreso geocoding -->
+          <div id="map-geocoding-bar" class="d-none" style="padding: 12px 16px; background: rgba(16,185,129,0.08); border-bottom: 1px solid rgba(16,185,129,0.15);">
+            <div class="d-flex align-items-center gap-3">
+              <i class="fa-solid fa-spinner fa-spin text-success"></i>
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between mb-1">
+                  <small class="text-muted fw-medium" id="map-geocoding-status">Localizando parques...</small>
+                  <small class="text-success fw-bold" id="map-geocoding-progress">0 / 0</small>
+                </div>
+                <div class="progress" style="height: 4px; background: rgba(255,255,255,0.1);">
+                  <div class="progress-bar bg-success" id="map-geocoding-progressbar" style="width:0%; transition: width 0.4s;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Contenedor del mapa -->
+          <div id="profile-map"></div>
+          <!-- Empty state si no hay parques -->
+          <div id="map-empty-state" class="d-none text-center py-5">
+            <i class="fa-solid fa-map-location-dot fs-1 mb-3 opacity-25 d-block"></i>
+            <p class="text-muted">Añade montañas rusas a tu top para ver los parques en el mapa.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-8 col-md-7 d-none" id="section-friends-content">
+      <div class="card profile-card mb-4">
+        <div class="card-header rounded-0 pt-3 pb-3 d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-users fs-5"></i>
+            <h5 class="fw-bold mb-0">Mis Amigos</h5>
+          </div>
+          <span class="tops-counter-pill" id="friends-total-pill" style="display:none;">
+            <i class="fa-solid fa-users me-1"></i>
+            <span id="friends-total-count">0</span> amigos
+          </span>
+        </div>
+        <div class="card-body p-3">
+          <!-- Filtros -->
+          <div class="d-flex align-items-end gap-3 mb-3">
+            <div style="flex:1;min-width:120px;">
+              <label class="tops-filter-label"><i class="fa-solid fa-search me-1"></i>Buscar amigos:</label>
+              <input type="text" id="friends-search" placeholder="Escribe el nombre del usuario..."
+                class="tops-filter-select w-100">
+            </div>
+            <div style="flex:1;min-width:120px;">
+              <label class="tops-filter-label"><i class="fa-solid fa-sort me-1"></i>Ordenar</label>
+              <select id="friends-sort" class="tops-filter-select w-100">
+                <option value="date_desc">Más recientes</option>
+                <option value="date_asc">Más antiguos</option>
+                <option value="credits_desc">Mayor nº de credits</option>
+                <option value="name_asc">Orden alfabético</option>
+              </select>
+            </div>
+          </div>
+          <!-- Lista y paginación -->
+          <div id="friends-list"></div>
+          <div id="friends-pagination" class="d-flex justify-content-center gap-2 mt-3"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- MODAL ESTADÍSTICAS AMPLIADAS -->
     <style>
       /* Fix para el bug visual de Chrome con backdrop-filter cortado en los bordes */
       #statsExpandedModal::before {
         content: "";
         position: fixed;
-        top: -50px; left: -50px; right: -50px; bottom: -50px;
+        top: -50px;
+        left: -50px;
+        right: -50px;
+        bottom: -50px;
         backdrop-filter: blur(14px);
         -webkit-backdrop-filter: blur(14px);
         z-index: -1;
@@ -721,40 +847,56 @@ $user_uid = $_SESSION['firebase_uid'];
                 <i class="fa-solid fa-chart-line text-success fs-5"></i>
               </div>
               <div>
-                <h5 class="modal-title fw-bold text-white mb-0" style="letter-spacing:0.5px;">Estadísticas Ampliadas</h5>
-                <p class="text-muted mb-0" style="font-size:0.75rem;">Resumen completo de tu actividad como enthusiast</p>
+                <h5 class="modal-title fw-bold text-white mb-0" style="letter-spacing:0.5px;">Estadísticas
+                  Ampliadas
+                </h5>
+                <p class="text-muted mb-0" style="font-size:0.75rem;">Resumen completo de tu actividad como
+                  enthusiast
+                </p>
               </div>
             </div>
-            <button type="button" class="btn-close btn-close-white opacity-50" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn-close btn-close-white opacity-50" data-bs-dismiss="modal"
+              aria-label="Close"></button>
           </div>
 
           <div class="modal-body p-0">
 
             <!-- HERO STATS -->
             <div class="row g-0" style="border-bottom: 1px solid rgba(255,255,255,0.06);">
-              <div class="col-4 text-center py-4 px-3 position-relative" style="border-right: 1px solid rgba(255,255,255,0.06);">
+              <div class="col-4 text-center py-4 px-3 position-relative"
+                style="border-right: 1px solid rgba(255,255,255,0.06);">
                 <div class="mb-2" style="font-size:2rem;line-height:1;">
-                  <i class="fa-solid fa-ticket" style="color:rgba(16,185,129,0.7);filter:drop-shadow(0 0 8px rgba(16,185,129,0.4));"></i>
+                  <i class="fa-solid fa-ticket"
+                    style="color:rgba(16,185,129,0.7);filter:drop-shadow(0 0 8px rgba(16,185,129,0.4));"></i>
                 </div>
                 <div class="fw-black text-white" id="modal-stat-total-coasters"
                   style="font-size:2.8rem;line-height:1;font-weight:900;letter-spacing:-1px;">0</div>
-                <div class="text-uppercase fw-bold mt-1" style="font-size:0.65rem;letter-spacing:2px;color:rgba(255,255,255,0.35);">Coaster Credits</div>
+                <div class="text-uppercase fw-bold mt-1"
+                  style="font-size:0.65rem;letter-spacing:2px;color:rgba(255,255,255,0.35);">Coaster Credits
+                </div>
               </div>
-              <div class="col-4 text-center py-4 px-3 position-relative" style="border-right: 1px solid rgba(255,255,255,0.06);">
+              <div class="col-4 text-center py-4 px-3 position-relative"
+                style="border-right: 1px solid rgba(255,255,255,0.06);">
                 <div class="mb-2" style="font-size:2rem;line-height:1;">
-                  <i class="fa-solid fa-map-location-dot" style="color:rgba(16,185,129,0.7);filter:drop-shadow(0 0 8px rgba(16,185,129,0.4));"></i>
+                  <i class="fa-solid fa-map-location-dot"
+                    style="color:rgba(16,185,129,0.7);filter:drop-shadow(0 0 8px rgba(16,185,129,0.4));"></i>
                 </div>
                 <div class="fw-black text-white" id="modal-stat-total-parks"
                   style="font-size:2.8rem;line-height:1;font-weight:900;letter-spacing:-1px;">0</div>
-                <div class="text-uppercase fw-bold mt-1" style="font-size:0.65rem;letter-spacing:2px;color:rgba(255,255,255,0.35);">Parques Visitados</div>
+                <div class="text-uppercase fw-bold mt-1"
+                  style="font-size:0.65rem;letter-spacing:2px;color:rgba(255,255,255,0.35);">Parques Visitados
+                </div>
               </div>
               <div class="col-4 text-center py-4 px-3">
                 <div class="mb-2" style="font-size:2rem;line-height:1;">
-                  <i class="fa-solid fa-earth-americas" style="color:rgba(16,185,129,0.7);filter:drop-shadow(0 0 8px rgba(16,185,129,0.4));"></i>
+                  <i class="fa-solid fa-earth-americas"
+                    style="color:rgba(16,185,129,0.7);filter:drop-shadow(0 0 8px rgba(16,185,129,0.4));"></i>
                 </div>
                 <div class="fw-black text-white" id="modal-stat-total-countries"
                   style="font-size:2.8rem;line-height:1;font-weight:900;letter-spacing:-1px;">0</div>
-                <div class="text-uppercase fw-bold mt-1" style="font-size:0.65rem;letter-spacing:2px;color:rgba(255,255,255,0.35);">Países Visitados</div>
+                <div class="text-uppercase fw-bold mt-1"
+                  style="font-size:0.65rem;letter-spacing:2px;color:rgba(255,255,255,0.35);">Países Visitados
+                </div>
               </div>
             </div>
 
@@ -765,7 +907,9 @@ $user_uid = $_SESSION['firebase_uid'];
               <div class="col-lg-6" style="border-right: 1px solid rgba(255,255,255,0.06);">
                 <div class="px-4 pt-4 pb-2 d-flex align-items-center gap-2">
                   <i class="fa-solid fa-earth-europe text-success" style="font-size:0.9rem;"></i>
-                  <span class="fw-bold text-white" style="font-size:0.8rem;letter-spacing:1px;text-transform:uppercase;">Coasters por País</span>
+                  <span class="fw-bold text-white"
+                    style="font-size:0.8rem;letter-spacing:1px;text-transform:uppercase;">Coasters por
+                    País</span>
                 </div>
                 <div id="modal-list-countries" style="max-height:280px;overflow-y:auto;">
                   <!-- Dinámico -->
@@ -776,7 +920,9 @@ $user_uid = $_SESSION['firebase_uid'];
               <div class="col-lg-6">
                 <div class="px-4 pt-4 pb-2 d-flex align-items-center gap-2">
                   <i class="fa-solid fa-industry text-success" style="font-size:0.9rem;"></i>
-                  <span class="fw-bold text-white" style="font-size:0.8rem;letter-spacing:1px;text-transform:uppercase;">Coasters por Fabricante</span>
+                  <span class="fw-bold text-white"
+                    style="font-size:0.8rem;letter-spacing:1px;text-transform:uppercase;">Coasters por
+                    Fabricante</span>
                 </div>
                 <div id="modal-list-manufacturers" style="max-height:280px;overflow-y:auto;">
                   <!-- Dinámico -->
@@ -788,7 +934,9 @@ $user_uid = $_SESSION['firebase_uid'];
             <!-- MÉTRICAS TOP COASTERS -->
             <div class="px-4 pt-4 pb-2 d-flex align-items-center gap-2">
               <i class="fa-solid fa-bolt text-success" style="font-size:0.9rem;"></i>
-              <span class="fw-bold text-white" style="font-size:0.8rem;letter-spacing:1px;text-transform:uppercase;">Métricas de las Coasters Top</span>
+              <span class="fw-bold text-white"
+                style="font-size:0.8rem;letter-spacing:1px;text-transform:uppercase;">Métricas de las Coasters
+                Top</span>
             </div>
             <div class="row g-0 px-3 pb-4">
 
@@ -796,13 +944,16 @@ $user_uid = $_SESSION['firebase_uid'];
               <div class="col-6 col-md p-2">
                 <div class="h-100 text-center p-3 rounded-0"
                   style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.15);transition:background .2s;"
-                  onmouseover="this.style.background='rgba(16,185,129,0.1)'" onmouseout="this.style.background='rgba(16,185,129,0.05)'">
+                  onmouseover="this.style.background='rgba(16,185,129,0.1)'"
+                  onmouseout="this.style.background='rgba(16,185,129,0.05)'">
                   <div class="mb-2"><i class="fa-solid fa-arrow-up-long text-success"></i></div>
                   <div class="fw-bold text-white mb-1" id="max-stat-height" style="font-size:1.4rem;line-height:1.1;">
                     <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
                   </div>
-                  <div class="small text-muted text-truncate" id="max-stat-height-name" style="font-size:0.72rem;">...</div>
-                  <div class="text-uppercase mt-2" style="font-size:0.6rem;letter-spacing:1.5px;color:rgba(255,255,255,0.25);">Más Alta</div>
+                  <div class="small text-muted text-truncate" id="max-stat-height-name" style="font-size:0.72rem;">...
+                  </div>
+                  <div class="text-uppercase mt-2"
+                    style="font-size:0.6rem;letter-spacing:1.5px;color:rgba(255,255,255,0.25);">Más Alta</div>
                 </div>
               </div>
 
@@ -810,13 +961,17 @@ $user_uid = $_SESSION['firebase_uid'];
               <div class="col-6 col-md p-2">
                 <div class="h-100 text-center p-3 rounded-0"
                   style="background:rgba(245,158,11,0.05);border:1px solid rgba(245,158,11,0.15);transition:background .2s;"
-                  onmouseover="this.style.background='rgba(245,158,11,0.1)'" onmouseout="this.style.background='rgba(245,158,11,0.05)'">
+                  onmouseover="this.style.background='rgba(245,158,11,0.1)'"
+                  onmouseout="this.style.background='rgba(245,158,11,0.05)'">
                   <div class="mb-2"><i class="fa-solid fa-gauge-high" style="color:#f59e0b;"></i></div>
                   <div class="fw-bold text-white mb-1" id="max-stat-speed" style="font-size:1.4rem;line-height:1.1;">
                     <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
                   </div>
-                  <div class="small text-muted text-truncate" id="max-stat-speed-name" style="font-size:0.72rem;">...</div>
-                  <div class="text-uppercase mt-2" style="font-size:0.6rem;letter-spacing:1.5px;color:rgba(255,255,255,0.25);">Más Rápida</div>
+                  <div class="small text-muted text-truncate" id="max-stat-speed-name" style="font-size:0.72rem;">...
+                  </div>
+                  <div class="text-uppercase mt-2"
+                    style="font-size:0.6rem;letter-spacing:1.5px;color:rgba(255,255,255,0.25);">Más Rápida
+                  </div>
                 </div>
               </div>
 
@@ -824,13 +979,17 @@ $user_uid = $_SESSION['firebase_uid'];
               <div class="col-6 col-md p-2">
                 <div class="h-100 text-center p-3 rounded-0"
                   style="background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.15);transition:background .2s;"
-                  onmouseover="this.style.background='rgba(59,130,246,0.1)'" onmouseout="this.style.background='rgba(59,130,246,0.05)'">
+                  onmouseover="this.style.background='rgba(59,130,246,0.1)'"
+                  onmouseout="this.style.background='rgba(59,130,246,0.05)'">
                   <div class="mb-2"><i class="fa-solid fa-ruler-horizontal" style="color:#3b82f6;"></i></div>
                   <div class="fw-bold text-white mb-1" id="max-stat-length" style="font-size:1.4rem;line-height:1.1;">
                     <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
                   </div>
-                  <div class="small text-muted text-truncate" id="max-stat-length-name" style="font-size:0.72rem;">...</div>
-                  <div class="text-uppercase mt-2" style="font-size:0.6rem;letter-spacing:1.5px;color:rgba(255,255,255,0.25);">Más Larga</div>
+                  <div class="small text-muted text-truncate" id="max-stat-length-name" style="font-size:0.72rem;">...
+                  </div>
+                  <div class="text-uppercase mt-2"
+                    style="font-size:0.6rem;letter-spacing:1.5px;color:rgba(255,255,255,0.25);">Más Larga
+                  </div>
                 </div>
               </div>
 
@@ -838,13 +997,18 @@ $user_uid = $_SESSION['firebase_uid'];
               <div class="col-6 col-md p-2">
                 <div class="h-100 text-center p-3 rounded-0"
                   style="background:rgba(168,85,247,0.05);border:1px solid rgba(168,85,247,0.15);transition:background .2s;"
-                  onmouseover="this.style.background='rgba(168,85,247,0.1)'" onmouseout="this.style.background='rgba(168,85,247,0.05)'">
+                  onmouseover="this.style.background='rgba(168,85,247,0.1)'"
+                  onmouseout="this.style.background='rgba(168,85,247,0.05)'">
                   <div class="mb-2"><i class="fa-solid fa-rotate-right" style="color:#a855f7;"></i></div>
-                  <div class="fw-bold text-white mb-1" id="max-stat-inversions" style="font-size:1.4rem;line-height:1.1;">
+                  <div class="fw-bold text-white mb-1" id="max-stat-inversions"
+                    style="font-size:1.4rem;line-height:1.1;">
                     <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
                   </div>
-                  <div class="small text-muted text-truncate" id="max-stat-inversions-name" style="font-size:0.72rem;">...</div>
-                  <div class="text-uppercase mt-2" style="font-size:0.6rem;letter-spacing:1.5px;color:rgba(255,255,255,0.25);">Más Invers.</div>
+                  <div class="small text-muted text-truncate" id="max-stat-inversions-name" style="font-size:0.72rem;">
+                    ...</div>
+                  <div class="text-uppercase mt-2"
+                    style="font-size:0.6rem;letter-spacing:1.5px;color:rgba(255,255,255,0.25);">Más Invers.
+                  </div>
                 </div>
               </div>
 
@@ -852,17 +1016,22 @@ $user_uid = $_SESSION['firebase_uid'];
               <div class="col-6 col-md p-2">
                 <div class="h-100 text-center p-3 rounded-0"
                   style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.15);transition:background .2s;"
-                  onmouseover="this.style.background='rgba(239,68,68,0.1)'" onmouseout="this.style.background='rgba(239,68,68,0.05)'">
+                  onmouseover="this.style.background='rgba(239,68,68,0.1)'"
+                  onmouseout="this.style.background='rgba(239,68,68,0.05)'">
                   <div class="mb-2"><i class="fa-solid fa-hourglass-start" style="color:#ef4444;"></i></div>
                   <div class="fw-bold text-white mb-1" id="max-stat-year" style="font-size:1.4rem;line-height:1.1;">
                     <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
                   </div>
-                  <div class="small text-muted text-truncate" id="max-stat-year-name" style="font-size:0.72rem;">...</div>
-                  <div class="text-uppercase mt-2" style="font-size:0.6rem;letter-spacing:1.5px;color:rgba(255,255,255,0.25);">Más Antigua</div>
+                  <div class="small text-muted text-truncate" id="max-stat-year-name" style="font-size:0.72rem;">...
+                  </div>
+                  <div class="text-uppercase mt-2"
+                    style="font-size:0.6rem;letter-spacing:1.5px;color:rgba(255,255,255,0.25);">Más Antigua
+                  </div>
                 </div>
               </div>
 
             </div>
+
 
           </div><!-- /modal-body -->
         </div>
@@ -877,7 +1046,10 @@ $user_uid = $_SESSION['firebase_uid'];
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="<?= Router::asset('web/js/users/profile.js') ?>"></script>
+
 
 
 

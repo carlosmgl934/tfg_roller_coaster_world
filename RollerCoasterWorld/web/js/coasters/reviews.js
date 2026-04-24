@@ -215,7 +215,7 @@ $(document).ready(function () {
           <!-- Bloque de Usuario y Coaster Central -->
           <div class="d-flex align-items-center gap-3 flex-grow-1">
             <a href="${profileUrl}" title="Ver perfil de ${review.username}" style="flex-shrink:0;">
-              <img src="${avatarPath}" alt="${review.username}" class="rounded-circle shadow-sm" style="width: 55px; height: 55px; object-fit: cover; border: 2px solid var(--theme-color); transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+              <img src="${avatarPath}" alt="${review.username}" class="rounded-circle shadow-sm" style="width: 55px; height: 55px; object-fit: cover; border: 2px solid var(--theme-color); transition: opacity 0.2s; background:#2d333b;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" onerror="this.src='${window.BASE_URL}/web/img/avatars/default_avatar.svg';this.onerror=null;">
             </a>
             <div class="d-flex flex-column">
               <h6 class="mb-1 fw-bold d-flex align-items-center gap-2 text-white" style="font-size: 1.1rem;">

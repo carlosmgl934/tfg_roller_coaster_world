@@ -58,7 +58,7 @@ $(document).ready(function () {
     fallbackColor = "198754",
     fallbackText = "fff",
   ) {
-    const fallbackInitials = `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=${fallbackColor}&color=${fallbackText}`;
+    const fallbackInitials = BASE_URL + '/web/img/avatars/default_avatar.svg';
 
     if (!profileImage) return fallbackInitials;
 
@@ -147,7 +147,7 @@ $(document).ready(function () {
             <img src="${avatarSrc}" alt="${req.username}"
                  class="rounded-circle object-fit-cover me-4 shadow-sm border border-success border-opacity-50"
                  style="width: 50px; height: 50px;"
-                 onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(req.username)}&background=020617&color=10b981'">
+                 onerror="this.src=window.BASE_URL+'/web/img/avatars/default_avatar.svg'">
             <div class="flex-grow-1 min-w-0">
                <a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${req.id}"
                   class="text-white text-decoration-none fw-bold d-block text-truncate fs-5 mb-1">${req.username}</a>
@@ -196,7 +196,7 @@ $(document).ready(function () {
             <img src="${avatarSrc}" alt="${inv.sender_username}"
                  class="rounded-circle object-fit-cover me-4 shadow-sm flex-shrink-0"
                  style="width: 50px; height: 50px; border: 2px solid #a78bfa;"
-                 onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(inv.sender_username)}&background=6d28d9&color=fff'">
+                 onerror="this.src=window.BASE_URL+'/web/img/avatars/default_avatar.svg'">
             <div class="flex-grow-1 min-w-0">
                <span class="text-white fw-bold d-block text-truncate fs-5 mb-1">${inv.sender_username}</span>
                <small class="d-block mb-1" style="color:#a78bfa;">
@@ -261,6 +261,16 @@ $(document).ready(function () {
           `<i class="fa-regular fa-calendar text-info me-1"></i>Miembro desde ${mes} de ${anio}`,
         );
       }
+      if (friend.since) {
+        const dateSince = new Date(friend.since);
+        const mesSince = new Intl.DateTimeFormat("es-ES", { month: "long" }).format(
+          dateSince,
+        );
+        const anioSince = dateSince.getFullYear();
+        details.push(
+          `<i class="fa-solid fa-handshake text-success opacity-75 me-1"></i>Amigos desde ${mesSince} de ${anioSince}`,
+        );
+      }
       details.push(
         `<span class="text-warning fw-bold">${friend.credits || 0}</span> credits`,
       );
@@ -285,7 +295,7 @@ $(document).ready(function () {
                 alt="${friend.username}"
                 class="rounded-circle shadow-sm border border-success border-opacity-25 object-fit-cover"
                 style="width: 52px; height: 52px;"
-                onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(friend.username)}&background=198754&color=fff&size=128'">
+                onerror="this.onerror=null; this.src=window.BASE_URL+'/web/img/avatars/default_avatar.svg'">
             </div>
 
             <!-- Info del amigo -->

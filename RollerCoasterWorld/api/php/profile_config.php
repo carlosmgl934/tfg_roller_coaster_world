@@ -16,6 +16,8 @@ $router->register('get_top_coasters', 'getTopCoasters');
 $router->register('get_top_parks', 'getTopParks');
 $router->register('save_top_coasters', 'saveTopCoasters', 'POST');
 $router->register('save_top_parks', 'saveTopParks', 'POST');
+$router->register('get_my_reviews', 'getMyReviews');
+$router->register('get_map_parks', 'getMapParks');
 
 $router->dispatch();
 
@@ -493,5 +495,93 @@ function saveTopParks()
     catch (PDOException $e) {
         $db->rollBack();
         Response::error('Error al guardar el top de parques: ' . $e->getMessage());
+    }
+}
+
+// ── Obtener parques del mapa (todos los parques de los coaster credits del usuario) ──
+function getMapParks()
+{
+    $user_id = getUserId();
+    if (!$user_id) {
+        Response::unauthorized('No estás logueado');
+    }
+
+    global $db;
+    try {
+        // Devuelve todos los parques distintos deducidos de los coaster credits del usuario
+        $stmt = $db->prepare("
+            SELECT
+                p.id          AS park_id,
+                p.park_name,
+                p.park_location,
+                p.park_country,
+                p.imagen_url,
+                COUNT(uc.id)  AS coaster_count
+            FROM user_credits uc
+            JOIN coasters c ON uc.coaster_id = c.id
+            JOIN parks    p ON c.park_id    = p.id
+            WHERE uc.user_id = :uid
+              AND p.park_name NOT IN ('Desconocido', 'Unknown')
+            GROUP BY p.id, p.park_name, p.park_location, p.park_country, p.imagen_url
+            ORDER BY coaster_count DESC
+        ");
+        $stmt->bindValue(':uid', $user_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $parks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        Response::success(['parks' => $parks]);
+    } catch (PDOException $e) {
+        Response::error('Error al obtener los parques del mapa: ' . $e->getMessage());
+    }
+}
+
+
+// ── Obtener reseñas propias del usuario logueado ──────────────────────────────
+function getMyReviews()
+{
+    $user_id = getUserId();
+    if (!$user_id) {
+        Response::unauthorized('No estás logueado');
+    }
+
+    global $db;
+    try {
+        $stmt = $db->prepare("
+            SELECT 'coaster' AS type,
+                   cr.id,
+                   cr.coaster_id AS item_id,
+                   c.coaster_name AS title,
+                   p.park_name AS subtitle,
+                   cr.note,
+                   cr.review,
+                   cr.created_at,
+                   c.imagen_url
+            FROM coaster_ratings cr
+            JOIN coasters c ON cr.coaster_id = c.id
+            JOIN parks    p ON c.park_id = p.id
+            WHERE cr.user_id = :uid
+
+            UNION ALL
+
+            SELECT 'park' AS type,
+                   pr.id,
+                   pr.park_id AS item_id,
+                   p.park_name AS title,
+                   p.park_country AS subtitle,
+                   pr.note,
+                   pr.review,
+                   pr.created_at,
+                   p.imagen_url
+            FROM park_ratings pr
+            JOIN parks p ON pr.park_id = p.id
+            WHERE pr.user_id = :uid
+
+            ORDER BY created_at DESC
+        ");
+        $stmt->bindValue(':uid', $user_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        Response::success(['reviews' => $reviews]);
+    } catch (PDOException $e) {
+        Response::error('Error al obtener reseñas: ' . $e->getMessage());
     }
 }

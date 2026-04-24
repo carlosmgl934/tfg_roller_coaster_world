@@ -299,30 +299,32 @@ $(document).ready(function () {
         if (data.user.profile_image) {
           let imgSrc = data.user.profile_image;
           // Si es URL absoluta, usarla tal cual
-          if (imgSrc.startsWith('http://') || imgSrc.startsWith('https://')) {
+          if (imgSrc.startsWith("http://") || imgSrc.startsWith("https://")) {
             // OK — usar directamente
-          } else if (imgSrc.startsWith('/')) {
+          } else if (imgSrc.startsWith("/")) {
             // Ruta local de otro XAMPP → no existe en esta máquina → ignorar
-            if (imgSrc.includes('/web/img/uploads/')) {
+            if (imgSrc.includes("/web/img/uploads/")) {
               imgSrc = null; // No mostrar imagen rota
             } else {
               imgSrc = window.BASE_URL + imgSrc;
             }
           } else {
             // Solo nombre de archivo → construir URL Supabase
-            imgSrc = 'https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/' + imgSrc;
+            imgSrc =
+              "https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/" +
+              imgSrc;
           }
 
           if (imgSrc) {
             // En la tarjeta de perfil
-            const avatarDiv = document.querySelector('.avatar-circle');
+            const avatarDiv = document.querySelector(".avatar-circle");
             if (avatarDiv) {
-              avatarDiv.innerHTML = `<img src="${imgSrc}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentElement.innerHTML=this.parentElement.dataset.initials||'?'">`;
+              avatarDiv.innerHTML = `<img src="${imgSrc}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" onerror="this.parentElement.innerHTML=this.parentElement.dataset.initials||'?'">`;
             }
             // En el header del navbar
-            const headerAvatar = document.getElementById('header-avatar');
+            const headerAvatar = document.getElementById("header-avatar");
             if (headerAvatar) {
-              headerAvatar.innerHTML = `<img src="${imgSrc}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentElement.innerHTML=this.parentElement.dataset.initials||'?'">`;
+              headerAvatar.innerHTML = `<img src="${imgSrc}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" onerror="this.parentElement.innerHTML=this.parentElement.dataset.initials||'?'">`;
             }
           }
         }
@@ -445,7 +447,9 @@ $(document).ready(function () {
       const compressedBlob = await comprimirImagen(file, 400, 400, 0.85);
 
       if (!compressedBlob) {
-        showAvatarError("No se pudo procesar la imagen. El formato podría no estar soportado o la imagen está corrupta.");
+        showAvatarError(
+          "No se pudo procesar la imagen. El formato podría no estar soportado o la imagen está corrupta.",
+        );
         return;
       }
 
@@ -453,7 +457,7 @@ $(document).ready(function () {
       const previewUrl = URL.createObjectURL(compressedBlob);
       const avatarDiv = document.querySelector(".avatar-circle");
       if (avatarDiv) {
-        avatarDiv.innerHTML = `<img src="${previewUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        avatarDiv.innerHTML = `<img src="${previewUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">`;
       }
 
       try {
@@ -462,7 +466,7 @@ $(document).ready(function () {
         // Actualizar cabecera del navbar en tiempo real con la foto
         const headerAvatar = document.getElementById("header-avatar");
         if (headerAvatar) {
-          headerAvatar.innerHTML = `<img src="${previewUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+          headerAvatar.innerHTML = `<img src="${previewUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">`;
         }
 
         const res = await fetch(
@@ -483,8 +487,12 @@ $(document).ready(function () {
       } catch (err) {
         console.error("Error subiendo avatar:", err);
         let errorMsg = err.message;
-        if (errorMsg.includes("the string did not match the expected pattern") || errorMsg.includes("is not of type 'Blob'")) {
-            errorMsg = "No se pudo procesar la imagen correctamente. Intenta con un archivo diferente (JPG o PNG válido).";
+        if (
+          errorMsg.includes("the string did not match the expected pattern") ||
+          errorMsg.includes("is not of type 'Blob'")
+        ) {
+          errorMsg =
+            "No se pudo procesar la imagen correctamente. Intenta con un archivo diferente (JPG o PNG válido).";
         }
         showAvatarError(errorMsg);
       }
@@ -531,7 +539,7 @@ $(document).ready(function () {
         URL.revokeObjectURL(url);
         canvas.toBlob((blob) => resolve(blob), "image/jpeg", quality);
       };
-      img.onerror = function() {
+      img.onerror = function () {
         URL.revokeObjectURL(url);
         resolve(null);
       };
@@ -548,28 +556,41 @@ $(document).ready(function () {
     formData.append("bucket", "avatars");
 
     try {
-      console.log("SUPER DEBUG: Iniciando fetch a upload.php", [...formData.entries()]);
+      console.log("SUPER DEBUG: Iniciando fetch a upload.php", [
+        ...formData.entries(),
+      ]);
       const res = await fetch(`${BASE_URL}/api/php/upload.php`, {
         method: "POST",
         body: formData,
       });
-      
+
       const rawText = await res.text();
-      console.log("SUPER DEBUG: Respuesta raw del servidor (status " + res.status + "):", rawText);
+      console.log(
+        "SUPER DEBUG: Respuesta raw del servidor (status " + res.status + "):",
+        rawText,
+      );
 
       let data;
       try {
         data = JSON.parse(rawText);
       } catch (parseErr) {
-        alert("SUPER DEBUG [JSON PARSE ERROR]\nStatus: " + res.status + "\nRespuesta cruda del servidor:\n" + rawText.substring(0, 500) + "...\nRevisa la consola y Network Tab.");
+        alert(
+          "SUPER DEBUG [JSON PARSE ERROR]\nStatus: " +
+            res.status +
+            "\nRespuesta cruda del servidor:\n" +
+            rawText.substring(0, 500) +
+            "...\nRevisa la consola y Network Tab.",
+        );
         throw new Error("El servidor no devolvió una respuesta JSON válida.");
       }
 
       if (!data.success) {
-        alert("SUPER DEBUG [SERVER ERROR]\n" + (data.error || "Error desconocido"));
+        alert(
+          "SUPER DEBUG [SERVER ERROR]\n" + (data.error || "Error desconocido"),
+        );
         throw new Error(data.error || "Error al subir la foto");
       }
-      
+
       return data.url;
     } catch (e) {
       console.error("SUPER DEBUG: Promesa / Red falló:", e);
@@ -999,10 +1020,10 @@ $(document).ready(function () {
     // 1. Contadores Globales
     $("#modal-stat-total-coasters").text(coasters.length);
     $("#modal-stat-total-parks").text(parks.length);
-    
+
     const allCountries = new Set();
-    coasters.forEach(c => c.country_name && allCountries.add(c.country_name));
-    parks.forEach(p => p.country_name && allCountries.add(p.country_name));
+    coasters.forEach((c) => c.country_name && allCountries.add(c.country_name));
+    parks.forEach((p) => p.country_name && allCountries.add(p.country_name));
     $("#modal-stat-total-countries").text(allCountries.size);
 
     // 2. Coasters por País (Completo)
@@ -1011,7 +1032,9 @@ $(document).ready(function () {
       const country = c.country_name || "Desconocido";
       countryCounts[country] = (countryCounts[country] || 0) + 1;
     });
-    const sortedCountries = Object.entries(countryCounts).sort((a, b) => b[1] - a[1]);
+    const sortedCountries = Object.entries(countryCounts).sort(
+      (a, b) => b[1] - a[1],
+    );
     const maxCountry = sortedCountries.length ? sortedCountries[0][1] : 1;
 
     const $modalCountries = $("#modal-list-countries").empty();
@@ -1032,7 +1055,10 @@ $(document).ready(function () {
         </div>
       `);
     });
-    if(!sortedCountries.length) $modalCountries.append('<div class="p-4 text-center text-muted" style="font-size:0.8rem;">No hay datos</div>');
+    if (!sortedCountries.length)
+      $modalCountries.append(
+        '<div class="p-4 text-center text-muted" style="font-size:0.8rem;">No hay datos</div>',
+      );
 
     // 3. Coasters por Fabricante (Completo)
     const mfrCounts = {};
@@ -1061,55 +1087,86 @@ $(document).ready(function () {
         </div>
       `);
     });
-    if(!sortedMfrs.length) $modalMfrs.append('<div class="p-4 text-center text-muted" style="font-size:0.8rem;">No hay datos</div>');
+    if (!sortedMfrs.length)
+      $modalMfrs.append(
+        '<div class="p-4 text-center text-muted" style="font-size:0.8rem;">No hay datos</div>',
+      );
 
     // 4. TOP RECORDS PERSONALES
-    let maxHeight = 0; let maxHeightCoaster = null;
-    let maxSpeed = 0; let maxSpeedCoaster = null;
-    let maxLength = 0; let maxLengthCoaster = null;
-    let maxInvers = 0; let maxInversCoaster = null;
-    let minYear = Infinity; let minYearCoaster = null;
+    let maxHeight = 0;
+    let maxHeightCoaster = null;
+    let maxSpeed = 0;
+    let maxSpeedCoaster = null;
+    let maxLength = 0;
+    let maxLengthCoaster = null;
+    let maxInvers = 0;
+    let maxInversCoaster = null;
+    let minYear = Infinity;
+    let minYearCoaster = null;
 
-    coasters.forEach(c => {
+    coasters.forEach((c) => {
       const h = parseFloat(c.height);
-      if (h > maxHeight) { maxHeight = h; maxHeightCoaster = c.coaster_name; }
-      
+      if (h > maxHeight) {
+        maxHeight = h;
+        maxHeightCoaster = c.coaster_name;
+      }
+
       const s = parseFloat(c.speed);
-      if (s > maxSpeed) { maxSpeed = s; maxSpeedCoaster = c.coaster_name; }
+      if (s > maxSpeed) {
+        maxSpeed = s;
+        maxSpeedCoaster = c.coaster_name;
+      }
 
       const l = parseFloat(c.coaster_length);
-      if (l > maxLength) { maxLength = l; maxLengthCoaster = c.coaster_name; }
+      if (l > maxLength) {
+        maxLength = l;
+        maxLengthCoaster = c.coaster_name;
+      }
 
       const inv = parseInt(c.inversions);
-      if (inv > maxInvers) { maxInvers = inv; maxInversCoaster = c.coaster_name; }
+      if (inv > maxInvers) {
+        maxInvers = inv;
+        maxInversCoaster = c.coaster_name;
+      }
 
       const y = parseInt(c.opening_year);
-      if (y > 0 && y < minYear) { minYear = y; minYearCoaster = c.coaster_name; }
+      if (y > 0 && y < minYear) {
+        minYear = y;
+        minYearCoaster = c.coaster_name;
+      }
     });
 
-    $("#max-stat-height").text(maxHeight > 0 ? `${maxHeight} m` : '—');
-    $("#max-stat-height-name").text(maxHeightCoaster || '—').attr("title", maxHeightCoaster || '');
+    $("#max-stat-height").text(maxHeight > 0 ? `${maxHeight} m` : "—");
+    $("#max-stat-height-name")
+      .text(maxHeightCoaster || "—")
+      .attr("title", maxHeightCoaster || "");
 
-    $("#max-stat-speed").text(maxSpeed > 0 ? `${maxSpeed} km/h` : '—');
-    $("#max-stat-speed-name").text(maxSpeedCoaster || '—').attr("title", maxSpeedCoaster || '');
+    $("#max-stat-speed").text(maxSpeed > 0 ? `${maxSpeed} km/h` : "—");
+    $("#max-stat-speed-name")
+      .text(maxSpeedCoaster || "—")
+      .attr("title", maxSpeedCoaster || "");
 
-    $("#max-stat-length").text(maxLength > 0 ? `${maxLength} m` : '—');
-    $("#max-stat-length-name").text(maxLengthCoaster || '—').attr("title", maxLengthCoaster || '');
+    $("#max-stat-length").text(maxLength > 0 ? `${maxLength} m` : "—");
+    $("#max-stat-length-name")
+      .text(maxLengthCoaster || "—")
+      .attr("title", maxLengthCoaster || "");
 
-    $("#max-stat-inversions").text(maxInvers > 0 ? maxInvers : '—');
-    $("#max-stat-inversions-name").text(maxInversCoaster || '—').attr("title", maxInversCoaster || '');
+    $("#max-stat-inversions").text(maxInvers > 0 ? maxInvers : "—");
+    $("#max-stat-inversions-name")
+      .text(maxInversCoaster || "—")
+      .attr("title", maxInversCoaster || "");
 
-    $("#max-stat-year").text(minYear !== Infinity ? minYear : '—');
-    $("#max-stat-year-name").text(minYearCoaster || '—').attr("title", minYearCoaster || '');
+    $("#max-stat-year").text(minYear !== Infinity ? minYear : "—");
+    $("#max-stat-year-name")
+      .text(minYearCoaster || "—")
+      .attr("title", minYearCoaster || "");
 
     // Mostrar modal
-    const modalEl = document.getElementById('statsExpandedModal');
-    if(modalEl) {
+    const modalEl = document.getElementById("statsExpandedModal");
+    if (modalEl) {
       new bootstrap.Modal(modalEl).show();
     }
   });
-
-
 
   // ── Helper: cambiar entre modos ──────────────────────────────────
 
@@ -1457,9 +1514,20 @@ $(document).ready(function () {
           } else {
             data.forEach(function (coaster) {
               let statusText = coaster.coaster_status || "Operativa";
-              if (statusText === 'Operating' || statusText === 'Operativa') statusText = 'Operativa';
-              else if (statusText === 'Defunct' || statusText === 'Closed' || statusText === 'Cerrada') statusText = 'Cerrada';
-              else if (statusText === 'Construction' || statusText === 'En Construcción' || statusText === 'En construcción') statusText = 'En Construcción';
+              if (statusText === "Operating" || statusText === "Operativa")
+                statusText = "Operativa";
+              else if (
+                statusText === "Defunct" ||
+                statusText === "Closed" ||
+                statusText === "Cerrada"
+              )
+                statusText = "Cerrada";
+              else if (
+                statusText === "Construction" ||
+                statusText === "En Construcción" ||
+                statusText === "En construcción"
+              )
+                statusText = "En Construcción";
               else statusText = statusText.toUpperCase();
 
               dropdown.append(
@@ -1468,7 +1536,7 @@ $(document).ready(function () {
                     <strong>${coaster.coaster_name}</strong> <small class="text-secondary ms-2">en ${coaster.park_name}</small>
                   </div>
                   <div class="opacity-50 text-nowrap ms-3 text-end" style="font-size: 0.8em; min-width: max-content;">
-                    ${statusText} • ${coaster.park_country || 'Desconocido'}
+                    ${statusText} • ${coaster.park_country || "Desconocido"}
                   </div>
                 </li>`,
               );
@@ -1503,14 +1571,24 @@ $(document).ready(function () {
     if (e.key === "ArrowDown") {
       e.preventDefault();
       index = (index + 1) % $items.length;
-      $items.removeClass("bg-secondary border-success active").addClass("bg-dark");
-      $items.eq(index).removeClass("bg-dark").addClass("bg-secondary border-success active");
+      $items
+        .removeClass("bg-secondary border-success active")
+        .addClass("bg-dark");
+      $items
+        .eq(index)
+        .removeClass("bg-dark")
+        .addClass("bg-secondary border-success active");
       $items.eq(index)[0].scrollIntoView({ block: "nearest" });
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       index = index - 1 < 0 ? $items.length - 1 : index - 1;
-      $items.removeClass("bg-secondary border-success active").addClass("bg-dark");
-      $items.eq(index).removeClass("bg-dark").addClass("bg-secondary border-success active");
+      $items
+        .removeClass("bg-secondary border-success active")
+        .addClass("bg-dark");
+      $items
+        .eq(index)
+        .removeClass("bg-dark")
+        .addClass("bg-secondary border-success active");
       $items.eq(index)[0].scrollIntoView({ block: "nearest" });
     } else if (e.key === "Enter") {
       e.preventDefault();
@@ -1639,14 +1717,24 @@ $(document).ready(function () {
     if (e.key === "ArrowDown") {
       e.preventDefault();
       index = (index + 1) % $items.length;
-      $items.removeClass("bg-secondary border-success active").addClass("bg-dark");
-      $items.eq(index).removeClass("bg-dark").addClass("bg-secondary border-success active");
+      $items
+        .removeClass("bg-secondary border-success active")
+        .addClass("bg-dark");
+      $items
+        .eq(index)
+        .removeClass("bg-dark")
+        .addClass("bg-secondary border-success active");
       $items.eq(index)[0].scrollIntoView({ block: "nearest" });
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       index = index - 1 < 0 ? $items.length - 1 : index - 1;
-      $items.removeClass("bg-secondary border-success active").addClass("bg-dark");
-      $items.eq(index).removeClass("bg-dark").addClass("bg-secondary border-success active");
+      $items
+        .removeClass("bg-secondary border-success active")
+        .addClass("bg-dark");
+      $items
+        .eq(index)
+        .removeClass("bg-dark")
+        .addClass("bg-secondary border-success active");
       $items.eq(index)[0].scrollIntoView({ block: "nearest" });
     } else if (e.key === "Enter") {
       e.preventDefault();
@@ -1704,28 +1792,47 @@ $(document).ready(function () {
   if (btnForgotProfile) {
     btnForgotProfile.addEventListener("click", function (e) {
       e.preventDefault();
-      const email = document.getElementById("config-user-email").value || window.auth?.currentUser?.email;
-      
+      const email =
+        document.getElementById("config-user-email").value ||
+        window.auth?.currentUser?.email;
+
       if (!email) {
-        if (typeof showAlert === 'function') showAlert("No se ha podido obtener tu correo electrónico. Cierra sesión y vuelve a entrar.");
-        else alert("No se ha podido obtener tu correo electrónico. Cierra sesión y vuelve a entrar.");
+        if (typeof showAlert === "function")
+          showAlert(
+            "No se ha podido obtener tu correo electrónico. Cierra sesión y vuelve a entrar.",
+          );
+        else
+          alert(
+            "No se ha podido obtener tu correo electrónico. Cierra sesión y vuelve a entrar.",
+          );
         return;
       }
 
-      window.auth.sendPasswordResetEmail(email)
+      window.auth
+        .sendPasswordResetEmail(email)
         .then(() => {
-          if (typeof showAlert === 'function') {
-            showAlert("¡Listo! Hemos enviado un enlace a " + email + " para que puedas restablecer tu contraseña. Revisa también la carpeta de SPAM.");
+          if (typeof showAlert === "function") {
+            showAlert(
+              "¡Listo! Hemos enviado un enlace a " +
+                email +
+                " para que puedas restablecer tu contraseña. Revisa también la carpeta de SPAM.",
+            );
           } else {
-            alert("¡Listo! Hemos enviado un enlace a " + email + " para restablecer tu contraseña.");
+            alert(
+              "¡Listo! Hemos enviado un enlace a " +
+                email +
+                " para restablecer tu contraseña.",
+            );
           }
         })
         .catch((error) => {
           let txt = "Error al restablecer contraseña: ";
-          if (error.code === 'auth/user-not-found') txt = "No hay ninguna cuenta vinculada con este correo en nuestro proveedor (Google/Firebase).";
+          if (error.code === "auth/user-not-found")
+            txt =
+              "No hay ninguna cuenta vinculada con este correo en nuestro proveedor (Google/Firebase).";
           else txt += error.message;
 
-          if (typeof showAlert === 'function') showAlert(txt);
+          if (typeof showAlert === "function") showAlert(txt);
           else alert(txt);
         });
     });
@@ -1743,4 +1850,632 @@ $(document).ready(function () {
       $("#top-parks-dropdown").addClass("d-none");
     }
   });
+
+  // ══════════════════════════════════════════════════════════════════
+  //  MIS RESEÑAS
+  // ══════════════════════════════════════════════════════════════════
+
+  let reviewsData = []; // cache de todas las reseñas
+  let reviewsLoaded = false; // lazy-load: sólo se carga una vez
+  const REVIEWS_PER_PAGE = 6;
+  let reviewsPage = 1;
+
+  // ── Helper: genera las estrellas visuales (nota de 0–10 → 0–5 ★) ─
+  function starsHtml(note) {
+    const n = parseFloat(note) || 0; // la BD guarda 0-5 directamente
+    const full = Math.floor(n);
+    const half = n - full >= 0.5 ? 1 : 0;
+    const empty = 5 - full - half;
+    let html = "";
+    for (let i = 0; i < full; i++)
+      html += '<i class="fa-solid fa-star text-warning"></i>';
+    if (half)
+      html += '<i class="fa-solid fa-star-half-stroke text-warning"></i>';
+    for (let i = 0; i < empty; i++)
+      html += '<i class="fa-regular fa-star text-warning"></i>';
+    return html;
+  }
+
+  // ── Helper: formatea fecha ─────────────────────────────────────────
+  function formatReviewDate(dateStr) {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("es-ES", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  }
+
+  // ── Aplica sort + tipo y devuelve el subarray de la página actual ──
+  function getFilteredReviews() {
+    const sort = $("#reviews-sort").val();
+    const type = $("#reviews-type-filter").val();
+
+    let data = [...reviewsData];
+
+    // Filtro por tipo
+    if (type) data = data.filter((r) => r.type === type);
+
+    // Ordenación
+    if (sort === "date_desc")
+      data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    else if (sort === "date_asc")
+      data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    else if (sort === "rating_desc")
+      data.sort((a, b) => parseFloat(b.note) - parseFloat(a.note));
+    else if (sort === "rating_asc")
+      data.sort((a, b) => parseFloat(a.note) - parseFloat(b.note));
+
+    return data;
+  }
+
+  // ── Render de reseñas ────────────────────────────────────────────
+  function renderReviews() {
+    const filtered = getFilteredReviews();
+    const $list = $("#reviews-list").empty();
+    const $pag = $("#reviews-pagination").empty();
+
+    // Actualizar pastilla de contador (muestra total sin paginar)
+    const total = filtered.length;
+    if (total > 0) {
+      $("#reviews-total-count").text(total);
+      $("#reviews-total-pill").show();
+    } else {
+      $("#reviews-total-pill").hide();
+    }
+
+    if (!total) {
+      $list.html(`
+        <div class="text-center text-muted py-5">
+          <i class="fa-solid fa-ghost fs-1 mb-3 opacity-50 d-block"></i>
+          <p>Todavía no has dejado ninguna reseña.</p>
+        </div>`);
+      return;
+    }
+
+    // Paginación
+    const totalPages = Math.ceil(total / REVIEWS_PER_PAGE);
+    if (reviewsPage > totalPages) reviewsPage = totalPages;
+    const start = (reviewsPage - 1) * REVIEWS_PER_PAGE;
+    const page = filtered.slice(start, start + REVIEWS_PER_PAGE);
+
+    // Renderizar tarjetas
+    page.forEach((r) => {
+      const isCoaster = r.type === "coaster";
+      const detailUrl = isCoaster
+        ? `${BASE_URL}/web/views/public/coasters/coasters.php?id=${r.item_id}`
+        : `${BASE_URL}/web/views/public/parks/parks.php?id=${r.item_id}`;
+
+      const typeIcon = isCoaster
+        ? '<i class="fa-solid fa-ticket me-1 text-success"></i>'
+        : '<i class="fa-solid fa-map-location-dot me-1 text-info"></i>';
+      const typeLabel = isCoaster ? "Coaster" : "Parque";
+
+      const imgHtml = r.imagen_url
+        ? `<img src="${r.imagen_url.startsWith("/") ? BASE_URL + r.imagen_url : r.imagen_url}"
+               alt="${r.title}" loading="lazy"
+               style="width:100%;height:100%;object-fit:cover;"
+               onerror="this.parentElement.innerHTML='<div class=\'d-flex align-items-center justify-content-center h-100 text-secondary\'><i class=\'fa-solid fa-image fs-3\'></i></div>'">`
+        : `<div class="d-flex align-items-center justify-content-center h-100 text-secondary">
+             <i class="fa-solid fa-image fs-3"></i>
+           </div>`;
+
+      const nota = parseFloat(r.note) || 0;
+      const notaText = nota % 1 === 0 ? nota.toFixed(0) : nota.toFixed(1);
+      const reviewText = r.review
+        ? `<p class="mb-0 text-secondary small" style="line-height:1.6;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;">${r.review}</p>`
+        : `<p class="mb-0 text-muted small fst-italic">Sin texto de reseña.</p>`;
+
+      $list.append(`
+        <div class="top-card d-flex align-items-stretch mb-3" style="min-height:130px;">
+          <!-- Miniatura -->
+          <div style="width:130px;flex-shrink:0;background:#0d1117;overflow:hidden;">
+            ${imgHtml}
+          </div>
+          <!-- Contenido -->
+          <div class="p-3 flex-grow-1 d-flex flex-column justify-content-between" style="min-width:0;">
+            <div>
+              <div class="d-flex justify-content-between align-items-start mb-1 gap-2">
+                <a href="${detailUrl}" class="fw-bold text-white text-decoration-none"
+                   style="font-size:0.95rem;word-break:break-word;flex:1 1 0;min-width:0;">${r.title}</a>
+                <span class="badge rounded-0 fw-bold px-2 py-1 flex-shrink-0"
+                      style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.67rem;white-space:nowrap;">
+                  ${typeIcon}${typeLabel}
+                </span>
+              </div>
+              <small class="text-secondary d-block mb-2">${r.subtitle || ""}</small>
+              ${reviewText}
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <div class="d-flex align-items-center gap-2">
+                ${starsHtml(r.note)}
+                <span class="fw-bold text-warning" style="font-size:0.85rem;">${notaText}/5</span>
+              </div>
+              <small class="text-muted">${formatReviewDate(r.created_at)}</small>
+            </div>
+          </div>
+        </div>`);
+    });
+
+    // Controles de paginación
+    if (totalPages > 1) {
+      if (reviewsPage > 1) {
+        $pag.append(`<button class="btn btn-sm btn-outline-success rounded-0 px-3" id="rev-prev">
+          <i class="fa-solid fa-chevron-left me-1"></i>Anterior
+        </button>`);
+      }
+      $pag.append(
+        `<span class="tops-counter-pill">${reviewsPage} / ${totalPages}</span>`,
+      );
+      if (reviewsPage < totalPages) {
+        $pag.append(`<button class="btn btn-sm btn-outline-success rounded-0 px-3" id="rev-next">
+          Siguiente<i class="fa-solid fa-chevron-right ms-1"></i>
+        </button>`);
+      }
+
+      $("#rev-prev").on("click", () => {
+        reviewsPage--;
+        renderReviews();
+      });
+      $("#rev-next").on("click", () => {
+        reviewsPage++;
+        renderReviews();
+      });
+    }
+  }
+
+  // ── Carga inicial (lazy) ──────────────────────────────────────────
+  async function cargarReviews() {
+    if (reviewsLoaded) {
+      renderReviews();
+      return;
+    }
+
+    const $list = $("#reviews-list");
+    $list.html(`<div class="text-center text-muted py-5">
+      <i class="fa-solid fa-spinner fa-spin fs-3 mb-3 d-block"></i>Cargando reseñas…
+    </div>`);
+    $("#reviews-pagination").empty();
+
+    try {
+      const res = await fetch(
+        `${BASE_URL}/api/php/profile_config.php?action=get_my_reviews`,
+      );
+      const data = await res.json();
+      reviewsData = data.success && data.reviews ? data.reviews : [];
+      reviewsLoaded = true;
+      reviewsPage = 1;
+
+      // Enlazar filtros AQUÍ, cuando los datos ya están listos
+      $("#reviews-sort, #reviews-type-filter")
+        .off("change.reviews")
+        .on("change.reviews", function () {
+          reviewsPage = 1;
+          renderReviews();
+        });
+
+      renderReviews();
+    } catch (e) {
+      console.error("Error cargando reseñas:", e);
+      $list.html(`<div class="text-center text-danger py-4">
+        <i class="fa-solid fa-circle-exclamation me-2"></i>Error al cargar las reseñas.
+      </div>`);
+    }
+  }
+
+  // ── Activar cuando se hace click en el menú de reseñas ───────────
+  $("#menu-reviews").on("click", cargarReviews);
+
+  // Si la URL ya está en #reviews al cargar la página, cargamos también
+  if (window.location.hash === "#reviews") {
+    cargarReviews();
+  }
+  // ══════════════════════════════════════════════════════════════════
+  //  MIS AMIGOS
+  // ══════════════════════════════════════════════════════════════════
+
+  let friendsData = [];
+  let friendsLoaded = false;
+
+  function renderFriends(data) {
+    const source = data || friendsData;
+    const $list = $("#friends-list").empty();
+    const total = friendsData.length;
+
+    if (total > 0) {
+      $("#friends-total-count").text(total);
+      $("#friends-total-pill").show();
+    } else {
+      $("#friends-total-pill").hide();
+    }
+
+    if (!source.length) {
+      $list.html(
+        '<div class="text-center text-muted py-5">' +
+        '<i class="fa-solid fa-ghost fs-1 mb-3 opacity-50 d-block"></i>' +
+        '<p>Todavía no tienes amigos agregados.</p>' +
+        '</div>'
+      );
+      return;
+    }
+
+    source.forEach(function(f) {
+      var imgSrc = f.profile_image
+        ? (f.profile_image.startsWith("http") ? f.profile_image
+            : (f.profile_image.startsWith("/") ? BASE_URL + f.profile_image
+                : BASE_URL + "/" + f.profile_image))
+        : null;
+
+      var imgHtml = imgSrc
+        ? '<img src="' + imgSrc + '" alt="' + f.username + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'
+        : '<div class="d-flex align-items-center justify-content-center h-100 text-secondary bg-dark"><i class="fa-solid fa-user fs-3"></i></div>';
+
+      var ubicacion = (f.city || f.country)
+        ? '<small class="text-secondary d-block mb-2"><i class="fa-solid fa-location-dot me-1"></i>' + [f.city, f.country].filter(Boolean).join(", ") + '</small>'
+        : '<small class="text-muted d-block mb-2"><i class="fa-solid fa-location-crosshairs me-1"></i>Ubicaci\u00f3n desconocida</small>';
+
+      var creditsText = f.credits || 0;
+      var topCoaster  = f.favorite_coaster || "Ninguna";
+
+      var friendSinceHtml = "";
+      if (f.since) {
+        var d = new Date(f.since);
+        var mes = new Intl.DateTimeFormat("es-ES", { month: "short" }).format(d);
+        friendSinceHtml = '<span class="badge rounded-0" style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.7rem;">'
+          + '<i class="fa-solid fa-handshake text-success me-1"></i>Desde ' + mes + ". " + d.getFullYear()
+          + '</span>';
+      }
+
+      $list.append(
+        '<div class="top-card d-flex align-items-center mb-3 p-3">' +
+          '<div style="width:70px;height:70px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid rgba(16,185,129,0.3);" class="me-3">' + imgHtml + '</div>' +
+          '<div class="flex-grow-1" style="min-width:0;">' +
+            '<a href="' + BASE_URL + '/web/views/public/users/user_profile.php?id=' + f.id + '" class="fw-bold text-white text-decoration-none fs-6 d-block text-truncate">' + f.username + '</a>' +
+            ubicacion +
+            '<div class="d-flex gap-2 mt-1 flex-wrap">' +
+              '<span class="badge rounded-0" style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.7rem;"><i class="fa-solid fa-ticket text-success me-1"></i>' + creditsText + ' credits</span>' +
+              '<span class="badge rounded-0" style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.7rem;"><i class="fa-solid fa-heart text-danger me-1"></i>Top 1: ' + topCoaster + '</span>' +
+              friendSinceHtml +
+            '</div>' +
+          '</div>' +
+          '<div class="ms-3 flex-shrink-0">' +
+            '<a href="' + BASE_URL + '/web/views/public/users/user_profile.php?id=' + f.id + '" class="btn btn-sm btn-outline-success rounded-0 px-3">Ver perfil</a>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+  }
+
+  function applyFriendsFilterSort() {
+    var query   = $("#friends-search").val().toLowerCase().trim();
+    var sortVal = $("#friends-sort").val();
+
+    var filtered = friendsData.filter(function(f) {
+      return f.username.toLowerCase().indexOf(query) !== -1;
+    });
+
+    filtered.sort(function(a, b) {
+      if (sortVal === "date_desc")    return new Date(b.since || b.created_at || 0) - new Date(a.since || a.created_at || 0);
+      if (sortVal === "date_asc")     return new Date(a.since || a.created_at || 0) - new Date(b.since || b.created_at || 0);
+      if (sortVal === "credits_desc") return (b.credits || 0) - (a.credits || 0);
+      if (sortVal === "name_asc")     return a.username.localeCompare(b.username, "es");
+      return 0;
+    });
+
+    if (!filtered.length) {
+      $("#friends-list").html(
+        '<div class="text-center text-muted py-4"><i class="fa-solid fa-search me-2"></i>No se encontraron amigos con ese nombre.</div>'
+      );
+      return;
+    }
+    renderFriends(filtered);
+  }
+
+  async function cargarAmigos() {
+    if (friendsLoaded) {
+      applyFriendsFilterSort();
+      return;
+    }
+
+    $("#friends-list").html(
+      '<div class="text-center text-muted py-5"><i class="fa-solid fa-spinner fa-spin fs-3 mb-3 d-block"></i>Cargando amigos\u2026</div>'
+    );
+
+    try {
+      var res      = await fetch(BASE_URL + "/api/php/users.php?action=get_friends_data");
+      var dataJson = await res.json();
+
+      friendsData   = (dataJson.success && dataJson.data && dataJson.data.friends) ? dataJson.data.friends : [];
+      friendsLoaded = true;
+
+      applyFriendsFilterSort();
+
+      // Registrar eventos solo una vez tras la primera carga
+      $("#friends-search").on("input",  applyFriendsFilterSort);
+      $("#friends-sort").on("change",   applyFriendsFilterSort);
+
+    } catch (e) {
+      console.error("Error cargando amigos:", e);
+      $("#friends-list").html(
+        '<div class="text-center text-danger py-4"><i class="fa-solid fa-circle-exclamation me-2"></i>Error al cargar los amigos.</div>'
+      );
+    }
+  }
+
+  // Activar cuando se hace click en el men\u00fa de amigos
+  $("#menu-friends").on("click", cargarAmigos);
+
+  // Si la URL ya est\u00e1 en #friends al cargar la p\u00e1gina
+  if (window.location.hash === "#friends") {
+    cargarAmigos();
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  //  MI MAPA — Leaflet.js + Nominatim geocoding
+  // ══════════════════════════════════════════════════════════════════
+
+  let mapInstance     = null;
+  let mapInitialized  = false;
+  let mapMarkerCluster= null;
+
+  function createParkIcon(coasterCount) {
+    const color = "#00c853";
+    const size  = coasterCount >= 5 ? 36 : coasterCount >= 2 ? 32 : 28;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size + 8}" viewBox="0 0 36 44">
+      <circle cx="18" cy="18" r="16" fill="${color}" fill-opacity="0.2" stroke="${color}" stroke-width="2"/>
+      <circle cx="18" cy="18" r="9" fill="${color}"/>
+      <line x1="18" y1="34" x2="18" y2="42" stroke="${color}" stroke-width="2" stroke-linecap="round"/>
+    </svg>`;
+    return L.divIcon({
+      html:       `<div class="rcw-map-marker">${svg}</div>`,
+      className:  "",
+      iconSize:   [size, size + 8],
+      iconAnchor: [size / 2, size + 8],
+      popupAnchor:[0, -(size + 4)],
+    });
+  }
+
+  function buildPopupHtml(park) {
+    const imgUrl = park.imagen_url
+      ? (park.imagen_url.startsWith("/") ? BASE_URL + park.imagen_url : park.imagen_url)
+      : null;
+    const imgBlock = imgUrl
+      ? `<img src="${imgUrl}" alt="${park.park_name}" class="rcw-map-popup-img" onerror="this.style.display='none'">`
+      : `<div class="rcw-map-popup-img-placeholder"><i class="fa-solid fa-image"></i></div>`;
+    const meta = [park.park_location, park.park_country].filter(Boolean).join(", ");
+    const detailUrl = `${BASE_URL}/web/views/public/parks/parks.php?id=${park.park_id}`;
+    const count = parseInt(park.coaster_count) || 1;
+    return `
+      <div class="rcw-map-popup">
+        ${imgBlock}
+        <div class="rcw-map-popup-body">
+          <div class="rcw-map-popup-name">${park.park_name}</div>
+          <div class="rcw-map-popup-meta">${meta}</div>
+          <div class="rcw-map-popup-badge">
+            <i class="fa-solid fa-ticket"></i> ${count} coaster${count !== 1 ? "s" : ""} en tu top
+          </div>
+        </div>
+        <a href="${detailUrl}" class="rcw-map-popup-link">
+          Ver parque <i class="fa-solid fa-arrow-right ms-1"></i>
+        </a>
+      </div>`;
+  }
+
+  // TTL de la cache de geocoding: 30 dias (en ms)
+  const GEOCODE_TTL = 30 * 24 * 60 * 60 * 1000;
+
+  async function geocodePark(park) {
+    const cacheKey = `rcw_geocode_${park.park_id}`;
+
+    // Intentar leer de localStorage (persiste entre sesiones)
+    try {
+      const raw = localStorage.getItem(cacheKey);
+      if (raw) {
+        const entry = JSON.parse(raw);
+        // Validar TTL: si han pasado menos de 30 dias, usar la cache
+        if (entry.ts && (Date.now() - entry.ts) < GEOCODE_TTL) {
+          return { lat: entry.lat, lng: entry.lng };
+        }
+        // Expirada: eliminar
+        localStorage.removeItem(cacheKey);
+      }
+    } catch (_) {}
+
+    // No hay cache valida -> llamar a Nominatim
+    const query = [park.park_name, park.park_location, park.park_country]
+      .filter(Boolean).join(", ");
+    try {
+      const res  = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`,
+        { headers: { "Accept-Language": "es", "User-Agent": "RollerCoasterWorld/TFG" } }
+      );
+      const data = await res.json();
+      if (data && data.length > 0) {
+        const coords = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), ts: Date.now() };
+        try { localStorage.setItem(cacheKey, JSON.stringify(coords)); } catch (_) {}
+        return { lat: coords.lat, lng: coords.lng };
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  // Devuelve las coords del localStorage sin llamar a la red (null si no hay cache valida)
+  function getCachedCoords(parkId) {
+    try {
+      const raw = localStorage.getItem(`rcw_geocode_${parkId}`);
+      if (!raw) return null;
+      const entry = JSON.parse(raw);
+      if (entry.ts && (Date.now() - entry.ts) < GEOCODE_TTL) {
+        return { lat: entry.lat, lng: entry.lng };
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async function initMap() {
+    if (mapInitialized) {
+      if (mapInstance) mapInstance.invalidateSize();
+      return;
+    }
+    mapInitialized = true;
+
+    mapInstance = L.map("profile-map", {
+      center: [20, 0],
+      zoom:   2,
+      zoomControl: true,
+    });
+
+    // ── Control de pantalla completa (Fullscreen API nativa) ──────
+    const FullscreenControl = L.Control.extend({
+      options: { position: "topleft" },
+      onAdd: function () {
+        const btn = L.DomUtil.create("button", "leaflet-bar leaflet-control rcw-fullscreen-btn");
+        btn.innerHTML = '<i class="fa-solid fa-expand"></i>';
+        btn.title = "Pantalla completa";
+        btn.setAttribute("type", "button");
+        L.DomEvent.disableClickPropagation(btn);
+        L.DomEvent.on(btn, "click", function () {
+          const mapEl = document.getElementById("profile-map");
+          const isFs  = !!(document.fullscreenElement || document.webkitFullscreenElement);
+          if (!isFs) {
+            (mapEl.requestFullscreen || mapEl.webkitRequestFullscreen).call(mapEl);
+            btn.innerHTML = '<i class="fa-solid fa-compress"></i>';
+            btn.title = "Salir de pantalla completa";
+          } else {
+            (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+            btn.innerHTML = '<i class="fa-solid fa-expand"></i>';
+            btn.title = "Pantalla completa";
+          }
+        });
+        document.addEventListener("fullscreenchange", function () {
+          if (!document.fullscreenElement) {
+            btn.innerHTML = '<i class="fa-solid fa-expand"></i>';
+            btn.title = "Pantalla completa";
+            if (mapInstance) mapInstance.invalidateSize();
+          }
+        });
+        return btn;
+      },
+    });
+    new FullscreenControl().addTo(mapInstance);
+
+    L.tileLayer(
+      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+      {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+        subdomains:  "abcd",
+        maxZoom:     19,
+      }
+    ).addTo(mapInstance);
+
+    mapMarkerCluster = L.markerClusterGroup({
+      showCoverageOnHover: false,
+      maxClusterRadius:    60,
+      spiderfyOnMaxZoom:   true,
+    });
+    mapInstance.addLayer(mapMarkerCluster);
+
+    // Fetch lista de parques del usuario
+    let parks = [];
+    try {
+      const res  = await fetch(`${BASE_URL}/api/php/profile_config.php?action=get_map_parks`);
+      const data = await res.json();
+      parks = (data.success && Array.isArray(data.parks)) ? data.parks : [];
+    } catch (e) {
+      console.error("Error cargando parques del mapa:", e);
+    }
+
+    if (!parks.length) {
+      $("#profile-map").addClass("d-none");
+      $("#map-empty-state").removeClass("d-none");
+      return;
+    }
+
+    $("#map-parks-count").text(parks.length);
+    $("#map-parks-pill").show();
+
+    // ── Paso 1: parques YA en localStorage → marcadores instantaneos ──
+    const cached    = [];
+    const toGeocode = [];
+    const bounds    = [];
+
+    for (const park of parks) {
+      const coords = getCachedCoords(park.park_id);
+      if (coords) {
+        cached.push({ park, coords });
+      } else {
+        toGeocode.push(park);
+      }
+    }
+
+    // Añadir marcadores cacheados al instante
+    for (const { park, coords } of cached) {
+      bounds.push([coords.lat, coords.lng]);
+      const marker = L.marker([coords.lat, coords.lng], {
+        icon: createParkIcon(parseInt(park.coaster_count) || 1),
+      });
+      marker.bindPopup(buildPopupHtml(park), { maxWidth: 260, className: "rcw-leaflet-popup" });
+      mapMarkerCluster.addLayer(marker);
+    }
+
+    // Ajustar vista con lo que ya tenemos (respuesta inmediata)
+    if (bounds.length > 0) {
+      mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 10 });
+    }
+    mapInstance.invalidateSize();
+
+    // ── Paso 2: parques SIN cache → geocodificar con Nominatim ────────
+    if (toGeocode.length > 0) {
+      const $bar      = $("#map-geocoding-bar").removeClass("d-none");
+      const $status   = $("#map-geocoding-status");
+      const $progress = $("#map-geocoding-progress");
+      const $pbBar    = $("#map-geocoding-progressbar");
+      const total     = toGeocode.length;
+      let   done      = 0;
+
+      for (const park of toGeocode) {
+        $status.text(`Localizando "${park.park_name}"...`);
+        $progress.text(`${done} / ${total}`);
+        $pbBar.css("width", `${Math.round((done / total) * 100)}%`);
+
+        const coords = await geocodePark(park); // llama Nominatim + guarda en localStorage
+        done++;
+
+        if (coords) {
+          bounds.push([coords.lat, coords.lng]);
+          const marker = L.marker([coords.lat, coords.lng], {
+            icon: createParkIcon(parseInt(park.coaster_count) || 1),
+          });
+          marker.bindPopup(buildPopupHtml(park), { maxWidth: 260, className: "rcw-leaflet-popup" });
+          mapMarkerCluster.addLayer(marker);
+        }
+
+        if (done < total) await sleep(1100);
+      }
+
+      $bar.addClass("d-none");
+      $progress.text(`${done} / ${total}`);
+      $pbBar.css("width", "100%");
+
+      // Re-ajustar viewport ahora que tenemos todos los marcadores
+      if (bounds.length > 0) {
+        mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 10 });
+      }
+      mapInstance.invalidateSize();
+    }
+  }
+
+  $("#menu-map").on("click", function () {
+    setTimeout(() => initMap(), 80);
+  });
+
+  if (window.location.hash === "#map") {
+    setTimeout(() => initMap(), 200);
+  }
+
 });

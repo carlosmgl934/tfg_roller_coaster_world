@@ -505,7 +505,7 @@ function getPublicProfile()
 
         // Lista de amigos del usuario
         $stmtFriendList = $db->prepare("
-            SELECT u.id, u.username, u.profile_image, u.city, u.country, u.created_at,
+            SELECT u.id, u.username, u.profile_image, u.city, u.country, u.created_at, f.accepted_at as since,
                    (SELECT COUNT(*) FROM user_credits uc WHERE uc.user_id = u.id) as credits
             FROM friendship f
             JOIN users u ON u.id = CASE WHEN f.solicitante_id = :tid THEN f.solicitada_id ELSE f.solicitante_id END

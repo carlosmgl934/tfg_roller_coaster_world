@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS parks (
     park_location VARCHAR(255) NOT NULL,
     park_country VARCHAR(250) DEFAULT NULL,
     imagen_url VARCHAR(255) DEFAULT NULL,
+    website VARCHAR(500) DEFAULT NULL,
     -- Estadísticas --
     num_coasters INT DEFAULT 0,
     operating_coasters INT DEFAULT 0,

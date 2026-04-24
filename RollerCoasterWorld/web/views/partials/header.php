@@ -364,9 +364,9 @@ header("Expires: 0"); // Proxies
                   <?php if ($showImg): ?>
                     <img src="<?= htmlspecialchars($finalImgUrl) ?>" alt="Avatar"
                       style="width:100%;height:100%;object-fit:cover;border-radius:50%;"
-                      onerror="this.style.display='none';this.parentElement.innerHTML='<span><?= htmlspecialchars($user_initials) ?></span>'">
+                      onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'d-flex align-items-center justify-content-center h-100 w-100 text-secondary bg-dark\' style=\'border-radius:50%;\'><i class=\'fa-solid fa-user fs-5\'></i></div>'">
                   <?php else: ?>
-                    <span><?= htmlspecialchars($user_initials) ?></span>
+                    <div class="d-flex align-items-center justify-content-center h-100 w-100 text-secondary bg-dark" style="border-radius:50%;"><i class="fa-solid fa-user fs-5"></i></div>
                   <?php endif; ?>
                 </div>
                 <span class="rcw-user-name d-none d-xl-inline"

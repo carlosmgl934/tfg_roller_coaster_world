@@ -505,9 +505,6 @@ $(document).ready(function () {
           $("#park-price-table").text(
             park.precio_entrada ? park.precio_entrada + "€" : "S/D",
           );
-          if (park.latitude && park.longitude) {
-            $("#park-coords-table").text(`${park.latitude}, ${park.longitude}`);
-          }
 
           // Botones
           if (park.website) {
@@ -735,20 +732,15 @@ $(document).ready(function () {
               tagsHtml += "</div>";
             }
 
-            // Avatar premium: foto o círculo con iniciales (estilo rcw-user-avatar, igual que coasters)
-            let avatarHtml;
-            const fixedImg = review.profile_image
+            // Avatar: foto del usuario o SVG por defecto
+            const defaultAvatarUrl = `${window.BASE_URL}/web/img/avatars/default_avatar.svg`;
+            const rawImg = review.profile_image
               ? (review.profile_image.startsWith('/') ? BASE_URL + review.profile_image : review.profile_image)
               : null;
-            if (fixedImg) {
-              avatarHtml = `<img src="${fixedImg}" alt="${review.username}" referrerpolicy="no-referrer"
-                style="width:40px;height:40px;object-fit:cover;border-radius:50%;border:2px solid var(--rcw-green-dim);flex-shrink:0;"
-                onerror="this.style.display='none'">`;
-            } else {
-              const nameParts = (review.username || "U").trim().split(/[\s_\-]+/);
-              const initials = (nameParts[0][0] + (nameParts[1] ? nameParts[1][0] : "")).toUpperCase();
-              avatarHtml = `<div class="rcw-user-avatar flex-shrink-0" style="width:40px;height:40px;font-size:0.95rem;"><span>${initials}</span></div>`;
-            }
+            const avatarSrc = rawImg || defaultAvatarUrl;
+            const avatarHtml = `<img src="${avatarSrc}" alt="${review.username}" referrerpolicy="no-referrer"
+              style="width:40px;height:40px;object-fit:cover;border-radius:50%;border:2px solid var(--rcw-green-dim,#198754);flex-shrink:0;background:#2d333b;"
+              onerror="this.src='${defaultAvatarUrl}';this.onerror=null;">`;
 
             container.append(`
               <div class="border-bottom pb-3 mb-3 animate__animated animate__fadeIn">

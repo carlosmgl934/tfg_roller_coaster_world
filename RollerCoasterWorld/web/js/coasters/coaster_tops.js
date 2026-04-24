@@ -24,6 +24,12 @@ $(document).ready(function () {
   // ── Estado ────────────────────────────────────────────────────────────────
   let allTops = []; // Guarda los datos de la última petición para filtrar sin recargar
 
+  // ── Restaurar caché local ──────────────────────────────────────────────────
+  const cachedSort = localStorage.getItem("coasterTopsSort");
+  if (cachedSort) {
+    $sortSelect.val(cachedSort);
+  }
+
   // ── Carga inicial ─────────────────────────────────────────────────────────
   fetchUserTops();
 
@@ -31,6 +37,7 @@ $(document).ready(function () {
 
   // Cambio en el select de ordenación → nueva petición al servidor
   $sortSelect.on("change", function () {
+    localStorage.setItem("coasterTopsSort", $(this).val());
     fetchUserTops();
   });
 
@@ -97,7 +104,7 @@ $(document).ready(function () {
 
     users.forEach((user) => {
       // ── Avatar (lógica defensiva) ─────────────────────────────────
-      const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=198754&color=fff`;
+      const fallback = window.BASE_URL + '/web/img/avatars/default_avatar.svg';
       const raw = user.profile_image;
       let avatar;
       if (!raw) {

@@ -1259,7 +1259,7 @@
   }
 
   function avatarFallback(username) {
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(username || '?')}&background=10b981&color=fff&size=64`;
+    return window.BASE_URL + '/web/img/avatars/default_avatar.svg';
   }
 
   function esc(str) {

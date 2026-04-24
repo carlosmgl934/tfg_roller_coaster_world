@@ -54,21 +54,6 @@ $(document).ready(function () {
 
     users.forEach(user => {
       let actionHtml = '';
-      
-      let avatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=198754&color=fff`;
-      if (user.profile_image) {
-        const img = user.profile_image;
-        if (img.startsWith('http://') || img.startsWith('https://')) {
-          avatarSrc = img;
-        } else if (img.startsWith('/')) {
-          if (!img.includes('/web/img/uploads/')) {
-            avatarSrc = window.BASE_URL + img;
-          }
-        } else {
-          avatarSrc = 'https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/' + img;
-        }
-      }
-
       let statusClass = '';
       let avatarBorderColor = 'var(--bs-success)';
 
@@ -97,6 +82,27 @@ $(document).ready(function () {
                         style="background: rgba(25,135,84,0.2); border: 1px solid rgba(25,135,84,0.5); color: #2bde8e; border-radius: 20px; font-size: 0.8rem; white-space:nowrap;">
                         <i class="fa-solid fa-user-check me-1"></i> Amigos
                       </span>`;
+      }
+      
+      let avatarHtml = `<div class="d-flex align-items-center justify-content-center text-secondary bg-dark rounded-circle flex-shrink-0" style="width: 52px; height: 52px; border: 2px solid ${avatarBorderColor};"><i class="fa-solid fa-user fs-4"></i></div>`;
+      if (user.profile_image) {
+        let avatarSrc = user.profile_image;
+        if (avatarSrc.startsWith('http://') || avatarSrc.startsWith('https://')) {
+          // keep as is
+        } else if (avatarSrc.startsWith('/')) {
+          if (!avatarSrc.includes('/web/img/uploads/')) {
+            avatarSrc = window.BASE_URL + avatarSrc;
+          }
+        } else {
+          avatarSrc = 'https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/' + avatarSrc;
+        }
+
+        if (avatarSrc && avatarSrc !== user.profile_image) {
+            // Reassign properly
+        }
+        
+        // Ensure image fallback
+        avatarHtml = `<img src="${avatarSrc}" alt="${user.username}" class="rounded-circle object-fit-cover flex-shrink-0" style="width: 52px; height: 52px; border: 2px solid ${avatarBorderColor};" onerror="this.outerHTML='<div class=\\'d-flex align-items-center justify-content-center text-secondary bg-dark rounded-circle flex-shrink-0\\' style=\\'width: 52px; height: 52px; border: 2px solid ${avatarBorderColor};\\'><i class=\\'fa-solid fa-user fs-4\\'></i></div>'">`;
       }
 
       let displayName = user.full_name ? user.full_name : user.username;
@@ -128,13 +134,7 @@ $(document).ready(function () {
           <div class="d-flex align-items-center gap-3 px-4 py-3">
             
             <!-- Avatar -->
-            <div class="flex-shrink-0">
-              <img src="${avatarSrc}" 
-                   alt="${user.username}" 
-                   class="rounded-circle object-fit-cover"
-                   style="width: 52px; height: 52px; border: 2px solid ${avatarBorderColor};"
-                   onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=198754&color=fff&size=128'">
-            </div>
+            ${avatarHtml}
 
             <!-- Info -->
             <div class="flex-grow-1 min-w-0">

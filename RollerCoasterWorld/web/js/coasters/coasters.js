@@ -1053,7 +1053,7 @@ $(document).ready(function () {
             $("#reviews-list").append(
               `<div class="border-bottom pb-3 mb-3">
               <div class="d-flex align-items-center gap-2 mb-1">
-                <img src="${window.rcwGetAvatarPath(review.profile_image, review.username)}" alt="${review.username}" class="review-avatar" style="width:40px;height:40px;object-fit:cover;border-radius:50%;">
+                <img src="${window.rcwGetAvatarPath(review.profile_image, review.username)}" alt="${review.username}" class="review-avatar" style="width:40px;height:40px;object-fit:cover;border-radius:50%;background:#2d333b;" onerror="this.src='${window.BASE_URL}/web/img/avatars/default_avatar.svg';this.onerror=null;">
                 <strong>${review.username}</strong>
                 <span class="stars-display ms-2">${renderStars(review.note)}</span>
                 <span class="text-muted small ms-2">• ${timeAgo(review.created_at)}</span>

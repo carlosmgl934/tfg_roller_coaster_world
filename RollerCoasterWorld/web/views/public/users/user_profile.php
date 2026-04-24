@@ -333,6 +333,7 @@ $user_id = $_GET['id'] ?? null;
                 <div class="modal-header border-secondary d-flex align-items-center py-2 px-3">
                     <img id="ig-modal-avatar" src="" alt="Avatar" class="rounded-circle me-2"
                         style="width:32px; height:32px; object-fit:cover;">
+                    <div id="ig-modal-avatar-fallback" class="d-flex align-items-center justify-content-center text-secondary bg-dark rounded-circle me-2" style="width:32px;height:32px;display:none !important;"><i class="fa-solid fa-user"></i></div>
                     <span id="ig-modal-username" class="fw-bold fs-6"></span>
                     <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal"
                         aria-label="Close"></button>

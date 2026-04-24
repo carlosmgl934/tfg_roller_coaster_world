@@ -179,7 +179,7 @@ $(document).ready(function () {
   let friendsLoaded = false;
 
   function getAvatarUrl(img, username) {
-    const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=198754&color=fff&size=64`;
+    const fallback = window.BASE_URL + '/web/img/avatars/default_avatar.svg';
     if (!img) return fallback;
     if (img.startsWith("http://") || img.startsWith("https://")) return img;
     return `https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/${img}`;
@@ -392,7 +392,7 @@ $(document).ready(function () {
                  if (collabs.length > 0) {
                    autor += `<small class="text-muted ms-1" style="font-size: 0.75rem;">colaborando con:</small><div class="d-flex ms-1">`;
                    collabs.slice(0, 3).forEach(c => {
-                       let imgSrc = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(c.username) + '&background=random';
+                       let imgSrc = window.BASE_URL + '/web/img/avatars/default_avatar.svg';
                        if (c.profile_image) {
                            if (c.profile_image.startsWith('http://') || c.profile_image.startsWith('https://')) { imgSrc = c.profile_image; }
                            else if (c.profile_image.startsWith('/')) { imgSrc = c.profile_image.includes('/web/img/uploads/') ? window.BASE_URL + '/web/img/uploads/' + c.profile_image.split('/web/img/uploads/')[1] : window.BASE_URL + c.profile_image; }

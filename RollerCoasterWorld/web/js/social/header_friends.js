@@ -45,7 +45,7 @@ $(document).ready(function () {
     users.forEach(user => {
       let actionHtml = '';
       
-      let avatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=198754&color=fff`;
+      let avatarSrc = window.BASE_URL + '/web/img/avatars/default_avatar.svg';
       if (user.profile_image) {
         const img = user.profile_image;
         if (img.startsWith('http://') || img.startsWith('https://')) {

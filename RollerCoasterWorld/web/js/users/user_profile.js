@@ -77,14 +77,21 @@ $(document).ready(function () {
 
     // Avatar
     const avatarDiv = $("#user-avatar");
-    const resolved = resolveAvatarUrl(user.profile_image, user.username);
-    if (resolved.type === "image") {
-      avatarDiv.html(
-        `<img src="${resolved.src}" class="w-100 h-100 object-fit-cover rounded-circle shadow"
-              onerror="$(this).parent().text('${user.username.substring(0, 2).toUpperCase()}')">`,
-      );
+    if (user.profile_image) {
+      const resolved = resolveAvatarUrl(user.profile_image, user.username);
+      if (resolved.type === "image") {
+        // Swap out the div for an img that fills the 80×80 circle
+        avatarDiv.replaceWith(
+          `<img id="user-avatar" src="${resolved.src}"
+               style="width:80px;height:80px;object-fit:cover;border-radius:50%;border:2px solid rgba(0,200,83,0.35);flex-shrink:0;"
+               class="shadow-sm"
+               onerror="this.src='${window.BASE_URL}/web/img/avatars/default_avatar.svg'">`
+        );
+      } else {
+        avatarDiv.css({"font-size": "2rem"}).html('<i class="fa-solid fa-user"></i>');
+      }
     } else {
-      avatarDiv.text(resolved.initials);
+      avatarDiv.css({"font-size": "2rem"}).html('<i class="fa-solid fa-user"></i>');
     }
 
     // Stats generales
@@ -116,8 +123,14 @@ $(document).ready(function () {
     if (techStats) {
       const totalHeight = parseInt(techStats.total_height || 0);
       const totalInv = parseInt(techStats.total_inversions || 0);
-      const fastest = techStats.fastest_coaster && techStats.fastest_coaster !== "—" ? techStats.fastest_coaster : "—";
-      const longest = techStats.longest_coaster && techStats.longest_coaster !== "—" ? techStats.longest_coaster : "—";
+      const fastest =
+        techStats.fastest_coaster && techStats.fastest_coaster !== "—"
+          ? techStats.fastest_coaster
+          : "—";
+      const longest =
+        techStats.longest_coaster && techStats.longest_coaster !== "—"
+          ? techStats.longest_coaster
+          : "—";
 
       $("#stat-tech-height").text(totalHeight);
       $("#stat-tech-inversions").text(totalInv);
@@ -151,8 +164,8 @@ $(document).ready(function () {
       $(".content-section").hide();
       const map = {
         "menu-profile": "#section-info",
-        "menu-tops":    "#section-tops",
-        "menu-photos":  "#section-photos",
+        "menu-tops": "#section-tops",
+        "menu-photos": "#section-photos",
         "menu-friends": "#section-friends",
         "menu-reviews": "#section-reviews",
       };
@@ -166,11 +179,11 @@ $(document).ready(function () {
 
     // Leer el hash de la URL para abrir la pestaña correcta al cargar
     const hash = window.location.hash;
-    if      (hash === "#tops")    activateSection("menu-tops");
-    else if (hash === "#photos")  activateSection("menu-photos");
+    if (hash === "#tops") activateSection("menu-tops");
+    else if (hash === "#photos") activateSection("menu-photos");
     else if (hash === "#friends") activateSection("menu-friends");
     else if (hash === "#reviews") activateSection("menu-reviews");
-    else                          activateSection("menu-profile");
+    else activateSection("menu-profile");
   }
 
   function renderFriendshipButton(targetId, status) {
@@ -325,11 +338,15 @@ $(document).ready(function () {
         : photo.photo_url;
       const caption =
         photo.caption || `${photo.coaster_name} en ${photo.park_name}`;
-      
-      const username = user ? user.username : (photo.username || $("#user-username").text());
-      const profileImage = user ? user.profile_image : (photo.profile_image || "");
+
+      const username = user
+        ? user.username
+        : photo.username || $("#user-username").text();
+      const profileImage = user
+        ? user.profile_image
+        : photo.profile_image || "";
       const avatarObj = resolveAvatarUrl(profileImage, username);
-      const avatarSrc = avatarObj.type === "image" ? avatarObj.src : `https://ui-avatars.com/api/?name=${username}&background=random`;
+      const avatarSrc = avatarObj.type === "image" ? avatarObj.src : null;
       const likes = photo.likes || 0;
 
       const html = `
@@ -340,7 +357,7 @@ $(document).ready(function () {
                  data-index="${index}"
                  data-url="${url}"
                  data-username="${username}"
-                 data-avatar="${avatarSrc}"
+                 data-avatar="${avatarSrc ? avatarSrc : ""}"
                  data-caption="${caption}"
                  data-likes="${likes}">
                 <img src="${url}" class="object-fit-cover w-100 h-100" style="transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" alt="Foto">
@@ -354,49 +371,64 @@ $(document).ready(function () {
     });
 
     let currentPhotoIndex = 0;
-    
+
     function updateModalContent(index) {
-        const allPhotosList = $(".photo-square-container");
-        if (index < 0 || index >= allPhotosList.length) return;
-        currentPhotoIndex = index;
-        const el = $(allPhotosList[index]);
-        
-        const id = el.data("id");
-        const url = el.data("url");
-        const username = el.data("username");
-        const avatar = el.data("avatar");
-        const caption = el.data("caption");
+      const allPhotosList = $(".photo-square-container");
+      if (index < 0 || index >= allPhotosList.length) return;
+      currentPhotoIndex = index;
+      const el = $(allPhotosList[index]);
 
-        $("#ig-modal-img").attr("src", url);
-        $("#ig-modal-avatar").attr("src", avatar);
-        $("#ig-modal-username").text(username);
-        
-        if (caption) {
-          $("#ig-modal-caption-user").text(username);
-          $("#ig-modal-caption").html(`<span class="text-muted opacity-50 mx-1">&bull;</span> ${caption}`);
-        } else {
-          $("#ig-modal-caption-user").text("");
-          $("#ig-modal-caption").text("");
-        }
+      const id = el.data("id");
+      const url = el.data("url");
+      const username = el.data("username");
+      const avatar = el.data("avatar");
+      const caption = el.data("caption");
 
-        $("#ig-modal-prev").toggle(index > 0);
-        $("#ig-modal-next").toggle(index < allPhotosList.length - 1);
+      $("#ig-modal-img").attr("src", url);
+      if (avatar) {
+        $("#ig-modal-avatar").attr("src", avatar).show();
+        $("#ig-modal-avatar-fallback").hide();
+      } else {
+        $("#ig-modal-avatar").hide();
+        $("#ig-modal-avatar-fallback").show();
+      }
+      $("#ig-modal-username").text(username);
+
+      if (caption) {
+        $("#ig-modal-caption-user").text(username);
+        $("#ig-modal-caption").html(
+          `<span class="text-muted opacity-50 mx-1">&bull;</span> ${caption}`,
+        );
+      } else {
+        $("#ig-modal-caption-user").text("");
+        $("#ig-modal-caption").text("");
+      }
+
+      $("#ig-modal-prev").toggle(index > 0);
+      $("#ig-modal-next").toggle(index < allPhotosList.length - 1);
     }
 
-    $("#photos-grid-container").off("click", ".photo-square-container").on("click", ".photo-square-container", function() {
+    $("#photos-grid-container")
+      .off("click", ".photo-square-container")
+      .on("click", ".photo-square-container", function () {
         const index = $(this).data("index");
         updateModalContent(index);
-        new bootstrap.Modal(document.getElementById("ig-lightbox-modal")).show();
-    });
+        new bootstrap.Modal(
+          document.getElementById("ig-lightbox-modal"),
+        ).show();
+      });
 
-    $("#ig-modal-prev").off("click").on("click", function() {
+    $("#ig-modal-prev")
+      .off("click")
+      .on("click", function () {
         updateModalContent(currentPhotoIndex - 1);
-    });
+      });
 
-    $("#ig-modal-next").off("click").on("click", function() {
+    $("#ig-modal-next")
+      .off("click")
+      .on("click", function () {
         updateModalContent(currentPhotoIndex + 1);
-    });
-
+      });
   }
 
   // ─── Renderizar amigos del perfil visitado ──────────────────────
@@ -408,32 +440,56 @@ $(document).ready(function () {
     $("#friends-section-count").text(friends.length);
 
     if (!friends || friends.length === 0) {
-      container.html('<div class="p-5 text-center text-muted"><i class="fa-solid fa-user-group fa-3x mb-3 d-block opacity-25"></i>Este usuario aún no tiene amigos en la plataforma.</div>');
+      container.html(
+        '<div class="p-5 text-center text-muted"><i class="fa-solid fa-user-group fa-3x mb-3 d-block opacity-25"></i>Este usuario aún no tiene amigos en la plataforma.</div>',
+      );
       return;
     }
 
-    let html = '';
-    friends.forEach(friend => {
+    let html = "";
+    friends.forEach((friend) => {
       const avatarObj = resolveAvatarUrl(friend.profile_image, friend.username);
-      const avatarSrc = avatarObj.type === "image"
-        ? avatarObj.src
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(friend.username)}&background=198754&color=fff&size=128`;
+      const avatarHtml =
+        avatarObj.type === "image"
+          ? `<img src="${avatarObj.src}" alt="${friend.username}" class="rounded-circle object-fit-cover flex-shrink-0" style="width: 46px; height: 46px; border: 2px solid rgba(25,135,84,0.4);" onerror="this.outerHTML='<div class=\\'d-flex align-items-center justify-content-center text-secondary bg-dark rounded-circle flex-shrink-0\\' style=\\'width:46px;height:46px;border: 2px solid rgba(25,135,84,0.4);\\'><i class=\\'fa-solid fa-user fs-5\\'></i></div>'">`
+          : `<div class="d-flex align-items-center justify-content-center text-secondary bg-dark rounded-circle flex-shrink-0" style="width: 46px; height: 46px; border: 2px solid rgba(25,135,84,0.4);"><i class="fa-solid fa-user fs-5"></i></div>`;
 
       let details = [];
       if (friend.city || friend.country) {
-          let loc = [friend.city, friend.country].filter(Boolean).join(", ");
-          details.push(`<i class="fa-solid fa-location-dot text-success me-1"></i>${loc}`);
+        let loc = [friend.city, friend.country].filter(Boolean).join(", ");
+        details.push(
+          `<i class="fa-solid fa-location-dot text-success me-1"></i>${loc}`,
+        );
       }
       if (friend.credits > 0) {
-          details.push(`<i class="fa-solid fa-ticket text-warning me-1"></i>${friend.credits} credits`);
+        details.push(
+          `<i class="fa-solid fa-ticket text-warning me-1"></i>${friend.credits} credits`,
+        );
       }
       if (friend.created_at) {
-          const date = new Date(friend.created_at);
-          const mes = new Intl.DateTimeFormat('es-ES', { month: 'long' }).format(date);
-          const anio = date.getFullYear();
-          details.push(`<i class="fa-regular fa-calendar text-info me-1"></i>Miembro desde ${mes} de ${anio}`);
+        const date = new Date(friend.created_at);
+        const mes = new Intl.DateTimeFormat("es-ES", { month: "long" }).format(
+          date,
+        );
+        const anio = date.getFullYear();
+        details.push(
+          `<i class="fa-regular fa-calendar text-info me-1"></i>Miembro desde ${mes} de ${anio}`,
+        );
       }
-      let detailsHtml = details.length > 0 ? details.join('<span class="mx-2 opacity-25">&bull;</span>') : 'Miembro RCW';
+      if (friend.since) {
+        const dateSince = new Date(friend.since);
+        const mesSince = new Intl.DateTimeFormat("es-ES", { month: "long" }).format(
+          dateSince,
+        );
+        const anioSince = dateSince.getFullYear();
+        details.push(
+          `<i class="fa-solid fa-handshake text-success opacity-75 me-1"></i>Amigos desde ${mesSince} de ${anioSince}`,
+        );
+      }
+      let detailsHtml =
+        details.length > 0
+          ? details.join('<span class="mx-2 opacity-25">&bull;</span>')
+          : "Miembro RCW";
 
       html += `
         <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 px-3 px-sm-4 py-3 position-relative"
@@ -443,11 +499,7 @@ $(document).ready(function () {
 
           <div class="d-flex align-items-center gap-3 w-100 flex-grow-1 min-w-0">
             <!-- Avatar -->
-            <img src="${avatarSrc}"
-                 alt="${friend.username}"
-                 class="rounded-circle object-fit-cover flex-shrink-0"
-                 style="width: 46px; height: 46px; border: 2px solid rgba(25,135,84,0.4);"
-                 onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(friend.username)}&background=198754&color=fff&size=128'">
+            ${avatarHtml}
 
             <!-- Nombre -->
             <div class="flex-grow-1 min-w-0">
@@ -476,28 +528,37 @@ $(document).ready(function () {
   }
 
   // ─── Modal Confirmar Eliminar Amigo (perfil público) ───────────
-  $(document).on("click", ".profile-remove-friend-trigger", function() {
+  $(document).on("click", ".profile-remove-friend-trigger", function () {
     const id = $(this).data("id");
     const name = $(this).data("name") || $("#user-username").text();
     $("#removeProfileFriendName").text(name);
     $("#confirmRemoveProfileFriendBtn").data("id", id);
-    new bootstrap.Modal(document.getElementById("removeProfileFriendModal")).show();
+    new bootstrap.Modal(
+      document.getElementById("removeProfileFriendModal"),
+    ).show();
   });
 
-  $("#confirmRemoveProfileFriendBtn").on("click", async function() {
+  $("#confirmRemoveProfileFriendBtn").on("click", async function () {
     const btn = $(this);
     const targetId = btn.data("id");
-    btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span>');
+    btn
+      .prop("disabled", true)
+      .html('<span class="spinner-border spinner-border-sm"></span>');
 
     try {
-      const res = await fetch(`${BASE_URL}/api/php/users.php?action=reject_remove_friend`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ target_id: targetId }),
-      });
+      const res = await fetch(
+        `${BASE_URL}/api/php/users.php?action=reject_remove_friend`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ target_id: targetId }),
+        },
+      );
       const data = await res.json();
       if (data.success) {
-        bootstrap.Modal.getInstance(document.getElementById("removeProfileFriendModal")).hide();
+        bootstrap.Modal.getInstance(
+          document.getElementById("removeProfileFriendModal"),
+        ).hide();
         fetchProfileData(targetId);
       } else {
         alert("Error: " + (data.error || "No se pudo eliminar"));
@@ -512,38 +573,51 @@ $(document).ready(function () {
   function renderReviews(reviewsArray) {
     const container = $("#reviews-list-container");
     const sortSelect = $("#reviews-sort-selector");
-    
+
     // Configurar estado inicial
     let currentReviews = [...reviewsArray];
 
     function drawReviews() {
-        container.empty();
-        if (currentReviews.length === 0) {
-            container.html('<div class="p-5 text-center text-muted"><i class="fa-solid fa-star-half-stroke fa-3x mb-3 d-block opacity-25"></i>Este usuario no ha escrito ninguna reseña.</div>');
-            return;
-        }
+      container.empty();
+      if (currentReviews.length === 0) {
+        container.html(
+          '<div class="p-5 text-center text-muted"><i class="fa-solid fa-star-half-stroke fa-3x mb-3 d-block opacity-25"></i>Este usuario no ha escrito ninguna reseña.</div>',
+        );
+        return;
+      }
 
-        let html = '';
-        currentReviews.forEach(r => {
-            const dateStr = new Date(r.created_at).toLocaleDateString("es-ES", {
-                year: 'numeric', month: 'long', day: 'numeric'
-            });
-            const link = r.type === "coaster"
-                ? `${BASE_URL}/web/views/public/coasters/coasters.php?id=${r.item_id}`
-                : `${BASE_URL}/web/views/public/parks/parks.php?id=${r.item_id}`;
-            const imgUrl = r.imagen_url && r.imagen_url.startsWith("/") ? BASE_URL + r.imagen_url : 
-                           (r.imagen_url || 'https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png');
+      let html = "";
+      currentReviews.forEach((r) => {
+        const dateStr = new Date(r.created_at).toLocaleDateString("es-ES", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        const link =
+          r.type === "coaster"
+            ? `${BASE_URL}/web/views/public/coasters/coasters.php?id=${r.item_id}`
+            : `${BASE_URL}/web/views/public/parks/parks.php?id=${r.item_id}`;
+        const imgUrl =
+          r.imagen_url && r.imagen_url.startsWith("/")
+            ? BASE_URL + r.imagen_url
+            : r.imagen_url ||
+              "https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png";
 
-            let starsHtml = '';
-            const fullStars = Math.floor(r.note);
-            const hasHalfStar = (r.note % 1 !== 0);
-            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+        let starsHtml = "";
+        const fullStars = Math.floor(r.note);
+        const hasHalfStar = r.note % 1 !== 0;
+        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
-            for(let i=0; i<fullStars; i++) starsHtml += '<i class="fa-solid fa-star text-success"></i>';
-            if(hasHalfStar) starsHtml += '<i class="fa-solid fa-star-half-stroke text-success"></i>';
-            for(let i=0; i<emptyStars; i++) starsHtml += '<i class="fa-regular fa-star text-success opacity-50"></i>';
+        for (let i = 0; i < fullStars; i++)
+          starsHtml += '<i class="fa-solid fa-star text-success"></i>';
+        if (hasHalfStar)
+          starsHtml +=
+            '<i class="fa-solid fa-star-half-stroke text-success"></i>';
+        for (let i = 0; i < emptyStars; i++)
+          starsHtml +=
+            '<i class="fa-regular fa-star text-success opacity-50"></i>';
 
-            html += `
+        html += `
             <a href="${link}" class="list-group-item list-group-item-action bg-transparent px-3 py-3" style="border-bottom: 1px solid var(--rcw-border); transition: background 0.2s;" onmouseover="this.style.background='rgba(25,135,84,0.06)'" onmouseout="this.style.background='transparent'">
                 <div class="row g-3">
                     <div class="col-sm-2 col-3">
@@ -552,7 +626,7 @@ $(document).ready(function () {
                     <div class="col-sm-10 col-9 d-flex flex-column justify-content-between">
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <h6 class="fw-bold mb-1 text-light">${r.title} <span class="badge ${r.type === 'coaster' ? 'bg-primary' : 'bg-success'} fw-normal ms-2" style="font-size: 0.70rem;">${r.type === 'coaster' ? 'Coaster' : 'Parque'}</span></h6>
+                                <h6 class="fw-bold mb-1 text-light">${r.title} <span class="badge ${r.type === "coaster" ? "bg-primary" : "bg-success"} fw-normal ms-2" style="font-size: 0.70rem;">${r.type === "coaster" ? "Coaster" : "Parque"}</span></h6>
                                 <p class="mb-1 text-muted small"><i class="fa-solid fa-location-dot me-1"></i>${r.subtitle}</p>
                             </div>
                             <div class="text-end">
@@ -564,31 +638,34 @@ $(document).ready(function () {
                             </div>
                         </div>
                         <div class="mt-2 text-white opacity-75" style="font-size: 0.9rem;">
-                            ${r.review ? r.review : '<i>Valoración sin reseña escrita.</i>'}
+                            ${r.review ? r.review : "<i>Valoración sin reseña escrita.</i>"}
                         </div>
                     </div>
                 </div>
             </a>`;
-        });
-        container.html(html);
+      });
+      container.html(html);
     }
 
-    sortSelect.off("change").on("change", function() {
-        const order = $(this).val();
-        if (order === "newest") {
-            currentReviews.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-        } else if (order === "oldest") {
-            currentReviews.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-        } else if (order === "highest") {
-            currentReviews.sort((a, b) => b.note - a.note);
-        } else if (order === "lowest") {
-            currentReviews.sort((a, b) => a.note - b.note);
-        }
-        drawReviews();
+    sortSelect.off("change").on("change", function () {
+      const order = $(this).val();
+      if (order === "newest") {
+        currentReviews.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at),
+        );
+      } else if (order === "oldest") {
+        currentReviews.sort(
+          (a, b) => new Date(a.created_at) - new Date(b.created_at),
+        );
+      } else if (order === "highest") {
+        currentReviews.sort((a, b) => b.note - a.note);
+      } else if (order === "lowest") {
+        currentReviews.sort((a, b) => a.note - b.note);
+      }
+      drawReviews();
     });
 
     // Estado inicial: ordenar por más reciente (newest)
     sortSelect.val("newest").trigger("change");
   }
-
 });

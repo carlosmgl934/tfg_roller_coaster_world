@@ -26,7 +26,7 @@ console.log(
 
 // Helper global para avatares (importante al tener nombres de archivo locales sueltos)
 window.rcwGetAvatarPath = function(imgSrc, username = 'Usuario', color1 = '198754', textCol = 'fff') {
-    if (!imgSrc) return `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=${color1}&color=${textCol}`;
+    if (!imgSrc) return window.BASE_URL + '/web/img/avatars/default_avatar.svg';
     if (imgSrc.startsWith("http://") || imgSrc.startsWith("https://")) return imgSrc;
     if (imgSrc.startsWith("/")) return window.BASE_URL + imgSrc;
     // Si solo hay un nombre pelado ("1774886670_xxxx.webp"), está en Supabase Storage
