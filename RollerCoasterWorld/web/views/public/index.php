@@ -1,5 +1,5 @@
-﻿<?php
-$page_css = ['web/css/home.css'];
+<?php
+$page_css = ['web/css/home.css', 'web/css/recommendations.css'];
 require_once __DIR__ . '/../partials/header.php';
 /** @var string $base_url */
 /** @var bool   $is_logged */
@@ -148,6 +148,33 @@ $is_admin = !empty($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
                     </a>
                 </div>
             </div>
+
+            <!-- ========== ESPECIALMENTE PARA TI (IA) ========== -->
+            <div class="home-section rcw-recs-section" id="recs-section">
+
+                <div class="rcw-recs-header">
+                    <div class="rcw-recs-title-group">
+                        <div class="home-section-title" style="margin-bottom:0;">Especialmente para ti</div>
+                        <span class="rcw-recs-ai-badge">
+                            <span class="ai-dot"></span> IA
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="text-muted small d-none d-sm-inline">
+                            Basado en tu perfil y actividad
+                        </span>
+                        <button class="rcw-recs-refresh-btn" id="recs-refresh-btn"
+                                title="Actualizar recomendaciones">
+                            <i class="fa-solid fa-rotate"></i>
+                            <span class="d-none d-sm-inline">Actualizar</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grid de 3 cards — poblado por recommendations.js -->
+                <div class="rcw-recs-grid" id="recs-grid"></div>
+
+            </div><!-- /recs-section -->
 
             <!-- PERFIL Y NOTICIAS -->
             <div class="home-section" style="padding-top:0;">
@@ -441,6 +468,7 @@ $is_admin = !empty($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
 
 
 <script src="<?= Router::asset('web/js/shared/index.js') ?>" defer></script>
+<script src="<?= Router::asset('web/js/shared/recommendations.js') ?>" defer></script>
 <?php if ($is_admin): ?>
     <script src="<?= Router::asset('web/js/shared/carousel_admin.js') ?>" defer></script>
 <?php endif; ?>

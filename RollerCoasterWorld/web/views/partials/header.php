@@ -272,14 +272,7 @@ header("Expires: 0"); // Proxies
             </li>
           <?php endif; ?>
 
-          <!-- Botón CTA: Mi agenda de Parques (solo logueados) -->
-          <?php if ($is_logged): ?>
-            <li class="nav-item">
-              <a class="nav-link rcw-btn-agenda" href="<?= Router::url('trips') ?>">
-                <i class="fa-solid fa-calendar-days me-1"></i> Mi agenda de Parques
-              </a>
-            </li>
-          <?php endif; ?>
+
 
         </ul>
         <!-- / Nav central -->
