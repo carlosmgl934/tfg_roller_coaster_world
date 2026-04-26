@@ -25,6 +25,7 @@ $router = new ApiRouter('getSummary');
 $router->register('getSummary',      'getSummary',      'GET');
 $router->register('getGrowth',       'getGrowth',       'GET');
 $router->register('getDistribution', 'getDistribution', 'GET');
+$router->register('getRecentTrips',  'getRecentTrips',  'GET');
 $router->dispatch();
 
 // ─────────────────────────────────────────────────────────────
@@ -43,7 +44,8 @@ function getSummary(): void
             (SELECT COUNT(*) FROM coaster_ratings) +
             (SELECT COUNT(*) FROM park_ratings)   AS total_reviews,
             (SELECT COUNT(*) FROM coaster_photos) AS total_photos,
-            (SELECT COUNT(*) FROM forum_messages) AS total_forum_posts";
+            (SELECT COUNT(*) FROM forum_messages) AS total_forum_posts,
+            (SELECT COUNT(*) FROM trips)          AS total_trips";
 
         $stmt = $db->prepare($sql);
         $stmt->execute();
@@ -69,7 +71,7 @@ function getGrowth(): void
     $type   = $_GET['type']   ?? 'users';
 
     // Whitelist allowed types
-    $allowedTypes = ['users', 'reviews', 'coasters', 'parks', 'photos', 'forum_posts'];
+    $allowedTypes = ['users', 'reviews', 'coasters', 'parks', 'photos', 'forum_posts', 'trips'];
     if (!in_array($type, $allowedTypes)) {
         Response::error('Tipo no válido');
         return;
@@ -82,6 +84,7 @@ function getGrowth(): void
         'parks'       => 'parks',
         'photos'      => 'coaster_photos',
         'forum_posts' => 'forum_messages',
+        'trips'       => 'trips',
     ];
     $isReviews = ($type === 'reviews');
     $dbTable   = $tableMap[$type] ?? null;
@@ -255,5 +258,31 @@ function getDistribution(): void
         exit;
     } catch (PDOException $e) {
         Response::error('Error obteniendo distribución: ' . $e->getMessage());
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// getRecentTrips — Data for latest booked trips table
+// ─────────────────────────────────────────────────────────────
+function getRecentTrips(): void
+{
+    requireAdmin();
+    global $db;
+
+    try {
+        $sql = "SELECT t.id, t.title, t.start_date, t.end_date, t.parks_visited, t.created_at, u.username
+                FROM trips t
+                LEFT JOIN users u ON t.user_id = u.id
+                ORDER BY t.created_at DESC
+                LIMIT 10";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        echo json_encode(['success' => true, 'data' => $data]);
+        exit;
+    } catch (PDOException $e) {
+        Response::error('Error obteniendo últimos viajes: ' . $e->getMessage());
     }
 }

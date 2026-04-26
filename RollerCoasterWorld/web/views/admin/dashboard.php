@@ -52,7 +52,7 @@ if (!isset($_SESSION['firebase_uid']) || !isset($_SESSION['user_rol']) || $_SESS
 
     <!-- KPI CARDS -->
     <div class="row g-3 mb-4">
-        <div class="col-6 col-md-4 col-lg-2">
+        <div class="col-6 col-md-4 col-lg flex-lg-fill">
             <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
                 <div class="card-body text-center py-4">
                     <i class="fa-solid fa-users fa-xl text-success mb-2"></i>
@@ -61,7 +61,7 @@ if (!isset($_SESSION['firebase_uid']) || !isset($_SESSION['user_rol']) || $_SESS
                 </div>
             </div>
         </div>
-        <div class="col-6 col-md-4 col-lg-2">
+        <div class="col-6 col-md-4 col-lg flex-lg-fill">
             <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
                 <div class="card-body text-center py-4">
                     <i class="fa-solid fa-bolt fa-xl text-warning mb-2"></i>
@@ -70,7 +70,7 @@ if (!isset($_SESSION['firebase_uid']) || !isset($_SESSION['user_rol']) || $_SESS
                 </div>
             </div>
         </div>
-        <div class="col-6 col-md-4 col-lg-2">
+        <div class="col-6 col-md-4 col-lg flex-lg-fill">
             <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
                 <div class="card-body text-center py-4">
                     <i class="fa-solid fa-map-location-dot fa-xl text-info mb-2"></i>
@@ -79,7 +79,7 @@ if (!isset($_SESSION['firebase_uid']) || !isset($_SESSION['user_rol']) || $_SESS
                 </div>
             </div>
         </div>
-        <div class="col-6 col-md-4 col-lg-2">
+        <div class="col-6 col-md-4 col-lg flex-lg-fill">
             <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
                 <div class="card-body text-center py-4">
                     <i class="fa-solid fa-star fa-xl text-primary mb-2"></i>
@@ -88,7 +88,7 @@ if (!isset($_SESSION['firebase_uid']) || !isset($_SESSION['user_rol']) || $_SESS
                 </div>
             </div>
         </div>
-        <div class="col-6 col-md-4 col-lg-2">
+        <div class="col-6 col-md-4 col-lg flex-lg-fill">
             <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
                 <div class="card-body text-center py-4">
                     <i class="fa-solid fa-images fa-xl text-danger mb-2"></i>
@@ -97,12 +97,21 @@ if (!isset($_SESSION['firebase_uid']) || !isset($_SESSION['user_rol']) || $_SESS
                 </div>
             </div>
         </div>
-        <div class="col-6 col-md-4 col-lg-2">
+        <div class="col-6 col-md-4 col-lg flex-lg-fill">
             <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
                 <div class="card-body text-center py-4">
                     <i class="fa-solid fa-comments fa-xl text-warning mb-2"></i>
                     <div class="text-muted small fw-semibold text-uppercase mb-1" style="letter-spacing:.04em;">Posts Foro</div>
                     <div class="fw-bold fs-3 text-white" id="kpi-forum-posts">--</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg flex-lg-fill">
+            <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
+                <div class="card-body text-center py-4">
+                    <i class="fa-solid fa-suitcase-rolling fa-xl text-success mb-2"></i>
+                    <div class="text-muted small fw-semibold text-uppercase mb-1" style="letter-spacing:.04em;">Viajes Reserv.</div>
+                    <div class="fw-bold fs-3 text-white" id="kpi-trips">--</div>
                 </div>
             </div>
         </div>
@@ -163,8 +172,8 @@ if (!isset($_SESSION['firebase_uid']) || !isset($_SESSION['user_rol']) || $_SESS
             </div>
         </div>
 
-        <!-- Actividad en Foros (Bar) - full width -->
-        <div class="col-12">
+        <!-- Actividad en Foros (Bar) -->
+        <div class="col-12 col-lg-6">
             <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
                 <div class="card-header border-0 d-flex justify-content-between align-items-center py-3 px-4" style="background:#161b22;">
                     <span class="fw-bold text-white">Actividad en Foros</span>
@@ -176,7 +185,48 @@ if (!isset($_SESSION['firebase_uid']) || !isset($_SESSION['user_rol']) || $_SESS
             </div>
         </div>
 
+        <!-- Nuevos Viajes (Line) -->
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-0 h-100" style="background:#161b22;">
+                <div class="card-header border-0 d-flex justify-content-between align-items-center py-3 px-4" style="background:#161b22;">
+                    <span class="fw-bold text-white">Nuevos Viajes</span>
+                    <i class="fa-solid fa-suitcase-rolling text-success"></i>
+                </div>
+                <div class="card-body px-4 pb-4" style="min-height:220px;">
+                    <canvas id="chart-growth-trips"></canvas>
+                </div>
+            </div>
+        </div>
+
     </div><!-- /row charts -->
+
+    <!-- TABLA DE ÚLTIMOS VIAJES -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-0" style="background:#161b22;">
+                <div class="card-header border-0 d-flex justify-content-between align-items-center py-3 px-4" style="background:#161b22;border-bottom:1px solid rgba(255,255,255,0.05)!important;">
+                    <span class="fw-bold text-white"><i class="fa-solid fa-list-check me-2 text-success"></i>Últimos Viajes Reservados</span>
+                </div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-dark table-hover mb-0" style="background:transparent;">
+                        <thead>
+                            <tr style="border-color:rgba(255,255,255,0.05);">
+                                <th class="py-3 px-4 text-muted small text-uppercase" style="background:transparent;">ID</th>
+                                <th class="py-3 px-4 text-muted small text-uppercase" style="background:transparent;">Título</th>
+                                <th class="py-3 px-4 text-muted small text-uppercase" style="background:transparent;">Usuario</th>
+                                <th class="py-3 px-4 text-muted small text-uppercase" style="background:transparent;">Parque</th>
+                                <th class="py-3 px-4 text-muted small text-uppercase" style="background:transparent;">Fechas</th>
+                                <th class="py-3 px-4 text-muted small text-uppercase" style="background:transparent;">Fecha Reserva</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-recent-trips">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </main>
 
@@ -184,6 +234,6 @@ if (!isset($_SESSION['firebase_uid']) || !isset($_SESSION['user_rol']) || $_SESS
 <script>
     window.DASHBOARD_API = '<?= $base_url ?>/api/php/admin/get_stats.php';
 </script>
-<script src="<?= Router::asset('web/js/admin/dashboard.js') ?>"></script>
+<script src="<?= Router::asset('web/js/admin/dashboard.js') ?>?v=<?= time() ?>"></script>
 
 <?php require_once __DIR__ . '/../partials/footer.php'; ?>

@@ -60,7 +60,8 @@ const StatManager = {
         await Promise.all([
             this.loadSummary(),
             this.loadGrowthCharts(),
-            this.loadDistCharts()
+            this.loadDistCharts(),
+            this.loadRecentTrips()
         ]);
     },
 
@@ -77,6 +78,8 @@ const StatManager = {
                 document.getElementById('kpi-photos').innerText   = s.total_photos      ?? '--';
                 const kpiForum = document.getElementById('kpi-forum-posts');
                 if (kpiForum) kpiForum.innerText = s.total_forum_posts ?? '--';
+                const kpiTrips = document.getElementById('kpi-trips');
+                if (kpiTrips) kpiTrips.innerText = s.total_trips ?? '--';
             }
         } catch (e) { console.error('Error KPI:', e); }
     },
@@ -92,6 +95,11 @@ const StatManager = {
         if (document.getElementById('chart-growth-forum')) {
             this.renderBarChart('chart-growth-forum', forumData, 'Mensajes en Foros', '#ffc107');
         }
+
+        const tripsData = await this.fetchGrowthData('trips', this.currentPeriod);
+        if (document.getElementById('chart-growth-trips')) {
+            this.renderLineChart('chart-growth-trips', tripsData, 'Viajes Reservados', '#20c997');
+        }
     },
 
     async loadDistCharts() {
@@ -100,6 +108,39 @@ const StatManager = {
 
         const countryData = await this.fetchDistData('country');
         this.renderHorizontalBarChart('chart-dist-country', countryData);
+    },
+
+    async loadRecentTrips() {
+        const tbody = document.getElementById('table-recent-trips');
+        if (!tbody) return;
+
+        try {
+            const res = await fetch(`${window.DASHBOARD_API}?action=getRecentTrips`);
+            const data = await res.json();
+            
+            if (data.success && data.data && data.data.length > 0) {
+                tbody.innerHTML = data.data.map(trip => {
+                    const start = new Date(trip.start_date).toLocaleDateString('es-ES');
+                    const end = new Date(trip.end_date).toLocaleDateString('es-ES');
+                    const created = new Date(trip.created_at).toLocaleDateString('es-ES');
+                    return `
+                        <tr style="border-color:rgba(255,255,255,0.05);">
+                            <td class="py-3 px-4 text-white align-middle">#${trip.id}</td>
+                            <td class="py-3 px-4 text-white align-middle fw-semibold">${trip.title}</td>
+                            <td class="py-3 px-4 text-white align-middle"><i class="fa-solid fa-user text-muted me-2"></i>${trip.username || 'Desconocido'}</td>
+                            <td class="py-3 px-4 text-white align-middle"><span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">${trip.parks_visited || '--'}</span></td>
+                            <td class="py-3 px-4 text-white align-middle">${start} &rarr; ${end}</td>
+                            <td class="py-3 px-4 text-muted align-middle">${created}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } else {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No hay viajes reservados recientemente.</td></tr>`;
+            }
+        } catch (e) {
+            console.error('Error cargando últimos viajes:', e);
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar datos.</td></tr>`;
+        }
     },
 
     async fetchGrowthData(type, period) {
