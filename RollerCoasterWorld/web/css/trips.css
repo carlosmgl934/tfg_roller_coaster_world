@@ -2,218 +2,166 @@
    trips.css — Agenda de Parques · RollerCoaster World
    ================================================================ */
 
-/* ── LAYOUT ───────────────────────────────────────────────────── */
-.trips-main {
-  min-height: 100vh;
+/* ── TRIP STAT BADGE (en modal) ───────────────────────────────── */
+.trip-stat-badge {
+    display: inline-flex;
+    align-items: center;
+    background: var(--rcw-bg-card-alt);
+    border: 1px solid var(--rcw-border);
+    border-radius: 0;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.82rem;
+    color: var(--rcw-text-secondary);
 }
 
-.trips-header-bar {
-  background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-  padding: 2rem 0 1.5rem;
-}
+/* ── FULLCALENDAR DARK MODE OVERRIDES ─────────────────────────── */
 
-.trips-header-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.trips-header-title-group {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.trips-header-icon {
-  font-size: 2rem;
-  color: var(--rcw-green-neon);
-  filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.5));
-}
-
-.trips-main-title {
-  font-family: var(--rcw-font-title);
-  font-size: 1.7rem;
-  font-weight: 800;
-  color: #fff;
-  margin: 0;
-  line-height: 1.2;
-}
-
-.trips-main-sub {
-  color: #64748b;
-  font-size: 0.85rem;
-  margin: 0.2rem 0 0;
-}
-
-.trips-back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 1.1rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  color: var(--rcw-text-muted);
-  font-size: 0.82rem;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-.trips-back-btn:hover {
-  border-color: var(--rcw-green-neon);
-  color: var(--rcw-green-neon);
-}
-
-/* ── CONTENT WRAPPER ─────────────────────────────────────────── */
-.trips-wrapper {
-  max-width: 1200px;
-  margin: 2rem auto;
-  padding: 0 1.5rem 3rem;
-}
-
-/* ── LOADER ──────────────────────────────────────────────────── */
-.trips-loader-wrap {
-  text-align: center;
-  padding: 4rem 1rem;
-}
-
-/* ── FULLCALENDAR DARK MODE OVERRIDES ────────────────────────── */
+/* Contenedor raíz */
 #calendar {
-  background: #0d1117;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  color: #cbd5e1;
+    color: var(--rcw-text-secondary);
 }
 
 /* Bordes de la cuadrícula */
 .fc-theme-standard .fc-scrollgrid,
 .fc-theme-standard td,
 .fc-theme-standard th {
-  border-color: rgba(255, 255, 255, 0.06) !important;
+    border-color: var(--rcw-border) !important;
 }
 
-/* Cabecera (Mes y Botones) */
+/* Toolbar: título del mes */
 .fc .fc-toolbar-title {
-  color: #fff;
-  font-family: var(--rcw-font-title);
-  font-size: 1.4rem !important;
-  font-weight: 800;
-  text-transform: capitalize;
+    color: var(--rcw-text-primary);
+    font-family: var(--rcw-font-title);
+    font-size: 1.25rem !important;
+    font-weight: 800;
+    text-transform: capitalize;
 }
 
+/* Botones de navegación (prev / next / today / vistas) */
 .fc .fc-button-primary {
-  background-color: #1e293b !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: #cbd5e1 !important;
-  border-radius: 8px !important;
-  padding: 0.4rem 1rem !important;
-  font-weight: 600 !important;
-  text-transform: capitalize !important;
-  box-shadow: none !important;
-  transition: all 0.2s ease;
+    background-color: var(--rcw-bg-card-alt) !important;
+    border: 1px solid var(--rcw-border) !important;
+    color: var(--rcw-text-muted) !important;
+    border-radius: 0 !important;
+    padding: 0.35rem 0.9rem !important;
+    font-weight: 600 !important;
+    text-transform: capitalize !important;
+    box-shadow: none !important;
+    transition: all 0.2s ease;
 }
 
 .fc .fc-button-primary:not(:disabled):active,
 .fc .fc-button-primary:not(:disabled).fc-button-active,
 .fc .fc-button-primary:hover {
-  background-color: rgba(16, 185, 129, 0.15) !important;
-  border-color: var(--rcw-green-neon) !important;
-  color: var(--rcw-green-neon) !important;
+    background-color: #198754 !important;
+    border-color: #198754 !important;
+    color: #fff !important;
 }
 
-/* Días de la semana (Lunes, Martes...) */
+/* Cabecera de días de la semana */
 .fc .fc-col-header-cell {
-  background: #161b22;
-  padding: 0.5rem 0;
+    background: var(--rcw-bg-card-alt);
+    border-color: var(--rcw-border) !important;
+    padding: 0.4rem 0;
 }
 
 .fc .fc-col-header-cell-cushion {
-  color: #94a3b8;
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+    color: #94a3b8;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
 }
 
 /* Celdas de los días */
 .fc .fc-daygrid-day-number {
-  color: #cbd5e1;
-  text-decoration: none;
-  padding: 8px;
-  font-weight: 600;
-  font-size: 0.9rem;
+    color: var(--rcw-text-muted);
+    text-decoration: none;
+    padding: 6px 8px;
+    font-weight: 600;
+    font-size: 0.88rem;
 }
 
 .fc .fc-day-today {
-  background: rgba(16, 185, 129, 0.06) !important;
+    background: rgba(25, 135, 84, 0.08) !important;
 }
 
 .fc .fc-day-today .fc-daygrid-day-number {
-  color: var(--rcw-green-neon);
+    color: #198754;
+    font-weight: 800;
 }
 
 .fc-day-other .fc-daygrid-day-number {
-  opacity: 0.3;
+    opacity: 0.35;
 }
 
-/* Estilo de los Eventos (Viajes) */
+/* Fondo de celda */
+.fc-theme-standard .fc-daygrid-day {
+    background: var(--rcw-bg-card);
+}
+
+/* Eventos (Viajes) */
 .fc-event {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-  border: none !important;
-  border-radius: 4px !important;
-  padding: 4px 6px !important;
-  margin: 2px 4px !important;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3) !important;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+    background-color: #198754 !important;
+    border: none !important;
+    border-left: 3px solid #00e676 !important;
+    border-radius: 0 !important;
+    padding: 3px 6px !important;
+    margin: 2px 4px !important;
+    cursor: pointer;
+    transition: filter 0.2s, transform 0.2s;
 }
 
 .fc-event:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.5) !important;
+    filter: brightness(1.15);
+    transform: translateY(-1px);
 }
 
 .fc-event-main {
-  color: #000 !important;
-  font-weight: 800 !important;
-  font-size: 0.8rem !important;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    color: #fff !important;
+    font-weight: 700 !important;
+    font-size: 0.78rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* ── MODAL STATS ─────────────────────────────────────────────── */
-.trip-modal-stat {
-  display: inline-flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  padding: 0.4rem 0.75rem;
-  font-size: 0.82rem;
-  color: var(--rcw-text-secondary);
+/* Vista listado */
+.fc .fc-list-event:hover td {
+    background: var(--rcw-bg-hover) !important;
 }
 
-/* ── RESPONSIVE ──────────────────────────────────────────────── */
+.fc .fc-list-event-dot {
+    border-color: #198754 !important;
+}
+
+.fc .fc-list-day-cushion {
+    background: var(--rcw-bg-card-alt) !important;
+    color: var(--rcw-text-primary) !important;
+}
+
+.fc .fc-list-table td {
+    color: var(--rcw-text-secondary) !important;
+    border-color: var(--rcw-border) !important;
+}
+
+/* ── BORDER TOP HELPER ────────────────────────────────────────── */
+.border-top-only {
+    border-top: 3px solid #198754 !important;
+    border-right: 1px solid var(--rcw-border) !important;
+    border-bottom: 1px solid var(--rcw-border) !important;
+    border-left: 1px solid var(--rcw-border) !important;
+}
+
+/* ── RESPONSIVE ───────────────────────────────────────────────── */
 @media (max-width: 576px) {
-  .trips-main-title {
-    font-size: 1.3rem;
-  }
-  .trips-header-icon {
-    font-size: 1.5rem;
-  }
+    .fc .fc-toolbar {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
 
-  .fc .fc-toolbar {
-    flex-direction: column;
-    gap: 1rem;
-  }
+    .fc .fc-toolbar-title {
+        font-size: 1rem !important;
+    }
 }

@@ -3,335 +3,83 @@
    RollerCoaster World · Design System Dark
    ================================================================ */
 
-/* ── HERO ─────────────────────────────────────────────────────── */
-.tg-main {
-  min-height: 100vh;
-}
-
-.tg-hero {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 3.5rem 0 2.5rem;
-  text-align: center;
-}
-
-/* Glow de fondo */
-.tg-hero-glow {
-  position: absolute;
-  top: -60px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 600px;
-  height: 300px;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(16, 185, 129, 0.18) 0%,
-    transparent 70%
-  );
-  pointer-events: none;
-}
-
-.tg-hero-inner {
-  position: relative;
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
-}
-
-/* Badge IA activo */
+/* ── BADGE IA ACTIVO (en el h1) ───────────────────────────────── */
 .tg-hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  color: #34d399;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 0.3rem 0.9rem;
-  border-radius: 20px;
-  margin-bottom: 1.2rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(25,135,84,0.15);
+    border: 1px solid rgba(25,135,84,0.4);
+    color: #34d399;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.7rem;
+    border-radius: 0;
+    vertical-align: middle;
 }
 
-.tg-hero-title {
-  font-family: var(--rcw-font-title);
-  font-size: clamp(2rem, 5vw, 3rem);
-  font-weight: 900;
-  color: #fff;
-  line-height: 1.15;
-  margin-bottom: 0.6rem;
-}
-
-.tg-hero-title-accent {
-  display: block;
-  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.tg-hero-sub {
-  font-size: 1rem;
-  color: #64748b;
-  line-height: 1.65;
-  max-width: 560px;
-  margin: 0 auto 1.5rem;
-}
-
-.tg-hero-sub strong {
-  color: #94a3b8;
-}
-
-/* Chips de perfil */
-.tg-profile-chips {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.5rem;
-  min-height: 32px;
-}
-
+/* ── CHIPS DE PERFIL ──────────────────────────────────────────── */
 .tg-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #cbd5e1;
-  font-size: 0.78rem;
-  font-weight: 500;
-  padding: 0.3rem 0.75rem;
-  border-radius: 20px;
-  white-space: nowrap;
-  transition:
-    border-color 0.2s,
-    color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: var(--rcw-bg-card-alt);
+    border: 1px solid var(--rcw-border);
+    color: var(--rcw-text-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.3rem 0.75rem;
+    border-radius: 0;
+    white-space: nowrap;
+    transition: border-color 0.2s, color 0.2s;
 }
 
 .tg-chip:hover {
-  border-color: rgba(16, 185, 129, 0.4);
-  color: #fff;
+    border-color: #198754;
+    color: #fff;
 }
 
 .skeleton-chip {
-  width: 110px;
-  height: 28px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
-  animation: skeletonPulse 1.6s ease-in-out infinite;
+    width: 120px;
+    height: 30px;
+    background: var(--rcw-bg-card-alt);
+    border-radius: 0;
+    animation: skeletonPulse 1.6s ease-in-out infinite;
 }
 
 @keyframes skeletonPulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.35;
-  }
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
 }
 
-/* ── WRAPPER ──────────────────────────────────────────────────── */
-.tg-wrapper {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem 4rem;
+/* ── HOW-ICON (dentro de Bootstrap cards) ────────────────────── */
+.tg-how-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
 }
 
-/* ── CONTROLS BAR ─────────────────────────────────────────────── */
-.tg-controls-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-}
-
-.tg-controls-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.tg-controls-right {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.tg-section-label {
-  font-family: var(--rcw-font-title);
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #fff;
-}
-
-/* Grid más grande en el generador (entradas plenas) */
+/* ── GRID MÁS GRANDE EN EL GENERADOR ─────────────────────────── */
 .tg-recs-grid {
-  grid-template-columns: repeat(3, 1fr) !important;
-  margin-bottom: 2.5rem;
+    grid-template-columns: repeat(3, 1fr) !important;
 }
 
 @media (max-width: 991px) {
-  .tg-recs-grid {
-    grid-template-columns: 1fr 1fr !important;
-  }
+    .tg-recs-grid { grid-template-columns: 1fr 1fr !important; }
 }
 @media (max-width: 600px) {
-  .tg-recs-grid {
-    grid-template-columns: 1fr !important;
-  }
+    .tg-recs-grid { grid-template-columns: 1fr !important; }
 }
 
-/* Cards un poco más altas en el generador */
+/* Cards más altas en el generador */
 .tg-recs-grid .rcw-rec-img,
 .tg-recs-grid .rcw-rec-img-placeholder {
-  height: 200px;
-}
-
-/* ── DIVIDER ──────────────────────────────────────────────────── */
-.tg-divider {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin: 2.5rem 0 2rem;
-}
-
-.tg-divider::before,
-.tg-divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.07);
-}
-
-.tg-divider-label {
-  white-space: nowrap;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: #475569;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-/* ── HOW IT WORKS GRID ────────────────────────────────────────── */
-.tg-how-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  margin-bottom: 2.5rem;
-}
-
-@media (max-width: 991px) {
-  .tg-how-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-@media (max-width: 576px) {
-  .tg-how-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.tg-how-card {
-  background: var(--rcw-bg-card);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 12px;
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  transition:
-    border-color 0.2s,
-    transform 0.2s;
-}
-
-.tg-how-card:hover {
-  border-color: rgba(255, 255, 255, 0.15);
-  transform: translateY(-2px);
-}
-
-.tg-how-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-}
-
-.tg-how-title {
-  font-family: var(--rcw-font-title);
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #fff;
-  margin: 0;
-}
-
-.tg-how-desc {
-  font-size: 0.78rem;
-  color: #64748b;
-  line-height: 1.55;
-  margin: 0;
-}
-
-/* ── TRIPS LINK BANNER ────────────────────────────────────────── */
-.tg-trips-link-banner {
-  background: linear-gradient(
-    135deg,
-    rgba(16, 185, 129, 0.08) 0%,
-    rgba(16, 185, 129, 0.03) 100%
-  );
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  border-radius: 14px;
-  padding: 1.5rem 1.75rem;
-}
-
-.tg-trips-link-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.tg-trips-link-title {
-  font-family: var(--rcw-font-title);
-  font-size: 1rem;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 0.25rem;
-}
-
-.tg-trips-link-sub {
-  font-size: 0.82rem;
-  color: #64748b;
-  margin: 0;
-}
-
-.tg-trips-link-btn {
-  display: inline-flex;
-  align-items: center;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: #000;
-  font-weight: 700;
-  font-size: 0.85rem;
-  padding: 0.65rem 1.4rem;
-  border-radius: 8px;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-}
-
-.tg-trips-link-btn:hover {
-  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
-  transform: translateY(-1px);
-  color: #000;
+    height: 200px;
 }

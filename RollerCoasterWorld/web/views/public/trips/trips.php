@@ -8,75 +8,71 @@ if (!isset($_SESSION['firebase_uid'])) {
 }
 ?>
 
-<main class="trips-main">
+<main class="container-fluid px-lg-5 my-5">
 
-    <div class="trips-header-bar">
-        <div class="trips-header-inner">
-            <div class="trips-header-title-group">
-                <i class="fa-solid fa-calendar-days trips-header-icon"></i>
-                <div>
-                    <h1 class="trips-main-title">Mi Agenda de Parques</h1>
-                    <p class="trips-main-sub">Tus viajes planificados y generados por la IA</p>
-                </div>
+    <!-- ══ CABECERA DE PÁGINA ═══════════════════════════════════════ -->
+    <div class="row mb-4">
+        <div class="col-12 d-flex align-items-center justify-content-between flex-wrap gap-2 border-bottom pb-2">
+            <h1 class="display-6 fw-bold text-success mb-0">
+                <i class="fa-solid fa-calendar-days me-2"></i>Mi Agenda de Parques
+            </h1>
+        </div>
+        <div class="col-12 mt-1">
+            <p class="text-muted small mb-0">Tus viajes planificados y generados por la IA</p>
+        </div>
+    </div>
+
+    <!-- ══ BANNER VACÍO ═════════════════════════════════════════════ -->
+    <div id="trips-empty-banner" class="alert alert-success d-none mb-4 rounded-0" role="alert">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <i class="fa-solid fa-map-location-dot me-2 fs-5"></i>
+                <strong>No tienes ningún viaje reservado todavía.</strong>
+                <span class="text-muted ms-1">Deja que la IA te recomiende tu próxima aventura.</span>
             </div>
-            <a href="<?= Router::url('home') ?>" class="trips-back-btn">
-                <i class="fa-solid fa-arrow-left me-1"></i>
-                <span class="d-none d-sm-inline">Volver al inicio</span>
+            <a href="<?= Router::url('trip_generator') ?>" class="btn btn-success btn-sm rounded-0 fw-bold">
+                <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Generador de Viajes
             </a>
         </div>
     </div>
 
-    <div class="trips-wrapper">
+    <!-- ══ LOADER ════════════════════════════════════════════════════ -->
+    <div id="trips-loader" class="text-center py-5">
+        <div class="spinner-border text-success" style="width:2.5rem;height:2.5rem;" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="text-muted mt-3 small mb-0">Cargando tu agenda...</p>
+    </div>
 
-        <!-- MENSAJE DE ESTADO VACÍO (visible cuando no hay viajes, pero el calendario sigue) -->
-        <div id="trips-empty-banner" class="alert alert-info d-none mb-4"
-            style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);color:#fff;">
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-                <div>
-                    <i class="fa-solid fa-map-location-dot me-2 text-success fs-5"></i>
-                    <strong>No tienes ningún viaje reservado todavía.</strong>
-                    <span class="text-muted ms-1">Deja que la IA te recomiende tu próxima aventura.</span>
-                </div>
-                <a href="<?= Router::url('trip_generator') ?>" class="btn btn-success btn-sm rounded-0 fw-bold">
-                    <i class="fa-solid fa-wand-magic-sparkles me-1"></i>
-                    Generador de Viajes
-                </a>
+    <!-- ══ CALENDARIO ════════════════════════════════════════════════ -->
+    <div id="calendar-container" class="d-none">
+        <div class="card shadow-sm rounded-0 border-success border-top-only">
+            <div class="card-header bg-success text-white rounded-0 d-flex align-items-center justify-content-between">
+                <h5 class="mb-0"><i class="fa-solid fa-calendar-days me-2"></i>Calendario de viajes</h5>
+            </div>
+            <div class="card-body p-3">
+                <div id="calendar"></div>
             </div>
         </div>
-
-        <!-- LOADER -->
-        <div id="trips-loader" class="trips-loader-wrap text-center py-5">
-            <div class="spinner-border text-success" style="width:2.5rem;height:2.5rem;" role="status">
-                <span class="visually-hidden">Cargando...</span>
-            </div>
-            <p class="text-muted mt-3 small">Cargando tu agenda...</p>
-        </div>
-
-        <!-- CALENDARIO -->
-        <div id="calendar-container" class="d-none">
-            <div id="calendar"></div>
-        </div>
-
     </div>
 
 </main>
 
-<!-- MODAL: Detalle de un viaje -->
+<!-- ══ MODAL: Detalle de un viaje ════════════════════════════════════ -->
 <div class="modal fade" id="trip-detail-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-        <div class="modal-content border-0" style="background:#0d1117;">
-            <div class="modal-header border-0 px-4 py-3"
-                style="background:#161b22;border-bottom:1px solid rgba(16,185,129,0.2)!important;">
+        <div class="modal-content rounded-0">
+            <div class="modal-header bg-success text-white rounded-0">
                 <div class="d-flex align-items-center gap-2">
-                    <i class="fa-solid fa-calendar-check text-success fs-5"></i>
-                    <h5 class="modal-title fw-bold mb-0 text-white" id="trip-modal-title">Detalle del viaje</h5>
+                    <i class="fa-solid fa-calendar-check fs-5"></i>
+                    <h5 class="modal-title fw-bold mb-0" id="trip-modal-title">Detalle del viaje</h5>
                 </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body px-4 py-3" id="trip-modal-body">
+            <div class="modal-body" id="trip-modal-body">
                 <!-- poblado por JS -->
             </div>
-            <div class="modal-footer border-0 px-4 pb-4 pt-0">
+            <div class="modal-footer rounded-0">
                 <button type="button" class="btn btn-outline-secondary rounded-0 px-4"
                     data-bs-dismiss="modal">Cerrar</button>
                 <button type="button" class="btn btn-danger rounded-0 px-4" id="trip-delete-btn">
@@ -87,23 +83,22 @@ if (!isset($_SESSION['firebase_uid'])) {
     </div>
 </div>
 
-<!-- MODAL: Confirmar Eliminación -->
+<!-- ══ MODAL: Confirmar Eliminación ═══════════════════════════════════ -->
 <div class="modal fade" id="delete-confirm-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0" style="background:#0d1117;">
-            <div class="modal-header border-0 px-4 py-3"
-                style="background:#161b22;border-bottom:1px solid rgba(239,68,68,0.2)!important;">
+        <div class="modal-content rounded-0">
+            <div class="modal-header bg-danger text-white rounded-0">
                 <div class="d-flex align-items-center gap-2">
-                    <i class="fa-solid fa-triangle-exclamation text-danger fs-5"></i>
-                    <h5 class="modal-title fw-bold mb-0 text-white">Eliminar viaje</h5>
+                    <i class="fa-solid fa-triangle-exclamation fs-5"></i>
+                    <h5 class="modal-title fw-bold mb-0">Eliminar viaje</h5>
                 </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body px-4 py-3">
-                <p class="text-white mb-0">¿Estás seguro de que deseas eliminar este viaje de tu agenda? Esta acción no
-                    se puede deshacer.</p>
+            <div class="modal-body">
+                <p class="mb-0">¿Estás seguro de que deseas eliminar este viaje de tu agenda? Esta acción no se puede
+                    deshacer.</p>
             </div>
-            <div class="modal-footer border-0 px-4 pb-4 pt-0">
+            <div class="modal-footer rounded-0">
                 <button type="button" class="btn btn-outline-secondary rounded-0 px-4"
                     data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-danger rounded-0 px-4" id="confirm-delete-btn">
@@ -159,21 +154,15 @@ if (!isset($_SESSION['firebase_uid'])) {
         function initCalendar() {
             const calendarEl = document.getElementById('calendar');
 
-            // Mapear los viajes al formato de eventos de FullCalendar
             const events = allTrips.map(trip => {
-                // FullCalendar end date is exclusive, so we add 1 day to end_date
                 const endDate = new Date(trip.end_date);
                 endDate.setDate(endDate.getDate() + 1);
-
                 return {
                     id: trip.id,
                     title: trip.title,
                     start: trip.start_date,
                     end: endDate.toISOString().split('T')[0],
-                    extendedProps: trip,
-                    backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                    borderColor: '#10b981',
-                    textColor: '#fff'
+                    extendedProps: trip
                 };
             });
 
@@ -191,7 +180,7 @@ if (!isset($_SESSION['firebase_uid'])) {
                     openTripModal(info.event.extendedProps);
                 },
                 height: 'auto',
-                firstDay: 1 // Lunes
+                firstDay: 1
             });
 
             calendar.render();
@@ -210,28 +199,28 @@ if (!isset($_SESSION['firebase_uid'])) {
             const days = daysBetween(trip.start_date, trip.end_date);
 
             body.innerHTML = `
-        <div class="d-flex flex-wrap gap-3 mb-3">
-            <div class="trip-modal-stat">
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            <span class="trip-stat-badge">
                 <i class="fa-solid fa-calendar-days text-success me-2"></i>
                 <strong>${start}</strong> → <strong>${end}</strong>
-            </div>
-            <div class="trip-modal-stat">
+            </span>
+            <span class="trip-stat-badge">
                 <i class="fa-solid fa-sun text-warning me-2"></i>
                 ${days} día${days !== 1 ? 's' : ''}
-            </div>
+            </span>
             ${trip.parks_visited ? `
-            <div class="trip-modal-stat">
+            <span class="trip-stat-badge">
                 <i class="fa-solid fa-location-dot text-danger me-2"></i>
                 ${escHtml(trip.parks_visited)}
-            </div>` : ''}
+            </span>` : ''}
         </div>
 
-        <div class="alert" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;" role="alert">
-            <i class="fa-solid fa-wand-magic-sparkles text-success me-2"></i>
-            <span class="text-white">Este viaje fue generado automáticamente por la IA basándose en tu perfil.</span>
+        <div class="alert alert-success rounded-0 mb-3" role="alert">
+            <i class="fa-solid fa-wand-magic-sparkles me-2"></i>
+            Este viaje fue generado automáticamente por la IA basándose en tu perfil.
         </div>
 
-        <p class="text-muted small mt-2">
+        <p class="text-muted small mb-0">
             Puedes eliminar este viaje si ya no es relevante. Una vez eliminado no se puede recuperar.
         </p>`;
 
@@ -254,7 +243,6 @@ if (!isset($_SESSION['firebase_uid'])) {
 
                 document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
                     if (!tripToDelete) return;
-
                     try {
                         const resp = await fetch(API + '?action=delete', {
                             method: 'POST',
@@ -263,19 +251,12 @@ if (!isset($_SESSION['firebase_uid'])) {
                             body: JSON.stringify({ trip_id: tripToDelete }),
                         });
                         const json = await resp.json();
-
                         if (json.success) {
                             deleteModal.hide();
                             activeModal && activeModal.hide();
-
                             allTrips = allTrips.filter(t => t.id != tripToDelete);
-
-                            // Actualizar calendario
                             const event = calendar.getEventById(tripToDelete);
-                            if (event) {
-                                event.remove();
-                            }
-
+                            if (event) event.remove();
                             if (allTrips.length === 0) {
                                 document.getElementById('trips-empty-banner').classList.remove('d-none');
                             }
@@ -291,7 +272,6 @@ if (!isset($_SESSION['firebase_uid'])) {
             deleteModal.show();
         }
 
-        // ── Helpers ────────────────────────────────────────────────────────
         function formatDate(str) {
             if (!str) return '—';
             const d = new Date(str);
@@ -300,7 +280,7 @@ if (!isset($_SESSION['firebase_uid'])) {
 
         function daysBetween(a, b) {
             const diff = new Date(b) - new Date(a);
-            return Math.max(1, Math.round(diff / 86400000)) + 1; // +1 para contar el día de inicio y fin inclusive
+            return Math.max(1, Math.round(diff / 86400000)) + 1;
         }
 
         function escHtml(str) {
