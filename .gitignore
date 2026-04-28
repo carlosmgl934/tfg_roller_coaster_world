@@ -16,3 +16,7 @@ RollerCoasterWorld/logs/
 
 # Firebase Service Account Key
 RollerCoasterWorld/api/config/*.json
+
+# Carpeta Vendor
+RollerCoasterWorld/vendor/
+/vendor/

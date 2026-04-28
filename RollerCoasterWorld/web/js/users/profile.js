@@ -675,9 +675,11 @@ $(document).ready(function () {
   // Vista completa: tarjetas ricas con sort + filtros
   function renderCoastersFull() {
     const sort = $("#coasters-sort").val();
+    const sortDir = $("#coasters-sort-dir").data("dir") || "desc";
     const fPark = $("#coasters-filter-park").val();
     const fCountry = $("#coasters-filter-country").val();
     const fMfr = $("#coasters-filter-manufacter").val();
+    const fModel = $("#coasters-filter-model").val();
     const isGrid = coastersViewType === "grid";
 
     let data = [...topsData.coasters];
@@ -686,28 +688,55 @@ $(document).ready(function () {
     if (fPark) data = data.filter((d) => d.park_name === fPark);
     if (fCountry) data = data.filter((d) => d.country_name === fCountry);
     if (fMfr) data = data.filter((d) => d.manufacter === fMfr);
+    if (fModel) data = data.filter((d) => d.model === fModel);
 
     // Ordenar
-    if (sort === "name")
-      data.sort((a, b) => a.coaster_name.localeCompare(b.coaster_name));
-    else if (sort === "height")
-      data.sort(
-        (a, b) => (parseFloat(b.height) || 0) - (parseFloat(a.height) || 0),
-      );
-    else if (sort === "speed")
-      data.sort(
-        (a, b) => (parseFloat(b.speed) || 0) - (parseFloat(a.speed) || 0),
-      );
-    else if (sort === "manufacter")
+    const asc = sortDir === "asc";
+    if (sort === "name") {
+      data.sort((a, b) => {
+        const c = a.coaster_name.localeCompare(b.coaster_name);
+        return asc ? c : -c;
+      });
+    } else if (sort === "height") {
       data.sort((a, b) =>
-        (a.manufacter || "").localeCompare(b.manufacter || ""),
+        asc
+          ? (parseFloat(a.height) || 0) - (parseFloat(b.height) || 0)
+          : (parseFloat(b.height) || 0) - (parseFloat(a.height) || 0),
       );
-    // 'rank' = orden original (rank_position)
+    } else if (sort === "speed") {
+      data.sort((a, b) =>
+        asc
+          ? (parseFloat(a.speed) || 0) - (parseFloat(b.speed) || 0)
+          : (parseFloat(b.speed) || 0) - (parseFloat(a.speed) || 0),
+      );
+    } else if (sort === "length") {
+      data.sort((a, b) =>
+        asc
+          ? (parseFloat(a.coaster_length) || 0) -
+            (parseFloat(b.coaster_length) || 0)
+          : (parseFloat(b.coaster_length) || 0) -
+            (parseFloat(a.coaster_length) || 0),
+      );
+    } else if (sort === "inversions") {
+      data.sort((a, b) =>
+        asc
+          ? (parseInt(a.inversions) || 0) - (parseInt(b.inversions) || 0)
+          : (parseInt(b.inversions) || 0) - (parseInt(a.inversions) || 0),
+      );
+    } else if (sort === "year") {
+      data.sort((a, b) => {
+        const ya = parseInt(a.opening_year) || 9999;
+        const yb = parseInt(b.opening_year) || 9999;
+        return asc ? ya - yb : yb - ya;
+      });
+    }
 
     const container = $("#top-coasters-full-container").empty();
 
-    // Update counter pill
-    $("#coasters-full-count").text(data.length);
+    // Update counter pill — singular / plural
+    const count = data.length;
+    $("#coasters-full-count").text(count);
+    $("#coasters-full-label").text(count === 1 ? "coaster" : "coasters");
 
     if (!data.length) {
       container.html(emptyState("Ningún elemento coincide con los filtros."));
@@ -715,6 +744,33 @@ $(document).ready(function () {
     }
 
     const colClass = isGrid ? "col-6 col-md-4" : "col-12";
+
+    // Definir qué badges mostrar según el criterio de sort
+    function getStatBadges(item, sortKey) {
+      const mfr = item.manufacter
+        ? `<small class="text-secondary"><i class="fa-solid fa-industry me-1"></i>${item.manufacter}</small>`
+        : "";
+
+      if (sortKey === "height") {
+        return (item.height ? `<small class="text-info"><i class="fa-solid fa-ruler-vertical me-1"></i>${item.height} m</small>` : "") + mfr;
+      }
+      if (sortKey === "speed") {
+        return (item.speed ? `<small class="text-warning"><i class="fa-solid fa-bolt me-1"></i>${item.speed} km/h</small>` : "") + mfr;
+      }
+      if (sortKey === "length") {
+        return (item.coaster_length ? `<small class="text-info"><i class="fa-solid fa-ruler-horizontal me-1"></i>${item.coaster_length} m</small>` : "") + mfr;
+      }
+      if (sortKey === "inversions") {
+        return (item.inversions != null ? `<small class="text-warning"><i class="fa-solid fa-infinity me-1"></i>${item.inversions} inv.</small>` : "") + mfr;
+      }
+      if (sortKey === "year") {
+        return (item.opening_year ? `<small class="text-secondary"><i class="fa-regular fa-calendar me-1"></i>${item.opening_year}</small>` : "") + mfr;
+      }
+      // rank, name, o cualquier otro → muestra altura + velocidad + fabricante
+      return (item.height ? `<small class="text-info"><i class="fa-solid fa-ruler-vertical me-1"></i>${item.height} m</small>` : "")
+        + (item.speed ? `<small class="text-warning"><i class="fa-solid fa-bolt me-1"></i>${item.speed} km/h</small>` : "")
+        + mfr;
+    }
 
     data.forEach((item) => {
       const img = item.imagen_url
@@ -749,9 +805,7 @@ $(document).ready(function () {
                   <small class="text-secondary">${item.park_name} · ${item.country_name || ""}</small>
                 </div>
                 <div class="d-flex gap-3 flex-wrap">
-                  ${item.height ? `<small class="text-info"><i class="fa-solid fa-ruler-vertical me-1"></i>${item.height} m</small>` : ""}
-                  ${item.speed ? `<small class="text-warning"><i class="fa-solid fa-bolt me-1"></i>${item.speed} km/h</small>` : ""}
-                  ${item.manufacter ? `<small class="text-secondary"><i class="fa-solid fa-industry me-1"></i>${item.manufacter}</small>` : ""}
+                  ${getStatBadges(item, sort)}
                 </div>
               </div>
             </a>
@@ -759,6 +813,7 @@ $(document).ready(function () {
       }
     });
   }
+
 
   function renderParksFull() {
     const sort = $("#parks-sort").val();
@@ -930,18 +985,24 @@ $(document).ready(function () {
     const mfrs = [
       ...new Set(data.map((d) => d.manufacter).filter(Boolean)),
     ].sort();
+    const models = [
+      ...new Set(data.map((d) => d.model).filter(Boolean)),
+    ].sort();
 
     const $pk = $("#coasters-filter-park").find("option:first").end();
     const $co = $("#coasters-filter-country").find("option:first").end();
     const $mf = $("#coasters-filter-manufacter").find("option:first").end();
+    const $mo = $("#coasters-filter-model").find("option:first").end();
 
     $pk.find("option:not(:first)").remove();
     $co.find("option:not(:first)").remove();
     $mf.find("option:not(:first)").remove();
+    $mo.find("option:not(:first)").remove();
 
     parks.forEach((v) => $pk.append(`<option value="${v}">${v}</option>`));
     countries.forEach((v) => $co.append(`<option value="${v}">${v}</option>`));
     mfrs.forEach((v) => $mf.append(`<option value="${v}">${v}</option>`));
+    models.forEach((v) => $mo.append(`<option value="${v}">${v}</option>`));
   }
 
   function populateParksFilters(data) {
@@ -1313,8 +1374,21 @@ $(document).ready(function () {
   // ── Sort y Filtros (Vista Completa) ──────────────────────────────
 
   $(
-    "#coasters-sort, #coasters-filter-park, #coasters-filter-country, #coasters-filter-manufacter",
+    "#coasters-sort, #coasters-filter-park, #coasters-filter-country, #coasters-filter-manufacter, #coasters-filter-model",
   ).on("change", renderCoastersFull);
+
+  // Botón de dirección (asc/desc) para el sort de coasters
+  $("#coasters-sort-dir").on("click", function () {
+    const currentDir = $(this).data("dir");
+    const newDir = currentDir === "desc" ? "asc" : "desc";
+    $(this).data("dir", newDir);
+    if (newDir === "asc") {
+      $(this).find("i").removeClass("fa-arrow-down-wide-short").addClass("fa-arrow-up-wide-short");
+    } else {
+      $(this).find("i").removeClass("fa-arrow-up-wide-short").addClass("fa-arrow-down-wide-short");
+    }
+    renderCoastersFull();
+  });
 
   $("#parks-sort, #parks-filter-country").on("change", renderParksFull);
 
@@ -2093,79 +2167,120 @@ $(document).ready(function () {
     if (!source.length) {
       $list.html(
         '<div class="text-center text-muted py-5">' +
-        '<i class="fa-solid fa-ghost fs-1 mb-3 opacity-50 d-block"></i>' +
-        '<p>Todavía no tienes amigos agregados.</p>' +
-        '</div>'
+          '<i class="fa-solid fa-ghost fs-1 mb-3 opacity-50 d-block"></i>' +
+          "<p>Todavía no tienes amigos agregados.</p>" +
+          "</div>",
       );
       return;
     }
 
-    source.forEach(function(f) {
+    source.forEach(function (f) {
       var imgSrc = f.profile_image
-        ? (f.profile_image.startsWith("http") ? f.profile_image
-            : (f.profile_image.startsWith("/") ? BASE_URL + f.profile_image
-                : BASE_URL + "/" + f.profile_image))
+        ? f.profile_image.startsWith("http")
+          ? f.profile_image
+          : f.profile_image.startsWith("/")
+            ? BASE_URL + f.profile_image
+            : BASE_URL + "/" + f.profile_image
         : null;
 
       var imgHtml = imgSrc
-        ? '<img src="' + imgSrc + '" alt="' + f.username + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'
+        ? '<img src="' +
+          imgSrc +
+          '" alt="' +
+          f.username +
+          '" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'
         : '<div class="d-flex align-items-center justify-content-center h-100 text-secondary bg-dark"><i class="fa-solid fa-user fs-3"></i></div>';
 
-      var ubicacion = (f.city || f.country)
-        ? '<small class="text-secondary d-block mb-2"><i class="fa-solid fa-location-dot me-1"></i>' + [f.city, f.country].filter(Boolean).join(", ") + '</small>'
-        : '<small class="text-muted d-block mb-2"><i class="fa-solid fa-location-crosshairs me-1"></i>Ubicaci\u00f3n desconocida</small>';
+      var ubicacion =
+        f.city || f.country
+          ? '<small class="text-secondary d-block mb-2"><i class="fa-solid fa-location-dot me-1"></i>' +
+            [f.city, f.country].filter(Boolean).join(", ") +
+            "</small>"
+          : '<small class="text-muted d-block mb-2"><i class="fa-solid fa-location-crosshairs me-1"></i>Ubicaci\u00f3n desconocida</small>';
 
       var creditsText = f.credits || 0;
-      var topCoaster  = f.favorite_coaster || "Ninguna";
+      var topCoaster = f.favorite_coaster || "Ninguna";
 
       var friendSinceHtml = "";
       if (f.since) {
         var d = new Date(f.since);
-        var mes = new Intl.DateTimeFormat("es-ES", { month: "short" }).format(d);
-        friendSinceHtml = '<span class="badge rounded-0" style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.7rem;">'
-          + '<i class="fa-solid fa-handshake text-success me-1"></i>Desde ' + mes + ". " + d.getFullYear()
-          + '</span>';
+        var mes = new Intl.DateTimeFormat("es-ES", { month: "short" }).format(
+          d,
+        );
+        friendSinceHtml =
+          '<span class="badge rounded-0" style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.7rem;">' +
+          '<i class="fa-solid fa-handshake text-success me-1"></i>Desde ' +
+          mes +
+          ". " +
+          d.getFullYear() +
+          "</span>";
       }
 
       $list.append(
         '<div class="top-card d-flex align-items-center mb-3 p-3">' +
-          '<div style="width:70px;height:70px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid rgba(16,185,129,0.3);" class="me-3">' + imgHtml + '</div>' +
+          '<div style="width:70px;height:70px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid rgba(16,185,129,0.3);" class="me-3">' +
+          imgHtml +
+          "</div>" +
           '<div class="flex-grow-1" style="min-width:0;">' +
-            '<a href="' + BASE_URL + '/web/views/public/users/user_profile.php?id=' + f.id + '" class="fw-bold text-white text-decoration-none fs-6 d-block text-truncate">' + f.username + '</a>' +
-            ubicacion +
-            '<div class="d-flex gap-2 mt-1 flex-wrap">' +
-              '<span class="badge rounded-0" style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.7rem;"><i class="fa-solid fa-ticket text-success me-1"></i>' + creditsText + ' credits</span>' +
-              '<span class="badge rounded-0" style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.7rem;"><i class="fa-solid fa-heart text-danger me-1"></i>Top 1: ' + topCoaster + '</span>' +
-              friendSinceHtml +
-            '</div>' +
-          '</div>' +
+          '<a href="' +
+          BASE_URL +
+          "/web/views/public/users/user_profile.php?id=" +
+          f.id +
+          '" class="fw-bold text-white text-decoration-none fs-6 d-block text-truncate">' +
+          f.username +
+          "</a>" +
+          ubicacion +
+          '<div class="d-flex gap-2 mt-1 flex-wrap">' +
+          '<span class="badge rounded-0" style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.7rem;"><i class="fa-solid fa-ticket text-success me-1"></i>' +
+          creditsText +
+          " credits</span>" +
+          '<span class="badge rounded-0" style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.7rem;"><i class="fa-solid fa-heart text-danger me-1"></i>Top 1: ' +
+          topCoaster +
+          "</span>" +
+          friendSinceHtml +
+          "</div>" +
+          "</div>" +
           '<div class="ms-3 flex-shrink-0">' +
-            '<a href="' + BASE_URL + '/web/views/public/users/user_profile.php?id=' + f.id + '" class="btn btn-sm btn-outline-success rounded-0 px-3">Ver perfil</a>' +
-          '</div>' +
-        '</div>'
+          '<a href="' +
+          BASE_URL +
+          "/web/views/public/users/user_profile.php?id=" +
+          f.id +
+          '" class="btn btn-sm btn-outline-success rounded-0 px-3">Ver perfil</a>' +
+          "</div>" +
+          "</div>",
       );
     });
   }
 
   function applyFriendsFilterSort() {
-    var query   = $("#friends-search").val().toLowerCase().trim();
+    var query = $("#friends-search").val().toLowerCase().trim();
     var sortVal = $("#friends-sort").val();
 
-    var filtered = friendsData.filter(function(f) {
+    var filtered = friendsData.filter(function (f) {
       return f.username.toLowerCase().indexOf(query) !== -1;
     });
 
-    filtered.sort(function(a, b) {
-      if (sortVal === "date_desc")    return new Date(b.since || b.created_at || 0) - new Date(a.since || a.created_at || 0);
-      if (sortVal === "date_asc")     return new Date(a.since || a.created_at || 0) - new Date(b.since || b.created_at || 0);
-      if (sortVal === "credits_desc") return (b.credits || 0) - (a.credits || 0);
-      if (sortVal === "name_asc")     return a.username.localeCompare(b.username, "es");
+    filtered.sort(function (a, b) {
+      if (sortVal === "date_desc")
+        return (
+          new Date(b.since || b.created_at || 0) -
+          new Date(a.since || a.created_at || 0)
+        );
+      if (sortVal === "date_asc")
+        return (
+          new Date(a.since || a.created_at || 0) -
+          new Date(b.since || b.created_at || 0)
+        );
+      if (sortVal === "credits_desc")
+        return (b.credits || 0) - (a.credits || 0);
+      if (sortVal === "name_asc")
+        return a.username.localeCompare(b.username, "es");
       return 0;
     });
 
     if (!filtered.length) {
       $("#friends-list").html(
-        '<div class="text-center text-muted py-4"><i class="fa-solid fa-search me-2"></i>No se encontraron amigos con ese nombre.</div>'
+        '<div class="text-center text-muted py-4"><i class="fa-solid fa-search me-2"></i>No se encontraron amigos con ese nombre.</div>',
       );
       return;
     }
@@ -2179,26 +2294,30 @@ $(document).ready(function () {
     }
 
     $("#friends-list").html(
-      '<div class="text-center text-muted py-5"><i class="fa-solid fa-spinner fa-spin fs-3 mb-3 d-block"></i>Cargando amigos\u2026</div>'
+      '<div class="text-center text-muted py-5"><i class="fa-solid fa-spinner fa-spin fs-3 mb-3 d-block"></i>Cargando amigos\u2026</div>',
     );
 
     try {
-      var res      = await fetch(BASE_URL + "/api/php/users.php?action=get_friends_data");
+      var res = await fetch(
+        BASE_URL + "/api/php/users.php?action=get_friends_data",
+      );
       var dataJson = await res.json();
 
-      friendsData   = (dataJson.success && dataJson.data && dataJson.data.friends) ? dataJson.data.friends : [];
+      friendsData =
+        dataJson.success && dataJson.data && dataJson.data.friends
+          ? dataJson.data.friends
+          : [];
       friendsLoaded = true;
 
       applyFriendsFilterSort();
 
       // Registrar eventos solo una vez tras la primera carga
-      $("#friends-search").on("input",  applyFriendsFilterSort);
-      $("#friends-sort").on("change",   applyFriendsFilterSort);
-
+      $("#friends-search").on("input", applyFriendsFilterSort);
+      $("#friends-sort").on("change", applyFriendsFilterSort);
     } catch (e) {
       console.error("Error cargando amigos:", e);
       $("#friends-list").html(
-        '<div class="text-center text-danger py-4"><i class="fa-solid fa-circle-exclamation me-2"></i>Error al cargar los amigos.</div>'
+        '<div class="text-center text-danger py-4"><i class="fa-solid fa-circle-exclamation me-2"></i>Error al cargar los amigos.</div>',
       );
     }
   }
@@ -2215,35 +2334,39 @@ $(document).ready(function () {
   //  MI MAPA — Leaflet.js + Nominatim geocoding
   // ══════════════════════════════════════════════════════════════════
 
-  let mapInstance     = null;
-  let mapInitialized  = false;
-  let mapMarkerCluster= null;
+  let mapInstance = null;
+  let mapInitialized = false;
+  let mapMarkerCluster = null;
 
   function createParkIcon(coasterCount) {
     const color = "#00c853";
-    const size  = coasterCount >= 5 ? 36 : coasterCount >= 2 ? 32 : 28;
+    const size = coasterCount >= 5 ? 36 : coasterCount >= 2 ? 32 : 28;
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size + 8}" viewBox="0 0 36 44">
       <circle cx="18" cy="18" r="16" fill="${color}" fill-opacity="0.2" stroke="${color}" stroke-width="2"/>
       <circle cx="18" cy="18" r="9" fill="${color}"/>
       <line x1="18" y1="34" x2="18" y2="42" stroke="${color}" stroke-width="2" stroke-linecap="round"/>
     </svg>`;
     return L.divIcon({
-      html:       `<div class="rcw-map-marker">${svg}</div>`,
-      className:  "",
-      iconSize:   [size, size + 8],
+      html: `<div class="rcw-map-marker">${svg}</div>`,
+      className: "",
+      iconSize: [size, size + 8],
       iconAnchor: [size / 2, size + 8],
-      popupAnchor:[0, -(size + 4)],
+      popupAnchor: [0, -(size + 4)],
     });
   }
 
   function buildPopupHtml(park) {
     const imgUrl = park.imagen_url
-      ? (park.imagen_url.startsWith("/") ? BASE_URL + park.imagen_url : park.imagen_url)
+      ? park.imagen_url.startsWith("/")
+        ? BASE_URL + park.imagen_url
+        : park.imagen_url
       : null;
     const imgBlock = imgUrl
       ? `<img src="${imgUrl}" alt="${park.park_name}" class="rcw-map-popup-img" onerror="this.style.display='none'">`
       : `<div class="rcw-map-popup-img-placeholder"><i class="fa-solid fa-image"></i></div>`;
-    const meta = [park.park_location, park.park_country].filter(Boolean).join(", ");
+    const meta = [park.park_location, park.park_country]
+      .filter(Boolean)
+      .join(", ");
     const detailUrl = `${BASE_URL}/web/views/public/parks/parks.php?id=${park.park_id}`;
     const count = parseInt(park.coaster_count) || 1;
     return `
@@ -2274,7 +2397,7 @@ $(document).ready(function () {
       if (raw) {
         const entry = JSON.parse(raw);
         // Validar TTL: si han pasado menos de 30 dias, usar la cache
-        if (entry.ts && (Date.now() - entry.ts) < GEOCODE_TTL) {
+        if (entry.ts && Date.now() - entry.ts < GEOCODE_TTL) {
           return { lat: entry.lat, lng: entry.lng };
         }
         // Expirada: eliminar
@@ -2283,17 +2406,53 @@ $(document).ready(function () {
     } catch (_) {}
 
     // No hay cache valida -> llamar a Nominatim
-    const query = [park.park_name, park.park_location, park.park_country]
-      .filter(Boolean).join(", ");
-    try {
-      const res  = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`,
-        { headers: { "Accept-Language": "es", "User-Agent": "RollerCoasterWorld/TFG" } }
+    const nominatimFetch = async (q) => {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`,
+        {
+          headers: {
+            "Accept-Language": "es",
+            "User-Agent": "RollerCoasterWorld/TFG",
+          },
+        },
       );
-      const data = await res.json();
+      return res.json();
+    };
+
+    try {
+      // Intento 1: nombre + localización + país (más preciso)
+      const query1 = [park.park_name, park.park_location, park.park_country]
+        .filter(Boolean)
+        .join(", ");
+      let data = await nominatimFetch(query1);
+
+      // Intento 2: localización + país (geográfico, seguro)
+      // Tiene prioridad sobre "nombre + país" para evitar coincidencias en otras regiones
+      if ((!data || !data.length) && park.park_location && park.park_country) {
+        await new Promise((r) => setTimeout(r, 1100));
+        data = await nominatimFetch(
+          [park.park_location, park.park_country].filter(Boolean).join(", "),
+        );
+      }
+
+      // Intento 3: nombre + país — SOLO si no hay localización
+      // (si hay localización ya se buscó geográficamente en intento 2)
+      if ((!data || !data.length) && park.park_country && !park.park_location) {
+        await new Promise((r) => setTimeout(r, 1100));
+        data = await nominatimFetch(
+          [park.park_name, park.park_country].filter(Boolean).join(", "),
+        );
+      }
+
       if (data && data.length > 0) {
-        const coords = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), ts: Date.now() };
-        try { localStorage.setItem(cacheKey, JSON.stringify(coords)); } catch (_) {}
+        const coords = {
+          lat: parseFloat(data[0].lat),
+          lng: parseFloat(data[0].lon),
+          ts: Date.now(),
+        };
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify(coords));
+        } catch (_) {}
         return { lat: coords.lat, lng: coords.lng };
       }
     } catch (_) {}
@@ -2306,7 +2465,7 @@ $(document).ready(function () {
       const raw = localStorage.getItem(`rcw_geocode_${parkId}`);
       if (!raw) return null;
       const entry = JSON.parse(raw);
-      if (entry.ts && (Date.now() - entry.ts) < GEOCODE_TTL) {
+      if (entry.ts && Date.now() - entry.ts < GEOCODE_TTL) {
         return { lat: entry.lat, lng: entry.lng };
       }
     } catch (_) {}
@@ -2326,7 +2485,7 @@ $(document).ready(function () {
 
     mapInstance = L.map("profile-map", {
       center: [20, 0],
-      zoom:   2,
+      zoom: 2,
       zoomControl: true,
     });
 
@@ -2334,20 +2493,29 @@ $(document).ready(function () {
     const FullscreenControl = L.Control.extend({
       options: { position: "topleft" },
       onAdd: function () {
-        const btn = L.DomUtil.create("button", "leaflet-bar leaflet-control rcw-fullscreen-btn");
+        const btn = L.DomUtil.create(
+          "button",
+          "leaflet-bar leaflet-control rcw-fullscreen-btn",
+        );
         btn.innerHTML = '<i class="fa-solid fa-expand"></i>';
         btn.title = "Pantalla completa";
         btn.setAttribute("type", "button");
         L.DomEvent.disableClickPropagation(btn);
         L.DomEvent.on(btn, "click", function () {
           const mapEl = document.getElementById("profile-map");
-          const isFs  = !!(document.fullscreenElement || document.webkitFullscreenElement);
+          const isFs = !!(
+            document.fullscreenElement || document.webkitFullscreenElement
+          );
           if (!isFs) {
-            (mapEl.requestFullscreen || mapEl.webkitRequestFullscreen).call(mapEl);
+            (mapEl.requestFullscreen || mapEl.webkitRequestFullscreen).call(
+              mapEl,
+            );
             btn.innerHTML = '<i class="fa-solid fa-compress"></i>';
             btn.title = "Salir de pantalla completa";
           } else {
-            (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+            (document.exitFullscreen || document.webkitExitFullscreen).call(
+              document,
+            );
             btn.innerHTML = '<i class="fa-solid fa-expand"></i>';
             btn.title = "Pantalla completa";
           }
@@ -2367,25 +2535,28 @@ $(document).ready(function () {
     L.tileLayer(
       "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
       {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
-        subdomains:  "abcd",
-        maxZoom:     19,
-      }
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+        subdomains: "abcd",
+        maxZoom: 19,
+      },
     ).addTo(mapInstance);
 
     mapMarkerCluster = L.markerClusterGroup({
       showCoverageOnHover: false,
-      maxClusterRadius:    60,
-      spiderfyOnMaxZoom:   true,
+      maxClusterRadius: 60,
+      spiderfyOnMaxZoom: true,
     });
     mapInstance.addLayer(mapMarkerCluster);
 
     // Fetch lista de parques del usuario
     let parks = [];
     try {
-      const res  = await fetch(`${BASE_URL}/api/php/profile_config.php?action=get_map_parks`);
+      const res = await fetch(
+        `${BASE_URL}/api/php/profile_config.php?action=get_map_parks`,
+      );
       const data = await res.json();
-      parks = (data.success && Array.isArray(data.parks)) ? data.parks : [];
+      parks = data.success && Array.isArray(data.parks) ? data.parks : [];
     } catch (e) {
       console.error("Error cargando parques del mapa:", e);
     }
@@ -2400,9 +2571,9 @@ $(document).ready(function () {
     $("#map-parks-pill").show();
 
     // ── Paso 1: parques YA en localStorage → marcadores instantaneos ──
-    const cached    = [];
+    const cached = [];
     const toGeocode = [];
-    const bounds    = [];
+    const bounds = [];
 
     for (const park of parks) {
       const coords = getCachedCoords(park.park_id);
@@ -2419,7 +2590,10 @@ $(document).ready(function () {
       const marker = L.marker([coords.lat, coords.lng], {
         icon: createParkIcon(parseInt(park.coaster_count) || 1),
       });
-      marker.bindPopup(buildPopupHtml(park), { maxWidth: 260, className: "rcw-leaflet-popup" });
+      marker.bindPopup(buildPopupHtml(park), {
+        maxWidth: 260,
+        className: "rcw-leaflet-popup",
+      });
       mapMarkerCluster.addLayer(marker);
     }
 
@@ -2431,12 +2605,12 @@ $(document).ready(function () {
 
     // ── Paso 2: parques SIN cache → geocodificar con Nominatim ────────
     if (toGeocode.length > 0) {
-      const $bar      = $("#map-geocoding-bar").removeClass("d-none");
-      const $status   = $("#map-geocoding-status");
+      const $bar = $("#map-geocoding-bar").removeClass("d-none");
+      const $status = $("#map-geocoding-status");
       const $progress = $("#map-geocoding-progress");
-      const $pbBar    = $("#map-geocoding-progressbar");
-      const total     = toGeocode.length;
-      let   done      = 0;
+      const $pbBar = $("#map-geocoding-progressbar");
+      const total = toGeocode.length;
+      let done = 0;
 
       for (const park of toGeocode) {
         $status.text(`Localizando "${park.park_name}"...`);
@@ -2451,7 +2625,10 @@ $(document).ready(function () {
           const marker = L.marker([coords.lat, coords.lng], {
             icon: createParkIcon(parseInt(park.coaster_count) || 1),
           });
-          marker.bindPopup(buildPopupHtml(park), { maxWidth: 260, className: "rcw-leaflet-popup" });
+          marker.bindPopup(buildPopupHtml(park), {
+            maxWidth: 260,
+            className: "rcw-leaflet-popup",
+          });
           mapMarkerCluster.addLayer(marker);
         }
 
@@ -2474,8 +2651,8 @@ $(document).ready(function () {
     setTimeout(() => initMap(), 80);
   });
 
+
   if (window.location.hash === "#map") {
     setTimeout(() => initMap(), 200);
   }
-
 });

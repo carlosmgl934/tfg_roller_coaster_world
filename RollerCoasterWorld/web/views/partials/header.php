@@ -40,6 +40,9 @@ $public_pages = [
   Router::getRoutePath('contact'),
   Router::getRoutePath('privacy'),
   Router::getRoutePath('notice'),
+
+  // Tienda — catálogo público
+  Router::getRoutePath('tickets'),
 ];
 
 // Determina si el usuario está logueado
@@ -119,7 +122,9 @@ header("Expires: 0"); // Proxies
   <!-- Funciones Nav para búsqueda de comunidad -->
   <?php if ($is_logged): ?>
     <script src="<?= Router::asset('web/js/social/header_friends.js') ?>"></script>
+    <script src="<?= Router::asset('web/js/shop/cart.js') ?>?v=<?= time() ?>"></script>
   <?php endif; ?>
+
 
   <!-- Design System globals (dark mode tokens + overrides) -->
   <link rel="stylesheet" href="<?= Router::asset('web/css/globals.css') ?>">
@@ -128,8 +133,8 @@ header("Expires: 0"); // Proxies
 
   <!-- Page specific CSS -->
   <?php if (isset($page_css)): ?>
-    <?php foreach((array)$page_css as $css): ?>
-      <?php if(strpos($css, 'http') === 0): ?>
+    <?php foreach ((array) $page_css as $css): ?>
+      <?php if (strpos($css, 'http') === 0): ?>
         <link rel="stylesheet" href="<?= htmlspecialchars($css) ?>">
       <?php else: ?>
         <link rel="stylesheet" href="<?= Router::asset($css) ?>">
@@ -219,6 +224,11 @@ header("Expires: 0"); // Proxies
                     class="fa-solid fa-earth-europe w-20px text-center me-2 text-success"></i> Ranking Global</a></li>
               <li><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('park_tops') ?>?filter=users"><i
                     class="fa-solid fa-trophy w-20px text-center me-2 text-info"></i> Tops Usuarios</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('tickets') ?>"><i
+                    class="fa-solid fa-ticket w-20px text-center me-2 text-warning"></i> Entradas</a></li>
             </ul>
           </li>
 
@@ -263,10 +273,12 @@ header("Expires: 0"); // Proxies
                 <li><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('user_search') ?>"><i
                       class="fa-solid fa-magnifying-glass w-20px text-center me-2 text-primary"></i> Buscar usuarios</a>
                 </li>
-                <li><a class="dropdown-item py-2 fw-semibold d-flex align-items-center justify-content-between" href="<?= Router::url('friends') ?>">
-                        <span><i class="fa-solid fa-user-group w-20px text-center me-2 text-success"></i> Amistades</span>
-                        <span id="nav-comm-inner-badge" class="badge rounded-pill bg-danger d-none" style="font-size: 0.65rem;">0</span>
-                      </a>
+                <li><a class="dropdown-item py-2 fw-semibold d-flex align-items-center justify-content-between"
+                    href="<?= Router::url('friends') ?>">
+                    <span><i class="fa-solid fa-user-group w-20px text-center me-2 text-success"></i> Amistades</span>
+                    <span id="nav-comm-inner-badge" class="badge rounded-pill bg-danger d-none"
+                      style="font-size: 0.65rem;">0</span>
+                  </a>
                 </li>
               </ul>
             </li>
@@ -298,20 +310,29 @@ header("Expires: 0"); // Proxies
                     <hr class="dropdown-divider">
                   </li>
                   <li><a class="dropdown-item py-2 d-flex align-items-center" href="<?= Router::url('admin_coasters') ?>">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="18" height="18" class="text-success flex-shrink-0" style="margin-right: 0.5rem;">
-                      <path d="M4 48 C 20 48, 24 16, 40 16 C 52 16, 56 32, 60 48" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
-                      <path d="M4 56 C 24 56, 28 24, 40 24 C 50 24, 54 38, 60 56" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
-                      <line x1="16" y1="42" x2="16" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
-                      <line x1="32" y1="20" x2="32" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
-                      <line x1="48" y1="24" x2="48" y2="60" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
-                      <line x1="24" y1="28" x2="16" y2="60" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6" />
-                      <line x1="40" y1="16" x2="32" y2="60" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6" />
-                      <rect x="23" y="10" width="10" height="6" rx="2" fill="currentColor" />
-                      <circle cx="25" cy="18" r="2" fill="currentColor" />
-                      <circle cx="31" cy="18" r="2" fill="currentColor" />
-                      <rect x="11" y="24" width="10" height="6" rx="2" fill="currentColor" transform="rotate(-40 16 27)" />
-                    </svg>
-                    Coasters</a></li>
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="18" height="18"
+                        class="text-success flex-shrink-0" style="margin-right: 0.5rem;">
+                        <path d="M4 48 C 20 48, 24 16, 40 16 C 52 16, 56 32, 60 48" fill="none" stroke="currentColor"
+                          stroke-width="4" stroke-linecap="round" />
+                        <path d="M4 56 C 24 56, 28 24, 40 24 C 50 24, 54 38, 60 56" fill="none" stroke="currentColor"
+                          stroke-width="4" stroke-linecap="round" />
+                        <line x1="16" y1="42" x2="16" y2="60" stroke="currentColor" stroke-width="3"
+                          stroke-linecap="round" />
+                        <line x1="32" y1="20" x2="32" y2="60" stroke="currentColor" stroke-width="3"
+                          stroke-linecap="round" />
+                        <line x1="48" y1="24" x2="48" y2="60" stroke="currentColor" stroke-width="3"
+                          stroke-linecap="round" />
+                        <line x1="24" y1="28" x2="16" y2="60" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          opacity="0.6" />
+                        <line x1="40" y1="16" x2="32" y2="60" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          opacity="0.6" />
+                        <rect x="23" y="10" width="10" height="6" rx="2" fill="currentColor" />
+                        <circle cx="25" cy="18" r="2" fill="currentColor" />
+                        <circle cx="31" cy="18" r="2" fill="currentColor" />
+                        <rect x="11" y="24" width="10" height="6" rx="2" fill="currentColor"
+                          transform="rotate(-40 16 27)" />
+                      </svg>
+                      Coasters</a></li>
                   <li><a class="dropdown-item py-2" href="<?= Router::url('admin_parks') ?>"><i
                         class="fa-solid fa-tree-city w-20px text-center me-2 text-success"></i> Parques</a></li>
                   <li><a class="dropdown-item py-2" href="<?= Router::url('admin_forums') ?>"><i
@@ -329,6 +350,8 @@ header("Expires: 0"); // Proxies
                         class="fa-solid fa-comment w-20px text-center me-2 text-secondary"></i> Comentarios</a></li>
                   <li><a class="dropdown-item py-2" href="<?= Router::url('admin_orders') ?>"><i
                         class="fa-solid fa-box w-20px text-center me-2 text-info"></i> Pedidos</a></li>
+                  <li><a class="dropdown-item py-2" href="<?= Router::url('admin_coupons') ?>"><i
+                        class="fa-solid fa-ticket w-20px text-center me-2 text-warning"></i> Cupones</a></li>
                 </ul>
               </div>
             <?php endif; ?>
@@ -342,15 +365,15 @@ header("Expires: 0"); // Proxies
                   $sessionImg = $_SESSION['profile_image'] ?? '';
                   $finalImgUrl = '';
                   if (!empty($sessionImg)) {
-                      if (strpos($sessionImg, 'http') === 0) {
-                          $finalImgUrl = $sessionImg;
-                      } elseif (strpos($sessionImg, '/') === 0) {
-                          $finalImgUrl = $base_url . $sessionImg;
-                      } else {
-                          // Es un nombre de archivo subido a Supabase
-                          $supabaseUrl = $_ENV['SUPABASE_URL'] ?? 'https://ubtoaaawqdneblyvbelr.supabase.co';
-                          $finalImgUrl = rtrim($supabaseUrl, '/') . '/storage/v1/object/public/avatars/' . $sessionImg;
-                      }
+                    if (strpos($sessionImg, 'http') === 0) {
+                      $finalImgUrl = $sessionImg;
+                    } elseif (strpos($sessionImg, '/') === 0) {
+                      $finalImgUrl = $base_url . $sessionImg;
+                    } else {
+                      // Es un nombre de archivo subido a Supabase
+                      $supabaseUrl = $_ENV['SUPABASE_URL'] ?? 'https://ubtoaaawqdneblyvbelr.supabase.co';
+                      $finalImgUrl = rtrim($supabaseUrl, '/') . '/storage/v1/object/public/avatars/' . $sessionImg;
+                    }
                   }
                   $showImg = !empty($finalImgUrl);
                   ?>
@@ -359,7 +382,8 @@ header("Expires: 0"); // Proxies
                       style="width:100%;height:100%;object-fit:cover;border-radius:50%;"
                       onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'d-flex align-items-center justify-content-center h-100 w-100 text-secondary bg-dark\' style=\'border-radius:50%;\'><i class=\'fa-solid fa-user fs-5\'></i></div>'">
                   <?php else: ?>
-                    <div class="d-flex align-items-center justify-content-center h-100 w-100 text-secondary bg-dark" style="border-radius:50%;"><i class="fa-solid fa-user fs-5"></i></div>
+                    <div class="d-flex align-items-center justify-content-center h-100 w-100 text-secondary bg-dark"
+                      style="border-radius:50%;"><i class="fa-solid fa-user fs-5"></i></div>
                   <?php endif; ?>
                 </div>
                 <span class="rcw-user-name d-none d-xl-inline"
@@ -369,11 +393,13 @@ header("Expires: 0"); // Proxies
                 <li>
                   <div class="rcw-dropdown-header px-3 py-2">
                     <div class="fw-semibold" id="header-dropdown-name" style="color: var(--rcw-text-primary);">
-                    
-                      <?= htmlspecialchars(ucfirst($user_display)) ?></div>
 
-                                        <div class="small" style="color: var(--rcw-text-muted);">
-                      <?= htmlspecialchars($_SESSION['user_email'] ?? '') ?></div>
+                      <?= htmlspecialchars(ucfirst($user_display)) ?>
+                    </div>
+
+                    <div class="small" style="color: var(--rcw-text-muted);">
+                      <?= htmlspecialchars($_SESSION['user_email'] ?? '') ?>
+                    </div>
                   </div>
                 </li>
                 <li>
@@ -384,7 +410,10 @@ header("Expires: 0"); // Proxies
                 <li><a class="dropdown-item py-2" href="<?= Router::url('profile') ?>#tops"><i
                       class="fa-solid fa-list-ol w-20px text-center me-2 text-warning"></i> Mis tops</a></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('carrito') ?>"><i
-                      class="fa-solid fa-cart-shopping w-20px text-center me-2 text-success"></i> Carrito</a></li>
+                      class="fa-solid fa-cart-shopping w-20px text-center me-2 text-success"></i> Carrito
+                    <span id="cart-nav-badge" class="badge rounded-pill bg-danger ms-auto d-none"
+                      style="font-size:.65rem;padding:.25em .5em;">0</span>
+                  </a></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('orders') ?>"><i
                       class="fa-solid fa-box w-20px text-center me-2 text-info"></i> Mis pedidos</a></li>
                 <li>
@@ -392,17 +421,17 @@ header("Expires: 0"); // Proxies
                 </li>
                 <li><a class="dropdown-item py-2 text-danger signOutBtn" href="#"><i
                       class="fa-solid fa-arrow-right-from-bracket w-20px text-center me-2"></i> Cerrar sesión</a></li>
-                </ul>
-              </div>
+              </ul>
+            </div>
 
-        <?php else: ?>
+          <?php else: ?>
             <!-- Login / Registro -->
             <a class="nav-link rcw-btn-login" href="<?= Router::url('login') ?>">
               <i class="fa-solid fa-right-to-bracket me-1"></i> Login
             </a>
             <a class="nav-link rcw-btn-register" href="<?= Router::url('register') ?>">
-                Registro
-              </a>
+              Registro
+            </a>
 
           <?php endif; ?>
 

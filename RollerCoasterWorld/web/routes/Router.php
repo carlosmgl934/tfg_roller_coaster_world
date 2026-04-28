@@ -58,10 +58,11 @@ class Router {
             'user_profile' => '/web/views/public/users/user_profile.php',
             'user_search' => '/web/views/public/users/user_search.php',
 
-            // Tienda
-            'carrito' => '/web/views/public/shop/carrito.php',
+            // Tienda / Entradas
+            'tickets'  => '/web/views/public/shop/tickets.php',
+            'carrito'  => '/web/views/public/shop/carrito.php',
             'checkout' => '/web/views/public/shop/checkout.php',
-            'orders' => '/web/views/public/shop/orders.php',
+            'orders'   => '/web/views/public/shop/orders.php',
 
             // Viajes
             'trips' => '/web/views/public/trips/trips.php',
@@ -84,6 +85,7 @@ class Router {
             'admin_photos' => '/web/views/admin/photos.php',
             'admin_comments' => '/web/views/admin/comments.php',
             'admin_orders' => '/web/views/admin/orders.php',
+            'admin_coupons' => '/web/views/admin/coupons.php',
         ];
     }
 

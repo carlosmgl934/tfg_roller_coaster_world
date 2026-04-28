@@ -61,7 +61,6 @@ $(document).ready(function () {
     const btnFiltrar = document.getElementById("btn-filtrar");
     if (btnFiltrar) {
       btnFiltrar.addEventListener("click", function () {
-        isFiltering = false;
         loadParks(getFilters(), 1);
       });
     }
@@ -160,8 +159,13 @@ $(document).ready(function () {
 
           let html = "";
           parks.forEach((park) => {
-            const fallbackImg = "https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png";
-            const imgSrc = park.imagen_url || fallbackImg;
+            const fallbackImg =
+              "https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png";
+            const imgSrc = park.imagen_url
+              ? park.imagen_url.startsWith("/")
+                ? (window.BASE_URL || "") + park.imagen_url
+                : park.imagen_url
+              : fallbackImg;
             html += `
               <a href="${window.BASE_URL || ""}/web/views/public/parks/parks.php?id=${park.id}" class="list-group-item list-group-item-action d-flex align-items-center p-3">
                 <img src="${imgSrc}" class="rounded-0 shadow-sm object-fit-cover me-3" style="width:100px; height:100px;">
@@ -201,7 +205,7 @@ $(document).ready(function () {
       if (totalPages <= 1) {
         return;
       }
-      
+
       const pageBtn = document.createElement("div");
       pageBtn.classList.add("page-buttons");
 
@@ -236,7 +240,7 @@ $(document).ready(function () {
 
       let start = Math.max(2, currentPage - 1);
       let end = Math.min(totalPages - 1, start + 2);
-      start = Math.max(2, end - 2); 
+      start = Math.max(2, end - 2);
 
       for (let i = start; i <= end; i++) {
         const pageButton = document.createElement("button");
@@ -319,7 +323,7 @@ $(document).ready(function () {
         url.searchParams.append("action", "list");
         url.searchParams.append("q", search);
         url.searchParams.append("limit", "10"); // Pedimos algunos más para saber si hay más de 5
-        
+
         const res = await fetch(url);
         const data = await res.json();
         const parksData = data.data || [];
@@ -345,7 +349,7 @@ $(document).ready(function () {
               Ver todos los resultados para "${search}" <i class="fa-solid fa-arrow-right ms-1"></i>
             </a>`;
         }
-        
+
         $("#search-results").html(html).show();
       }, 300);
     });
@@ -364,13 +368,17 @@ $(document).ready(function () {
         e.preventDefault();
         index = (index + 1) % $items.length;
         $items.removeClass("bg-secondary border-success active text-white");
-        $items.eq(index).addClass("bg-secondary border-success active text-white");
+        $items
+          .eq(index)
+          .addClass("bg-secondary border-success active text-white");
         $items.eq(index)[0].scrollIntoView({ block: "nearest" });
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         index = index - 1 < 0 ? $items.length - 1 : index - 1;
         $items.removeClass("bg-secondary border-success active text-white");
-        $items.eq(index).addClass("bg-secondary border-success active text-white");
+        $items
+          .eq(index)
+          .addClass("bg-secondary border-success active text-white");
         $items.eq(index)[0].scrollIntoView({ block: "nearest" });
       } else if (e.key === "Enter") {
         e.preventDefault();
@@ -446,7 +454,7 @@ $(document).ready(function () {
           .addClass("fa-magnifying-glass text-muted")
           .css("cursor", "text");
         isFiltering = false;
-        $("h1").text("Buscar Parques");
+        $("h1").text("Base de datos de parques de atracciones");
         loadParks(getFilters(), 1);
       }
     });
@@ -473,7 +481,10 @@ $(document).ready(function () {
           $("#park-country-header").text(park.park_country);
 
           if (park.imagen_url) {
-            $("#park-hero-img").attr("src", park.imagen_url);
+            const heroUrl = park.imagen_url.startsWith("/")
+              ? (window.BASE_URL || "") + park.imagen_url
+              : park.imagen_url;
+            $("#park-hero-img").attr("src", heroUrl);
           } else {
             $("#park-hero-img").attr(
               "src",
@@ -482,7 +493,7 @@ $(document).ready(function () {
           }
 
           // 2x2 Stats (Coaster style)
-          $("#global-ranking").text(park.ranking ? '#' + park.ranking : "—");
+          $("#global-ranking").text(park.ranking ? "#" + park.ranking : "—");
           $("#park-score").text(
             park.stars ? parseFloat(park.stars).toFixed(2) : "0.00",
           );
@@ -517,6 +528,24 @@ $(document).ready(function () {
             $("#btn-website").addClass("disabled");
           }
 
+          // Botón comprar entradas (solo si tiene precio)
+          if (park.precio_entrada && parseFloat(park.precio_entrada) > 0) {
+            const ticketsUrl =
+              (window.BASE_URL || "") +
+              "/web/views/public/shop/tickets.php?park_id=" +
+              park.id;
+            const btnBuy = $(`
+              <a id="btn-buy-tickets" href="${ticketsUrl}"
+                 class="btn btn-success fw-bold flex-grow-1 d-flex align-items-center justify-content-center gap-2"
+                 style="border-radius:0;padding:10px;">
+                <i class="fa-solid fa-ticket fs-5"></i>
+                <span>Comprar Entradas</span>
+                <span class="badge bg-dark ms-1" style="font-size:.75rem;">${parseFloat(park.precio_entrada).toFixed(2)}€</span>
+              </a>`);
+            // Insertar antes del primer botón del grupo
+            $("#btn-website").parent().prepend(btnBuy);
+          }
+
           if (park.park_location) {
             $("#btn-map")
               .off("click")
@@ -548,10 +577,10 @@ $(document).ready(function () {
         grid.empty();
         // SCROLL INTERNO para no alargar demasiado la página
         grid.css({
-           "max-height": "600px",
-           "overflow-y": "auto",
-           "overflow-x": "hidden",
-           "padding-right": "8px"
+          "max-height": "600px",
+          "overflow-y": "auto",
+          "overflow-x": "hidden",
+          "padding-right": "8px",
         });
 
         if (data.success && data.coasters && data.coasters.length > 0) {
@@ -559,15 +588,19 @@ $(document).ready(function () {
           const constructionList = [];
           const closedList = [];
 
-          data.coasters.forEach(c => {
-             let statusText = c.coaster_status || "Operativa";
-             if (statusText === "Operating" || statusText === "Operativa") {
-                operatingList.push({c, statusText});
-             } else if (statusText === "Under Construction" || statusText === "Under construction" || statusText === "Construction") {
-                constructionList.push({c, statusText});
-             } else {
-                closedList.push({c, statusText});
-             }
+          data.coasters.forEach((c) => {
+            let statusText = c.coaster_status || "Operativa";
+            if (statusText === "Operating" || statusText === "Operativa") {
+              operatingList.push({ c, statusText });
+            } else if (
+              statusText === "Under Construction" ||
+              statusText === "Under construction" ||
+              statusText === "Construction"
+            ) {
+              constructionList.push({ c, statusText });
+            } else {
+              closedList.push({ c, statusText });
+            }
           });
 
           $("#operating-coasters-val").text(operatingList.length); // Only operating for the stat block
@@ -576,49 +609,75 @@ $(document).ready(function () {
             let html = "";
 
             const renderRow = (item) => {
-               const c = item.c;
-               const statusText = item.statusText;
-               const fallback = "https://placehold.co/400x300?text=Coaster";
-               const img = c.imagen_url
-                 ? (c.imagen_url.startsWith('/') ? (window.BASE_URL || '') + c.imagen_url : c.imagen_url)
-                 : fallback;
+              const c = item.c;
+              const statusText = item.statusText;
+              const fallback = "https://placehold.co/400x300?text=Coaster";
+              const img = c.imagen_url
+                ? c.imagen_url.startsWith("/")
+                  ? (window.BASE_URL || "") + c.imagen_url
+                  : c.imagen_url
+                : fallback;
 
-               let statusLabel = statusText;
-               let statusColor = "#6c757d";
-               let statusTextLabel = "UNK";
+              let statusLabel = statusText;
+              let statusColor = "#6c757d";
+              let statusTextLabel = "UNK";
 
-               if (statusText === "Operating" || statusText === "Operativa") {
-                 statusLabel = "Operativa";
-                 statusColor = "#00e676";
-                 statusTextLabel = "OP";
-               } else if (statusText === "Defunct" || statusText === "Closed" || statusText === "Cerrada") {
-                 statusLabel = "Cerrada";
-                 statusColor = "#ff4c4c";
-                 statusTextLabel = "DEF";
-               } else if (statusText === "SBNO") {
-                 statusLabel = "SBNO";
-                 statusColor = "#ffc107";
-                 statusTextLabel = "SBN";
-               } else if (statusText === "Under Construction" || statusText === "Under construction" || statusText === "Construction") {
-                 statusLabel = "En Construcción";
-                 statusColor = "#0dcaf0";
-                 statusTextLabel = "CNS";
-               }
+              if (statusText === "Operating" || statusText === "Operativa") {
+                statusLabel = "Operativa";
+                statusColor = "#00e676";
+                statusTextLabel = "OP";
+              } else if (
+                statusText === "Defunct" ||
+                statusText === "Closed" ||
+                statusText === "Cerrada"
+              ) {
+                statusLabel = "Cerrada";
+                statusColor = "#ff4c4c";
+                statusTextLabel = "DEF";
+              } else if (statusText === "SBNO") {
+                statusLabel = "SBNO";
+                statusColor = "#ffc107";
+                statusTextLabel = "SBN";
+              } else if (
+                statusText === "Under Construction" ||
+                statusText === "Under construction" ||
+                statusText === "Construction"
+              ) {
+                statusLabel = "En Construcción";
+                statusColor = "#0dcaf0";
+                statusTextLabel = "CNS";
+              }
 
-               // Stats con Bootstrap icons layout
-               const statItems = [];
-               if (c.height && c.height !== '0') statItems.push(`<span><i class="fa-solid fa-ruler-vertical opacity-75 me-1"></i>${c.height}m</span>`);
-               if (c.speed && c.speed !== '0') statItems.push(`<span><i class="fa-solid fa-gauge opacity-75 me-1"></i>${c.speed}km/h</span>`);
-               if (c.coaster_length && c.coaster_length !== '0') statItems.push(`<span><i class="fa-solid fa-road opacity-75 me-1"></i>${c.coaster_length}m</span>`);
-               if (c.inversions && c.inversions !== '0') statItems.push(`<span><i class="fa-solid fa-arrows-rotate opacity-75 me-1"></i>${c.inversions} inv.</span>`);
+              // Stats con Bootstrap icons layout
+              const statItems = [];
+              if (c.height && c.height !== "0")
+                statItems.push(
+                  `<span><i class="fa-solid fa-ruler-vertical opacity-75 me-1"></i>${c.height}m</span>`,
+                );
+              if (c.speed && c.speed !== "0")
+                statItems.push(
+                  `<span><i class="fa-solid fa-gauge opacity-75 me-1"></i>${c.speed}km/h</span>`,
+                );
+              if (c.coaster_length && c.coaster_length !== "0")
+                statItems.push(
+                  `<span><i class="fa-solid fa-road opacity-75 me-1"></i>${c.coaster_length}m</span>`,
+                );
+              if (c.inversions && c.inversions !== "0")
+                statItems.push(
+                  `<span><i class="fa-solid fa-arrows-rotate opacity-75 me-1"></i>${c.inversions} inv.</span>`,
+                );
 
-               // Subtítulo text-muted Bootstrap
-               const subtitleParts = [];
-               if (c.manufacter) subtitleParts.push(`<span class="text-success fw-medium">${c.manufacter}</span>`);
-               if (c.modelo) subtitleParts.push(`<span>${c.modelo}</span>`);
-               if (c.coaster_type) subtitleParts.push(`<span>${c.coaster_type}</span>`);
+              // Subtítulo text-muted Bootstrap
+              const subtitleParts = [];
+              if (c.manufacter)
+                subtitleParts.push(
+                  `<span class="text-success fw-medium">${c.manufacter}</span>`,
+                );
+              if (c.modelo) subtitleParts.push(`<span>${c.modelo}</span>`);
+              if (c.coaster_type)
+                subtitleParts.push(`<span>${c.coaster_type}</span>`);
 
-               return `
+              return `
                <a href="${window.BASE_URL || ""}/web/views/public/coasters/coasters.php?id=${c.id}" class="list-group-item list-group-item-action bg-transparent border-bottom border-secondary border-opacity-25 px-0 py-3 text-decoration-none animate__animated animate__fadeIn" style="transition: all 0.2s ease-in-out;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.03)'" onmouseout="this.style.backgroundColor='transparent'">
                    <div class="d-flex align-items-center gap-3 px-3">
                        
@@ -632,7 +691,7 @@ $(document).ready(function () {
                              ${subtitleParts.join(' <span class="mx-1 opacity-50">&bull;</span> ')}
                            </div>
                            <div class="d-flex flex-wrap" style="gap: 12px; font-size:0.8rem; color: #6e7681;">
-                             ${statItems.length > 0 ? statItems.join('') : '<span class="fst-italic opacity-50">Sin datos estadísticos</span>'}
+                             ${statItems.length > 0 ? statItems.join("") : '<span class="fst-italic opacity-50">Sin datos estadísticos</span>'}
                            </div>
                        </div>
 
@@ -656,17 +715,26 @@ $(document).ready(function () {
 
             if (constructionList.length > 0) {
               html += separator("En Construcción");
-              html += `<div class="list-group list-group-flush w-100 bg-transparent px-2">` + constructionList.map(renderRow).join('') + `</div>`;
+              html +=
+                `<div class="list-group list-group-flush w-100 bg-transparent px-2">` +
+                constructionList.map(renderRow).join("") +
+                `</div>`;
             }
 
             if (operatingList.length > 0) {
               html += separator("Operativas");
-              html += `<div class="list-group list-group-flush w-100 bg-transparent px-2">` + operatingList.map(renderRow).join('') + `</div>`;
+              html +=
+                `<div class="list-group list-group-flush w-100 bg-transparent px-2">` +
+                operatingList.map(renderRow).join("") +
+                `</div>`;
             }
 
             if (closedList.length > 0) {
               html += separator("Cerradas / SBNO");
-              html += `<div class="list-group list-group-flush w-100 bg-transparent px-2">` + closedList.map(renderRow).join('') + `</div>`;
+              html +=
+                `<div class="list-group list-group-flush w-100 bg-transparent px-2">` +
+                closedList.map(renderRow).join("") +
+                `</div>`;
             }
 
             grid.html(html);
@@ -694,9 +762,12 @@ $(document).ready(function () {
       const empty = 5 - full - half;
 
       let html = "";
-      for (let i = 0; i < full; i++) html += '<i class="fa-solid fa-star text-warning"></i>';
-      if (half) html += '<i class="fa-solid fa-star-half-stroke text-warning"></i>';
-      for (let i = 0; i < empty; i++) html += '<i class="fa-regular fa-star text-warning"></i>';
+      for (let i = 0; i < full; i++)
+        html += '<i class="fa-solid fa-star text-warning"></i>';
+      if (half)
+        html += '<i class="fa-solid fa-star-half-stroke text-warning"></i>';
+      for (let i = 0; i < empty; i++)
+        html += '<i class="fa-regular fa-star text-warning"></i>';
 
       return html;
     }
@@ -735,7 +806,9 @@ $(document).ready(function () {
             // Avatar: foto del usuario o SVG por defecto
             const defaultAvatarUrl = `${window.BASE_URL}/web/img/avatars/default_avatar.svg`;
             const rawImg = review.profile_image
-              ? (review.profile_image.startsWith('/') ? BASE_URL + review.profile_image : review.profile_image)
+              ? review.profile_image.startsWith("/")
+                ? BASE_URL + review.profile_image
+                : review.profile_image
               : null;
             const avatarSrc = rawImg || defaultAvatarUrl;
             const avatarHtml = `<img src="${avatarSrc}" alt="${review.username}" referrerpolicy="no-referrer"
@@ -789,15 +862,15 @@ $(document).ready(function () {
     if (parkIdInput) {
       const pId = parkIdInput.value;
       fetch(`${BASE_URL}/api/php/parks.php?action=check_review&id=${pId}`)
-        .then(r => r.json())
-        .then(data => {
-           if (data.success && data.hasReviewed) {
-              rf.classList.add("d-none");
-              const msg = document.getElementById("already-reviewed-msg");
-              if (msg) msg.classList.remove("d-none");
-           }
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.success && data.hasReviewed) {
+            rf.classList.add("d-none");
+            const msg = document.getElementById("already-reviewed-msg");
+            if (msg) msg.classList.remove("d-none");
+          }
         })
-        .catch(e => console.error("Error check review:", e));
+        .catch((e) => console.error("Error check review:", e));
     }
 
     new Choices("#pros-select", {

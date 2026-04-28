@@ -415,7 +415,7 @@ span.flatpickr-weekday {
 }
 .tops-filters-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 10px;
   margin-bottom: 10px;
 }
@@ -456,6 +456,43 @@ span.flatpickr-weekday {
   border-color: var(--rcw-green-neon);
   box-shadow: 0 0 0 2px rgba(0, 200, 83, 0.15);
 }
+
+/* ── Sort row: select + direction button ────────────────────── */
+.tops-sort-row {
+  display: flex;
+  gap: 4px;
+  align-items: stretch;
+}
+.tops-sort-select {
+  flex: 1;
+  min-width: 0;
+}
+.tops-sort-dir-btn {
+  flex-shrink: 0;
+  width: 34px;
+  height: 100%;
+  min-height: 30px;
+  background: var(--rcw-bg-input);
+  border: 1px solid var(--rcw-border-strong);
+  color: var(--rcw-green-neon);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 0 !important;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  padding: 0;
+}
+.tops-sort-dir-btn:hover {
+  background: rgba(0, 200, 83, 0.12);
+  border-color: var(--rcw-green-neon);
+  color: #fff;
+}
+.tops-sort-dir-btn i {
+  transition: transform 0.25s ease;
+}
+
 .tops-filters-footer {
   display: flex;
   align-items: center;

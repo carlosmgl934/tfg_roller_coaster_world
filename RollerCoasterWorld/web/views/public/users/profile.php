@@ -510,12 +510,21 @@ $user_uid = $_SESSION['firebase_uid'];
                   <div class="tops-filters-grid">
                     <div class="tops-filter-item">
                       <label class="tops-filter-label"><i class="fa-solid fa-sort me-1"></i>Ordenar</label>
-                      <select id="coasters-sort" class="tops-filter-select">
-                        <option value="rank">Mi Ranking</option>
-                        <option value="name">Nombre A-Z</option>
-                        <option value="height">Altura ↓</option>
-                        <option value="speed">Velocidad ↓</option>
-                      </select>
+                      <div class="tops-sort-row">
+                        <select id="coasters-sort" class="tops-filter-select tops-sort-select">
+                          <option value="rank">Mi Ranking</option>
+                          <option value="name">A-Z</option>
+                          <option value="height">Altura</option>
+                          <option value="speed">Velocidad</option>
+                          <option value="length">Longitud</option>
+                          <option value="inversions">Inversiones</option>
+                          <option value="year">Antigüedad</option>
+                        </select>
+                        <button id="coasters-sort-dir" class="tops-sort-dir-btn" title="Cambiar dirección"
+                          data-dir="desc">
+                          <i class="fa-solid fa-arrow-down-wide-short"></i>
+                        </button>
+                      </div>
                     </div>
                     <div class="tops-filter-item">
                       <label class="tops-filter-label"><i class="fa-solid fa-map-pin me-1"></i>Parque</label>
@@ -535,10 +544,27 @@ $user_uid = $_SESSION['firebase_uid'];
                         <option value="">Todos los fabricantes</option>
                       </select>
                     </div>
+                    <div class="tops-filter-item">
+                      <label class="tops-filter-label"><i class="fa-solid fa-gears me-1"></i>Modelo</label>
+                      <select id="coasters-filter-model" class="tops-filter-select">
+                        <option value="">Todos los modelos</option>
+                      </select>
+                    </div>
                   </div>
                   <div class="tops-filters-footer">
                     <span class="tops-counter-pill">
-                      <i class="fa-solid fa-ticket me-1"></i><span id="coasters-full-count">0</span> coasters
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="14" height="14"
+                        style="vertical-align:-1px;flex-shrink:0;" fill="none" stroke="currentColor"
+                        stroke-linecap="round">
+                        <path d="M4 48 C 20 48, 24 16, 40 16 C 52 16, 56 32, 60 48" stroke-width="4" />
+                        <path d="M4 56 C 24 56, 28 24, 40 24 C 50 24, 54 38, 60 56" stroke-width="4" />
+                        <line x1="16" y1="42" x2="16" y2="60" stroke-width="3" />
+                        <line x1="32" y1="20" x2="32" y2="60" stroke-width="3" />
+                        <line x1="48" y1="24" x2="48" y2="60" stroke-width="3" />
+                        <rect x="23" y="10" width="10" height="6" rx="2" fill="currentColor" stroke="none" />
+                        <circle cx="25" cy="18" r="2" fill="currentColor" stroke="none" />
+                        <circle cx="31" cy="18" r="2" fill="currentColor" stroke="none" />
+                      </svg><span id="coasters-full-count">0</span> <span id="coasters-full-label">coasters</span>
                     </span>
                     <div class="btn-group btn-group-sm ms-auto">
                       <button id="coasters-view-list" class="btn btn-success rounded-0" title="Lista"><i
@@ -752,10 +778,11 @@ $user_uid = $_SESSION['firebase_uid'];
             <i class="fa-solid fa-map-pin me-1"></i>
             <span id="map-parks-count">0</span> parques
           </span>
-        </div>
+        </div><!-- /card-header -->
         <div class="card-body p-0 position-relative">
           <!-- Barra de progreso geocoding -->
-          <div id="map-geocoding-bar" class="d-none" style="padding: 12px 16px; background: rgba(16,185,129,0.08); border-bottom: 1px solid rgba(16,185,129,0.15);">
+          <div id="map-geocoding-bar" class="d-none"
+            style="padding: 12px 16px; background: rgba(16,185,129,0.08); border-bottom: 1px solid rgba(16,185,129,0.15);">
             <div class="d-flex align-items-center gap-3">
               <i class="fa-solid fa-spinner fa-spin text-success"></i>
               <div class="flex-grow-1">
@@ -764,7 +791,8 @@ $user_uid = $_SESSION['firebase_uid'];
                   <small class="text-success fw-bold" id="map-geocoding-progress">0 / 0</small>
                 </div>
                 <div class="progress" style="height: 4px; background: rgba(255,255,255,0.1);">
-                  <div class="progress-bar bg-success" id="map-geocoding-progressbar" style="width:0%; transition: width 0.4s;"></div>
+                  <div class="progress-bar bg-success" id="map-geocoding-progressbar"
+                    style="width:0%; transition: width 0.4s;"></div>
                 </div>
               </div>
             </div>

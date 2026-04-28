@@ -57,8 +57,7 @@ if (!isset($_SESSION['firebase_uid'])) {
                 <span class="text-muted small d-none d-md-inline">
                     Basado en tu perfil · Caché 24h
                 </span>
-                <button class="rcw-recs-refresh-btn" id="recs-refresh-btn"
-                        title="Regenerar recomendaciones">
+                <button class="rcw-recs-refresh-btn" id="recs-refresh-btn" title="Regenerar recomendaciones">
                     <i class="fa-solid fa-rotate"></i>
                     <span class="d-none d-sm-inline">Regenerar</span>
                 </button>
@@ -150,29 +149,29 @@ if (!isset($_SESSION['firebase_uid'])) {
 
 <script src="<?= Router::asset('web/js/shared/recommendations.js') ?>" defer></script>
 <script>
-/* Carga el perfil resumido para mostrar los chips en el hero */
-(function () {
-    document.addEventListener('DOMContentLoaded', async function () {
-        try {
-            const resp = await fetch(window.BASE_URL + '/api/php/index.php?action=dashboard',
-                { credentials: 'same-origin' });
-            const json = await resp.json();
-            if (!json.success) return;
+    /* Carga el perfil resumido para mostrar los chips en el hero */
+    (function () {
+        document.addEventListener('DOMContentLoaded', async function () {
+            try {
+                const resp = await fetch(window.BASE_URL + '/api/php/index.php?action=dashboard',
+                    { credentials: 'same-origin' });
+                const json = await resp.json();
+                if (!json.success) return;
 
-            const chips = document.getElementById('tg-profile-chips');
-            if (!chips) return;
+                const chips = document.getElementById('tg-profile-chips');
+                if (!chips) return;
 
-            const stats = json.data?.stats || {};
-            const user  = json.data?.user  || {};
-            chips.innerHTML = [
-                stats.credits   ? `<span class="tg-chip"><i class="fa-solid fa-train-tram me-1"></i>${stats.credits} coasters</span>` : '',
-                stats.parks_visited ? `<span class="tg-chip"><i class="fa-solid fa-tree-city me-1"></i>${stats.parks_visited} parques visitados</span>` : '',
-                user.location && user.location !== '—' ? `<span class="tg-chip"><i class="fa-solid fa-location-dot me-1"></i>${user.location}</span>` : '',
-                stats.trips  ? `<span class="tg-chip"><i class="fa-solid fa-route me-1"></i>${stats.trips} viajes</span>` : '',
-            ].filter(Boolean).join('') || '<span class="tg-chip text-muted">Completa tu perfil para mejores recomendaciones</span>';
-        } catch (e) { /* silencioso */ }
-    });
-})();
+                const stats = json.data?.stats || {};
+                const user = json.data?.user || {};
+                chips.innerHTML = [
+                    stats.credits ? `<span class="tg-chip"><i class="fa-solid fa-train-tram me-1"></i>${stats.credits} coasters</span>` : '',
+                    stats.parks_visited ? `<span class="tg-chip"><i class="fa-solid fa-tree-city me-1"></i>${stats.parks_visited} parques visitados</span>` : '',
+                    user.location && user.location !== '—' ? `<span class="tg-chip"><i class="fa-solid fa-location-dot me-1"></i>${user.location}</span>` : '',
+                    stats.trips ? `<span class="tg-chip"><i class="fa-solid fa-route me-1"></i>${stats.trips} viajes</span>` : '',
+                ].filter(Boolean).join('') || '<span class="tg-chip text-muted">Completa tu perfil para mejores recomendaciones</span>';
+            } catch (e) { /* silencioso */ }
+        });
+    })();
 </script>
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>

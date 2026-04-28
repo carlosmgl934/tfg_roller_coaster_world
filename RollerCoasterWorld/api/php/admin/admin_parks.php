@@ -36,6 +36,88 @@ function requireAdmin(): void
 }
 
 // ─────────────────────────────────────────────────────────────
+// uploadParkImage — convierte a WebP y sube a Supabase Storage (bucket: park-images)
+// Devuelve la URL pública o null si falla.
+// ─────────────────────────────────────────────────────────────
+function uploadParkImage(array $fileEntry): ?string
+{
+    $supabaseUrl = $_ENV['SUPABASE_URL']         ?? null;
+    $supabaseKey = $_ENV['SUPABASE_SERVICE_KEY'] ?? null;
+
+    // Fallback local si Supabase no está configurado
+    if (!$supabaseUrl || !$supabaseKey) {
+        $uploadDir = __DIR__ . '/../../../web/img/uploads/parks/';
+        if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+        $fileName  = uniqid('park_') . '-' . pathinfo($fileEntry['name'], PATHINFO_FILENAME) . '.webp';
+        $optimized = ImageHelper::optimizeAndConvertToWebP($fileEntry['tmp_name'], 1920, 80);
+        if ($optimized && rename($optimized, $uploadDir . $fileName)) {
+            return '/web/img/uploads/parks/' . $fileName;
+        }
+        $fb = uniqid('park_') . '-' . basename($fileEntry['name']);
+        if (move_uploaded_file($fileEntry['tmp_name'], $uploadDir . $fb)) {
+            return '/web/img/uploads/parks/' . $fb;
+        }
+        return null;
+    }
+
+    // Convertir a WebP optimizado
+    $webpPath = ImageHelper::optimizeAndConvertToWebP($fileEntry['tmp_name'], 1920, 82);
+    $readPath = $webpPath ?: $fileEntry['tmp_name'];
+    $fileData = file_get_contents($readPath);
+    if ($webpPath && file_exists($webpPath)) @unlink($webpPath);
+    if ($fileData === false) return null;
+
+    $fileName  = uniqid('park_') . '.webp';
+    $bucket    = 'park-images';
+    $uploadUrl = rtrim($supabaseUrl, '/') . "/storage/v1/object/{$bucket}/{$fileName}";
+
+    $ch = curl_init($uploadUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_CUSTOMREQUEST  => 'PUT',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POSTFIELDS     => $fileData,
+        CURLOPT_HTTPHEADER     => [
+            "Authorization: Bearer {$supabaseKey}",
+            'Content-Type: image/webp',
+            'x-upsert: true',
+        ],
+    ]);
+    curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode < 200 || $httpCode >= 300) {
+        error_log("uploadParkImage: Error subiendo a Supabase. HTTP {$httpCode}");
+        return null;
+    }
+
+    return rtrim($supabaseUrl, '/') . "/storage/v1/object/public/{$bucket}/{$fileName}";
+}
+
+// Elimina una imagen de Supabase Storage (solo si la URL apunta al bucket park-images)
+function deleteParkImage(?string $imageUrl): void
+{
+    if (!$imageUrl || !str_contains($imageUrl, '/park-images/')) return;
+
+    $supabaseUrl = $_ENV['SUPABASE_URL']         ?? null;
+    $supabaseKey = $_ENV['SUPABASE_SERVICE_KEY'] ?? null;
+    if (!$supabaseUrl || !$supabaseKey) return;
+
+    $filename = basename(parse_url($imageUrl, PHP_URL_PATH));
+    if (!$filename) return;
+
+    $deleteUrl = rtrim($supabaseUrl, '/') . "/storage/v1/object/park-images/{$filename}";
+    $ch = curl_init($deleteUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_CUSTOMREQUEST  => 'DELETE',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER     => ["Authorization: Bearer {$supabaseKey}"],
+    ]);
+    curl_exec($ch);
+    curl_close($ch);
+}
+
+// ─────────────────────────────────────────────────────────────
 // searchParks — búsqueda por nombre, país o localización
 // ─────────────────────────────────────────────────────────────
 function searchParks(): void
@@ -230,20 +312,9 @@ function addPark(): void
     $imagenUrl = $data['imagenUrl'] ?? null;
 
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $uploadDir = __DIR__ . '/../../../web/img/uploads/parks/';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
-        }
-        $fileName = uniqid('park_') . '-' . pathinfo($_FILES['image']['name'], PATHINFO_FILENAME) . '.webp';
-        $optimized = ImageHelper::optimizeAndConvertToWebP($_FILES['image']['tmp_name'], 1920, 80);
-        if ($optimized && rename($optimized, $uploadDir . $fileName)) {
-            $imagenUrl = '/web/img/uploads/parks/' . $fileName;
-        } else {
-            // Fallback
-            $fileNameFallback = uniqid('park_') . '-' . basename($_FILES['image']['name']);
-            if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileNameFallback)) {
-                $imagenUrl = '/web/img/uploads/parks/' . $fileNameFallback;
-            }
+        $uploaded = uploadParkImage($_FILES['image']);
+        if ($uploaded) {
+            $imagenUrl = $uploaded;
         }
     }
 
@@ -343,6 +414,12 @@ function deletePark(): void
 
     try {
         global $db;
+        // Obtener imagen antes de eliminar para borrarla de Supabase
+        $stmtImg = $db->prepare("SELECT imagen_url FROM parks WHERE id = :id");
+        $stmtImg->execute([':id' => $id]);
+        $row = $stmtImg->fetch(PDO::FETCH_ASSOC);
+        deleteParkImage($row['imagen_url'] ?? null);
+
         // Reasignar coasters al parque "Desconocido" antes de eliminar
         $db->prepare("UPDATE coasters SET park_id = 2895 WHERE park_id = :id")
            ->execute([':id' => $id]);
@@ -379,20 +456,18 @@ function editPark(): void
     try {
         global $db;
 
-        // Gestión de imagen (igual que addPark)
+        // Gestión de imagen — ahora via Supabase
         $imagenUrl = $data['imagenUrl'] ?? null;
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = __DIR__ . '/../../../web/img/uploads/parks/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-            $fileName  = uniqid('park_') . '-' . pathinfo($_FILES['image']['name'], PATHINFO_FILENAME) . '.webp';
-            $optimized = ImageHelper::optimizeAndConvertToWebP($_FILES['image']['tmp_name'], 1920, 80);
-            if ($optimized && rename($optimized, $uploadDir . $fileName)) {
-                $imagenUrl = '/web/img/uploads/parks/' . $fileName;
-            } else {
-                $fb = uniqid('park_') . '-' . basename($_FILES['image']['name']);
-                if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fb)) {
-                    $imagenUrl = '/web/img/uploads/parks/' . $fb;
-                }
+            // Borrar imagen anterior de Supabase si la hay
+            $stmtOld = $db->prepare("SELECT imagen_url FROM parks WHERE id = :id");
+            $stmtOld->execute([':id' => $id]);
+            $oldRow = $stmtOld->fetch(PDO::FETCH_ASSOC);
+            deleteParkImage($oldRow['imagen_url'] ?? null);
+
+            $uploaded = uploadParkImage($_FILES['image']);
+            if ($uploaded) {
+                $imagenUrl = $uploaded;
             }
         }
 

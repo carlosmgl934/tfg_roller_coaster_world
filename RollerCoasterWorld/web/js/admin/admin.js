@@ -1589,6 +1589,22 @@ $(document).ready(function () {
     const PARK_ITEMS_PAGE = 15;
     let parkSearchDebounce = null;
 
+    // ── Poblar selector de países ────────────────────────
+    fetch(`${BASE_URL}/api/php/parks.php?action=country`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && data.data) {
+          data.data
+            .filter((c) => c && c.trim() !== "")
+            .forEach((c) => {
+              $("#filter-park-country").append(
+                `<option value="${c}">${c}</option>`,
+              );
+            });
+        }
+      })
+      .catch(() => {});
+
     // ── Helpers ─────────────────────────────────────────────
     function getParkFilters() {
       return {
@@ -1600,6 +1616,47 @@ $(document).ready(function () {
     function hasActiveParkFilters(f) {
       return f.country || f.year;
     }
+
+    // ── Autocomplete para países (Añadir/Editar Parque) ──
+    initAutocomplete({
+      inputId: "add-park-country",
+      dropdownId: "ac-dropdown-park-country",
+      fetchItems: async (q) => {
+        const res = await fetch(`${BASE_URL}/api/php/parks.php?action=country`);
+        const data = await res.json();
+        if (!data.success) return [];
+        const all = [
+          { label: "Desconocido", value: "Desconocido", unknown: true },
+          ...data.data
+            .filter((c) => c && c.trim() !== "")
+            .map((c) => ({ label: c, value: c })),
+        ];
+        return q
+          ? all.filter((i) => i.label.toLowerCase().includes(q.toLowerCase()))
+          : all;
+      },
+      onSelect: () => {},
+    });
+
+    initAutocomplete({
+      inputId: "edit-park-country",
+      dropdownId: "ac-dropdown-edit-park-country",
+      fetchItems: async (q) => {
+        const res = await fetch(`${BASE_URL}/api/php/parks.php?action=country`);
+        const data = await res.json();
+        if (!data.success) return [];
+        const all = [
+          { label: "Desconocido", value: "Desconocido", unknown: true },
+          ...data.data
+            .filter((c) => c && c.trim() !== "")
+            .map((c) => ({ label: c, value: c })),
+        ];
+        return q
+          ? all.filter((i) => i.label.toLowerCase().includes(q.toLowerCase()))
+          : all;
+      },
+      onSelect: () => {},
+    });
 
     // ── Render rows ─────────────────────────────────────────
     function renderParkRows(parks) {
@@ -1881,77 +1938,6 @@ $(document).ready(function () {
       }
     });
 
-    // ── Abrir modal editar (carga datos por API) ───────────────
-    $(document).on("click", ".btn-edit-park", async function () {
-      const id = $(this).data("id");
-      try {
-        const res = await fetch(
-          `${BASE_URL}/api/php/admin/admin_parks.php?action=getPark&id=${id}`,
-          { credentials: "include" },
-        );
-        const data = await res.json();
-        if (!data.success) {
-          alert("Error cargando el parque.");
-          return;
-        }
-        const p = data.park;
-
-        document.getElementById("edit-park-id").value = p.id;
-        document.getElementById("edit-park-name").value = p.park_name || "";
-        document.getElementById("edit-park-location").value =
-          p.park_location || "";
-        document.getElementById("edit-park-website").value = p.website || "";
-        document.getElementById("edit-park-price").value =
-          p.precio_entrada || "";
-
-        // País (autocomplete)
-        const cntryEl = document.getElementById("edit-park-country");
-        cntryEl.value = p.park_country || "";
-        cntryEl.dataset.selected = "true";
-
-        // Año
-        const yearEl = document.getElementById("edit-park-year");
-        const yearChk = document.getElementById("unknown-edit-park-year");
-        if (p.opening_year) {
-          yearEl.value = p.opening_year;
-          yearEl.disabled = false;
-          yearChk.checked = false;
-        } else {
-          yearEl.value = "";
-          yearEl.disabled = true;
-          yearChk.checked = true;
-        }
-
-        // Imagen preview
-        const preview = document.getElementById("edit-park-preview");
-        if (p.imagen_url) {
-          let imgUrl = p.imagen_url.startsWith("/")
-            ? BASE_URL + p.imagen_url
-            : p.imagen_url;
-          preview.src = imgUrl;
-          preview.style.display = "";
-        } else {
-          preview.src = "";
-          preview.style.display = "none";
-        }
-        document.getElementById("edit-park-dropzone-text").textContent =
-          "Cambiar imagen";
-        document.getElementById("edit-park-image").value = "";
-
-        // Reset mensajes
-        document.getElementById("edit-park-messages").classList.add("d-none");
-        document.getElementById("edit-park-error").classList.add("d-none");
-        document.getElementById("edit-park-success").classList.add("d-none");
-        document.getElementById("edit-park-coasters-ids").value = "";
-
-        new bootstrap.Modal(document.getElementById("modal-edit-park")).show();
-
-        // Cargar coasters (lazy: después de abrir el modal)
-        loadEditParkCoasters("", id, true);
-      } catch (e) {
-        console.error("Error abriendo edición de parque:", e);
-      }
-    });
   }
 
   // ── Modal añadir parque ───────────────────────────────────────────────────────
@@ -2407,6 +2393,78 @@ $(document).ready(function () {
         );
       });
 
+    // ── Abrir modal editar (carga datos por API) — registrado aquí para funcionar también en park.php ──
+    $(document).on("click", ".btn-edit-park", async function () {
+      const id = $(this).data("id");
+      try {
+        const res = await fetch(
+          `${BASE_URL}/api/php/admin/admin_parks.php?action=getPark&id=${id}`,
+          { credentials: "include" },
+        );
+        const data = await res.json();
+        if (!data.success) {
+          alert("Error cargando el parque.");
+          return;
+        }
+        const p = data.park;
+
+        document.getElementById("edit-park-id").value = p.id;
+        document.getElementById("edit-park-name").value = p.park_name || "";
+        document.getElementById("edit-park-location").value =
+          p.park_location || "";
+        document.getElementById("edit-park-website").value = p.website || "";
+        document.getElementById("edit-park-price").value =
+          p.precio_entrada || "";
+
+        // País (autocomplete)
+        const cntryEl = document.getElementById("edit-park-country");
+        cntryEl.value = p.park_country || "";
+        cntryEl.dataset.selected = "true";
+
+        // Año
+        const yearEl = document.getElementById("edit-park-year");
+        const yearChk = document.getElementById("unknown-edit-park-year");
+        if (p.opening_year) {
+          yearEl.value = p.opening_year;
+          yearEl.disabled = false;
+          yearChk.checked = false;
+        } else {
+          yearEl.value = "";
+          yearEl.disabled = true;
+          yearChk.checked = true;
+        }
+
+        // Imagen preview
+        const preview = document.getElementById("edit-park-preview");
+        if (p.imagen_url) {
+          let imgUrl = p.imagen_url.startsWith("/")
+            ? BASE_URL + p.imagen_url
+            : p.imagen_url;
+          preview.src = imgUrl;
+          preview.style.display = "";
+        } else {
+          preview.src = "";
+          preview.style.display = "none";
+        }
+        document.getElementById("edit-park-dropzone-text").textContent =
+          "Cambiar imagen";
+        document.getElementById("edit-park-image").value = "";
+
+        // Reset mensajes
+        document.getElementById("edit-park-messages").classList.add("d-none");
+        document.getElementById("edit-park-error").classList.add("d-none");
+        document.getElementById("edit-park-success").classList.add("d-none");
+        document.getElementById("edit-park-coasters-ids").value = "";
+
+        new bootstrap.Modal(document.getElementById("modal-edit-park")).show();
+
+        // Cargar coasters (lazy: después de abrir el modal)
+        window.loadEditParkCoasters("", id, true);
+      } catch (e) {
+        console.error("Error abriendo edición de parque:", e);
+      }
+    });
+
     // ── Confirmar guardar edición ───────────────────────────────
     document
       .getElementById("confirm-edit-park")
@@ -2496,7 +2554,7 @@ $(document).ready(function () {
             showOk("Parque actualizado correctamente.");
             setTimeout(() => {
               bootstrap.Modal.getInstance(_modalEditPark)?.hide();
-              loadParks(parkCurrentPage);
+              if (typeof window.loadAdminParks === "function") window.loadAdminParks(parkCurrentPage);
             }, 1500);
           } else {
             showErr("Error: " + (data.error || "No se pudo guardar."));
@@ -2519,6 +2577,9 @@ $(document).ready(function () {
       document.getElementById("edit-park-image").value = "";
       _editSelectedCoasterIds = [];
     });
+
+    // Cargar parques al inicio (solo en la vista admin que tiene la lista)
+    if (typeof window.loadAdminParks === "function") window.loadAdminParks(1);
   }
 
   // ── Manejar acciones tras redirecciones ─────────────────────────────────
@@ -3392,4 +3453,663 @@ if ($("#admin-news-list").length) {
       console.error("Error deleting news:", err);
     }
   });
+
+  /* ════════════════════════════════════════════════════════
+     ADMIN PARKS
+  ════════════════════════════════════════════════════════ */
+  if (document.getElementById("admin-park-list")) {
+    const parksApi = `${BASE_URL}/api/php/admin/admin_parks.php`;
+
+    // ── Poblar selector de países ────────────────────────
+    fetch(`${BASE_URL}/api/php/parks.php?action=country`)
+      .then((r) => r.json())
+      .then((data) => {
+        const select = document.getElementById("filter-park-country");
+        if (!select) return;
+        const countries = data.data || data;
+        if (Array.isArray(countries)) {
+          countries.filter(Boolean).forEach((c) => {
+            select.append(new Option(c, c));
+          });
+        }
+      })
+      .catch(() => {});
+
+    // ── Carga principal de parques ───────────────────────
+    let adminParkPage = 1;
+    const PARKS_PER_PAGE = 15;
+
+    window.loadAdminParks = async function (page) {
+      adminParkPage = page || 1;
+      const search = (
+        document.getElementById("admin-park-search")?.value || ""
+      ).trim();
+      const country =
+        document.getElementById("filter-park-country")?.value || "";
+      const year = document.getElementById("filter-park-year")?.value || "";
+
+      const $list = $("#admin-park-list");
+      const $count = $("#admin-park-count");
+      const $pag = $("#admin-park-pagination");
+
+      if (!search && !country && !year) {
+        $list.html(
+          '<div class="list-group-item text-center text-muted py-5"><i class="fa-solid fa-hand-point-up fa-2x mb-2 d-block text-success"></i>Usa el buscador o activa un filtro para ver parques.</div>',
+        );
+        $count.text("");
+        $pag.empty();
+        return;
+      }
+
+      $list.html(
+        '<div class="list-group-item text-center text-muted py-4"><div class="spinner-border spinner-border-sm text-success me-2"></div>Cargando...</div>',
+      );
+
+      const params = new URLSearchParams({
+        action: "list",
+        page: adminParkPage,
+      });
+      if (search) params.set("q", search);
+      if (country) params.set("country", country);
+      if (year) params.set("year", year);
+
+      try {
+        const res = await fetch(`${BASE_URL}/api/php/parks.php?${params}`, {
+          credentials: "include",
+        });
+        const data = await res.json();
+        const parks = data.data || [];
+        const total = data.total || parks.length;
+
+        $count.text(`Mostrando ${total} parque${total !== 1 ? "s" : ""}`);
+
+        if (!parks.length) {
+          $list.html(
+            '<div class="list-group-item text-center text-muted py-4">No se encontraron parques.</div>',
+          );
+          $pag.empty();
+          return;
+        }
+
+        $list.empty();
+        parks.forEach((p) => {
+          const img = p.imagen_url
+            ? p.imagen_url.startsWith("/")
+              ? BASE_URL + p.imagen_url
+              : p.imagen_url
+            : "https://placehold.co/80x60/0d1117/444?text=Parque";
+          const esc = (s) =>
+            (s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+          const priceBadge = p.precio_entrada
+            ? '<span class="badge bg-success ms-2" style="font-size:.7rem;">' +
+              parseFloat(p.precio_entrada).toFixed(2) +
+              "\u20AC</span>"
+            : "";
+          const html =
+            '<div class="list-group-item list-group-item-action d-flex align-items-center p-3 gap-3">' +
+            '<img src="' +
+            img +
+            '" onerror="this.src=\'https://placehold.co/80x60/0d1117/444?text=P\'" style="width:80px;height:60px;object-fit:cover;flex-shrink:0;" class="rounded-0">' +
+            '<div class="flex-grow-1 min-w-0">' +
+            '<h6 class="mb-0 fw-bold text-success text-truncate">' +
+            esc(p.park_name) +
+            "</h6>" +
+            '<small class="text-muted">' +
+            esc(p.park_location || "\u2014") +
+            ", " +
+            esc(p.park_country || "\u2014") +
+            " &bull; " +
+            (p.opening_year || "\u2014") +
+            " &bull; " +
+            (p.operating_coasters || 0) +
+            " coasters " +
+            priceBadge +
+            "</small>" +
+            "</div>" +
+            '<div class="d-flex gap-2 flex-shrink-0">' +
+            '<button class="btn btn-sm btn-outline-primary rounded-0 btn-edit-park" data-id="' +
+            p.id +
+            '" data-name="' +
+            esc(p.park_name) +
+            '" data-country="' +
+            esc(p.park_country) +
+            '" data-location="' +
+            esc(p.park_location) +
+            '" data-year="' +
+            (p.opening_year || "") +
+            '" data-website="' +
+            esc(p.website) +
+            '" data-price="' +
+            (p.precio_entrada || "") +
+            '" data-img="' +
+            (p.imagen_url || "") +
+            '"><i class="fa-solid fa-pen"></i> Editar</button>' +
+            '<button class="btn btn-sm btn-outline-warning rounded-0 btn-duplicate-park" data-id="' +
+            p.id +
+            '" data-name="' +
+            esc(p.park_name) +
+            '"><i class="fa-solid fa-copy"></i> Duplicar</button>' +
+            '<button class="btn btn-sm btn-outline-danger rounded-0 btn-delete-park" data-id="' +
+            p.id +
+            '" data-name="' +
+            esc(p.park_name) +
+            '"><i class="fa-solid fa-trash"></i> Eliminar</button>' +
+            "</div></div>";
+          $list.append(html);
+        });
+
+        renderParkPagination(total, adminParkPage);
+      } catch (err) {
+        console.error("Error cargando parques:", err);
+        $list.html(
+          '<div class="list-group-item text-center text-danger py-4">Error de conexión</div>',
+        );
+      }
+    };
+
+    function renderParkPagination(total, page) {
+      const $pag = $("#admin-park-pagination");
+      $pag.empty();
+      const totalPages = Math.ceil(total / PARKS_PER_PAGE);
+      if (totalPages <= 1) return;
+      const nav = $("<nav></nav>");
+      const ul = $('<ul class="pagination pagination-sm mb-0"></ul>');
+      ul.append(
+        `<li class="page-item ${page === 1 ? "disabled" : ""}"><button class="page-link rounded-0" data-page="${page - 1}">&#8249;</button></li>`,
+      );
+      let start = Math.max(1, page - 2),
+        end = Math.min(totalPages, start + 4);
+      start = Math.max(1, end - 4);
+      for (let i = start; i <= end; i++) {
+        ul.append(
+          `<li class="page-item ${i === page ? "active" : ""}"><button class="page-link rounded-0" data-page="${i}">${i}</button></li>`,
+        );
+      }
+      ul.append(
+        `<li class="page-item ${page === totalPages ? "disabled" : ""}"><button class="page-link rounded-0" data-page="${page + 1}">&#8250;</button></li>`,
+      );
+      nav.append(ul);
+      $pag.append(nav);
+      $pag.find("button[data-page]").on("click", function () {
+        window.loadAdminParks(parseInt($(this).data("page")));
+        window.scrollTo({
+          top: $("#admin-park-list").offset().top - 80,
+          behavior: "smooth",
+        });
+      });
+    }
+
+    // ── Buscador ─────────────────────────────────────────
+    let parkSearchDebounce = null;
+    $("#admin-park-search").on("input", function () {
+      const $icon = $("#admin-park-search-icon");
+      if ($(this).val().length > 0) {
+        $icon
+          .removeClass("fa-magnifying-glass text-muted")
+          .addClass("fa-xmark text-danger")
+          .css("cursor", "pointer");
+      } else {
+        $icon
+          .removeClass("fa-xmark text-danger")
+          .addClass("fa-magnifying-glass text-muted")
+          .css("cursor", "default");
+      }
+      clearTimeout(parkSearchDebounce);
+      parkSearchDebounce = setTimeout(() => window.loadAdminParks(1), 400);
+    });
+    $("#admin-park-search-icon").on("click", function () {
+      if ($("#admin-park-search").val().length > 0) {
+        $("#admin-park-search").val("");
+        $(this)
+          .removeClass("fa-xmark text-danger")
+          .addClass("fa-magnifying-glass text-muted")
+          .css("cursor", "default");
+        window.loadAdminParks(1);
+      }
+    });
+
+    // ── Filtros ──────────────────────────────────────────
+    $("#btn-park-filtrar").on("click", () => window.loadAdminParks(1));
+    $("#btn-park-borrar").on("click", function () {
+      $("#filter-park-country").val("");
+      $("#filter-park-year").val("");
+      $("#admin-park-search").val("");
+      window.loadAdminParks(1);
+    });
+
+    // ── Añadir parque ────────────────────────────────────
+    $("#btn-add-park").on("click", function (e) {
+      e.preventDefault();
+      document.getElementById("add-park-name").value = "";
+      document.getElementById("add-park-country").value = "";
+      document.getElementById("add-park-location").value = "";
+      document.getElementById("add-park-year").value = "";
+      document.getElementById("add-park-website").value = "";
+      document.getElementById("add-park-price").value = "";
+      document
+        .getElementById("add-park-preview-container")
+        .classList.add("d-none");
+      document.getElementById("add-park-dropzone-text").textContent =
+        "Subir imagen";
+      document.getElementById("add-park-messages").classList.add("d-none");
+      document.getElementById("add-park-error").classList.add("d-none");
+      document.getElementById("add-park-success").classList.add("d-none");
+      loadUnassignedCoasters();
+      new bootstrap.Modal(document.getElementById("modal-add-park")).show();
+    });
+
+    async function loadUnassignedCoasters(
+      containerId = "add-park-coasters-list",
+      searchId = "add-park-coasters-search",
+      idsId = "add-park-coasters-ids",
+      parkId = null,
+    ) {
+      const container = document.getElementById(containerId);
+      const searchInput = document.getElementById(searchId);
+      const idsInput = document.getElementById(idsId);
+      if (!container) return;
+
+      container.innerHTML =
+        '<div class="text-center text-muted py-3"><div class="spinner-border spinner-border-sm text-success"></div> Cargando coasters...</div>';
+
+      try {
+        let url = `${BASE_URL}/api/php/coasters.php?action=apply_filters&park_id=null&limit=500`;
+        if (parkId)
+          url = `${BASE_URL}/api/php/coasters.php?action=apply_filters&park_id=${parkId}&limit=500`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+        const coasters = data.coasters || [];
+
+        if (!coasters.length) {
+          container.innerHTML =
+            '<div class="text-muted py-2 text-center small">No hay coasters disponibles</div>';
+          return;
+        }
+
+        let selectedIds = new Set(
+          (idsInput.value || "").split(",").filter(Boolean),
+        );
+
+        function renderCoasters(list) {
+          container.innerHTML = list
+            .map(
+              (c) => `
+            <label class="d-flex align-items-center gap-2 py-1 px-2 rounded-0" style="cursor:pointer;font-size:.85rem;">
+              <input type="checkbox" class="form-check-input coaster-assign-cb" value="${c.id}"
+                     ${selectedIds.has(c.id.toString()) ? "checked" : ""} style="cursor:pointer;">
+              <span class="text-white">${c.coaster_name}</span>
+              <span class="text-muted ms-auto" style="font-size:.75rem;">${c.manufacter || ""}</span>
+            </label>`,
+            )
+            .join("");
+
+          container.querySelectorAll(".coaster-assign-cb").forEach((cb) => {
+            cb.addEventListener("change", function () {
+              if (this.checked) selectedIds.add(this.value);
+              else selectedIds.delete(this.value);
+              idsInput.value = Array.from(selectedIds).join(",");
+              const badge = document.getElementById(
+                containerId === "add-park-coasters-list"
+                  ? "park-coasters-badge"
+                  : "edit-park-coasters-badge",
+              );
+              if (badge)
+                badge.textContent = `${selectedIds.size} seleccionadas`;
+            });
+          });
+        }
+
+        renderCoasters(coasters);
+
+        if (searchInput) {
+          searchInput.addEventListener("input", function () {
+            const q = this.value.toLowerCase();
+            renderCoasters(
+              coasters.filter(
+                (c) =>
+                  c.coaster_name.toLowerCase().includes(q) ||
+                  (c.manufacter || "").toLowerCase().includes(q),
+              ),
+            );
+          });
+        }
+      } catch (e) {
+        container.innerHTML =
+          '<div class="text-danger small py-2">Error cargando coasters</div>';
+      }
+    }
+
+    // Previsualización imagen añadir
+    document
+      .getElementById("add-park-image")
+      ?.addEventListener("change", function () {
+        const file = this.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          document.getElementById("add-park-preview").src = e.target.result;
+          document
+            .getElementById("add-park-preview-container")
+            .classList.remove("d-none");
+          document.getElementById("add-park-dropzone-text").textContent =
+            file.name;
+        };
+        reader.readAsDataURL(file);
+      });
+
+    // Guardar parque nuevo
+    $("#confirm-add-park").on("click", async function () {
+      const btn = $(this);
+      const name = document.getElementById("add-park-name").value.trim();
+      const country = document.getElementById("add-park-country").value.trim();
+      const location = document
+        .getElementById("add-park-location")
+        .value.trim();
+      const year = document.getElementById("add-park-year").value.trim();
+      const website = document.getElementById("add-park-website").value.trim();
+      const price = document.getElementById("add-park-price").value.trim();
+      const coasterIds = document.getElementById("add-park-coasters-ids").value;
+      const imageFile = document.getElementById("add-park-image").files[0];
+
+      if (!name || !country || !location) {
+        document.getElementById("add-park-messages").classList.remove("d-none");
+        document.getElementById("add-park-error").classList.remove("d-none");
+        document
+          .getElementById("add-park-error")
+          .querySelector("span").textContent =
+          "Nombre, país y localización son obligatorios.";
+        return;
+      }
+
+      btn
+        .prop("disabled", true)
+        .html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Guardando...');
+
+      const fd = new FormData();
+      fd.append("action", "addPark");
+      fd.append("name", name);
+      fd.append("country", country);
+      fd.append("location", location);
+      if (year) fd.append("year", year);
+      if (website) fd.append("website", website);
+      if (price) fd.append("precio_entrada", price);
+      if (coasterIds) fd.append("coasterIds", coasterIds);
+      if (imageFile) fd.append("image", imageFile);
+
+      try {
+        const res = await fetch(`${parksApi}`, {
+          method: "POST",
+          body: fd,
+          credentials: "include",
+        });
+        const data = await res.json();
+        document.getElementById("add-park-messages").classList.remove("d-none");
+        if (data.success) {
+          document
+            .getElementById("add-park-success")
+            .classList.remove("d-none");
+          document
+            .getElementById("add-park-success")
+            .querySelector("span").textContent =
+            "Parque añadido correctamente.";
+          setTimeout(() => {
+            bootstrap.Modal.getInstance(
+              document.getElementById("modal-add-park"),
+            ).hide();
+            window.loadAdminParks(1);
+          }, 1200);
+        } else {
+          document.getElementById("add-park-error").classList.remove("d-none");
+          document
+            .getElementById("add-park-error")
+            .querySelector("span").textContent =
+            data.error || "Error al añadir el parque.";
+        }
+      } catch (err) {
+        document.getElementById("add-park-error").classList.remove("d-none");
+        document
+          .getElementById("add-park-error")
+          .querySelector("span").textContent = "Error de conexión.";
+      }
+      btn
+        .prop("disabled", false)
+        .html('<i class="fa-solid fa-plus me-2"></i>Añadir parque');
+    });
+
+    // Autocomplete países (add y edit)
+    ["add-park-country", "edit-park-country"].forEach((inputId) => {
+      const dropdownId =
+        inputId === "add-park-country"
+          ? "ac-dropdown-park-country"
+          : "ac-dropdown-edit-park-country";
+      if (!document.getElementById(inputId)) return;
+      initAutocomplete({
+        inputId,
+        dropdownId,
+        fetchItems: async (q) => {
+          const res = await fetch(
+            `${BASE_URL}/api/php/parks.php?action=country`,
+          );
+          const data = await res.json();
+          const all = data.data || [];
+          return all
+            .filter(
+              (c) => c && c.toLowerCase().includes((q || "").toLowerCase()),
+            )
+            .map((c) => ({ label: c, value: c }));
+        },
+        onSelect: () => {},
+      });
+    });
+
+    // ── Editar parque ────────────────────────────────────
+    $(document).on("click", ".btn-edit-park", function () {
+      const btn = $(this);
+      document.getElementById("edit-park-id").value = btn.data("id");
+      document.getElementById("edit-park-name").value = btn.data("name");
+      document.getElementById("edit-park-country").value = btn.data("country");
+      document.getElementById("edit-park-location").value =
+        btn.data("location");
+      document.getElementById("edit-park-year").value = btn.data("year");
+      document.getElementById("edit-park-website").value = btn.data("website");
+      document.getElementById("edit-park-price").value = btn.data("price");
+      document.getElementById("edit-park-messages").classList.add("d-none");
+
+      const prevImg = btn.data("img");
+      const prev = document.getElementById("edit-park-preview");
+      if (prevImg && prev) {
+        prev.src = prevImg.startsWith("/") ? BASE_URL + prevImg : prevImg;
+        prev.style.display = "block";
+      }
+
+      loadUnassignedCoasters(
+        "edit-park-coasters-list",
+        "edit-park-coasters-search",
+        "edit-park-coasters-ids",
+        btn.data("id"),
+      );
+      new bootstrap.Modal(document.getElementById("modal-edit-park")).show();
+    });
+
+    document
+      .getElementById("edit-park-image")
+      ?.addEventListener("change", function () {
+        const file = this.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const prev = document.getElementById("edit-park-preview");
+          prev.src = e.target.result;
+          prev.style.display = "block";
+          document.getElementById("edit-park-dropzone-text").textContent =
+            file.name;
+        };
+        reader.readAsDataURL(file);
+      });
+
+    $("#confirm-edit-park").on("click", async function () {
+      const btn = $(this);
+      const id = document.getElementById("edit-park-id").value;
+      const fd = new FormData();
+      fd.append("action", "editPark");
+      fd.append("id", id);
+      fd.append("name", document.getElementById("edit-park-name").value.trim());
+      fd.append(
+        "country",
+        document.getElementById("edit-park-country").value.trim(),
+      );
+      fd.append(
+        "location",
+        document.getElementById("edit-park-location").value.trim(),
+      );
+      fd.append("year", document.getElementById("edit-park-year").value.trim());
+      fd.append(
+        "website",
+        document.getElementById("edit-park-website").value.trim(),
+      );
+      fd.append(
+        "precio_entrada",
+        document.getElementById("edit-park-price").value.trim(),
+      );
+      fd.append(
+        "coasterIds",
+        document.getElementById("edit-park-coasters-ids").value,
+      );
+      const imgFile = document.getElementById("edit-park-image").files[0];
+      if (imgFile) fd.append("image", imgFile);
+
+      btn
+        .prop("disabled", true)
+        .html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Guardando...');
+
+      try {
+        const res = await fetch(`${parksApi}`, {
+          method: "POST",
+          body: fd,
+          credentials: "include",
+        });
+        const data = await res.json();
+        document
+          .getElementById("edit-park-messages")
+          .classList.remove("d-none");
+        if (data.success) {
+          document
+            .getElementById("edit-park-success")
+            .classList.remove("d-none");
+          document
+            .getElementById("edit-park-success")
+            .querySelector("span").textContent = "Cambios guardados.";
+          setTimeout(() => {
+            bootstrap.Modal.getInstance(
+              document.getElementById("modal-edit-park"),
+            ).hide();
+            window.loadAdminParks(adminParkPage);
+          }, 1000);
+        } else {
+          document.getElementById("edit-park-error").classList.remove("d-none");
+          document
+            .getElementById("edit-park-error")
+            .querySelector("span").textContent =
+            data.error || "Error al editar.";
+        }
+      } catch (err) {
+        console.error(err);
+      }
+      btn
+        .prop("disabled", false)
+        .html('<i class="fa-solid fa-floppy-disk me-2"></i>Guardar cambios');
+    });
+
+    // ── Eliminar parque ──────────────────────────────────
+    $(document).on("click", ".btn-delete-park", function () {
+      const id = $(this).data("id"),
+        name = $(this).data("name");
+      $("#delete-park-name").text(name);
+      $("#confirm-delete-park").attr("data-id", id);
+      new bootstrap.Modal(document.getElementById("modal-delete-park")).show();
+    });
+
+    $("#confirm-delete-park").on("click", async function () {
+      const btn = $(this);
+      const id = btn.attr("data-id");
+      btn
+        .prop("disabled", true)
+        .html('<i class="fa-solid fa-spinner fa-spin"></i>');
+      try {
+        const fd = new FormData();
+        fd.append("action", "deletePark");
+        fd.append("id", id);
+        const res = await fetch(`${parksApi}`, {
+          method: "POST",
+          body: fd,
+          credentials: "include",
+        });
+        const data = await res.json();
+        if (data.success) {
+          bootstrap.Modal.getInstance(
+            document.getElementById("modal-delete-park"),
+          ).hide();
+          window.loadAdminParks(adminParkPage);
+        } else {
+          alert(data.error || "Error al eliminar");
+        }
+      } catch (err) {
+        alert("Error de conexión");
+      }
+      btn
+        .prop("disabled", false)
+        .html('<i class="fa-solid fa-trash me-1"></i>Eliminar');
+    });
+
+    // ── Duplicar parque ──────────────────────────────────
+    $(document).on("click", ".btn-duplicate-park", function () {
+      const id = $(this).data("id"),
+        name = $(this).data("name");
+      $("#duplicate-park-name").text(name);
+      $("#confirm-duplicate-park").attr("data-id", id);
+      new bootstrap.Modal(
+        document.getElementById("modal-duplicate-park"),
+      ).show();
+    });
+
+    $("#confirm-duplicate-park").on("click", async function () {
+      const btn = $(this);
+      const id = btn.attr("data-id");
+      btn
+        .prop("disabled", true)
+        .html('<i class="fa-solid fa-spinner fa-spin"></i>');
+      try {
+        const fd = new FormData();
+        fd.append("action", "duplicatePark");
+        fd.append("id", id);
+        const res = await fetch(`${parksApi}`, {
+          method: "POST",
+          body: fd,
+          credentials: "include",
+        });
+        const data = await res.json();
+        if (data.success) {
+          bootstrap.Modal.getInstance(
+            document.getElementById("modal-duplicate-park"),
+          ).hide();
+          window.loadAdminParks(1);
+        } else {
+          alert(data.error || "Error al duplicar");
+        }
+      } catch (err) {
+        alert("Error de conexión");
+      }
+      btn
+        .prop("disabled", false)
+        .html('<i class="fa-solid fa-copy me-1"></i>Duplicar');
+    });
+
+    // ── Restaurar estado si viene de btn-new-park ────────
+    const pendingPark = sessionStorage.getItem("pendingParkFromCoaster");
+    if (pendingPark) {
+      sessionStorage.removeItem("pendingParkFromCoaster");
+      $("#btn-add-park").trigger("click");
+    }
+  }
 }
