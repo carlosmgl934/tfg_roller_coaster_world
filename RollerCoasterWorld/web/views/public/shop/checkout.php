@@ -23,12 +23,12 @@ if (!$is_logged) Router::redirect('login');
           </div>
           <div class="card-body text-center py-4">
             <p class="text-muted mb-2">Tu pedido ha sido registrado correctamente y está</p>
-            <h4 class="text-warning fw-bold mb-3"><i class="fa-solid fa-hourglass-half me-2"></i>Pendiente de confirmación</h4>
+            <h4 class="text-success fw-bold mb-3"><i class="fa-solid fa-circle-check me-2"></i>¡Pedido Confirmado!</h4>
             <div class="bg-dark border border-success rounded-0 py-3 px-4 mb-4 d-inline-block">
               <small class="text-muted d-block mb-1">Referencia del pedido</small>
               <span class="fw-bold fs-5 text-success font-monospace" id="success-order-ref">—</span>
             </div>
-            <p class="text-muted small mb-4">Recibirás tu entrada digital en cuanto un administrador confirme el pedido.</p>
+            <p class="text-muted small mb-4">Tus entradas digitales ya están disponibles en tu cuenta para descargar.</p>
             <div class="d-flex gap-3 justify-content-center flex-wrap">
               <a href="<?= Router::url('orders') ?>" class="btn btn-success fw-bold rounded-0 shadow-sm px-4">
                 <i class="fa-solid fa-ticket me-2"></i>Ver mis pedidos
@@ -96,9 +96,9 @@ if (!$is_logged) Router::redirect('login');
           </div>
           <div class="card-footer rounded-0 border-warning" style="background:rgba(255,193,7,.08);border-color:rgba(255,193,7,.3)!important;">
             <small class="text-warning">
-              <i class="fa-solid fa-triangle-exclamation me-1"></i>
-              <strong>Pago simulado:</strong> Al confirmar, el pedido quedará pendiente de validación por el equipo.
-            </small>
+                <i class="fa-solid fa-credit-card me-1"></i>
+                <strong>Pago simulado:</strong> Al confirmar, tus entradas se generarán automáticamente en tu cuenta.
+              </small>
           </div>
         </div>
       </div>
@@ -146,6 +146,19 @@ if (!$is_logged) Router::redirect('login');
         <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-success fw-bold rounded-0 px-4" id="btn-modal-confirm-order">Sí, confirmar</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast para mensajes (Diseño mejorado y centrado) -->
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 2000; margin-top: 85px;">
+  <div id="cart-toast" class="toast align-items-center text-white border-0 rounded-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" style="min-width: 350px;">
+    <div class="d-flex align-items-center p-3">
+      <div class="toast-body flex-grow-1 text-center fw-medium" style="font-size: 0.95rem;">
+        <i class="fa-solid fa-circle-info me-2" id="cart-toast-icon-tag"></i>
+        <span id="cart-toast-msg"></span>
+      </div>
+      <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
   </div>
 </div>

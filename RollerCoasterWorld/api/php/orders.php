@@ -27,6 +27,8 @@ function getUserId(): ?int {
 
 $router = new ApiRouter('my_orders');
 $router->register('my_orders', 'getMyOrders');
+$router->register('request_cancel', 'requestCancel', 'POST');
+$router->register('mark_refunds_notified', 'markRefundsNotified', 'POST');
 $router->dispatch();
 
 // ──────────────────────────────────────────────────────────
@@ -49,8 +51,64 @@ function getMyOrders() {
         ");
         $stmt->execute([':uid' => $userId]);
         $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        Response::success(['data' => $orders]);
+
+        // Buscar reembolsos no notificados
+        $stmtRefunds = $db->prepare("SELECT price FROM pedidos WHERE user_id = :uid AND status = 'cancelado' AND reembolso_notificado = FALSE");
+        $stmtRefunds->execute([':uid' => $userId]);
+        $unnotified = $stmtRefunds->fetchAll(PDO::FETCH_COLUMN);
+
+        Response::success([
+            'data' => $orders,
+            'unnotified_refunds' => $unnotified
+        ]);
     } catch (Exception $e) {
         Response::error('Error al obtener pedidos: ' . $e->getMessage(), 500);
+    }
+}
+
+/** Solicitar cancelación de un pedido */
+function requestCancel() {
+    $userId = getUserId();
+    if (!$userId) Response::error('No autenticado.', 401);
+
+    $orderId = (int)($_POST['order_id'] ?? 0);
+    if ($orderId <= 0) Response::error('ID inválido.', 400);
+
+    $db = getDb();
+    try {
+        // Solo puede solicitar si es su pedido, está confirmado y no ha pasado la fecha
+        $stmt = $db->prepare("
+            UPDATE pedidos 
+            SET status = 'solicitada_cancelacion' 
+            WHERE id = :id 
+              AND user_id = :uid 
+              AND status = 'confirmado'
+              AND visit_date >= CURRENT_DATE
+            RETURNING id
+        ");
+        $stmt->execute([':id' => $orderId, ':uid' => $userId]);
+        
+        if ($stmt->fetchColumn()) {
+            Response::success(['message' => 'Solicitud enviada correctamente.']);
+        } else {
+            Response::error('No es posible solicitar la cancelación de este pedido.', 400);
+        }
+    } catch (Exception $e) {
+        Response::error('Error: ' . $e->getMessage(), 500);
+    }
+}
+
+/** Marcar reembolsos como notificados */
+function markRefundsNotified() {
+    $userId = getUserId();
+    if (!$userId) Response::error('No autenticado.', 401);
+
+    $db = getDb();
+    try {
+        $stmt = $db->prepare("UPDATE pedidos SET reembolso_notificado = TRUE WHERE user_id = :uid AND status = 'cancelado' AND reembolso_notificado = FALSE");
+        $stmt->execute([':uid' => $userId]);
+        Response::success(['message' => 'Notificaciones actualizadas.']);
+    } catch (Exception $e) {
+        Response::error('Error: ' . $e->getMessage(), 500);
     }
 }

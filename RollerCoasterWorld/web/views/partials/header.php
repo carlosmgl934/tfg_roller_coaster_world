@@ -415,7 +415,7 @@ header("Expires: 0"); // Proxies
                       style="font-size:.65rem;padding:.25em .5em;">0</span>
                   </a></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('orders') ?>"><i
-                      class="fa-solid fa-box w-20px text-center me-2 text-info"></i> Mis pedidos</a></li>
+                      class="fa-solid fa-ticket w-20px text-center me-2 text-info"></i> Mis entradas</a></li>
                 <li>
                   <hr class="dropdown-divider">
                 </li>

@@ -24,6 +24,7 @@ $router->register('list',    'listAllOrders');
 $router->register('confirm', 'confirmOrder', 'POST');
 $router->register('cancel',  'cancelOrder',  'POST');
 $router->register('pending_count', 'getPendingCount');
+$router->register('cancellations_count', 'getPendingCancellations');
 $router->dispatch();
 
 // ──────────────────────────────────────────────────────────
@@ -31,6 +32,7 @@ $router->dispatch();
 /** Listar todos los pedidos con filtros */
 function listAllOrders() {
     requireAdmin();
+    runMonthlyCleanup();
     $db = getDb();
 
     $where  = ['1=1'];
@@ -101,7 +103,7 @@ function cancelOrder() {
 
     $db = getDb();
     try {
-        $stmt = $db->prepare("UPDATE pedidos SET status = 'cancelado' WHERE id = :id AND status = 'pendiente' RETURNING id");
+        $stmt = $db->prepare("UPDATE pedidos SET status = 'cancelado' WHERE id = :id AND status IN ('pendiente', 'confirmado', 'solicitada_cancelacion') RETURNING id");
         $stmt->execute([':id' => $orderId]);
         if ($stmt->fetchColumn()) {
             Response::success(['message' => 'Pedido cancelado.']);
@@ -118,5 +120,55 @@ function getPendingCount() {
     requireAdmin();
     $db = getDb();
     $count = $db->query("SELECT COUNT(*) FROM pedidos WHERE status = 'pendiente'")->fetchColumn();
+    Response::success(['count' => (int)$count]);
+}
+
+/** Limpieza automática mensual de pedidos antiguos */
+function runMonthlyCleanup() {
+    // 1. Solo ejecutar si hoy es día 15 o posterior
+    if ((int)date('d') < 15) return;
+
+    $db = getDb();
+    
+    // 2. Obtener el último mes limpiado
+    $stmt = $db->prepare("SELECT valor FROM app_config WHERE clave = 'last_cleanup_month'");
+    $stmt->execute();
+    $lastCleanup = $stmt->fetchColumn();
+
+    // 3. Calcular el mes anterior al actual (formato YYYY-MM)
+    $targetMonth = date('Y-m', strtotime('first day of last month'));
+
+    // 4. Si ya se limpió este mes, salir
+    if ($lastCleanup === $targetMonth) return;
+
+    try {
+        $db->beginTransaction();
+
+        // 5. Borrar registros: confirmados/cancelados cuya visita sea anterior al mes actual
+        $stmtDelete = $db->prepare("
+            DELETE FROM pedidos 
+            WHERE status IN ('confirmado', 'cancelado') 
+              AND visit_date < DATE_TRUNC('month', CURRENT_DATE)
+        ");
+        $stmtDelete->execute();
+
+        // 6. Actualizar el flag en la configuración
+        $stmtUpdate = $db->prepare("
+            INSERT INTO app_config (clave, valor) VALUES ('last_cleanup_month', :val)
+            ON CONFLICT (clave) DO UPDATE SET valor = EXCLUDED.valor
+        ");
+        $stmtUpdate->execute([':val' => $targetMonth]);
+
+        $db->commit();
+    } catch (Exception $e) {
+        if ($db->inTransaction()) $db->rollBack();
+    }
+}
+
+/** Contar solicitudes de cancelación pendientes */
+function getPendingCancellations() {
+    requireAdmin();
+    $db = getDb();
+    $count = $db->query("SELECT COUNT(*) FROM pedidos WHERE status = 'solicitada_cancelacion'")->fetchColumn();
     Response::success(['count' => (int)$count]);
 }

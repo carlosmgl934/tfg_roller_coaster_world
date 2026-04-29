@@ -192,7 +192,7 @@ function createOrder()
             INSERT INTO pedidos
               (user_id, park_id, ticket_type, visit_date, quantity, unit_price, price, buyer_name, buyer_email, status)
             VALUES
-              (:user_id, :park_id, :ticket_type, :visit_date, :quantity, :unit_price, :price, :buyer_name, :buyer_email, 'pendiente')
+              (:user_id, :park_id, :ticket_type, :visit_date, :quantity, :unit_price, :price, :buyer_name, :buyer_email, 'confirmado')
             RETURNING id
         ");
 
@@ -228,7 +228,7 @@ function createOrder()
 
         Response::success([
             'order_ids' => $createdOrders,
-            'message' => 'Pedido creado correctamente. Pendiente de confirmación.',
+            'message' => '¡Pedido confirmado! Ya puedes descargar tus entradas.',
         ]);
     } catch (Exception $e) {
         if ($db->inTransaction())

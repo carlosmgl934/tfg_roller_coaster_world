@@ -30,14 +30,14 @@ const typeLabel = (t) =>
   t === "pase_rapido" ? "Pase Rápido" : "Entrada General";
 const statusBadge = (s) => {
   const map = {
-    pendiente: "badge-pendiente",
     confirmado: "badge-confirmado",
     cancelado: "badge-cancelado",
+    solicitada_cancelacion: "badge-pendiente",
   };
   const lbl = {
-    pendiente: "Pendiente",
     confirmado: "Confirmado",
     cancelado: "Cancelado",
+    solicitada_cancelacion: "Reembolso solicitado",
   };
   return `<span class="status-badge ${map[s] || ""}">${lbl[s] || s}</span>`;
 };
@@ -475,10 +475,16 @@ async function confirmOrder() {
   const email = document.getElementById("checkout-email")?.value.trim();
 
   if (!name || !email) {
-    bootstrap.Modal.getInstance(
-      document.getElementById("modal-confirm-order"),
-    ).hide();
-    showToast("Completa tu nombre y email antes de confirmar", "error");
+    const modalEl = document.getElementById("modal-confirm-order");
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    if (modal) modal.hide();
+
+    // Pequeño retardo para que la animación del modal no oculte el toast
+    setTimeout(() => {
+      showToast("Por favor, rellena tu nombre y email para recibir las entradas", "error");
+      if (!name) document.getElementById("checkout-name").focus();
+      else if (!email) document.getElementById("checkout-email").focus();
+    }, 400);
     return;
   }
 
@@ -522,6 +528,21 @@ async function initOrders() {
   if (!document.getElementById("orders-activas")) return;
   const res = await apiGet(ORDERS_API + "?action=my_orders");
   document.getElementById("orders-loading")?.remove();
+
+  // Notificación de reembolsos procesados
+  if (res.unnotified_refunds && res.unnotified_refunds.length > 0) {
+    const total = res.unnotified_refunds.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+    const msgEl = document.getElementById("refund-notice-msg");
+    const modalEl = document.getElementById("refundNoticeModal");
+    if (msgEl && modalEl) {
+      msgEl.innerHTML = `Se te han reembolsado <strong>${fmt(total)}</strong> de tus entradas canceladas.`;
+      const modal = new bootstrap.Modal(modalEl);
+      modal.show();
+
+      // Marcamos como notificados inmediatamente al mostrar el aviso
+      apiPost(ORDERS_API + "?action=mark_refunds_notified", {});
+    }
+  }
   const today = new Date().toISOString().split("T")[0];
   const all = res.orders || res.data || [];
   const activas = all.filter(
@@ -561,6 +582,37 @@ async function initOrders() {
         .classList.toggle("d-none", tab !== "pasadas");
     });
   });
+
+  // Evento para solicitar cancelación
+  document.querySelectorAll(".btn-request-cancel").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const modalEl = document.getElementById("refundConfirmModal");
+      if (!modalEl) return;
+
+      const modal = new bootstrap.Modal(modalEl);
+      const confirmBtn = document.getElementById("btn-confirm-refund-modal");
+
+      // Clonar para limpiar eventos previos
+      const newConfirmBtn = confirmBtn.cloneNode(true);
+      confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+      newConfirmBtn.addEventListener("click", async () => {
+        newConfirmBtn.disabled = true;
+        const res = await apiPost(ORDERS_API + "?action=request_cancel", {
+          order_id: btn.dataset.id,
+        });
+        modal.hide();
+        if (res.success) {
+          showToast("Solicitud enviada correctamente");
+          initOrders();
+        } else {
+          showToast(res.error || "Error al procesar la solicitud", "error");
+        }
+      });
+
+      modal.show();
+    });
+  });
 }
 
 function renderTicket(o) {
@@ -571,6 +623,22 @@ function renderTicket(o) {
          <i class="fa-solid fa-download me-1"></i>PDF
        </a>`
       : `<span class="text-muted small text-center d-block" style="font-size:.72rem;">Pendiente<br>de confirmación</span>`;
+
+  const today = new Date().toISOString().split("T")[0];
+  const canCancel = o.status === "confirmado" && o.visit_date >= today;
+
+  const refundAction = canCancel
+    ? `<a href="javascript:void(0)" class="btn-request-cancel text-danger text-decoration-none d-block text-center mt-2 fw-semibold" 
+          data-id="${o.id}" style="font-size: .72rem; opacity: 0.8; transition: all 0.2s;"
+          onmouseover="this.style.opacity='1'; this.style.textDecoration='underline'" 
+          onmouseout="this.style.opacity='0.8'; this.style.textDecoration='none'">
+         <i class="fa-solid fa-rotate-left me-1"></i>Solicitar devolución
+       </a>`
+    : o.status === "solicitada_cancelacion"
+      ? `<span class="text-warning small d-block text-center mt-2 fw-bold" style="font-size:.68rem;">
+           <i class="fa-solid fa-clock-rotate-left me-1"></i>Reembolso en proceso
+         </span>`
+      : "";
 
   return `
     <div class="ticket-card">
@@ -599,6 +667,7 @@ function renderTicket(o) {
         <div class="tc-total">${fmt(o.price)}</div>
         <div class="tc-code">${code}</div>
         ${pdfLink}
+        ${refundAction}
       </div>
     </div>`;
 }
@@ -616,7 +685,7 @@ function emptyOrders() {
 async function initAdminOrders() {
   if (!document.getElementById("admin-orders-tbody")) return;
   await loadAdminOrders();
-  await loadPendingCount();
+  await loadCancellationCount();
 
   document
     .getElementById("filter-status")
@@ -672,19 +741,13 @@ async function loadAdminOrders() {
       <td>${statusBadge(o.status)}</td>
       <td class="text-muted" style="font-size:.75rem;">${new Date(o.created_at).toLocaleDateString("es-ES")}</td>
       <td class="text-center">
-        ${
-          o.status === "pendiente"
-            ? `
-          <div class="d-flex gap-1 justify-content-center">
-            <button class="btn btn-success btn-sm rounded-0 btn-confirm-order" data-id="${o.id}" title="Confirmar" style="font-size:.72rem;padding:3px 8px;">
-              <i class="fa-solid fa-check"></i>
-            </button>
+        <div class="d-flex gap-1 justify-content-center">
+          ${(o.status === "confirmado" || o.status === "solicitada_cancelacion") ? `
             <button class="btn btn-outline-danger btn-sm rounded-0 btn-cancel-order" data-id="${o.id}" title="Cancelar" style="font-size:.72rem;padding:3px 8px;">
               <i class="fa-solid fa-xmark"></i>
             </button>
-          </div>`
-            : '<span class="text-muted" style="font-size:.72rem;">-"</span>'
-        }
+          ` : '<span class="text-muted" style="font-size:.72rem;">-</span>'}
+        </div>
       </td>
     </tr>
   `,
@@ -783,15 +846,43 @@ async function loadPendingCount() {
   if (el) el.textContent = res.count ?? res.data?.count ?? "-";
 }
 
+async function loadCancellationCount() {
+  const res = await apiGet(ADMIN_ORDERS_API + "?action=cancellations_count");
+  const count = res.count ?? 0;
+  const wrap = document.getElementById("refund-alert-wrap");
+  const textEl = document.getElementById("admin-refunds-text");
+  if (wrap && textEl) {
+    if (count > 0) {
+      const plural = count > 1 ? "es" : "";
+      const pending = count > 1 ? "s" : "";
+      textEl.textContent = `¡${count} devolución${plural} pendiente${pending}!`;
+      wrap.classList.remove("d-none");
+    } else {
+      wrap.classList.add("d-none");
+    }
+  }
+}
+
 /* ...........................................................
    TOAST
    ........................................................... */
 function showToast(msg, type = "success") {
   const toastEl = document.getElementById("cart-toast");
   if (!toastEl) return;
-  document.getElementById("cart-toast-msg").textContent = msg;
-  toastEl.style.borderColor =
-    type === "error" ? "#dc3545" : "var(--rcw-green-neon)";
+  const msgEl = document.getElementById("cart-toast-msg");
+  if (msgEl) msgEl.textContent = msg;
+
+  const icon = document.getElementById("cart-toast-icon-tag");
+  if (icon) {
+    icon.className =
+      type === "error"
+        ? "fa-solid fa-circle-xmark me-2"
+        : "fa-solid fa-circle-check me-2";
+  }
+
+  toastEl.classList.remove("bg-dark", "bg-danger");
+  toastEl.classList.add(type === "error" ? "bg-danger" : "bg-dark");
+
   new bootstrap.Toast(toastEl, { delay: 3500 }).show();
 }
 /* ...........................................................

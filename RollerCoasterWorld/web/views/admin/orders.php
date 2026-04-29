@@ -17,8 +17,17 @@ if (!$is_logged || !$is_admin)
         <p class="text-muted mb-0">Confirma o cancela los pedidos de entradas de los usuarios</p>
       </div>
       <div class="d-flex align-items-center gap-2">
-        <span class="text-muted">Pendientes:</span>
-        <span class="badge bg-danger fs-5 px-3 py-2" id="admin-pending-count">—</span>
+        <div id="refund-alert-wrap" class="d-none">
+          <div class="bg-danger text-white p-2 shadow-sm text-center" style="border-radius: 4px; min-width: 220px; line-height: 1.2;">
+            <div class="fw-bold" style="font-size: 0.85rem;">
+              <i class="fa-solid fa-circle-exclamation me-1"></i>
+              <span id="admin-refunds-text">¡1 devolución pendiente!</span>
+            </div>
+            <div style="font-size: 0.6rem; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;">
+              Cancela su entrada para hacer el reembolso
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -34,8 +43,8 @@ if (!$is_logged || !$is_admin)
           <label class="form-label small text-muted fw-semibold mb-1">Estado</label>
           <select id="filter-status" class="form-select shadow-sm rounded-0" style="width:auto;">
             <option value="">Todos</option>
-            <option value="pendiente" selected>Pendientes</option>
-            <option value="confirmado">Confirmados</option>
+            <option value="confirmado" selected>Confirmados</option>
+            <option value="solicitada_cancelacion">Solicitudes de cancelación</option>
             <option value="cancelado">Cancelados</option>
           </select>
         </div>
@@ -137,6 +146,19 @@ if (!$is_logged || !$is_admin)
           <i class="fa-solid fa-xmark me-1"></i>Sí, cancelar
         </button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast para mensajes (Admin) -->
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 2000; margin-top: 20px;">
+  <div id="cart-toast" class="toast align-items-center text-white border-0 rounded-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" style="min-width: 350px;">
+    <div class="d-flex align-items-center p-3">
+      <div class="toast-body flex-grow-1 text-center fw-medium" style="font-size: 0.95rem;">
+        <i class="fa-solid fa-circle-info me-2" id="cart-toast-icon-tag"></i>
+        <span id="cart-toast-msg"></span>
+      </div>
+      <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
   </div>
 </div>
