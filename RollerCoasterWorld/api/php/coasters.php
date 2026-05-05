@@ -1,5 +1,17 @@
 <?php
 session_start();
+
+// Asegurar que tenemos el user_id de la BD si hay sesión de Firebase
+if (isset($_SESSION['firebase_uid']) && !isset($_SESSION['user_id'])) {
+    require_once __DIR__ . '/../database/db_conexion.php';
+    $db_init = new DBConexion();
+    $stmt_init = $db_init->prepare("SELECT id FROM users WHERE firebase_uid = :uid LIMIT 1");
+    $stmt_init->execute([':uid' => $_SESSION['firebase_uid']]);
+    $user_init = $stmt_init->fetch(PDO::FETCH_ASSOC);
+    if ($user_init) {
+        $_SESSION['user_id'] = (int)$user_init['id'];
+    }
+}
 require_once __DIR__ . '/../database/db_conexion.php';
 
 header('Content-Type: application/json');
@@ -24,6 +36,7 @@ $router->register('save_review', 'saveReview', 'POST');
 $router->register('save_photo', 'savePhoto', 'POST');
 $router->register('like_photo', 'likePhoto', 'POST');
 $router->register('check_review', 'checkReview');
+$router->register('update_review', 'updateReview', 'POST');
 $router->register('user_tops', 'getUserCoasterTops');
 $router->register('ranking', 'getRanking');
 $router->register('all_reviews', 'getAllReviews');
@@ -413,29 +426,35 @@ function getCoasterReviews()
         Response::error('ID no válido');
     }
 
+    $currentUserId = $_SESSION['user_id'] ?? 0;
+
     $orderSql = match ($order) {
         'recent' => 'cr.created_at DESC',
-        'best' => 'cr.note DESC',
-        'worst' => 'cr.note ASC',
-        default => 'cr.created_at DESC'
+        'best'   => 'cr.note DESC',
+        'worst'  => 'cr.note ASC',
+        default  => 'cr.created_at DESC'
     };
 
     try {
         global $db;
-        $sql = "SELECT cr.id, cr.note, cr.review, cr.created_at, users.username, users.profile_image, 
+        // La reseña del usuario actual siempre aparece la primera
+        $sql = "SELECT cr.id, cr.note, cr.review, cr.created_at,
+                       cr.user_id,
+                       users.username, users.profile_image,
                        (SELECT json_agg(json_build_object('tag', rt.tag, 'type', rt.type))
                         FROM review_tags rt WHERE rt.review_id = cr.id) AS tags
                 FROM coaster_ratings AS cr
                 INNER JOIN users ON cr.user_id = users.id
-                WHERE cr.coaster_id = :id
-                ORDER BY $orderSql";
+                WHERE cr.coaster_id = :id AND cr.is_hidden = FALSE
+                ORDER BY (cr.user_id = :current_user) DESC, $orderSql";
 
-        $sql_count = "SELECT COUNT(*) FROM coaster_ratings WHERE coaster_id = :id";
+        $sql_count = "SELECT COUNT(*) FROM coaster_ratings WHERE coaster_id = :id AND is_hidden = FALSE";
 
         $stmt = $db->prepare($sql);
         $stmt_count = $db->prepare($sql_count);
 
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':current_user', $currentUserId, PDO::PARAM_INT);
         $stmt_count->bindValue(':id', $id, PDO::PARAM_INT);
 
         $stmt->execute();
@@ -577,11 +596,80 @@ function checkReview()
 
     try {
         global $db;
-        $stmt = $db->prepare("SELECT COUNT(*) FROM coaster_ratings WHERE user_id = :user_id AND coaster_id = :coaster_id");
+        $stmt = $db->prepare("
+            SELECT cr.id, cr.note, cr.review,
+                   (SELECT json_agg(json_build_object('tag', rt.tag, 'type', rt.type))
+                    FROM review_tags rt WHERE rt.review_id = cr.id) AS tags
+            FROM coaster_ratings cr
+            WHERE cr.user_id = :user_id AND cr.coaster_id = :coaster_id
+            LIMIT 1
+        ");
         $stmt->execute([':user_id' => $_SESSION['user_id'], ':coaster_id' => $coasterId]);
-        Response::success(['hasReviewed' => $stmt->fetchColumn() > 0]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            $row['tags'] = $row['tags'] ? json_decode($row['tags'], true) : [];
+            Response::success(['hasReviewed' => true, 'review' => $row]);
+        } else {
+            Response::success(['hasReviewed' => false]);
+        }
     } catch (PDOException $e) {
         Response::error('Error comprobando estado de reseña');
+    }
+}
+
+function updateReview()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        Response::error('Método no permitido', 405);
+    }
+    if (!isset($_SESSION['user_id'])) {
+        Response::unauthorized();
+    }
+
+    $userId    = (int) $_SESSION['user_id'];
+    $reviewId  = (int) ($_POST['review_id'] ?? 0);
+    $note      = (float) ($_POST['note'] ?? 0);
+    $reviewTxt = trim($_POST['review'] ?? '');
+    $pros      = $_POST['pros'] ?? [];
+    $contras   = $_POST['contras'] ?? [];
+
+    if ($reviewId <= 0 || $note <= 0) {
+        Response::error('Datos inválidos', 400);
+    }
+
+    try {
+        global $db;
+        // Verificar que la reseña pertenece al usuario
+        $check = $db->prepare("SELECT coaster_id FROM coaster_ratings WHERE id = :id AND user_id = :uid");
+        $check->execute([':id' => $reviewId, ':uid' => $userId]);
+        $row = $check->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
+            Response::error('Reseña no encontrada o sin permiso', 403);
+        }
+        $coasterId = (int) $row['coaster_id'];
+
+        $db->beginTransaction();
+
+        // Actualizar nota y texto
+        $db->prepare("UPDATE coaster_ratings SET note = :note, review = :review WHERE id = :id")
+           ->execute([':note' => $note, ':review' => empty($reviewTxt) ? null : $reviewTxt, ':id' => $reviewId]);
+
+        // Regenerar tags
+        $db->prepare("DELETE FROM review_tags WHERE review_id = :id")->execute([':id' => $reviewId]);
+        $tagStmt = $db->prepare("INSERT INTO review_tags (review_id, tag, type) VALUES (:review_id, :tag, :type)");
+        foreach ((array)$pros as $tag) {
+            $tagStmt->execute([':review_id' => $reviewId, ':tag' => $tag, ':type' => 'pro']);
+        }
+        foreach ((array)$contras as $tag) {
+            $tagStmt->execute([':review_id' => $reviewId, ':tag' => $tag, ':type' => 'con']);
+        }
+
+        $db->commit();
+        StatsHelper::updateCoasterStats($coasterId);
+        Response::success();
+    } catch (PDOException $e) {
+        if ($db->inTransaction()) $db->rollBack();
+        Response::error('Error al actualizar reseña: ' . $e->getMessage());
     }
 }
 
@@ -832,13 +920,13 @@ function getAllReviews()
 
     try {
         global $db;
-        $whereClause = "";
+        $whereClause = "WHERE coaster_ratings.is_hidden = FALSE";
         $params = [];
 
         // Si han escrito algo en el buscador
         if ($search !== "") {
-            $whereClause = "WHERE (unaccent(coasters.coaster_name) ILIKE unaccent(:search) 
-                               OR unaccent(users.username) ILIKE unaccent(:search))";
+            $whereClause .= " AND (unaccent(coasters.coaster_name) ILIKE unaccent(:search) 
+                                OR unaccent(users.username) ILIKE unaccent(:search))";
             $params[':search'] = "%" . $search . "%";
         }
 
@@ -852,11 +940,7 @@ function getAllReviews()
                         (f.solicitante_id = :my_id AND f.solicitada_id = users.id)
                      OR (f.solicitada_id = :my_id AND f.solicitante_id = users.id)
                      )";
-            if ($whereClause === "") {
-                $whereClause = "WHERE f.estado_solicitud = 'ACEPTADA'";
-            } else {
-                $whereClause .= " AND f.estado_solicitud = 'ACEPTADA'";
-            }
+            $whereClause .= " AND f.estado_solicitud = 'ACEPTADA'";
             $params[':my_id'] = $_SESSION['user_id'];
         }
 

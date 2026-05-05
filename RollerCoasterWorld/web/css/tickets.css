@@ -101,3 +101,46 @@
     flex-direction: row; min-width: auto;
   }
 }
+
+/* -- Wizard de compra (2 pasos) ----------------------------- */
+.step-tab {
+  color: rgba(255,255,255,.4);
+  font-weight: 600;
+  border-bottom: 3px solid transparent;
+  transition: color .2s, border-color .2s;
+}
+.step-tab.active {
+  color: #fff;
+  border-bottom-color: #198754;
+}
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  background: rgba(255,255,255,.12);
+  font-size: .7rem;
+  font-weight: 800;
+  transition: background .2s;
+}
+.step-tab.active .step-num {
+  background: #198754;
+  color: #fff;
+}
+
+/* -- Add-on cards ------------------------------------------- */
+.addon-card {
+  background: #141b25;
+  border-width: 2px !important;
+  transition: border-color .2s, background .2s, transform .15s;
+  user-select: none;
+}
+.addon-card:hover {
+  background: #1a2232;
+  transform: translateY(-1px);
+}
+.addon-card.border-success {
+  background: rgba(25,135,84,.08) !important;
+}

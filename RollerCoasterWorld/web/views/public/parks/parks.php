@@ -244,6 +244,44 @@ require_once __DIR__ . '/../../partials/header.php';
 
 </main>
 
+<!-- MODAL EDITAR RESEÑA (parque) -->
+<div class="modal fade" id="edit-review-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark border-secondary text-white">
+      <div class="modal-header bg-success">
+        <h5 class="modal-title fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i>Editar reseña</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="edit-review-id">
+        <div class="mb-3">
+          <label class="form-label text-muted small fw-semibold">Puntuación</label>
+          <div class="star-rating edit-star-rating-container" style="font-size: 2rem;">
+            <?php for ($i = 10; $i >= 1; $i--):
+              $value = $i / 2;
+              $half = ($i % 2 !== 0);
+            ?>
+              <input type="radio" name="edit_note" id="pestar<?= $i ?>" value="<?= $value ?>">
+              <label for="pestar<?= $i ?>" class="<?= $half ? 'half' : 'full' ?>" title="<?= $value ?>"></label>
+            <?php endfor; ?>
+          </div>
+          <input type="hidden" id="edit-review-note" value="0">
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-muted small fw-semibold">Reseña (opcional)</label>
+          <textarea class="form-control bg-dark text-white border-secondary rounded-0" id="edit-review-text" rows="4" placeholder="Escribe tu opinión..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer border-secondary">
+        <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success rounded-0 fw-bold px-4" id="save-edit-review-btn">
+          <i class="fa-solid fa-floppy-disk me-1"></i>Guardar cambios
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <?php
 $login_msg = 'Para subir fotos o escribir reseñas necesitas iniciar sesión.';
@@ -252,4 +290,8 @@ require_once __DIR__ . '/../../partials/login_modal.php';
 
 <?php require_once __DIR__ . '/../../partials/footer.php';?>
 
+<script>
+  window.CURRENT_USER_ID = <?= isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 'null' ?>;
+  window.CURRENT_USERNAME = <?= isset($_SESSION['username']) ? json_encode($_SESSION['username']) : 'null' ?>;
+</script>
 <script src="<?= Router::asset('web/js/parks/parks.js') ?>?v=<?= time() ?>"></script>

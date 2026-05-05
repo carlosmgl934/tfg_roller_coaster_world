@@ -18,7 +18,7 @@ require_once __DIR__ . '/../partials/header.php';
       <p class="brand-sub">Descubre, colecciona y comparte<br>tus experiencias en montañas rusas.</p>
       <div class="brand-stats">
         <div class="stat-pill"><i class="fa-solid fa-bolt"></i> +13.000 coasters</div>
-        <div class="stat-pill"><i class="fa-solid fa-tree-city"></i> +5500 parques</div>
+        <div class="stat-pill"><i class="fa-solid fa-tree-city"></i> +5000 parques</div>
         <div class="stat-pill"><i class="fa-solid fa-earth-europe"></i> 70+ países</div>
       </div>
     </div>

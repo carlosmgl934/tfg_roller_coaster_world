@@ -161,13 +161,17 @@ $(document).ready(function () {
         e.preventDefault();
         index = (index + 1) % $items.length;
         $items.removeClass("bg-secondary border-success active text-white");
-        $items.eq(index).addClass("bg-secondary border-success active text-white");
+        $items
+          .eq(index)
+          .addClass("bg-secondary border-success active text-white");
         $items.eq(index)[0].scrollIntoView({ block: "nearest" });
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         index = index - 1 < 0 ? $items.length - 1 : index - 1;
         $items.removeClass("bg-secondary border-success active text-white");
-        $items.eq(index).addClass("bg-secondary border-success active text-white");
+        $items
+          .eq(index)
+          .addClass("bg-secondary border-success active text-white");
         $items.eq(index)[0].scrollIntoView({ block: "nearest" });
       } else if (e.key === "Enter") {
         e.preventDefault();
@@ -296,7 +300,7 @@ $(document).ready(function () {
             document.querySelector("#country-filter").appendChild(option);
           });
         }
-        
+
         // Inicializar autocompletado de parques (sustituye a la carga masiva)
         initAutocomplete({
           inputId: "filter-park-search",
@@ -317,7 +321,6 @@ $(document).ready(function () {
             document.getElementById("park-filter").value = item.id;
           },
         });
-
       } catch (e) {
         console.warn("Error cargando filtros:", e);
       }
@@ -1050,13 +1053,30 @@ $(document).ready(function () {
               });
               tagsHtml += "</div>";
             }
+
+            const isOwn = (window.CURRENT_USER_ID && parseInt(review.user_id) === window.CURRENT_USER_ID) || 
+                          (window.CURRENT_USERNAME && review.username === window.CURRENT_USERNAME);
+
+            const editBtn = isOwn
+              ? `<button class="btn btn-link p-0 ms-auto text-warning edit-review-btn"
+                   data-id="${review.id}"
+                   data-note="${review.note}"
+                   data-text="${encodeURIComponent(review.review || "")}"
+                   title="Editar mi reseña"
+                   style="font-size:1.1rem;line-height:1;text-decoration:none;">
+                   <i class="fa-solid fa-pen-to-square me-1"></i>
+                   <span style="font-size:0.75rem;font-weight:600;text-transform:uppercase;vertical-align:middle;">Editar reseña</span>
+                 </button>`
+              : "";
+
             $("#reviews-list").append(
-              `<div class="border-bottom pb-3 mb-3">
+              `<div class="border-bottom pb-3 mb-3${isOwn ? " own-review" : ""}">
               <div class="d-flex align-items-center gap-2 mb-1">
                 <img src="${window.rcwGetAvatarPath(review.profile_image, review.username)}" alt="${review.username}" class="review-avatar" style="width:40px;height:40px;object-fit:cover;border-radius:50%;background:#2d333b;" onerror="this.src='${window.BASE_URL}/web/img/avatars/default_avatar.svg';this.onerror=null;">
                 <strong>${review.username}</strong>
                 <span class="stars-display ms-2">${renderStars(review.note)}</span>
                 <span class="text-muted small ms-2">• ${timeAgo(review.created_at)}</span>
+                ${editBtn}
               </div>
               ${tagsHtml}
               <p class="mb-0 mt-3 text-white-50" style="font-size:0.9rem; line-height:1.6;">${review.review || ""}</p>
@@ -1068,6 +1088,76 @@ $(document).ready(function () {
         console.error("Error cargando reseñas:", e);
       }
     }
+
+    // ── Lógica modal de edición de reseña (coasters) ─────────────────────────
+    let editReviewModal = null;
+    const editModalEl = document.getElementById("edit-review-modal");
+    if (editModalEl && typeof bootstrap !== "undefined") {
+      editReviewModal = new bootstrap.Modal(editModalEl);
+    }
+
+    // Actualizar nota oculta cuando cambia el radio
+    $(document).on("change", 'input[name="edit_note"]', function () {
+      $("#edit-review-note").val($(this).val());
+    });
+
+    // Abrir modal al pulsar lápiz
+    $(document).on("click", ".edit-review-btn", function () {
+      const id = $(this).data("id");
+      const note = parseFloat($(this).data("note")) || 0;
+      const text = decodeURIComponent($(this).data("text") || "");
+
+      $("#edit-review-id").val(id);
+      $("#edit-review-note").val(note);
+      $("#edit-review-text").val(text);
+
+      // Marcar el radio correspondiente
+      $(`input[name="edit_note"][value="${note}"]`).prop("checked", true);
+
+      if (editReviewModal) editReviewModal.show();
+    });
+
+    // Guardar cambios
+    $(document).on("click", "#save-edit-review-btn", async function () {
+      const btn = $(this);
+      const reviewId = $("#edit-review-id").val();
+      const note = parseFloat($("#edit-review-note").val()) || 0;
+      const text = $("#edit-review-text").val().trim();
+
+      if (!note) {
+        alert("Por favor, selecciona una puntuación.");
+        return;
+      }
+
+      btn
+        .prop("disabled", true)
+        .html('<i class="fa-solid fa-spinner fa-spin me-1"></i>Guardando...');
+
+      const fd = new FormData();
+      fd.append("review_id", reviewId);
+      fd.append("note", note);
+      fd.append("review", text);
+
+      try {
+        const res = await fetch(
+          `${BASE_URL}/api/php/coasters.php?action=update_review`,
+          { method: "POST", body: fd },
+        );
+        const data = await res.json();
+        if (data.success) {
+          if (editReviewModal) editReviewModal.hide();
+          loadReviews($("#reviews-order").val() || "default");
+        } else {
+          alert("Error: " + (data.error || "No se pudo guardar."));
+        }
+      } catch (e) {
+        alert("Error de conexión.");
+      } finally {
+        btn
+          .prop("disabled", false)
+          .html('<i class="fa-solid fa-floppy-disk me-1"></i>Guardar cambios');
+      }
+    });
 
     if (coasterId) {
       loadCoastersData(coasterId);
@@ -1224,10 +1314,13 @@ $(document).ready(function () {
             uploadForm.append("bucket", "coasters");
             uploadForm.append("path", coasterId);
 
-            const uploadRes = await fetch(`${window.BASE_URL}/api/php/upload.php`, {
-              method: "POST",
-              body: uploadForm,
-            });
+            const uploadRes = await fetch(
+              `${window.BASE_URL}/api/php/upload.php`,
+              {
+                method: "POST",
+                body: uploadForm,
+              },
+            );
 
             // Leer como texto primero para detectar errores del servidor
             const rawText = await uploadRes.text();
@@ -1235,7 +1328,10 @@ $(document).ready(function () {
             try {
               uploadData = JSON.parse(rawText);
             } catch (e) {
-              throw new Error("El servidor devolvió una respuesta inválida: " + rawText.substring(0, 200));
+              throw new Error(
+                "El servidor devolvió una respuesta inválida: " +
+                  rawText.substring(0, 200),
+              );
             }
 
             if (!uploadData.success) {
@@ -1275,7 +1371,8 @@ $(document).ready(function () {
             } else {
               showNotify(
                 "Error al guardar",
-                "Error al guardar la foto: " + (saveData.error || "Desconocido"),
+                "Error al guardar la foto: " +
+                  (saveData.error || "Desconocido"),
                 true,
               );
             }

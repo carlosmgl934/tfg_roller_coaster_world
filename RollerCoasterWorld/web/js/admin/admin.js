@@ -3321,6 +3321,7 @@ if ($("#admin-news-list").length) {
 
   // Abrir Modal Añadir
   $(document).on("click", "#btn-add-news", function () {
+    clearNewsErrors();
     $("#modal-news-title-header").text("Añadir Noticia");
     $("#news-form-id").val("");
     $("#news-form-title").val("");
@@ -3340,6 +3341,7 @@ if ($("#admin-news-list").length) {
 
   // Abrir Modal Editar
   $(document).on("click", ".btn-edit-news", function () {
+    clearNewsErrors();
     const b = $(this);
     $("#modal-news-title-header").text("Editar Noticia");
     $("#news-form-id").val(b.data("id"));
@@ -3369,29 +3371,35 @@ if ($("#admin-news-list").length) {
   // Guardar / Actualizar (Usando FormData para archivos)
   $(document).on("click", "#btn-save-news", async function () {
     const btn = $(this);
+    clearNewsErrors();
     const id = $("#news-form-id").val();
     const action = id ? "updateNews" : "addNews";
 
+    const title = $("#news-form-title").val()?.trim() || "";
+    const tag = $("#news-form-tag").val()?.trim() || "";
+    const external_link = $("#news-form-link").val()?.trim() || "";
+    const description = $("#news-form-desc").val()?.trim() || "";
+    const image_url = $("#news-form-image").val()?.trim() || "";
+
+    if (!title || !description) {
+      showNewsModalError("Título y descripción son obligatorios");
+      if (!title) markNewsError("news-form-title");
+      if (!description) markNewsError("news-form-desc");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("id", id);
-    formData.append("title", $("#news-form-title").val().trim());
-    formData.append("tag", $("#news-form-tag").val().trim());
-    formData.append("external_link", $("#news-form-link").val().trim());
-    formData.append("description", $("#news-form-desc").val().trim());
-    formData.append("image_url", $("#news-form-image").val().trim());
+    formData.append("title", title);
+    formData.append("tag", tag);
+    formData.append("external_link", external_link);
+    formData.append("description", description);
+    formData.append("image_url", image_url);
     formData.append("is_featured", $("#news-form-featured").is(":checked"));
 
     const fileInput = document.getElementById("news-form-file");
-    if (fileInput.files.length > 0) {
+    if (fileInput && fileInput.files.length > 0) {
       formData.append("image", fileInput.files[0]);
-    }
-
-    if (
-      !$("#news-form-title").val().trim() ||
-      !$("#news-form-desc").val().trim()
-    ) {
-      alert("Título y descripción son obligatorios");
-      return;
     }
 
     btn.prop("disabled", true).text("Guardando...");
@@ -3411,11 +3419,11 @@ if ($("#admin-news-list").length) {
         if (m) m.hide();
         window.loadAdminNews(1);
       } else {
-        alert(data.error || "Error al guardar noticia");
+        showNewsModalError(data.error || "Error al guardar noticia");
       }
     } catch (err) {
       console.error("Error saving news:", err);
-      alert("Error de conexión al servidor");
+      showNewsModalError("Error de conexión al servidor");
     } finally {
       btn.prop("disabled", false).text("Guardar noticia");
     }
@@ -3454,7 +3462,30 @@ if ($("#admin-news-list").length) {
     }
   });
 
-  /* ════════════════════════════════════════════════════════
+function showNewsModalError(msg) {
+  const container = document.getElementById("news-form-messages");
+  const error = document.getElementById("news-form-error");
+  if (!container || !error) return;
+  container.classList.remove("d-none");
+  error.classList.remove("d-none");
+  error.textContent = msg;
+}
+
+function markNewsError(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add("field-error");
+}
+
+function clearNewsErrors() {
+  document.getElementById("news-form-messages")?.classList.add("d-none");
+  document.getElementById("news-form-error")?.classList.add("d-none");
+  document.querySelectorAll("#modal-news-form .field-error").forEach((el) => {
+    el.classList.remove("field-error");
+  });
+}
+
+/* ════════════════════════════════════════════════════════
      ADMIN PARKS
   ════════════════════════════════════════════════════════ */
   if (document.getElementById("admin-park-list")) {

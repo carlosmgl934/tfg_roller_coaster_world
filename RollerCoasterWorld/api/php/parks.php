@@ -1,5 +1,17 @@
 <?php
 session_start();
+
+// Asegurar que tenemos el user_id de la BD si hay sesión de Firebase
+if (isset($_SESSION['firebase_uid']) && !isset($_SESSION['user_id'])) {
+    require_once __DIR__ . '/../database/db_conexion.php';
+    $db_init = new DBConexion();
+    $stmt_init = $db_init->prepare("SELECT id FROM users WHERE firebase_uid = :uid LIMIT 1");
+    $stmt_init->execute([':uid' => $_SESSION['firebase_uid']]);
+    $user_init = $stmt_init->fetch(PDO::FETCH_ASSOC);
+    if ($user_init) {
+        $_SESSION['user_id'] = (int)$user_init['id'];
+    }
+}
 require_once __DIR__ . '/../database/db_conexion.php';
 require_once __DIR__ . '/utils/Response.php';
 require_once __DIR__ . '/utils/ApiRouter.php';
@@ -48,6 +60,7 @@ $router->register('country', 'getCountries');
 $router->register('details', 'getParkDetails');
 $router->register('reviews', 'getParkReviews');
 $router->register('save_review', 'saveReview', 'POST');
+$router->register('update_review', 'updateReview', 'POST');
 $router->register('check_review', 'checkReview');
 $router->register('top_global', 'getTopGlobalParks');
 $router->register('ranking', 'getRanking');
@@ -226,6 +239,8 @@ function getParkReviews()
         Response::error("ID de parque inválido", 400);
     }
 
+    $currentUserId = $_SESSION['user_id'] ?? 0;
+
     $orderBy = 'pr.created_at DESC';
     if ($order === 'best')
         $orderBy = 'pr.note DESC, pr.created_at DESC';
@@ -233,16 +248,18 @@ function getParkReviews()
         $orderBy = 'pr.note ASC, pr.created_at DESC';
 
     $stmt = $db->prepare("
-        SELECT pr.id, pr.review, pr.note, pr.created_at, u.username, u.profile_image,
+        SELECT pr.id, pr.review, pr.note, pr.created_at,
+               pr.user_id,
+               u.username, u.profile_image,
                (SELECT json_agg(json_build_object('tag', pt.tag, 'type', pt.type))
                 FROM park_review_tags pt WHERE pt.review_id = pr.id) AS tags
         FROM park_ratings pr
         JOIN users u ON pr.user_id = u.id
-        WHERE pr.park_id = :id
-        ORDER BY $orderBy
+        WHERE pr.park_id = :id AND pr.is_hidden = FALSE
+        ORDER BY (pr.user_id = :current_user) DESC, $orderBy
         LIMIT 50
     ");
-    $stmt->execute([':id' => $id]);
+    $stmt->execute([':id' => $id, ':current_user' => $currentUserId]);
     $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($reviews as &$r) {
@@ -493,11 +510,77 @@ function checkReview()
 
     try {
         $db = getDb();
-        $stmt = $db->prepare("SELECT COUNT(*) FROM park_ratings WHERE user_id = :user_id AND park_id = :park_id");
+        $stmt = $db->prepare("
+            SELECT pr.id, pr.note, pr.review,
+                   (SELECT json_agg(json_build_object('tag', pt.tag, 'type', pt.type))
+                    FROM park_review_tags pt WHERE pt.review_id = pr.id) AS tags
+            FROM park_ratings pr
+            WHERE pr.user_id = :user_id AND pr.park_id = :park_id
+            LIMIT 1
+        ");
         $stmt->execute([':user_id' => getUserId() ?: 0, ':park_id' => $parkId]);
-        Response::success(['hasReviewed' => $stmt->fetchColumn() > 0]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            $row['tags'] = $row['tags'] ? json_decode($row['tags'], true) : [];
+            Response::success(['hasReviewed' => true, 'review' => $row]);
+        } else {
+            Response::success(['hasReviewed' => false]);
+        }
     } catch (Exception $e) {
         Response::error("Error comprobando estado de reseña");
+    }
+}
+
+function updateReview()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        Response::error('Método no permitido', 405);
+    }
+    $userId = getUserId();
+    if (!$userId) {
+        Response::error('No autorizado', 401);
+    }
+
+    $reviewId  = (int) ($_POST['review_id'] ?? 0);
+    $note      = (float) ($_POST['note'] ?? 0);
+    $reviewTxt = trim($_POST['review'] ?? '');
+    $pros      = $_POST['pros'] ?? [];
+    $contras   = $_POST['contras'] ?? [];
+
+    if ($reviewId <= 0 || $note <= 0) {
+        Response::error('Datos inválidos', 400);
+    }
+
+    try {
+        $db = getDb();
+        $check = $db->prepare("SELECT park_id FROM park_ratings WHERE id = :id AND user_id = :uid");
+        $check->execute([':id' => $reviewId, ':uid' => $userId]);
+        $row = $check->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
+            Response::error('Reseña no encontrada o sin permiso', 403);
+        }
+        $parkId = (int) $row['park_id'];
+
+        $db->beginTransaction();
+
+        $db->prepare("UPDATE park_ratings SET note = :note, review = :review WHERE id = :id")
+           ->execute([':note' => $note, ':review' => empty($reviewTxt) ? null : $reviewTxt, ':id' => $reviewId]);
+
+        $db->prepare("DELETE FROM park_review_tags WHERE review_id = :id")->execute([':id' => $reviewId]);
+        $tagStmt = $db->prepare("INSERT INTO park_review_tags (review_id, tag, type) VALUES (:review_id, :tag, :type)");
+        foreach ((array)$pros as $tag) {
+            $tagStmt->execute([':review_id' => $reviewId, ':tag' => $tag, ':type' => 'pro']);
+        }
+        foreach ((array)$contras as $tag) {
+            $tagStmt->execute([':review_id' => $reviewId, ':tag' => $tag, ':type' => 'con']);
+        }
+
+        $db->commit();
+        StatsHelper::updateParkStats($parkId);
+        Response::success();
+    } catch (Exception $e) {
+        if ($db->inTransaction()) $db->rollBack();
+        Response::error('Error al actualizar reseña: ' . $e->getMessage());
     }
 }
 

@@ -815,13 +815,29 @@ $(document).ready(function () {
               style="width:40px;height:40px;object-fit:cover;border-radius:50%;border:2px solid var(--rcw-green-dim,#198754);flex-shrink:0;background:#2d333b;"
               onerror="this.src='${defaultAvatarUrl}';this.onerror=null;">`;
 
+            const isOwn = (window.CURRENT_USER_ID && parseInt(review.user_id) === window.CURRENT_USER_ID) || 
+                          (window.CURRENT_USERNAME && review.username === window.CURRENT_USERNAME);
+
+            const editBtn = isOwn
+              ? `<button class="btn btn-link p-0 ms-auto text-warning edit-review-btn"
+                   data-id="${review.id}"
+                   data-note="${review.note}"
+                   data-text="${encodeURIComponent(review.review || '')}"
+                   title="Editar mi reseña"
+                   style="font-size:1.1rem;line-height:1;text-decoration:none;">
+                   <i class="fa-solid fa-pen-to-square me-1"></i>
+                   <span style="font-size:0.75rem;font-weight:600;text-transform:uppercase;vertical-align:middle;">Editar reseña</span>
+                 </button>`
+              : "";
+
             container.append(`
-              <div class="border-bottom pb-3 mb-3 animate__animated animate__fadeIn">
+              <div class="border-bottom pb-3 mb-3 animate__animated animate__fadeIn${isOwn ? ' own-review' : ''}">
                 <div class="d-flex align-items-center gap-2 mb-1">
                   ${avatarHtml}
                   <strong>${review.username || "Usuario anónimo"}</strong>
                   <span class="stars-display ms-2">${renderStars(review.note)}</span>
                   <span class="text-muted small ms-2">• ${timeAgo(review.created_at)}</span>
+                  ${editBtn}
                 </div>
                 ${tagsHtml}
                 ${review.review ? `<p class="mb-0 mt-3 text-white-50" style="font-size:0.9rem;line-height:1.6;">${review.review}</p>` : ""}
@@ -844,6 +860,57 @@ $(document).ready(function () {
       }
     }
 
+    // ── Lógica modal de edición de reseña (parks) ────────────────────────────
+    let editReviewModalPark = null;
+    const editModalElPark = document.getElementById("edit-review-modal");
+    if (editModalElPark && typeof bootstrap !== "undefined") {
+      editReviewModalPark = new bootstrap.Modal(editModalElPark);
+    }
+
+    // Actualizar nota oculta cuando cambia el radio (parques)
+    $(document).on("change", 'input[name="edit_note"]', function () {
+      $("#edit-review-note").val($(this).val());
+    });
+
+    $(document).on("click", ".edit-review-btn", function () {
+      const id   = $(this).data("id");
+      const note = parseFloat($(this).data("note")) || 0;
+      const text = decodeURIComponent($(this).data("text") || "");
+      $("#edit-review-id").val(id);
+      $("#edit-review-note").val(note);
+      $("#edit-review-text").val(text);
+      // Marcar el radio correspondiente
+      $(`input[name="edit_note"][value="${note}"]`).prop("checked", true);
+      if (editReviewModalPark) editReviewModalPark.show();
+    });
+
+    $(document).on("click", "#save-edit-review-btn", async function () {
+      const btn      = $(this);
+      const reviewId = $("#edit-review-id").val();
+      const note     = parseFloat($("#edit-review-note").val()) || 0;
+      const text     = $("#edit-review-text").val().trim();
+      if (!note) { alert("Por favor, selecciona una puntuación."); return; }
+      btn.prop("disabled", true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i>Guardando...');
+      const fd = new FormData();
+      fd.append("review_id", reviewId);
+      fd.append("note", note);
+      fd.append("review", text);
+      try {
+        const res  = await fetch(`${window.BASE_URL}/api/php/parks.php?action=update_review`, { method: "POST", body: fd });
+        const data = await res.json();
+        if (data.success) {
+          if (editReviewModalPark) editReviewModalPark.hide();
+          loadReviews($("#reviews-sort").val() || "newest");
+        } else {
+          alert("Error: " + (data.error || "No se pudo guardar."));
+        }
+      } catch (e) {
+        alert("Error de conexión.");
+      } finally {
+        btn.prop("disabled", false).html('<i class="fa-solid fa-floppy-disk me-1"></i>Guardar cambios');
+      }
+    });
+
     if (parkId) {
       loadParkData(parkId);
       loadParkCoasters(parkId);
@@ -854,6 +921,7 @@ $(document).ready(function () {
       });
     }
   }
+
 
   // --- LÓGICA PARA EL FORMULARIO DE RESEÑAS DE PARQUES ---
   if (document.getElementById("review-form")) {

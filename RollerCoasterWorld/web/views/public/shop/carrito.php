@@ -149,3 +149,4 @@ window.TICKETS_API  = '<?= Router::getBaseUrl() ?>/api/php/tickets.php';
 window.CHECKOUT_URL = '<?= Router::url('checkout') ?>';
 </script>
 <script src="<?= Router::asset('web/js/shop/tickets.js') ?>?v=<?= time() ?>"></script>
+<script src="<?= Router::asset('web/js/shop/carrito.js') ?>?v=<?= time() ?>"></script>

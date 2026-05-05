@@ -1,6 +1,7 @@
 <?php
 $page_css = [
   'web/css/profile.css',
+  'web/css/coasters.css',
   'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css',

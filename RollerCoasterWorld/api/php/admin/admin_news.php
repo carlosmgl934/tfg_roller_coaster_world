@@ -11,7 +11,7 @@ $db = new DBConexion();
 
 $router = new ApiRouter();
 $router->register('filterNews', 'filterNews', 'GET');
-$router->register('addNews',    'addNews',    'POST');
+$router->register('addNews', 'addNews', 'POST');
 $router->register('updateNews', 'updateNews', 'POST');
 $router->register('deleteNews', 'deleteNews', 'POST');
 $router->dispatch();
@@ -34,7 +34,7 @@ function requireAdmin(): void
 // ─────────────────────────────────────────────────────────────
 function uploadNewsImage(array $fileEntry): ?string
 {
-    $supabaseUrl = $_ENV['SUPABASE_URL']         ?? null;
+    $supabaseUrl = $_ENV['SUPABASE_URL'] ?? null;
     $supabaseKey = $_ENV['SUPABASE_SERVICE_KEY'] ?? null;
 
     if (!$supabaseUrl || !$supabaseKey) {
@@ -47,18 +47,19 @@ function uploadNewsImage(array $fileEntry): ?string
     $readPath = $webpPath ?: $fileEntry['tmp_name'];
 
     $fileData = file_get_contents($readPath);
-    if ($fileData === false) return null;
+    if ($fileData === false)
+        return null;
 
-    $fileName  = uniqid('news_') . '.webp';
-    $bucket    = 'news-covers';
+    $fileName = uniqid('news_') . '.webp';
+    $bucket = 'news-covers';
     $uploadUrl = rtrim($supabaseUrl, '/') . "/storage/v1/object/{$bucket}/{$fileName}";
 
     $ch = curl_init($uploadUrl);
     curl_setopt_array($ch, [
-        CURLOPT_CUSTOMREQUEST  => 'PUT',
+        CURLOPT_CUSTOMREQUEST => 'PUT',
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POSTFIELDS     => $fileData,
-        CURLOPT_HTTPHEADER     => [
+        CURLOPT_POSTFIELDS => $fileData,
+        CURLOPT_HTTPHEADER => [
             "Authorization: Bearer {$supabaseKey}",
             'Content-Type: image/webp',
             'x-upsert: true',
@@ -68,7 +69,8 @@ function uploadNewsImage(array $fileEntry): ?string
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
     // Limpiar WebP temporal
-    if ($webpPath && file_exists($webpPath)) @unlink($webpPath);
+    if ($webpPath && file_exists($webpPath))
+        @unlink($webpPath);
 
     if ($httpCode < 200 || $httpCode >= 300) {
         error_log("uploadNewsImage: Error subiendo a Supabase. HTTP {$httpCode}");
@@ -81,22 +83,25 @@ function uploadNewsImage(array $fileEntry): ?string
 // Elimina una imagen de Supabase Storage (solo si la URL apunta al bucket news-covers)
 function deleteNewsImage(?string $imageUrl): void
 {
-    if (!$imageUrl || !str_contains($imageUrl, '/news-covers/')) return;
+    if (!$imageUrl || !str_contains($imageUrl, '/news-covers/'))
+        return;
 
-    $supabaseUrl = $_ENV['SUPABASE_URL']         ?? null;
+    $supabaseUrl = $_ENV['SUPABASE_URL'] ?? null;
     $supabaseKey = $_ENV['SUPABASE_SERVICE_KEY'] ?? null;
-    if (!$supabaseUrl || !$supabaseKey) return;
+    if (!$supabaseUrl || !$supabaseKey)
+        return;
 
     // Extraer el nombre de archivo del final de la URL
     $filename = basename(parse_url($imageUrl, PHP_URL_PATH));
-    if (!$filename) return;
+    if (!$filename)
+        return;
 
     $deleteUrl = rtrim($supabaseUrl, '/') . "/storage/v1/object/news-covers/{$filename}";
     $ch = curl_init($deleteUrl);
     curl_setopt_array($ch, [
-        CURLOPT_CUSTOMREQUEST  => 'DELETE',
+        CURLOPT_CUSTOMREQUEST => 'DELETE',
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER     => [
+        CURLOPT_HTTPHEADER => [
             "Authorization: Bearer {$supabaseKey}",
         ],
     ]);
@@ -110,15 +115,15 @@ function filterNews(): void
 {
     requireAdmin();
 
-    $search     = trim($_GET['search'] ?? '');
-    $tag        = trim($_GET['tag'] ?? '');
-    $featured   = filter_var($_GET['featured'] ?? false, FILTER_VALIDATE_BOOLEAN);
-    $page       = max(1, intval($_GET['page'] ?? 1));
-    $limit      = 15;
-    $offset     = ($page - 1) * $limit;
+    $search = trim($_GET['search'] ?? '');
+    $tag = trim($_GET['tag'] ?? '');
+    $featured = filter_var($_GET['featured'] ?? false, FILTER_VALIDATE_BOOLEAN);
+    $page = max(1, intval($_GET['page'] ?? 1));
+    $limit = 15;
+    $offset = ($page - 1) * $limit;
 
     $conditions = ['1=1'];
-    $params     = [];
+    $params = [];
 
     if ($search !== '') {
         $conditions[] = "n.title ILIKE :search";
@@ -147,21 +152,21 @@ function filterNews(): void
 
         $sql_count = "SELECT COUNT(*) FROM news n WHERE $where";
 
-        $stmt  = $db->prepare($sql);
+        $stmt = $db->prepare($sql);
         $stmt2 = $db->prepare($sql_count);
 
         foreach ($params as $key => $value) {
             $stmt->bindValue($key, $value);
             $stmt2->bindValue($key, $value);
         }
-        $stmt->bindValue(':limit',  $limit,  PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 
         $stmt->execute();
         $stmt2->execute();
 
-        $news  = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $total = (int)$stmt2->fetchColumn();
+        $news = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $total = (int) $stmt2->fetchColumn();
 
         Response::success(['news' => $news, 'total' => $total]);
     } catch (PDOException $e) {
@@ -182,20 +187,11 @@ function addNews(): void
         return;
     }
 
-    $title       = trim($data['title'] ?? '');
-    $tag         = trim($data['tag'] ?? '');
-    $ext_link    = trim($data['external_link'] ?? '');
-    $desc        = trim($data['description'] ?? '');
+    $title = trim($data['title'] ?? '');
+    $tag = trim($data['tag'] ?? '');
+    $ext_link = trim($data['external_link'] ?? '');
+    $desc = trim($data['description'] ?? '');
     $is_featured = filter_var($data['is_featured'] ?? false, FILTER_VALIDATE_BOOLEAN);
-
-    $imagenUrl = null;
-    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $imagenUrl = uploadNewsImage($_FILES['image']);
-        if (!$imagenUrl) {
-            Response::error('Error al subir la imagen a Supabase. Comprueba el bucket news-covers.', 500);
-            return;
-        }
-    }
 
     if ($title === '') {
         Response::error('El título es obligatorio.', 400);
@@ -206,9 +202,18 @@ function addNews(): void
         return;
     }
 
+    $imagenUrl = null;
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $imagenUrl = uploadNewsImage($_FILES['image']);
+        if (!$imagenUrl) {
+            Response::error('Error al subir la imagen a Supabase. Comprueba el bucket news-covers.', 500);
+            return;
+        }
+    }
+
     try {
         global $db;
-        
+
         if ($is_featured) {
             $db->prepare("UPDATE news SET is_featured = false")->execute();
         }
@@ -223,9 +228,9 @@ function addNews(): void
         $stmt->bindValue(':desc', $desc);
         $stmt->bindValue(':image', $imagenUrl);
         $stmt->bindValue(':is_featured', $is_featured, PDO::PARAM_BOOL);
-        
+
         $stmt->execute();
-        $newId = (int)$stmt->fetchColumn();
+        $newId = (int) $stmt->fetchColumn();
 
         Response::success(['id' => $newId, 'message' => 'Noticia añadida correctamente.']);
     } catch (PDOException $e) {
@@ -246,12 +251,21 @@ function updateNews(): void
         return;
     }
 
-    $id          = intval($data['id']);
-    $title       = trim($data['title'] ?? '');
-    $tag         = trim($data['tag'] ?? '');
-    $ext_link    = trim($data['external_link'] ?? '');
-    $desc        = trim($data['description'] ?? '');
+    $id = intval($data['id']);
+    $title = trim($data['title'] ?? '');
+    $tag = trim($data['tag'] ?? '');
+    $ext_link = trim($data['external_link'] ?? '');
+    $desc = trim($data['description'] ?? '');
     $is_featured = filter_var($data['is_featured'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+    if ($title === '') {
+        Response::error('El título es obligatorio.', 400);
+        return;
+    }
+    if ($desc === '') {
+        Response::error('La descripción es obligatoria.', 400);
+        return;
+    }
 
     // Imagen: si viene nueva, subir a Supabase; si no, conservar la actual
     $imagenUrl = $data['image_url'] ?? null;
@@ -266,18 +280,9 @@ function updateNews(): void
         $imagenUrl = $newUrl;
     }
 
-    if ($title === '') {
-        Response::error('El título es obligatorio.', 400);
-        return;
-    }
-    if ($desc === '') {
-        Response::error('La descripción es obligatoria.', 400);
-        return;
-    }
-
     try {
         global $db;
-        
+
         if ($is_featured) {
             $stmtReset = $db->prepare("UPDATE news SET is_featured = false WHERE id != :id");
             $stmtReset->execute([':id' => $id]);
@@ -300,7 +305,7 @@ function updateNews(): void
         $stmt->bindValue(':desc', $desc);
         $stmt->bindValue(':image', $imagenUrl);
         $stmt->bindValue(':is_featured', $is_featured, PDO::PARAM_BOOL);
-        
+
         $stmt->execute();
 
         Response::success(['message' => 'Noticia actualizada correctamente.']);

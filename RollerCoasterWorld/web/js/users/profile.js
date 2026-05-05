@@ -2042,7 +2042,7 @@ $(document).ready(function () {
         : `<p class="mb-0 text-muted small fst-italic">Sin texto de reseña.</p>`;
 
       $list.append(`
-        <div class="top-card d-flex align-items-stretch mb-3" style="min-height:130px;">
+        <div class="top-card d-flex align-items-stretch mb-3" style="min-height:130px;" data-review-id="${r.id}" data-review-type="${r.type}" data-item-id="${r.item_id}">
           <!-- Miniatura -->
           <div style="width:130px;flex-shrink:0;background:#0d1117;overflow:hidden;">
             ${imgHtml}
@@ -2066,7 +2066,16 @@ $(document).ready(function () {
                 ${starsHtml(r.note)}
                 <span class="fw-bold text-warning" style="font-size:0.85rem;">${notaText}/5</span>
               </div>
-              <small class="text-muted">${formatReviewDate(r.created_at)}</small>
+              <div class="d-flex align-items-center gap-2">
+                <small class="text-muted">${formatReviewDate(r.created_at)}</small>
+                <button class="btn btn-link p-0 text-warning profile-edit-review-btn"
+                        data-id="${r.id}" data-type="${r.type}"
+                        data-note="${nota}" data-text="${encodeURIComponent(r.review || '')}"
+                        title="Editar reseña" style="font-size:1.1rem;text-decoration:none;">
+                  <i class="fa-solid fa-pen-to-square me-1"></i>
+                  <span style="font-size:0.75rem;font-weight:600;text-transform:uppercase;vertical-align:middle;">Editar reseña</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>`);
@@ -2145,6 +2154,111 @@ $(document).ready(function () {
   if (window.location.hash === "#reviews") {
     cargarReviews();
   }
+
+  // ── Modal de edición de reseñas desde el perfil ──────────────────────────
+  let profileEditModal = null;
+
+  // Crear el modal de edición dinámicamente si no existe
+  if (!document.getElementById("profile-edit-review-modal")) {
+    const modalHtml = `
+    <div class="modal fade" id="profile-edit-review-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark border-secondary text-white">
+          <div class="modal-header bg-success">
+            <h5 class="modal-title fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i>Editar reseña</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="pedit-review-id">
+            <input type="hidden" id="pedit-review-type">
+            <div class="mb-3">
+              <label class="form-label text-muted small fw-semibold">Puntuación</label>
+              <div class="star-rating pedit-star-rating-container" style="font-size: 2rem;">
+                ${[10,9,8,7,6,5,4,3,2,1].map(i => {
+                  const val = i / 2;
+                  const half = (i % 2 !== 0);
+                  return `<input type="radio" name="pedit_note" id="pstar${i}" value="${val}">
+                          <label for="pstar${i}" class="${half ? 'half' : 'full'}" title="${val}"></label>`;
+                }).join('')}
+              </div>
+              <input type="hidden" id="pedit-review-note" value="0">
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-muted small fw-semibold">Reseña (opcional)</label>
+              <textarea class="form-control bg-dark text-white border-secondary rounded-0" id="pedit-review-text" rows="4" placeholder="Escribe tu opinión..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer border-secondary">
+            <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-success rounded-0 fw-bold px-4" id="pedit-save-btn">
+              <i class="fa-solid fa-floppy-disk me-1"></i>Guardar cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  }
+
+  profileEditModal = new bootstrap.Modal(document.getElementById("profile-edit-review-modal"));
+
+  // Actualizar nota oculta cuando cambia el radio (perfil)
+  $(document).on("change", 'input[name="pedit_note"]', function () {
+    $("#pedit-review-note").val($(this).val());
+  });
+
+  // Abrir modal desde tarjeta de reseña del perfil
+  $(document).on("click", ".profile-edit-review-btn", function () {
+    const id   = $(this).data("id");
+    const type = $(this).data("type"); // 'coaster' | 'park'
+    const note = parseFloat($(this).data("note")) || 0;
+    const text = decodeURIComponent($(this).data("text") || "");
+    $("#pedit-review-id").val(id);
+    $("#pedit-review-type").val(type);
+    $("#pedit-review-note").val(note);
+    $("#pedit-review-text").val(text);
+    // Marcar el radio correspondiente
+    $(`input[name="pedit_note"][value="${note}"]`).prop("checked", true);
+    profileEditModal.show();
+  });
+
+  // Guardar cambios desde el perfil
+  $(document).on("click", "#pedit-save-btn", async function () {
+    const btn      = $(this);
+    const reviewId = $("#pedit-review-id").val();
+    const type     = $("#pedit-review-type").val();
+    const note     = parseFloat($("#pedit-review-note").val()) || 0;
+    const text     = $("#pedit-review-text").val().trim();
+    if (!note) { alert("Por favor, selecciona una puntuación."); return; }
+    btn.prop("disabled", true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i>Guardando...');
+    const fd = new FormData();
+    fd.append("review_id", reviewId);
+    fd.append("note", note);
+    fd.append("review", text);
+    const endpoint = type === "coaster"
+      ? `${BASE_URL}/api/php/coasters.php?action=update_review`
+      : `${BASE_URL}/api/php/parks.php?action=update_review`;
+    try {
+      const res  = await fetch(endpoint, { method: "POST", body: fd });
+      const data = await res.json();
+      if (data.success) {
+        profileEditModal.hide();
+        // Actualizar localmente sin recargar toda la lista
+        const idx = reviewsData.findIndex(r => String(r.id) === String(reviewId));
+        if (idx !== -1) {
+          reviewsData[idx].note   = note;
+          reviewsData[idx].review = text;
+        }
+        renderReviews();
+      } else {
+        alert("Error: " + (data.error || "No se pudo guardar."));
+      }
+    } catch (e) {
+      alert("Error de conexión.");
+    } finally {
+      btn.prop("disabled", false).html('<i class="fa-solid fa-floppy-disk me-1"></i>Guardar cambios');
+    }
+  });
   // ══════════════════════════════════════════════════════════════════
   //  MIS AMIGOS
   // ══════════════════════════════════════════════════════════════════

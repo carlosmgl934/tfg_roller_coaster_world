@@ -148,17 +148,17 @@ function searchParks(): void
                     p.num_coasters
                 FROM parks p
                 WHERE
-                    p.park_name     ILIKE :like
-                    OR p.park_country  ILIKE :like
-                    OR p.park_location ILIKE :like
+                    unaccent(p.park_name)     ILIKE unaccent(:like)
+                    OR unaccent(p.park_country)  ILIKE unaccent(:like)
+                    OR unaccent(p.park_location) ILIKE unaccent(:like)
                 ORDER BY p.park_name ASC
                 LIMIT :limit OFFSET :offset";
 
         $sql_count = "SELECT COUNT(*) FROM parks p
                       WHERE
-                          p.park_name     ILIKE :like
-                          OR p.park_country  ILIKE :like
-                          OR p.park_location ILIKE :like";
+                          unaccent(p.park_name)     ILIKE unaccent(:like)
+                          OR unaccent(p.park_country)  ILIKE unaccent(:like)
+                          OR unaccent(p.park_location) ILIKE unaccent(:like)";
 
         $stmt = $db->prepare($sql);
         $stmt->bindValue(':like',   $like,   PDO::PARAM_STR);

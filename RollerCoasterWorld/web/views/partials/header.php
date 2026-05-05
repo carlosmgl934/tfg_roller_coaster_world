@@ -4,6 +4,25 @@ if (session_status() === PHP_SESSION_NONE) {
   session_start();
 }
 
+// Asegurar que tenemos el user_id de la BD si hay sesión de Firebase
+if (isset($_SESSION['firebase_uid']) && !isset($_SESSION['user_id'])) {
+  try {
+    require_once __DIR__ . '/../../api/database/db_conexion.php';
+    $db_h = new DBConexion();
+    $stmt_h = $db_h->prepare("SELECT id, user_rol, username, profile_image FROM users WHERE firebase_uid = :uid LIMIT 1");
+    $stmt_h->execute([':uid' => $_SESSION['firebase_uid']]);
+    $user_h = $stmt_h->fetch(PDO::FETCH_ASSOC);
+    if ($user_h) {
+      $_SESSION['user_id'] = (int)$user_h['id'];
+      $_SESSION['user_rol'] = $user_h['user_rol'];
+      if (!isset($_SESSION['username'])) $_SESSION['username'] = $user_h['username'];
+      if (!isset($_SESSION['profile_image'])) $_SESSION['profile_image'] = $user_h['profile_image'];
+    }
+  } catch (Exception $e) {
+    // Ignorar errores de conexión aquí para no romper el sitio
+  }
+}
+
 // Cargar el Router definitivo
 require_once __DIR__ . '/../../routes/Router.php';
 
@@ -388,6 +407,12 @@ header("Expires: 0"); // Proxies
                 </div>
                 <span class="rcw-user-name d-none d-xl-inline"
                   id="header-username-display"><?= htmlspecialchars(ucfirst($user_display)) ?></span>
+                <!-- Icono carrito con badge (solo visual, no es enlace) -->
+                <span class="position-relative d-none d-xl-inline-flex align-items-center ms-1" id="cart-nav-icon-wrap" style="display:none!important;">
+                  <i class="fa-solid fa-cart-shopping" style="font-size:.85rem;color:var(--rcw-text-muted);"></i>
+                  <span class="cart-nav-badge position-absolute badge rounded-pill bg-success d-none"
+                    style="font-size:.55rem;padding:.2em .45em;top:-6px;right:-8px;min-width:16px;line-height:1.2;">0</span>
+                </span>
               </a>
               <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                 <li>
@@ -411,7 +436,7 @@ header("Expires: 0"); // Proxies
                       class="fa-solid fa-list-ol w-20px text-center me-2 text-warning"></i> Mis tops</a></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('carrito') ?>"><i
                       class="fa-solid fa-cart-shopping w-20px text-center me-2 text-success"></i> Carrito
-                    <span id="cart-nav-badge" class="badge rounded-pill bg-danger ms-auto d-none"
+                    <span class="cart-nav-badge badge rounded-pill bg-danger ms-auto d-none"
                       style="font-size:.65rem;padding:.25em .5em;">0</span>
                   </a></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('orders') ?>"><i

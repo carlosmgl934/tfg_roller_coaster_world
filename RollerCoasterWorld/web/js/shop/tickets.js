@@ -60,25 +60,29 @@ async function apiGet(url) {
 /* ............................................................
    BADGE CARRITO (global)
    ............................................................ */
-async function updateCartBadge() {
-  try {
-    const res = await apiGet(TICKETS_API + "?action=get_cart");
-    const count = res.count ?? 0;
-    const badge = document.getElementById("cart-nav-badge");
-    if (badge) {
-      badge.textContent = count;
-      badge.classList.toggle("d-none", count === 0);
-    }
-  } catch (e) {}
-}
 
 /* ............................................................
    CATÁLOGO DE ENTRADAS (/tickets)
    ............................................................ */
 let allParks = [];
 let currentPark = null;
-let selectedType = "entrada";
 let qty = 1;
+
+// Precios de complementos (por persona excepto parking que es fijo)
+const ADDON_CONFIG = {
+  pase_rapido: { pct: 0.50, perPerson: true  },
+  photopass:   { pct: 0.30, perPerson: true  },
+  buffet:      { pct: 0.20, perPerson: true  },
+  parking:     { pct: null, perPerson: false }, // precio fijo determinista
+};
+
+function parkingPrice(parkId) {
+  return 10 + (parkId % 9); // €10–€18, siempre el mismo para el mismo parque
+}
+
+function fmtAddon(n) {
+  return n.toFixed(2) + " €";
+}
 
 async function initTicketsCatalog() {
   if (!document.getElementById("tickets-grid")) return;
@@ -98,33 +102,29 @@ async function initTicketsCatalog() {
     );
   });
 
-  // Cantidad
+  // ── Paso 1: cantidad ──────────────────────────────────────────
   document.getElementById("qty-minus")?.addEventListener("click", () => {
-    if (qty > 1) {
-      qty--;
-      updateModal();
-    }
+    if (qty > 1) { qty--; updateStep1(); }
   });
   document.getElementById("qty-plus")?.addEventListener("click", () => {
-    if (qty < 10) {
-      qty++;
-      updateModal();
-    }
+    if (qty < 10) { qty++; updateStep1(); }
   });
 
-  // Tipo
-  document.querySelectorAll(".type-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      document
-        .querySelectorAll(".type-btn")
-        .forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      selectedType = btn.dataset.type;
-      updateModal();
+  // ── Navegación wizard ─────────────────────────────────────────
+  document.getElementById("btn-next-step")?.addEventListener("click", goToStep2);
+  document.getElementById("btn-prev-step")?.addEventListener("click", goToStep1);
+
+  // ── Paso 2: add-ons ───────────────────────────────────────────
+  document.querySelectorAll(".addon-check").forEach((cb) => {
+    cb.addEventListener("change", () => {
+      const card = cb.closest(".addon-card");
+      card.classList.toggle("border-success", cb.checked);
+      card.classList.toggle("border-secondary", !cb.checked);
+      updateStep2Total();
     });
   });
 
-  // Añadir al carrito
+  // ── Añadir al carrito ─────────────────────────────────────────
   document.getElementById("btn-add-cart")?.addEventListener("click", addToCart);
 }
 
@@ -181,15 +181,18 @@ function openBuyModal(parkId) {
   }
   currentPark = allParks.find((p) => p.id === parkId);
   if (!currentPark) return;
+
   qty = 1;
-  selectedType = "entrada";
-  document
-    .querySelectorAll(".type-btn")
-    .forEach((b) => b.classList.toggle("active", b.dataset.type === "entrada"));
-  document.getElementById("modal-park-name").textContent =
-    currentPark.park_name;
-  document.getElementById("modal-park-country").textContent =
-    currentPark.park_country;
+
+  // Reset checkboxes
+  document.querySelectorAll(".addon-check").forEach((cb) => {
+    cb.checked = false;
+    cb.closest(".addon-card")?.classList.replace("border-success", "border-secondary");
+  });
+
+  document.getElementById("modal-park-name").textContent = currentPark.park_name;
+  document.getElementById("modal-park-country").textContent = currentPark.park_country;
+
   const fpInput = document.getElementById("modal-visit-date");
   if (fpInput._flatpickr) fpInput._flatpickr.destroy();
   flatpickr(fpInput, {
@@ -200,45 +203,124 @@ function openBuyModal(parkId) {
     defaultDate: "today",
   });
 
-  updateModal();
+  goToStep1(false); // muestra paso 1 sin animación innecesaria
+  updateStep1();
   new bootstrap.Modal(document.getElementById("buy-modal")).show();
 }
 
-function updateModal() {
-  if (!currentPark) return;
-  const basePrice = parseFloat(currentPark.precio_entrada);
-  const unitPrice =
-    selectedType === "pase_rapido" ? +(basePrice * 1.5).toFixed(2) : basePrice;
-  document.getElementById("price-label-entrada").textContent = fmt(basePrice);
-  document.getElementById("price-label-pase").textContent =
-    fmt(+(basePrice * 1.5).toFixed(2)) + " (+50%)";
-  document.getElementById("qty-display").textContent = qty;
-  document.getElementById("modal-total").textContent = fmt(unitPrice * qty);
+function goToStep1(reset = true) {
+  document.getElementById("step-1").classList.remove("d-none");
+  document.getElementById("step-2").classList.add("d-none");
+  document.getElementById("footer-step-1").classList.remove("d-none");
+  document.getElementById("footer-step-2").classList.add("d-none");
+  document.getElementById("step-tab-1").classList.add("active");
+  document.getElementById("step-tab-2").classList.remove("active");
 }
 
-async function addToCart() {
+function goToStep2() {
   const visitDate = document.getElementById("modal-visit-date").value;
   if (!visitDate) {
     showToast("Selecciona una fecha de visita", "error");
     return;
   }
-  const basePrice = parseFloat(currentPark.precio_entrada);
-  const unitPrice =
-    selectedType === "pase_rapido" ? +(basePrice * 1.5).toFixed(2) : basePrice;
+
+  const base = parseFloat(currentPark.precio_entrada);
+  const parking = parkingPrice(currentPark.id);
+
+  // Rellenar precios de add-ons
+  document.getElementById("price-pase").textContent    = fmtAddon(base * qty * 0.50);
+  document.getElementById("price-photo").textContent   = fmtAddon(base * qty * 0.30);
+  document.getElementById("price-buffet").textContent  = fmtAddon(base * qty * 0.20);
+  document.getElementById("price-parking").textContent = fmtAddon(parking);
+
+  // Resumen
+  document.getElementById("s-qty").textContent  = qty;
+  document.getElementById("s-base").textContent = fmtAddon(base * qty);
+
+  updateStep2Total();
+
+  document.getElementById("step-1").classList.add("d-none");
+  document.getElementById("step-2").classList.remove("d-none");
+  document.getElementById("footer-step-1").classList.add("d-none");
+  document.getElementById("footer-step-2").classList.remove("d-none");
+  document.getElementById("step-tab-1").classList.remove("active");
+  document.getElementById("step-tab-2").classList.add("active");
+}
+
+function updateStep1() {
+  if (!currentPark) return;
+  const base = parseFloat(currentPark.precio_entrada);
+  document.getElementById("qty-display").textContent     = qty;
+  document.getElementById("step1-qty-label").textContent = `× ${qty}`;
+  document.getElementById("step1-total").textContent     = fmtAddon(base * qty);
+}
+
+function updateStep2Total() {
+  if (!currentPark) return;
+  const base    = parseFloat(currentPark.precio_entrada);
+  const parking = parkingPrice(currentPark.id);
+
+  const pase    = document.getElementById("addon-pase").checked;
+  const photo   = document.getElementById("addon-photo").checked;
+  const buffet  = document.getElementById("addon-buffet").checked;
+  const park    = document.getElementById("addon-parking").checked;
+
+  let total = base * qty;
+  if (pase)   total += base * qty * 0.50;
+  if (photo)  total += base * qty * 0.30;
+  if (buffet) total += base * qty * 0.20;
+  if (park)   total += parking;
+
+  // Mostrar/ocultar filas del resumen
+  document.querySelector(".addon-row-pase").classList.toggle("d-none", !pase);
+  document.querySelector(".addon-row-photo").classList.toggle("d-none", !photo);
+  document.querySelector(".addon-row-buffet").classList.toggle("d-none", !buffet);
+  document.querySelector(".addon-row-parking").classList.toggle("d-none", !park);
+
+  document.getElementById("s-pase").textContent    = fmtAddon(base * qty * 0.50);
+  document.getElementById("s-photo").textContent   = fmtAddon(base * qty * 0.30);
+  document.getElementById("s-buffet").textContent  = fmtAddon(base * qty * 0.20);
+  document.getElementById("s-parking").textContent = fmtAddon(parking);
+  document.getElementById("modal-total").textContent = fmtAddon(total);
+}
+
+async function addToCart() {
+  const visitDate = document.getElementById("modal-visit-date").value;
+  if (!visitDate) { showToast("Selecciona una fecha de visita", "error"); return; }
+
+  const base    = parseFloat(currentPark.precio_entrada);
+  const parking = parkingPrice(currentPark.id);
+  const pase    = document.getElementById("addon-pase").checked;
+  const photo   = document.getElementById("addon-photo").checked;
+  const buffet  = document.getElementById("addon-buffet").checked;
+  const park    = document.getElementById("addon-parking").checked;
+
+  let unitPrice = base;
+  if (pase)   unitPrice += base * 0.50;
+  if (photo)  unitPrice += base * 0.30;
+  if (buffet) unitPrice += base * 0.20;
+  // Parking se añade como importe fijo, no por persona
+  const parkingTotal = park ? parking : 0;
+
+  const totalPrice = +(unitPrice * qty + parkingTotal).toFixed(2);
 
   const btn = document.getElementById("btn-add-cart");
   btn.disabled = true;
-  btn.innerHTML =
-    '<span class="spinner-border spinner-border-sm me-2"></span>Añadiendo...';
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Añadiendo...';
 
   const res = await apiPost(TICKETS_API + "?action=add_to_cart", {
-    park_id: currentPark.id,
-    park_name: currentPark.park_name,
-    park_img: currentPark.imagen_url || "",
-    ticket_type: selectedType,
-    quantity: qty,
-    unit_price: unitPrice,
-    visit_date: visitDate,
+    park_id:          currentPark.id,
+    park_name:        currentPark.park_name,
+    park_img:         currentPark.imagen_url || "",
+    ticket_type:      "entrada",
+    quantity:         qty,
+    unit_price:       +unitPrice.toFixed(2),
+    visit_date:       visitDate,
+    addon_pase_rapido: pase   ? 1 : 0,
+    addon_photopass:   photo  ? 1 : 0,
+    addon_buffet:      buffet ? 1 : 0,
+    addon_parking:     park   ? 1 : 0,
+    parking_price:     parkingTotal,
   });
 
   btn.disabled = false;
@@ -246,174 +328,16 @@ async function addToCart() {
 
   if (res.success) {
     bootstrap.Modal.getInstance(document.getElementById("buy-modal")).hide();
-    updateCartBadge();
-    showToast(`${qty} entrada(s) añadida(s) al carrito "`);
+    window.updateCartBadge?.();
+    const addons = [pase && "Pase Rápido", photo && "PhotoPass", buffet && "Buffet", park && "Parking"]
+      .filter(Boolean).join(", ");
+    showToast(`${qty} entrada(s) añadida(s)${addons ? ` + ${addons}` : ""}`);
   } else {
     showToast(res.error || "Error al añadir", "error");
   }
 }
 
 /* ............................................................
-   CARRITO (/carrito)
-   ............................................................ */
-async function initCart() {
-  if (!document.getElementById("cart-tbody")) return;
-  await loadCart();
-
-  document.getElementById("btn-clear-cart")?.addEventListener("click", () => {
-    const modalEl = document.getElementById("modal-clear-cart");
-    if (modalEl) new bootstrap.Modal(modalEl).show();
-  });
-
-  document
-    .getElementById("btn-confirm-clear-cart")
-    ?.addEventListener("click", async () => {
-      const btn = document.getElementById("btn-confirm-clear-cart");
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
-      await apiPost(TICKETS_API + "?action=clear_cart", {});
-      await apiPost(TICKETS_API + "?action=remove_coupon", {});
-      updateCartBadge();
-      bootstrap.Modal.getInstance(
-        document.getElementById("modal-clear-cart"),
-      ).hide();
-      btn.disabled = false;
-      btn.innerHTML = "Sí, vaciar";
-      await loadCart();
-    });
-
-  // Cupón: aplicar
-  document
-    .getElementById("btn-apply-coupon")
-    ?.addEventListener("click", async () => {
-      const code = (document.getElementById("coupon-input")?.value || "")
-        .trim()
-        .toUpperCase();
-      if (!code) return;
-      const btn = document.getElementById("btn-apply-coupon");
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
-      const res = await apiPost(TICKETS_API + "?action=apply_coupon", { code });
-      btn.disabled = false;
-      btn.innerHTML = "Aplicar";
-      const fb = document.getElementById("coupon-feedback");
-      if (res.success) {
-        fb.className = "small mb-2 text-success";
-        fb.innerHTML = `<i class="fa-solid fa-check-circle me-1"></i>${res.description} (-${res.discount_percent}%)`;
-        document
-          .getElementById("btn-remove-coupon")
-          ?.classList.remove("d-none");
-        await loadCart();
-      } else {
-        fb.className = "small mb-2 text-danger";
-        fb.innerHTML = `<i class="fa-solid fa-xmark-circle me-1"></i>${res.error || "Cupón no válido"}`;
-      }
-    });
-
-  // Cupón: quitar
-  document
-    .getElementById("btn-remove-coupon")
-    ?.addEventListener("click", async () => {
-      await apiPost(TICKETS_API + "?action=remove_coupon", {});
-      const inp = document.getElementById("coupon-input");
-      const fb = document.getElementById("coupon-feedback");
-      const rmv = document.getElementById("btn-remove-coupon");
-      if (inp) inp.value = "";
-      if (fb) fb.className = "small mb-2 d-none";
-      if (rmv) rmv.classList.add("d-none");
-      await loadCart();
-    });
-}
-
-async function loadCart() {
-  const res = await apiGet(TICKETS_API + "?action=get_cart");
-  const items = res.items || [];
-  const items_raw = res.items || [];
-  const subtotal =
-    res.subtotal ?? items_raw.reduce((s, i) => s + parseFloat(i.total || 0), 0);
-  const discount = res.discount ?? 0;
-  const total = res.total ?? 0;
-  const coupon = res.coupon || null;
-  const empty = document.getElementById("cart-empty");
-  const content = document.getElementById("cart-content");
-  const tbody = document.getElementById("cart-tbody");
-
-  if (!items.length) {
-    empty.classList.remove("d-none");
-    content.classList.add("d-none");
-    return;
-  }
-  empty.classList.add("d-none");
-  content.classList.remove("d-none");
-  document.getElementById("cart-item-count").textContent = items.reduce(
-    (s, i) => s + i.quantity,
-    0,
-  );
-  document.getElementById("summary-subtotal").textContent = fmt(subtotal);
-  // Fila de descuento cupón
-  const discRow = document.getElementById("summary-discount-row");
-  if (discRow) {
-    if (discount > 0 && coupon) {
-      discRow.classList.remove("d-none");
-      document.getElementById("summary-discount").textContent =
-        "-" + fmt(discount);
-      const lbl = document.getElementById("summary-coupon-label");
-      if (lbl) lbl.textContent = `Cupón "${coupon.code}" (-${coupon.percent}%)`;
-    } else {
-      discRow.classList.add("d-none");
-    }
-  }
-  document.getElementById("summary-total").textContent = fmt(total);
-  // Mostrar cupón activo
-  if (coupon) {
-    const inp = document.getElementById("coupon-input");
-    const fb = document.getElementById("coupon-feedback");
-    const rmv = document.getElementById("btn-remove-coupon");
-    if (inp) inp.value = coupon.code;
-    if (fb) {
-      fb.className = "small mb-2 text-success";
-      fb.innerHTML = `<i class="fa-solid fa-check-circle me-1"></i>${coupon.description} (-${coupon.percent}%)`;
-    }
-    if (rmv) rmv.classList.remove("d-none");
-  }
-
-  tbody.innerHTML = items
-    .map(
-      (item, idx) => `
-    <tr>
-      <td class="ps-3">
-        <div class="d-flex align-items-center gap-2">
-          <img src="${item.park_img || "https://placehold.co/52x40/0d1117/444?text=P"}"
-               class="cart-park-img" alt="${item.park_name}"
-               onerror="this.src='https://placehold.co/52x40/0d1117/444?text=P'">
-          <span class="fw-semibold text-white" style="font-size:.88rem;">${item.park_name}</span>
-        </div>
-      </td>
-      <td><span class="status-badge ${item.ticket_type === "pase_rapido" ? "badge-confirmado" : "badge-pendiente"}" style="font-size:.65rem;">${typeLabel(item.ticket_type)}</span></td>
-      <td class="text-muted">${date(item.visit_date)}</td>
-      <td class="text-center">${item.quantity}</td>
-      <td class="text-end text-muted">${fmt(item.unit_price)}</td>
-      <td class="text-end fw-bold text-success pe-3">${fmt(item.total)}</td>
-      <td>
-        <button class="btn btn-sm btn-outline-danger rounded-0 btn-remove-item" data-index="${idx}" title="Eliminar">
-          <i class="fa-solid fa-trash-can"></i>
-        </button>
-      </td>
-    </tr>
-  `,
-    )
-    .join("");
-
-  tbody.querySelectorAll(".btn-remove-item").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      await apiPost(TICKETS_API + "?action=remove_from_cart", {
-        index: btn.dataset.index,
-      });
-      updateCartBadge();
-      await loadCart();
-    });
-  });
-}
 
 /* ............................................................
    CHECKOUT (/checkout)
@@ -465,59 +389,72 @@ async function initCheckout() {
   document.getElementById("checkout-breakdown").innerHTML = breakdown;
   document.getElementById("checkout-grand-total").textContent = fmt(total);
 
-  document
-    .getElementById("btn-modal-confirm-order")
-    ?.addEventListener("click", confirmOrder);
+  // Botón principal -> redirige a Stripe directamente
+  document.getElementById("btn-pay-stripe")?.addEventListener("click", goToStripe);
+
+  // Manejar retorno de Stripe (payment=success|cancel)
+  const returnStatus = window.STRIPE_RETURN_STATUS || "";
+  const returnSession = window.STRIPE_RETURN_SESSION || "";
+
+  if (returnStatus === "success" && returnSession) {
+    document.getElementById("checkout-form-wrap")?.classList.add("d-none");
+    document.getElementById("checkout-verifying")?.classList.remove("d-none");
+    verifyStripeSession(returnSession);
+  } else if (returnStatus === "cancel") {
+    document.getElementById("checkout-form-wrap")?.classList.add("d-none");
+    document.getElementById("checkout-cancelled")?.classList.remove("d-none");
+  }
 }
 
-async function confirmOrder() {
-  const name = document.getElementById("checkout-name")?.value.trim();
+/** Redirige al usuario a la pasarela de Stripe */
+async function goToStripe() {
+  const name  = document.getElementById("checkout-name")?.value.trim();
   const email = document.getElementById("checkout-email")?.value.trim();
 
   if (!name || !email) {
-    const modalEl = document.getElementById("modal-confirm-order");
-    const modal = bootstrap.Modal.getInstance(modalEl);
-    if (modal) modal.hide();
-
-    // Pequeño retardo para que la animación del modal no oculte el toast
-    setTimeout(() => {
-      showToast("Por favor, rellena tu nombre y email para recibir las entradas", "error");
-      if (!name) document.getElementById("checkout-name").focus();
-      else if (!email) document.getElementById("checkout-email").focus();
-    }, 400);
+    showToast("Indica el nombre del titular y el email donde recibirás las entradas", "error");
+    if (!name) document.getElementById("checkout-name")?.focus();
+    else document.getElementById("checkout-email")?.focus();
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast("El email no tiene un formato válido", "error");
     return;
   }
 
-  const btn = document.getElementById("btn-modal-confirm-order");
+  const btn = document.getElementById("btn-pay-stripe");
   btn.disabled = true;
-  btn.innerHTML =
-    '<span class="spinner-border spinner-border-sm me-2"></span>Procesando...';
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a Stripe...';
 
-  const res = await apiPost(TICKETS_API + "?action=create_order", {
-    name,
-    email,
-  });
-  if (res.success) {
-    const ids = res.order_ids || [];
-    bootstrap.Modal.getInstance(
-      document.getElementById("modal-confirm-order"),
-    ).hide();
-    document.getElementById("checkout-form-wrap").classList.add("d-none");
-    document.getElementById("checkout-success").classList.remove("d-none");
-    document.getElementById("success-order-ref").textContent = ids
-      .map(
-        (id) =>
-          `#RCW-${new Date().getFullYear()}-${String(id).padStart(6, "0")}`,
-      )
-      .join(", ");
-    updateCartBadge();
+  const stripeApi = window.STRIPE_API || window.BASE_URL + "/api/php/stripe_checkout.php";
+  const res = await apiPost(stripeApi + "?action=create_session", { name, email });
+
+  if (res.success && res.url) {
+    window.location.href = res.url;
   } else {
     btn.disabled = false;
-    btn.innerHTML = "Sí, confirmar";
-    bootstrap.Modal.getInstance(
-      document.getElementById("modal-confirm-order"),
-    ).hide();
-    showToast(res.error || "Error al confirmar el pedido", "error");
+    btn.innerHTML = '<i class="fa-solid fa-credit-card me-2"></i>Pagar con Stripe';
+    showToast(res.error || "Error al iniciar el pago", "error");
+  }
+}
+
+/** Verifica el pago tras volver de Stripe y crea los pedidos */
+async function verifyStripeSession(sessionId) {
+  const stripeApi = window.STRIPE_API || window.BASE_URL + "/api/php/stripe_checkout.php";
+  const res = await apiPost(stripeApi + "?action=verify_session", { session_id: sessionId });
+
+  document.getElementById("checkout-verifying")?.classList.add("d-none");
+
+  if (res.success) {
+    const ids = res.order_ids || [];
+    document.getElementById("checkout-success")?.classList.remove("d-none");
+    document.getElementById("success-order-ref").textContent = ids
+      .map((id) => `#RCW-${new Date().getFullYear()}-${String(id).padStart(6, "0")}`)
+      .join(", ");
+    window.updateCartBadge?.();
+  } else {
+    document.getElementById("checkout-form-wrap")?.classList.remove("d-none");
+    showToast(res.error || "No se pudo verificar el pago. Contacta con soporte.", "error");
   }
 }
 
@@ -589,19 +526,32 @@ async function initOrders() {
       const modalEl = document.getElementById("refundConfirmModal");
       if (!modalEl) return;
 
-      const modal = new bootstrap.Modal(modalEl);
+      // Usar getOrCreateInstance para no crear instancias duplicadas
+      const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
       const confirmBtn = document.getElementById("btn-confirm-refund-modal");
 
-      // Clonar para limpiar eventos previos
+      // Clonar para limpiar eventos previos, y SIEMPRE resetear estado
       const newConfirmBtn = confirmBtn.cloneNode(true);
+      newConfirmBtn.disabled = false;
+      newConfirmBtn.innerHTML = '<i class="fa-solid fa-rotate-left me-1"></i>Confirmar Solicitud';
       confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
 
       newConfirmBtn.addEventListener("click", async () => {
         newConfirmBtn.disabled = true;
+        newConfirmBtn.innerHTML =
+          '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
+
         const res = await apiPost(ORDERS_API + "?action=request_cancel", {
           order_id: btn.dataset.id,
         });
+
+        // Siempre restaurar el botón antes de cualquier otra acción
+        newConfirmBtn.disabled = false;
+        newConfirmBtn.innerHTML =
+          '<i class="fa-solid fa-rotate-left me-1"></i>Confirmar Solicitud';
+
         modal.hide();
+
         if (res.success) {
           showToast("Solicitud enviada correctamente");
           initOrders();
@@ -613,6 +563,7 @@ async function initOrders() {
       modal.show();
     });
   });
+
 }
 
 function renderTicket(o) {
@@ -889,9 +840,9 @@ function showToast(msg, type = "success") {
    INIT
    ........................................................... */
 document.addEventListener("DOMContentLoaded", () => {
-  updateCartBadge();
+  window.updateCartBadge?.();
   initTicketsCatalog();
-  initCart();
+
   initCheckout();
   initOrders();
   initAdminOrders();

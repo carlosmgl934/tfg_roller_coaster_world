@@ -190,11 +190,16 @@ $(document).ready(function () {
   logoutButtons.forEach((btn) => {
     btn.addEventListener("click", function (e) {
       e.preventDefault();
-      fetch(BASE + "/api/php/auth/logout.php", { method: "POST" }).finally(() => {
-        window.auth.signOut().then(() => {
-          window.location.href = BASE + "/web/views/auth/login.php";
+      // Vaciar carrito + destruir sesión PHP + cerrar sesión Firebase
+      fetch(BASE + "/api/php/tickets.php?action=clear_cart", { method: "POST", credentials: "include" })
+        .catch(() => {})
+        .finally(() => {
+          fetch(BASE + "/api/php/auth/logout.php", { method: "POST" }).finally(() => {
+            window.auth.signOut().then(() => {
+              window.location.href = BASE + "/web/views/auth/login.php";
+            });
+          });
         });
-      });
     });
   });
 

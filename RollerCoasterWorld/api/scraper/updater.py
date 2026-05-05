@@ -72,7 +72,8 @@ class RCDBUpdater:
         ('status',             'coaster_status',        'Estado'),
         ('make',               'coaster_manufacter',    'Fabricante'),
         ('model',              'coaster_model',         'Modelo'),
-        ('year',               'opening_year',          'Año apertura'),
+        # 'year'/'opening_year' excluido: RCDB actualiza el año cuando cambia a SBNO/Closed,
+        # pero queremos conservar el año de APERTURA original que tenemos en BD.
         ('inversions',         'inversions',            'Inversiones'),
         ('main_image_url',     'imagen_url',            'Imagen URL'),
         # Numéricos con tolerancia (se comparan como float)
@@ -260,33 +261,40 @@ class RCDBUpdater:
                 # (evita confundir ft con m cuando RCDB muestra ambas en la misma celda)
                 def extract_near_unit(text: str, unit: str) -> Optional[float]:
                     import re as _re
-                    pattern = rf'([\d]+(?:[.,]\d+)?)\s*{_re.escape(unit)}'
+                    pattern = rf'([\.\d]+(?:[.,]\d+)?)\s*{_re.escape(unit)}(?!\w)'
                     m = _re.search(pattern, text)
                     return float(m.group(1).replace(',', '.')) if m else None
 
                 if 'Length' in stat_name:
-                    if ' m' in cell_full_text and 'mph' not in cell_full_text:
-                        val_m = extract_near_unit(cell_full_text, 'm')
-                        if val_m:
-                            stats['length_m'] = val_m
-                    elif ' ft' in cell_full_text and num:
-                        stats['length_m'] = round(num * 0.3048, 1)
+                    # FIX DUELING: solo guardamos el primer valor encontrado
+                    if 'length_m' not in stats:
+                        if ' m' in cell_full_text and 'mph' not in cell_full_text:
+                            val_m = extract_near_unit(cell_full_text, 'm')
+                            if val_m:
+                                stats['length_m'] = val_m
+                        elif ' ft' in cell_full_text and num:
+                            stats['length_m'] = round(num * 0.3048, 1)
 
                 elif 'Height' in stat_name:
-                    if ' m' in cell_full_text:
-                        val_m = extract_near_unit(cell_full_text, 'm')
-                        if val_m:
-                            stats['height_m'] = val_m
-                    elif ' ft' in cell_full_text and num:
-                        stats['height_m'] = round(num * 0.3048, 1)
+                    # FIX DUELING: solo guardamos el primer valor encontrado
+                    # (evita que el 2° track de una dueling coaster sobreescriba la altura real)
+                    if 'height_m' not in stats:
+                        if ' m' in cell_full_text:
+                            val_m = extract_near_unit(cell_full_text, 'm')
+                            if val_m:
+                                stats['height_m'] = val_m
+                        elif ' ft' in cell_full_text and num:
+                            stats['height_m'] = round(num * 0.3048, 1)
 
                 elif 'Speed' in stat_name:
-                    if 'km/h' in cell_full_text:
-                        val_kmh = extract_near_unit(cell_full_text, 'km/h')
-                        if val_kmh:
-                            stats['speed_kmh'] = val_kmh
-                    elif 'mph' in cell_full_text and num:
-                        stats['speed_kmh'] = round(num * 1.60934, 1)
+                    # FIX DUELING: solo guardamos el primer valor encontrado
+                    if 'speed_kmh' not in stats:
+                        if 'km/h' in cell_full_text:
+                            val_kmh = extract_near_unit(cell_full_text, 'km/h')
+                            if val_kmh:
+                                stats['speed_kmh'] = val_kmh
+                        elif 'mph' in cell_full_text and num:
+                            stats['speed_kmh'] = round(num * 1.60934, 1)
 
                 elif 'Inversions' in stat_name:
                     if num is not None:
@@ -307,6 +315,47 @@ class RCDBUpdater:
 
         try:
             soup = BeautifulSoup(r.text, 'html.parser')
+
+            # ── VALIDACIÓN: ¿es realmente una página de montaña rusa? ──────────
+            # Las páginas de montañas rusas en RCDB SIEMPRE tienen div#feature.
+            # Páginas de fabricantes, fotógrafos, usuarios, etc. NO lo tienen.
+            feature_div_check = soup.find('div', id='feature')
+            if not feature_div_check:
+                return None  # No es una coaster (fabricante, foto, persona, etc.)
+
+            # Además debe haber un enlace a parque (las coasters siempre pertenecen a un parque)
+            h1_check = soup.find('h1')
+            h1_parent_check = h1_check.parent if h1_check else None
+            park_link_check = h1_parent_check.find('a', href=re.compile(r'/\d+\.htm')) if h1_parent_check else None
+            if not park_link_check:
+                return None  # Sin parque asociado = no es una coaster
+
+            # ── FILTRO 3: ¿el tipo de atracción es una montaña rusa? ──────────
+            # En RCDB, el div#feature contiene el material del ride (Steel, Wooden…).
+            # Water rides, flat rides, dark rides, etc. NO tienen esas palabras.
+            # Allowlist de palabras clave que identifican montañas rusas:
+            COASTER_MATERIALS = {
+                'steel', 'wooden', 'wood', 'hybrid', 'bobsled',
+                'iron', 'fiberglass', 'alpine', 'coaster',
+                'suspended', 'inverted', 'flying', 'spinning',
+                'stand-up', 'stand up', 'wing', 'launched',
+                'sit down', 'sit-down', 'mine train', 'wild mouse',
+                'powered', 'gravity group', 'intamin', 'gerstlauer',
+            }
+            feature_text_low = feature_div_check.get_text(' ').lower()
+            if not any(kw in feature_text_low for kw in COASTER_MATERIALS):
+                return None  # Water ride, flat ride, dark ride, etc. → descartado
+
+            # ── FILTRO 4: Rechazar catálogos de modelos genéricos ────────────
+            # Páginas como "Floorless Coaster" o "Dive Coaster" no son montañas
+            # rusas físicas. Su estado suele ser "In Production" o "Discontinued".
+            status_p_check = feature_div_check.find('p')
+            if status_p_check:
+                st_text = status_p_check.get_text()
+                if 'In Production' in st_text or 'Discontinued' in st_text:
+                    return None
+            # ─────────────────────────────────────────────────────────────────
+
             coaster: Dict[str, Any] = {'rcdb_id': rcdb_id, 'rcdb_url': url}
 
             # Imagen
@@ -369,17 +418,32 @@ class RCDBUpdater:
                             coaster['year'] = int(ym.group(1))
 
             # Make y Model
-            text_content = soup.get_text()
-            make_m = re.search(r'Make:\s*([^\n]+?)(?:Model:|Pictures|Videos|$)', text_content, re.DOTALL)
+            # Usamos get_text(separator=' ') para que los elementos HTML adyacentes
+            # no se concatenen sin espacio (bug: 'Extreme EngineeringModel Line: ...')
+            text_content = soup.get_text(separator=' ')
+
+            make_m = re.search(r'Make:\s*([^\n]+?)(?:Model Line:|Model:|Pictures|Videos|$)', text_content, re.DOTALL)
             if make_m:
-                coaster['make'] = ' '.join(make_m.group(1).strip().split())
+                make_val = make_m.group(1).strip()
+                # Limpieza defensiva extra: quitar cualquier resto de 'Model Line:...'
+                make_val = re.sub(r'\s*Model Line:.*$', '', make_val, flags=re.IGNORECASE).strip()
+                coaster['make'] = ' '.join(make_val.split())
 
             model_m = re.search(r'Model:\s*([^\n]+?)(?:Pictures|Videos|Tracks|$)', text_content, re.DOTALL)
             if model_m:
                 mt = re.sub(r'All Models\s*/\s*', '', model_m.group(1).strip())
                 mt = ' '.join(mt.split())
                 mt = re.sub(r'(Pictures|Videos|Maps|Tracks).*$', '', mt).strip()
-                coaster['model'] = mt
+                # Quitar suffix 'Model Line: ...' si aparece en el modelo también
+                mt = re.sub(r'\s*Model Line:.*$', '', mt, flags=re.IGNORECASE).strip()
+                # Limpiar '(in production)', '(discontinued)', etc. si es un nombre genérico
+                mt = re.sub(r'\s*\(in production\)|\(discontinued\)', '', mt, flags=re.IGNORECASE).strip()
+                if mt:
+                    coaster['model'] = mt
+
+            # Filtrar páginas de catálogo de modelos ('All Models ...')
+            if coaster.get('name', '').startswith('All Models'):
+                return None
 
             # Stats numéricas
             coaster.update(self.parse_stat_table(soup))
@@ -403,12 +467,21 @@ class RCDBUpdater:
             except (TypeError, ValueError):
                 return str(scraped_val) == str(bd_val)
 
-        # Para inversions y opening_year comparar como int
-        if field_scraped in ('inversions', 'year'):
+        # Para inversions comparar como int
+        if field_scraped == 'inversions':
             try:
                 return int(scraped_val) == int(bd_val)
             except (TypeError, ValueError):
                 pass
+
+        # FIX DUELING: para el nombre, si el nombre en BD empieza por el scrapeado
+        # (p.ej. BD tiene 'American Eagle (Blue)' y RCDB tiene 'American Eagle'),
+        # lo tratamos como igual para no generar un falso cambio de nombre.
+        if field_scraped == 'name':
+            bd_str = str(bd_val).strip()
+            sc_str = str(scraped_val).strip()
+            if bd_str.startswith(sc_str):
+                return True  # Nombre personalizado en BD — no tocar
 
         return str(scraped_val).strip() == str(bd_val).strip()
 
@@ -460,7 +533,10 @@ class RCDBUpdater:
         self.db.commit()
 
     def update_coaster(self, rcdb_id: int, scraped: Dict):
-        """Actualiza TODOS los campos de una coaster existente con los datos frescos de RCDB."""
+        """Actualiza los campos de una coaster existente con los datos frescos de RCDB.
+        NUNCA se toca opening_year: RCDB actualiza ese campo al año en que cambia de estado
+        (SBNO, Closed…), lo que sobreescribiría el año de apertura original.
+        """
         self.cursor.execute("""
             UPDATE coasters SET
                 coaster_name       = COALESCE(%s, coaster_name),
@@ -471,8 +547,7 @@ class RCDBUpdater:
                 height             = COALESCE(%s, height),
                 speed              = COALESCE(%s, speed),
                 coaster_length     = COALESCE(%s, coaster_length),
-                inversions         = COALESCE(%s, inversions),
-                opening_year       = COALESCE(%s, opening_year)
+                inversions         = COALESCE(%s, inversions)
             WHERE rcdb_id = %s
         """, (
             scraped.get('name'),
@@ -484,7 +559,6 @@ class RCDBUpdater:
             scraped.get('speed_kmh'),
             scraped.get('length_m'),
             scraped.get('inversions'),
-            scraped.get('year'),
             rcdb_id,
         ))
         self.db.commit()

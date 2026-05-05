@@ -53,7 +53,7 @@ function searchParks()
     }
 
     try {
-        $stmt = $db->prepare("SELECT id AS park_id, park_name, park_country AS country_name FROM parks WHERE park_name ILIKE :search AND park_name NOT IN ('Desconocido', 'Unknown') LIMIT 10");
+        $stmt = $db->prepare("SELECT id AS park_id, park_name, park_country AS country_name FROM parks WHERE unaccent(park_name) ILIKE unaccent(:search) AND park_name NOT IN ('Desconocido', 'Unknown') LIMIT 10");
         $stmt->execute([':search' => '%' . $search . '%']);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         exit;
@@ -563,7 +563,7 @@ function getMyReviews()
             FROM coaster_ratings cr
             JOIN coasters c ON cr.coaster_id = c.id
             JOIN parks    p ON c.park_id = p.id
-            WHERE cr.user_id = :uid
+            WHERE cr.user_id = :uid AND cr.is_hidden = FALSE
 
             UNION ALL
 
@@ -578,7 +578,7 @@ function getMyReviews()
                    p.imagen_url
             FROM park_ratings pr
             JOIN parks p ON pr.park_id = p.id
-            WHERE pr.user_id = :uid
+            WHERE pr.user_id = :uid AND pr.is_hidden = FALSE
 
             ORDER BY created_at DESC
         ");
