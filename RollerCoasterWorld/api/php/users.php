@@ -242,12 +242,27 @@ function getFriendsData()
         $stmtFI->execute([':uid' => $current_user_id]);
         $forum_invitations = $stmtFI->fetchAll(PDO::FETCH_ASSOC);
 
+        // Invitaciones de viajes recibidas (pendientes)
+        $stmtTI = $db->prepare("
+            SELECT tc.id as invite_id, tc.trip_id, t.title as trip_title,
+                   u.username as inviter_username, u.profile_image as inviter_image,
+                   tc.joined_at as created_at
+            FROM trip_collaborators tc
+            JOIN trips t ON tc.trip_id = t.id
+            JOIN users u ON tc.invited_by = u.id
+            WHERE tc.user_id = :uid AND tc.status = 'pending'
+            ORDER BY tc.joined_at DESC
+        ");
+        $stmtTI->execute([':uid' => $current_user_id]);
+        $trip_invitations = $stmtTI->fetchAll(PDO::FETCH_ASSOC);
+
         Response::success([
             'data' => [
                 'friends'           => $friends,
                 'received_requests' => $received,
                 'sent_requests'     => $sent,
-                'forum_invitations' => $forum_invitations
+                'forum_invitations' => $forum_invitations,
+                'trip_invitations'  => $trip_invitations
             ]
         ]);
     } catch (Exception $e) {

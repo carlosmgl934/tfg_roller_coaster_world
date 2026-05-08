@@ -1,12 +1,15 @@
 CREATE TABLE IF NOT EXISTS trips (
     id SERIAL PRIMARY KEY,
-    -- Datos del viaje --
-    user_id INT NOT NULL,   -- usuario que realiza el viaje
-    title VARCHAR(100) NOT NULL,    -- nombre del viaje (a los frikiparques nos encanta bautizar los trips)
-    start_date DATE NOT NULL,    -- fecha de inicio
-    end_date DATE NOT NULL,      -- fecha deL final
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
-    parks_visited VARCHAR(255) DEFAULT NULL,  --nuevos parques que visita
-    new_credits INT DEFAULT 0, --nuevas montañas rusas que prueba
+    user_id INT NOT NULL,
+    title VARCHAR(150) NOT NULL,
+    description TEXT DEFAULT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    cover_image VARCHAR(255) DEFAULT NULL,
+    trip_type VARCHAR(20) DEFAULT 'manual',   -- 'manual' | 'ai'
+    status VARCHAR(20) DEFAULT 'planned',     -- 'planned' | 'active' | 'completed'
+    parks_visited VARCHAR(255) DEFAULT NULL,
+    new_credits INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

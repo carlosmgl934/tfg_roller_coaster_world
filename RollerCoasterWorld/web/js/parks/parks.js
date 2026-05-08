@@ -819,28 +819,37 @@ $(document).ready(function () {
                           (window.CURRENT_USERNAME && review.username === window.CURRENT_USERNAME);
 
             const editBtn = isOwn
-              ? `<button class="btn btn-link p-0 ms-auto text-warning edit-review-btn"
+              ? `<button class="btn btn-link p-0 text-warning edit-review-btn d-flex flex-column align-items-center lh-1"
                    data-id="${review.id}"
                    data-note="${review.note}"
                    data-text="${encodeURIComponent(review.review || '')}"
                    title="Editar mi reseña"
-                   style="font-size:1.1rem;line-height:1;text-decoration:none;">
-                   <i class="fa-solid fa-pen-to-square me-1"></i>
-                   <span style="font-size:0.75rem;font-weight:600;text-transform:uppercase;vertical-align:middle;">Editar reseña</span>
+                   style="text-decoration:none; min-width: 60px;">
+                   <i class="fa-solid fa-pen-to-square mb-1 fs-5"></i>
+                   <span class="fw-bold" style="font-size:0.55rem;text-transform:uppercase;">Editar reseña</span>
                  </button>`
               : "";
 
             container.append(`
-              <div class="border-bottom pb-3 mb-3 animate__animated animate__fadeIn${isOwn ? ' own-review' : ''}">
-                <div class="d-flex align-items-center gap-2 mb-1">
+              <div class="border-bottom pb-4 mb-4 animate__animated animate__fadeIn${isOwn ? ' own-review' : ''}">
+                <div class="d-flex align-items-start gap-3 mb-2">
                   ${avatarHtml}
-                  <strong>${review.username || "Usuario anónimo"}</strong>
-                  <span class="stars-display ms-2">${renderStars(review.note)}</span>
-                  <span class="text-muted small ms-2">• ${timeAgo(review.created_at)}</span>
-                  ${editBtn}
+                  <div class="flex-grow-1 min-w-0">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-1">
+                      <strong class="text-white fs-6 text-truncate flex-grow-1 min-w-0" title="${review.username || "Usuario anónimo"}">${review.username || "Usuario anónimo"}</strong>
+                      ${editBtn}
+                    </div>
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+                      <span class="stars-display lh-1">${renderStars(review.note)}</span>
+                      <span class="text-muted small">• ${timeAgo(review.created_at)}</span>
+                    </div>
+                  </div>
                 </div>
                 ${tagsHtml}
-                ${review.review ? `<p class="mb-0 mt-3 text-white-50" style="font-size:0.9rem;line-height:1.6;">${review.review}</p>` : ""}
+                ${review.review ? `
+                <div class="mt-3 p-3 bg-dark bg-opacity-25 rounded border-start border-3 border-success border-opacity-50">
+                  <p class="mb-0 text-white-50" style="font-size:0.92rem; line-height:1.7;">${review.review}</p>
+                </div>` : ""}
               </div>
             `);
           });
@@ -995,4 +1004,30 @@ $(document).ready(function () {
           });
       });
   }
+
+  // --- COMPARTIR ---
+  $("#btn-share").on("click", async function () {
+    const title =
+      document.querySelector(".park-name")?.textContent ||
+      "RollerCoaster World";
+    const text = `Mira este parque en RollerCoaster World: ${title}`;
+    const url = window.location.href;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, text, url });
+      } catch (err) {
+        if (err.name !== "AbortError") console.error("Error sharing:", err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        if (window.rcwToast)
+          window.rcwToast("Enlace copiado al portapapeles", "success");
+        else alert("Enlace copiado al portapapeles");
+      } catch (err) {
+        console.error("Error copying:", err);
+      }
+    }
+  });
 });

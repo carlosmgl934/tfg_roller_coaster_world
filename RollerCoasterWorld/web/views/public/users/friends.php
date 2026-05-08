@@ -58,15 +58,14 @@ if (!$is_logged) {
                 </div>
                 <div class="card-body p-4">
                     <div class="row align-items-center mb-4">
-                        <div class="col-12 col-md-6 mb-3 mb-md-0">
-                            <div class="input-group">
-                                <input type="text" class="form-control square-box border-success" id="search-friends-input" placeholder="Buscar amigo..." style="background-color: var(--rcw-bg-input);">
-                                <span class="input-group-text bg-success text-white border-success rounded-0 px-3"><i class="fa-solid fa-magnifying-glass"></i></span>
+                        <div class="col-12 col-md-7 mb-3 mb-md-0">
+                            <div class="input-group shadow-sm">
+                                <input type="text" class="form-control border-success text-white" id="search-friends-input" placeholder="Buscar amigo..." style="background-color: var(--rcw-bg-input); border-radius: 4px 0 0 4px;">
+                                <span class="input-group-text bg-success text-white border-success px-3" style="border-radius: 0 4px 4px 0;"><i class="fa-solid fa-magnifying-glass"></i></span>
                             </div>
                         </div>
-                        <div class="col-12 col-md-6 text-md-end text-start">
-                            <label for="sort-friends-select" class="visually-hidden">Ordenar por</label>
-                            <select class="form-select square-box d-inline-block w-auto" id="sort-friends-select">
+                        <div class="col-12 col-md-5 text-md-end">
+                            <select class="form-select border-success text-white" id="sort-friends-select" style="background-color: var(--rcw-bg-input); border-radius: 4px;">
                                 <option value="antiguedad_desc">Más recientes</option>
                                 <option value="antiguedad_asc">Más antiguos</option>
                                 <option value="alfabetico_asc">Alfabéticamente (A-Z)</option>

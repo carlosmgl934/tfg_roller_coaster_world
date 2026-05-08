@@ -78,10 +78,6 @@ require_once __DIR__ . '/../../partials/header.php';
                     <i class="fa-solid fa-xmark fs-5" id="coaster-ridden"></i>
                     <span>No montada</span>
                 </button>
-                <button id="btn-favorite" class="btn btn-outline-warning" style="border-radius:0; padding:10px 14px;"
-                    title="Favorito">
-                    <i class="fa-regular fa-star fs-5" id="fav-icon"></i>
-                </button>
                 <button id="btn-share" class="btn btn-outline-secondary" style="border-radius:0; padding:10px 14px;"
                     title="Compartir">
                     <i class="fa-solid fa-share-nodes fs-5"></i>
@@ -199,11 +195,11 @@ require_once __DIR__ . '/../../partials/header.php';
                     </button>
                 </div>
                 <div class="card-body p-3">
-                    <div class="row g-2" id="photos-grid">
+                    <div class="row g-2 photos-expandable-grid" id="photos-grid">
                         <!-- Las fotos se cargan dinámicamente -->
                     </div>
                     <div class="text-center mt-3">
-                        <a href="#" class="text-success fw-semibold text-decoration-none">
+                        <a href="#" id="btn-view-all-photos" class="text-success fw-semibold text-decoration-none">
                             Ver todas las fotos <i class="fa-solid fa-arrow-right ms-1"></i>
                         </a>
                     </div>

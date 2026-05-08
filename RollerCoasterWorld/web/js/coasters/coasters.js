@@ -795,33 +795,60 @@ $(document).ready(function () {
             const col = document.createElement("div");
             col.className = "col-6 col-sm-4 col-md-3 col-lg-2 mb-4";
             col.innerHTML = `
-              <div class="h-100 d-flex flex-column">
-                  <div class="photo-square-container position-relative overflow-hidden w-100" 
-                       style="padding-bottom: 100%; border-radius: 8px; cursor: pointer;"
-                       data-id="${photo.id}"
-                       data-index="${index}"
-                       data-url="${photo.photo_url}"
-                       data-username="${photo.username}"
-                       data-avatar="${window.rcwGetAvatarPath(photo.profile_image, photo.username)}"
-                       data-caption="${photo.caption || ""}"
-                       data-likes="${photo.likes || 0}">
-                      <img src="${photo.photo_url}" alt="${photo.caption || "Foto"}" class="position-absolute w-100 h-100" style="object-fit: cover; top:0; left:0; transition: transform 0.3s ease;">
-                  </div>
-                  <div class="mt-2 text-muted d-flex align-items-center" style="font-size: 0.9rem;">
-                      <button class="btn btn-link p-0 text-decoration-none text-muted me-2 grid-like-btn" data-id="${photo.id}" title="Me gusta">
-                          <i class="${heartClass} fa-heart"></i> <span class="grid-likes-count">${photo.likes || 0}</span>
-                      </button>
-                      <span class="text-truncate"><i class="fa-solid fa-user fa-sm me-1"></i>${photo.username}</span>
-                  </div>
-              </div>
+                        <div class="photo-square-container position-relative overflow-hidden w-100" 
+                        style="padding-bottom: 100%; border-radius: 10px; cursor: pointer;"
+                        data-id="${photo.id}"
+                        data-index="${index}"
+                        data-url="${photo.photo_url}"
+                        data-username="${photo.username}"
+                        data-avatar="${window.rcwGetAvatarPath(photo.profile_image, photo.username)}"
+                        data-caption="${photo.caption || ""}"
+                        data-likes="${photo.likes || 0}">
+                       <img src="${photo.photo_url}" alt="${photo.caption || "Foto"}" class="position-absolute w-100 h-100" style="object-fit: cover; top:0; left:0; transition: transform 0.3s ease;">
+                       
+                       <!-- Likes Overlay Badge -->
+                       <div class="position-absolute top-0 end-0 m-2" style="z-index: 10;">
+                           <button class="btn grid-like-btn d-flex align-items-center gap-1 px-2 py-1" 
+                                   data-id="${photo.id}" 
+                                   style="background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; font-size: 0.75rem; color: #fff; line-height: 1;">
+                               <i class="${heartClass} fa-heart ${photo.user_has_liked ? 'text-danger' : ''}"></i>
+                               <span class="grid-likes-count fw-bold">${photo.likes || 0}</span>
+                           </button>
+                       </div>
+                   </div>
+                   <div class="mt-2 px-1">
+                       <div class="text-white-50 text-truncate w-100" style="font-size: 0.82rem; font-weight: 500;" title="${photo.username}">
+                           <i class="fa-solid fa-user fa-xs me-1 opacity-50"></i>${photo.username}
+                       </div>
+                   </div>
             `;
             document.querySelector("#photos-grid").appendChild(col);
           });
+
+          // Ocultar el botón si hay pocas fotos (umbral diferente para PC y móvil)
+          const isMobile = window.innerWidth < 992;
+          const threshold = isMobile ? 4 : 6; 
+          if (data.photos.length <= threshold) {
+              $("#btn-view-all-photos").hide();
+          }
         }
       } catch (e) {
         console.error("Error cargando fotos:", e);
       }
     }
+
+    // Handler para expandir/contraer fotos
+    $("#btn-view-all-photos").on("click", function(e) {
+        e.preventDefault();
+        const grid = $("#photos-grid");
+        if (grid.hasClass("expanded")) {
+            grid.removeClass("expanded");
+            $(this).html('Ver todas las fotos <i class="fa-solid fa-arrow-right ms-1"></i>');
+        } else {
+            grid.addClass("expanded");
+            $(this).html('Contraer fotos <i class="fa-solid fa-arrow-up ms-1"></i>');
+        }
+    });
 
     // Handlers para Lightbox IG y Likes
     let currentPhotoIndex = 0;
@@ -925,103 +952,75 @@ $(document).ready(function () {
         updateModalContent(currentPhotoIndex + 1);
       });
 
-    $("#ig-modal-like-btn").on("click", async function () {
-      const id = $(this).data("id");
-      if (!id) return;
-      const hasLiked = localStorage.getItem("liked_photo_" + id) === "true";
+    // Función única para gestionar likes (Sincronizada y con protección anti-doble click)
+    async function togglePhotoLike(photoId, btnElement) {
+        if (!photoId || btnElement.prop('disabled')) return;
+        
+        const hasLiked = localStorage.getItem("liked_photo_" + photoId) === "true";
+        
+        // Bloquear todos los botones relacionados con esta foto para evitar spam
+        const gridBtns = $(`.grid-like-btn[data-id='${photoId}']`);
+        const modalBtn = $("#ig-modal-like-btn");
+        
+        const allRelatedBtns = gridBtns.add(modalBtn);
+        allRelatedBtns.prop('disabled', true).addClass('opacity-50');
 
-      try {
-        const formData = new FormData();
-        formData.append("photo_id", id);
-        formData.append("unlike", hasLiked);
+        try {
+            const formData = new FormData();
+            formData.append("photo_id", photoId);
+            formData.append("unlike", hasLiked);
 
-        const res = await fetch(
-          `${BASE_URL}/api/php/coasters.php?action=like_photo`,
-          {
-            method: "POST",
-            body: formData,
-          },
-        );
-        const data = await res.json();
-        if (data.success) {
-          if (hasLiked) {
-            localStorage.removeItem("liked_photo_" + id);
-            $(this).html('<i class="fa-regular fa-heart"></i>');
-          } else {
-            localStorage.setItem("liked_photo_" + id, "true");
-            $(this).html('<i class="fa-solid fa-heart text-danger"></i>');
-          }
-          $("#ig-modal-likes").text(data.likes + " me gusta");
+            const res = await fetch(`${window.BASE_URL}/api/php/coasters.php?action=like_photo`, {
+                method: "POST",
+                body: formData
+            });
+            const data = await res.json();
 
-          // Actualizar el data attribute en el DOM
-          const sqContainer = $(`.photo-square-container[data-id='${id}']`);
-          sqContainer.data("likes", data.likes);
+            if (data.success) {
+                const newHasLiked = !hasLiked;
+                if (newHasLiked) {
+                    localStorage.setItem("liked_photo_" + photoId, "true");
+                } else {
+                    localStorage.removeItem("liked_photo_" + photoId);
+                }
 
-          // Actualizar el DOM visible del grid si existe
-          const gridBtn = sqContainer.closest(".h-100").find(".grid-like-btn");
-          if (hasLiked) {
-            gridBtn
-              .find("i")
-              .removeClass("fa-solid text-danger")
-              .addClass("fa-regular");
-          } else {
-            gridBtn
-              .find("i")
-              .removeClass("fa-regular")
-              .addClass("fa-solid text-danger");
-          }
-          gridBtn.find(".grid-likes-count").text(data.likes);
+                // 1. Actualizar el Grid (todos los botones de esa foto)
+                gridBtns.each(function() {
+                    const icon = $(this).find("i");
+                    if (newHasLiked) {
+                        icon.removeClass("fa-regular").addClass("fa-solid text-danger");
+                    } else {
+                        icon.removeClass("fa-solid text-danger").addClass("fa-regular");
+                    }
+                    $(this).find(".grid-likes-count").text(data.likes);
+                });
+
+                // 2. Sincronizar el dataset de la foto (para que el modal herede los likes actuales si se abre)
+                $(`.photo-square-container[data-id='${photoId}']`).data("likes", data.likes);
+
+                // 3. Sincronizar el Modal (si es la foto que estamos viendo)
+                if (modalBtn.data('id') == photoId) {
+                    modalBtn.html(newHasLiked ? '<i class="fa-solid fa-heart text-danger"></i>' : '<i class="fa-regular fa-heart"></i>');
+                    $("#ig-modal-likes").text(data.likes + " me gusta");
+                }
+            }
+        } catch (e) {
+            console.error("Error toggle like:", e);
+        } finally {
+            allRelatedBtns.prop('disabled', false).removeClass('opacity-50');
         }
-      } catch (err) {
-        console.error("Error al modificar like:", err);
-      }
+    }
+
+    $("#ig-modal-like-btn").on("click", function () {
+      const id = $(this).data("id");
+      togglePhotoLike(id, $(this));
     });
 
     // Lógica para dar a like directamente desde el grid
-    $("#photos-grid").on("click", ".grid-like-btn", async function () {
+    $("#photos-grid").on("click", ".grid-like-btn", function (e) {
+      e.stopPropagation(); // Evitar que se abra el lightbox al dar like
       const id = $(this).data("id");
-      if (!id) return;
-
-      const hasLiked = localStorage.getItem("liked_photo_" + id) === "true";
-
-      try {
-        const formData = new FormData();
-        formData.append("photo_id", id);
-        formData.append("unlike", hasLiked);
-
-        const res = await fetch(
-          `${BASE_URL}/api/php/coasters.php?action=like_photo`,
-          {
-            method: "POST",
-            body: formData,
-          },
-        );
-        const data = await res.json();
-        if (data.success) {
-          if (hasLiked) {
-            localStorage.removeItem("liked_photo_" + id);
-            $(this)
-              .find("i")
-              .removeClass("fa-solid text-danger")
-              .addClass("fa-regular");
-          } else {
-            localStorage.setItem("liked_photo_" + id, "true");
-            $(this)
-              .find("i")
-              .removeClass("fa-regular")
-              .addClass("fa-solid text-danger");
-          }
-          $(this).find(".grid-likes-count").text(data.likes);
-
-          // Actualizar los datos del contenedor para que el lightbox también se actualice si se abre después
-          $(this)
-            .closest(".h-100")
-            .find(".photo-square-container")
-            .data("likes", data.likes);
-        }
-      } catch (err) {
-        console.error("Error al modificar like:", err);
-      }
+      togglePhotoLike(id, $(this));
     });
 
     async function loadReviews(order) {
@@ -1058,28 +1057,36 @@ $(document).ready(function () {
                           (window.CURRENT_USERNAME && review.username === window.CURRENT_USERNAME);
 
             const editBtn = isOwn
-              ? `<button class="btn btn-link p-0 ms-auto text-warning edit-review-btn"
+              ? `<button class="btn btn-link p-0 text-warning edit-review-btn d-flex flex-column align-items-center lh-1"
                    data-id="${review.id}"
                    data-note="${review.note}"
                    data-text="${encodeURIComponent(review.review || "")}"
                    title="Editar mi reseña"
-                   style="font-size:1.1rem;line-height:1;text-decoration:none;">
-                   <i class="fa-solid fa-pen-to-square me-1"></i>
-                   <span style="font-size:0.75rem;font-weight:600;text-transform:uppercase;vertical-align:middle;">Editar reseña</span>
+                   style="text-decoration:none; min-width: 60px;">
+                   <i class="fa-solid fa-pen-to-square mb-1 fs-5"></i>
+                   <span class="fw-bold" style="font-size:0.55rem;text-transform:uppercase;">Editar reseña</span>
                  </button>`
               : "";
 
             $("#reviews-list").append(
-              `<div class="border-bottom pb-3 mb-3${isOwn ? " own-review" : ""}">
-              <div class="d-flex align-items-center gap-2 mb-1">
-                <img src="${window.rcwGetAvatarPath(review.profile_image, review.username)}" alt="${review.username}" class="review-avatar" style="width:40px;height:40px;object-fit:cover;border-radius:50%;background:#2d333b;" onerror="this.src='${window.BASE_URL}/web/img/avatars/default_avatar.svg';this.onerror=null;">
-                <strong>${review.username}</strong>
-                <span class="stars-display ms-2">${renderStars(review.note)}</span>
-                <span class="text-muted small ms-2">• ${timeAgo(review.created_at)}</span>
-                ${editBtn}
+              `<div class="border-bottom pb-4 mb-4${isOwn ? " own-review" : ""}">
+              <div class="d-flex align-items-start gap-3 mb-2">
+                <img src="${window.rcwGetAvatarPath(review.profile_image, review.username)}" alt="${review.username}" class="review-avatar shadow-sm" style="width:50px;height:50px;object-fit:cover;border-radius:50%;background:#2d333b; border: 2px solid rgba(255,255,255,0.05);" onerror="this.src='${window.BASE_URL}/web/img/avatars/default_avatar.svg';this.onerror=null;">
+                <div class="flex-grow-1 min-w-0">
+                  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-1">
+                    <strong class="text-white fs-6 text-truncate flex-grow-1 min-w-0" title="${review.username}">${review.username}</strong>
+                    ${editBtn}
+                  </div>
+                  <div class="d-flex align-items-center flex-wrap gap-2">
+                    <span class="stars-display lh-1">${renderStars(review.note)}</span>
+                    <span class="text-muted small">• ${timeAgo(review.created_at)}</span>
+                  </div>
+                </div>
               </div>
               ${tagsHtml}
-              <p class="mb-0 mt-3 text-white-50" style="font-size:0.9rem; line-height:1.6;">${review.review || ""}</p>
+              <div class="mt-3 p-3 bg-dark bg-opacity-25 rounded border-start border-3 border-success border-opacity-50">
+                <p class="mb-0 text-white-50" style="font-size:0.92rem; line-height:1.7;">${review.review || ""}</p>
+              </div>
             </div>`,
             );
           });
@@ -1494,4 +1501,28 @@ $(document).ready(function () {
         closeDropdown();
     });
   }
+
+  // --- COMPARTIR ---
+  $("#btn-share").on("click", async function () {
+    const title = document.getElementById("coaster-name")?.textContent || "RollerCoaster World";
+    const text = `Mira esta montaña rusa en RollerCoaster World: ${title}`;
+    const url = window.location.href;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, text, url });
+      } catch (err) {
+        if (err.name !== "AbortError") console.error("Error sharing:", err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        if (window.rcwToast)
+          window.rcwToast("Enlace copiado al portapapeles", "success");
+        else alert("Enlace copiado al portapapeles");
+      } catch (err) {
+        console.error("Error copying:", err);
+      }
+    }
+  });
 });

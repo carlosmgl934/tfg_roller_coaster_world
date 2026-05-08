@@ -1,5 +1,5 @@
 /* ============================================================
-   home.css — Estilos de la landing page (vista guest)
+   home.css -  Estilos de la landing page (vista guest)
    RollerCoaster World
    ============================================================ */
 
@@ -7,7 +7,7 @@
   overflow-x: hidden;
 }
 
-/* ── Tipografía hero ─────────────────────────────────────── */
+/* Tipografía hero */
 .landing-title {
   font-family: "Outfit", sans-serif;
   letter-spacing: -2px;
@@ -18,7 +18,7 @@
   color: var(--rcw-text-muted);
 }
 
-/* ── Badge pill hero ─────────────────────────────────────── */
+/*Badge pill hero */
 .landing-badge {
   background: rgba(16, 185, 129, 0.12);
   border: 1px solid rgba(16, 185, 129, 0.3);
@@ -30,7 +30,7 @@
   letter-spacing: 0.02em;
 }
 
-/* ── Stats bar en el hero ────────────────────────────────── */
+/*Stats bar en el hero */
 .landing-stats-bar {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -42,7 +42,6 @@
   align-self: center;
 }
 
-/* ── Sección CTA final ───────────────────────────────────── */
 .landing-cta-section {
   background: linear-gradient(135deg, var(--rcw-bg) 0%, #071a10 100%);
   border-top: 1px solid var(--rcw-border);
@@ -72,7 +71,6 @@
   box-shadow: 0 12px 32px rgba(16, 185, 129, 0.08);
 }
 
-/* ── General hover utilities ─────────────────────────────── */
 .hover-scale {
   transition: transform 0.2s ease;
 }
@@ -85,7 +83,6 @@
   transition: all 0.3s ease;
 }
 
-/* ── CTA final ───────────────────────────────────────────── */
 .landing-cta-glow {
   width: 160px;
   height: 4px;
@@ -96,7 +93,8 @@
     transparent
   );
   border-radius: 999px;
-} /* ============================================================
+}
+/* ============================================================
    ESTILOS DASHBOARD LOGUEADO (Mockup style)
    ============================================================ */
 /* HERO CAROUSEL - full-width */
@@ -257,10 +255,10 @@
   text-align: center;
 }
 .home-stat-num {
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: 800;
   color: var(--rcw-green);
-  line-height: 1;
+  line-height: 1.1;
 }
 .home-stat-label {
   font-size: 0.72rem;
@@ -274,6 +272,11 @@
   width: 1px;
   height: 40px;
   background: var(--rcw-border);
+}
+.stat-icon {
+  font-size: 0.85rem;
+  color: var(--rcw-green);
+  opacity: 0.5;
 }
 
 /* SECTIONS */
@@ -290,6 +293,8 @@
   align-items: center;
   gap: 10px;
   color: var(--rcw-text);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .home-section-title::before {
   content: "";
@@ -542,7 +547,7 @@
   font-size: 0.82rem;
   color: var(--rcw-text-muted);
   line-height: 1.5;
-  /* Truncar a 2 líneas por defecto (cards pequeñas) */
+  /* Truncar a 2 lÃ­neas por defecto (cards pequeÃ±as) */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -599,8 +604,8 @@
   top: 50%;
   transform: translateY(-50%);
   z-index: 4;
-  background: rgba(0,0,0,0.35);
-  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   color: #fff;
   width: 44px;
   height: 44px;
@@ -609,15 +614,21 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
+  transition:
+    background 0.2s,
+    transform 0.2s;
   backdrop-filter: blur(4px);
 }
 .home-hero-arrow:hover {
-  background: rgba(16,185,129,0.55);
+  background: rgba(16, 185, 129, 0.55);
   transform: translateY(-50%) scale(1.08);
 }
-.home-hero-arrow-prev { left: 1.5rem; }
-.home-hero-arrow-next { right: 1.5rem; }
+.home-hero-arrow-prev {
+  left: 1.5rem;
+}
+.home-hero-arrow-next {
+  right: 1.5rem;
+}
 
 .home-wrapper {
   max-width: 1700px;
@@ -642,7 +653,7 @@
   }
 }
 
-/*  Admin: bot�n l�piz en el carrusel  */
+/*  Admin: botón lápiz en el carrusel  */
 .carousel-admin-edit-btn {
   position: absolute;
   bottom: 4.5rem;
@@ -651,8 +662,8 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: rgba(0,0,0,0.55);
-  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   color: #fff;
   font-size: 0.72rem;
   display: flex;
@@ -660,10 +671,12 @@
   justify-content: center;
   cursor: pointer;
   backdrop-filter: blur(6px);
-  transition: background 0.2s, transform 0.15s;
+  transition:
+    background 0.2s,
+    transform 0.15s;
 }
 .carousel-admin-edit-btn:hover {
-  background: rgba(16,185,129,0.65);
+  background: rgba(16, 185, 129, 0.65);
   transform: scale(1.1);
 }
 
@@ -679,12 +692,19 @@
   justify-content: center;
   transition: border-color 0.2s;
 }
-.carousel-slot-card:hover { border-color: #198754; }
-.carousel-slot-card img { width: 100%; height: 100%; object-fit: cover; }
+.carousel-slot-card:hover {
+  border-color: #198754;
+}
+.carousel-slot-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 .carousel-slot-label {
   position: absolute;
-  top: 0.4rem; left: 0.6rem;
-  background: rgba(0,0,0,0.65);
+  top: 0.4rem;
+  left: 0.6rem;
+  background: rgba(0, 0, 0, 0.65);
   color: #fff;
   font-size: 0.65rem;
   font-weight: 700;
@@ -695,7 +715,12 @@
 }
 .carousel-slot-actions {
   position: absolute;
-  bottom: 0.4rem; right: 0.4rem;
-  display: flex; gap: 0.3rem;
+  bottom: 0.4rem;
+  right: 0.4rem;
+  display: flex;
+  gap: 0.3rem;
 }
-.carousel-slot-empty { color: #30363d; font-size: 1.8rem; }
+.carousel-slot-empty {
+  color: #30363d;
+  font-size: 1.8rem;
+}

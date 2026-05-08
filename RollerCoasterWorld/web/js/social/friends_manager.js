@@ -32,7 +32,8 @@ $(document).ready(function () {
       if (payload.success) {
         allFriends = payload.data.friends || [];
         const forumInvites = payload.data.forum_invitations || [];
-        renderReceived(payload.data.received_requests, forumInvites);
+        const tripInvites = payload.data.trip_invitations || [];
+        renderReceived(payload.data.received_requests, forumInvites, tripInvites);
         renderSent(payload.data.sent_requests);
         filterAndRenderFriends();
       } else {
@@ -116,10 +117,11 @@ $(document).ready(function () {
   searchInput.on("input", filterAndRenderFriends);
   sortSelect.on("change", filterAndRenderFriends);
 
-  function renderReceived(requests, forumInvites) {
+  function renderReceived(requests, forumInvites, tripInvites) {
     requestsList.empty();
     forumInvites = forumInvites || [];
-    const totalCount = requests.length + forumInvites.length;
+    tripInvites = tripInvites || [];
+    const totalCount = requests.length + forumInvites.length + tripInvites.length;
     requestsCount.text(totalCount);
 
     if (totalCount > 0) {
@@ -221,6 +223,41 @@ $(document).ready(function () {
         </div>`;
     });
 
+    // ── Invitaciones de viajes ──────────────────────────────────
+    tripInvites.forEach((inv) => {
+      const avatarSrc = getAvatarUrl(inv.inviter_image, inv.inviter_username, "10b981", "fff");
+      html += `
+        <div class="list-group-item bg-transparent py-3 px-4 border-bottom border-secondary border-opacity-25"
+             style="border-left: 3px solid #10b981 !important;">
+          <div class="d-flex align-items-center">
+            <img src="${avatarSrc}" alt="${inv.inviter_username}"
+                 class="rounded-circle object-fit-cover me-4 shadow-sm flex-shrink-0"
+                 style="width: 50px; height: 50px; border: 2px solid #10b981;"
+                 onerror="this.src=window.BASE_URL+'/web/img/avatars/default_avatar.svg'">
+            <div class="flex-grow-1 min-w-0">
+               <span class="text-white fw-bold d-block text-truncate fs-5 mb-1">${inv.inviter_username}</span>
+               <small class="d-block mb-1 text-success">
+                 <i class="fa-solid fa-suitcase-rolling me-1"></i>
+                 Te invita al viaje
+               </small>
+               <span class="badge text-white fw-semibold px-2 py-1" style="background:rgba(16,185,129,0.15); border:1px solid #10b981; white-space:normal; line-height:1.3; max-width:280px; text-align:left; display:inline-block;">
+                 "${esc(inv.trip_title)}"
+               </span>
+            </div>
+            <div class="d-flex flex-column gap-2 ms-3 flex-shrink-0" style="z-index:2;">
+               <button class="btn btn-sm btn-success shadow-sm rcw-trip-invite-btn px-3 fw-bold"
+                       data-action="accept" data-invite-id="${inv.invite_id}" title="Aceptar">
+                 <i class="fa-solid fa-check"></i>
+               </button>
+               <button class="btn btn-sm btn-outline-danger shadow-sm rcw-trip-invite-btn px-3 fw-bold"
+                       data-action="decline" data-invite-id="${inv.invite_id}" title="Rechazar">
+                 <i class="fa-solid fa-xmark"></i>
+               </button>
+            </div>
+          </div>
+        </div>`;
+    });
+
     requestsList.html(html);
   }
 
@@ -277,19 +314,17 @@ $(document).ready(function () {
 
       let detailsHtml =
         details.length > 0
-          ? details.join('<span class="mx-2 opacity-25">&bull;</span>')
+          ? `<div class="d-flex flex-wrap gap-2 align-items-center">${details.join('<span class="d-none d-sm-inline opacity-25">•</span>')}</div>`
           : '<i class="fa-solid fa-user text-muted me-1"></i>Miembro RCW';
 
       html += `
         <div class="col-12">
-          <div class="rcw-friend-row d-flex align-items-center gap-3 px-4 py-3"
-               style="background-color: #1a222e;
-                      border-bottom: 1px solid var(--rcw-border);
-                      transition: background 0.2s;"
+          <div class="rcw-friend-row d-flex align-items-center gap-3 px-3 px-md-4 py-3"
+               style="background-color: #1a222e; border-bottom: 1px solid var(--rcw-border); transition: background 0.2s;"
                onmouseover="this.style.background='#222b38'"
                onmouseout="this.style.background='#1a222e'">
 
-            <!-- Avatar Redondo -->
+            <!-- Avatar -->
             <div class="flex-shrink-0">
               <img src="${avatarSrc}"
                 alt="${friend.username}"
@@ -298,29 +333,29 @@ $(document).ready(function () {
                 onerror="this.onerror=null; this.src=window.BASE_URL+'/web/img/avatars/default_avatar.svg'">
             </div>
 
-            <!-- Info del amigo -->
+            <!-- Info -->
             <div class="flex-grow-1 min-w-0 py-1">
-              <div class="d-flex align-items-baseline gap-2 mb-0">
+              <div class="d-flex align-items-baseline flex-wrap gap-2 mb-0">
                 <a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${friend.id}"
                    class="text-white text-decoration-none fw-bold"
-                   style="font-size: 1rem;">
+                   style="font-size: 1rem; font-family: var(--rcw-font-title);">
                   ${friend.username}
                 </a>
-                <small class="text-success fw-bold" style="font-size: 0.65rem;"><i class="fa-solid fa-circle-check me-1"></i>Amigo</small>
+                <small class="text-success fw-bold d-flex align-items-center gap-1" style="font-size: 0.65rem;">
+                   <i class="fa-solid fa-circle-check"></i> AMIGO
+                </small>
                 <small class="text-muted font-monospace ms-1" style="font-size: 0.7rem;">Nº ${String(friend.id).padStart(6, "0")}</small>
               </div>
-              <div class="text-muted text-truncate mt-1" style="font-size: 0.75rem;">
+              <div class="text-muted mt-1" style="font-size: 0.75rem;">
                 ${detailsHtml}
               </div>
             </div>
 
-
-
             <!-- Btn Eliminar -->
-            <div class="flex-shrink-0 rcw-trigger-remove"
+            <div class="flex-shrink-0 ms-auto rcw-trigger-remove"
                  data-id="${friend.id}" data-name="${friend.username}"
                  title="Eliminar amigo"
-                 style="cursor:pointer; position:relative; z-index:10;">
+                 style="cursor:pointer; z-index:10;">
               <button class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center"
                       style="width:36px; height:36px; border-width: 2px;"
                       tabindex="-1">
@@ -561,4 +596,59 @@ $(document).ready(function () {
     }
     btn.prop("disabled", false).text("Eliminar");
   });
+
+  // Trip invite actions (accept / decline)
+  $(document).on("click", ".rcw-trip-invite-btn", async function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const btn      = $(this);
+    const action   = btn.data("action");
+    const inviteId = btn.data("invite-id");
+    const accept   = action === "accept";
+
+    const originalHtml = btn.html();
+    btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span>');
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/php/trips.php?action=respond_invite`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ invite_id: inviteId, accept: accept }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchFriendsData();
+        // Also refresh header badge if needed
+        if (typeof updateCommBadge === "function") updateCommBadge();
+      } else {
+        alert("Error: " + (data.error || "Acción fallida"));
+        btn.prop("disabled", false).html(originalHtml);
+      }
+    } catch (err) {
+      console.error(err);
+      btn.prop("disabled", false).html(originalHtml);
+    }
+  });
 });
+
+// Helpers globales para escape de strings (por si no están definidos)
+function esc(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function escJS(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "\\r");
+}

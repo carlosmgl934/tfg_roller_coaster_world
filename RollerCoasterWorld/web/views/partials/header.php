@@ -270,10 +270,10 @@ header("Expires: 0"); // Proxies
               </a>
               <ul class="dropdown-menu shadow border-0">
                 <li><a class="dropdown-item py-2" href="<?= Router::url('trips') ?>"><i
-                      class="fa-solid fa-suitcase w-20px text-center me-2 text-warning"></i> Mis viajes</a></li>
+                      class="fa-solid fa-calendar-days w-20px text-center me-2 text-success"></i> Mi Agenda</a></li>
+                <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('trip_generator') ?>"><i
-                      class="fa-solid fa-wand-magic-sparkles w-20px text-center me-2 text-danger"></i> Generador de
-                    viajes</a></li>
+                      class="fa-solid fa-wand-magic-sparkles w-20px text-center me-2 text-danger"></i> Generador IA</a></li>
               </ul>
             </li>
           <?php endif; ?>

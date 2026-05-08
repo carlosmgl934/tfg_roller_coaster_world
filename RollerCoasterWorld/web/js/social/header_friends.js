@@ -101,7 +101,8 @@ $(document).ready(function () {
         const data = await res.json();
         if (data.success) {
             globalCommCount = (data.data.received_requests || []).length
-                        + (data.data.forum_invitations || []).length;
+                        + (data.data.forum_invitations || []).length
+                        + (data.data.trip_invitations || []).length;
             if (globalCommCount > 0) {
                 mainBadge.text(globalCommCount);
                 innerBadge.text(globalCommCount);

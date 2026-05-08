@@ -21,6 +21,48 @@ $(document).ready(function () {
     },
   });
 
+  function showSection(sectionId) {
+    // Hide all contents
+    document.querySelectorAll('.col-lg-8 > div[id^="section-"]').forEach(el => {
+      el.classList.add('d-none');
+    });
+
+    // Remove active class from all menu items
+    document.querySelectorAll('#profile-menu .list-group-item').forEach(el => {
+      el.classList.remove('active');
+    });
+
+    // Show the target section
+    const targetEl = document.getElementById(sectionId);
+    if (targetEl) targetEl.classList.remove('d-none');
+
+    // Add active class to corresponding menu item
+    const menuItem = document.querySelector(`#profile-menu a[href="#${sectionId.replace('section-', '')}"]`);
+    if (menuItem) menuItem.classList.add('active');
+    
+    if (sectionId === 'section-reviews') {
+      loadUserReviews();
+    } else if (sectionId === 'section-tops') {
+      window.loadUserTops();
+    } else if (sectionId === 'section-trips-content') {
+      if(window.loadTrips) window.loadTrips();
+      if(window.loadRanking) window.loadRanking();
+    }
+  }
+
+  // Setup trips view toggle (Grid vs Stats)
+  document.querySelectorAll('input[name="trips-view-toggle"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      if (this.value === 'list') {
+        document.getElementById('trips-view-list').classList.remove('d-none');
+        document.getElementById('trips-view-stats').classList.add('d-none');
+      } else {
+        document.getElementById('trips-view-list').classList.add('d-none');
+        document.getElementById('trips-view-stats').classList.remove('d-none');
+      }
+    });
+  });
+
   // ── Auto-relleno de país usando Nominatim (OpenStreetMap) ──────────────────
   const cityInput = document.getElementById("config-user-city");
   const countryInput = document.getElementById("config-user-country");
@@ -748,27 +790,26 @@ $(document).ready(function () {
     // Definir qué badges mostrar según el criterio de sort
     function getStatBadges(item, sortKey) {
       const mfr = item.manufacter
-        ? `<small class="text-secondary"><i class="fa-solid fa-industry me-1"></i>${item.manufacter}</small>`
+        ? `<small class="text-secondary d-flex align-items-center gap-1" title="${item.manufacter}"><i class="fa-solid fa-industry"></i><span class="text-truncate d-inline-block" style="max-width: 100px;">${item.manufacter}</span></small>`
         : "";
 
       if (sortKey === "height") {
-        return (item.height ? `<small class="text-info"><i class="fa-solid fa-ruler-vertical me-1"></i>${item.height} m</small>` : "") + mfr;
+        return (item.height ? `<small class="text-info d-flex align-items-center gap-1"><i class="fa-solid fa-ruler-vertical"></i>${item.height} m</small>` : "") + mfr;
       }
       if (sortKey === "speed") {
-        return (item.speed ? `<small class="text-warning"><i class="fa-solid fa-bolt me-1"></i>${item.speed} km/h</small>` : "") + mfr;
+        return (item.speed ? `<small class="text-warning d-flex align-items-center gap-1"><i class="fa-solid fa-bolt"></i>${item.speed} km/h</small>` : "") + mfr;
       }
       if (sortKey === "length") {
-        return (item.coaster_length ? `<small class="text-info"><i class="fa-solid fa-ruler-horizontal me-1"></i>${item.coaster_length} m</small>` : "") + mfr;
+        return (item.coaster_length ? `<small class="text-info d-flex align-items-center gap-1"><i class="fa-solid fa-ruler-horizontal"></i>${item.coaster_length} m</small>` : "") + mfr;
       }
       if (sortKey === "inversions") {
-        return (item.inversions != null ? `<small class="text-warning"><i class="fa-solid fa-infinity me-1"></i>${item.inversions} inv.</small>` : "") + mfr;
+        return (item.inversions != null ? `<small class="text-warning d-flex align-items-center gap-1"><i class="fa-solid fa-infinity"></i>${item.inversions} inv.</small>` : "") + mfr;
       }
       if (sortKey === "year") {
-        return (item.opening_year ? `<small class="text-secondary"><i class="fa-regular fa-calendar me-1"></i>${item.opening_year}</small>` : "") + mfr;
+        return (item.opening_year ? `<small class="text-secondary d-flex align-items-center gap-1"><i class="fa-regular fa-calendar"></i>${item.opening_year}</small>` : "") + mfr;
       }
-      // rank, name, o cualquier otro → muestra altura + velocidad + fabricante
-      return (item.height ? `<small class="text-info"><i class="fa-solid fa-ruler-vertical me-1"></i>${item.height} m</small>` : "")
-        + (item.speed ? `<small class="text-warning"><i class="fa-solid fa-bolt me-1"></i>${item.speed} km/h</small>` : "")
+      return (item.height ? `<small class="text-info d-flex align-items-center gap-1"><i class="fa-solid fa-ruler-vertical"></i>${item.height}m</small>` : "")
+        + (item.speed ? `<small class="text-warning d-flex align-items-center gap-1"><i class="fa-solid fa-bolt"></i>${item.speed}km/h</small>` : "")
         + mfr;
     }
 
@@ -782,29 +823,29 @@ $(document).ready(function () {
       if (isGrid) {
         container.append(`
           <div class="${colClass}">
-            <a href="${detailUrl}" class="top-card position-relative d-block text-decoration-none">
+            <a href="${detailUrl}" class="top-card position-relative d-block text-decoration-none shadow-sm">
               ${img}
               <span class="rank-badge">#${item.rank_position}</span>
               <div class="p-2">
-                <div class="fw-bold text-white small text-truncate">${item.coaster_name}</div>
-                <div class="text-secondary" style="font-size:.75rem;">${item.park_name}</div>
+                <div class="fw-bold text-white small text-truncate" style="font-family: var(--rcw-font-title);">${item.coaster_name}</div>
+                <div class="text-secondary text-truncate" style="font-size:.7rem;">${item.park_name}</div>
               </div>
             </a>
           </div>`);
       } else {
         container.append(`
           <div class="${colClass}">
-            <a href="${detailUrl}" class="top-card d-flex align-items-stretch text-decoration-none" style="height:120px;">
-              <div style="width:120px;flex-shrink:0;position:relative;">
-                ${img.replace("height:150px", "height:120px")}
-                <span class="rank-badge">#${item.rank_position}</span>
+            <a href="${detailUrl}" class="top-card d-flex align-items-stretch text-decoration-none shadow-sm mb-2" style="height:110px;">
+              <div style="width:110px; flex-shrink:0; position:relative;">
+                ${img.replace("height:150px", "height:110px").replace("height:120px", "height:110px")}
+                <span class="rank-badge" style="font-size: 0.65rem; padding: 2px 6px;">#${item.rank_position}</span>
               </div>
-              <div class="p-3 flex-grow-1 d-flex flex-column justify-content-between">
-                <div>
-                  <div class="fw-bold text-white">${item.coaster_name}</div>
-                  <small class="text-secondary">${item.park_name} · ${item.country_name || ""}</small>
+              <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center" style="width: 0; min-width: 0;">
+                <div class="mb-1 pe-2">
+                  <div class="fw-bold text-white text-truncate" style="font-family: var(--rcw-font-title); font-size: 0.95rem; width: 100%;">${item.coaster_name}</div>
+                  <small class="text-muted text-truncate d-block" style="font-size: 0.72rem; width: 100%;">${item.park_name} · ${item.country_name || ""}</small>
                 </div>
-                <div class="d-flex gap-3 flex-wrap">
+                <div class="d-flex gap-2 flex-wrap mt-1">
                   ${getStatBadges(item, sort)}
                 </div>
               </div>
@@ -871,19 +912,19 @@ $(document).ready(function () {
         const detailUrl = `${BASE_URL}/web/views/public/parks/parks.php?id=${item.park_id}`;
         container.append(`
           <div class="${colClass}">
-            <a href="${detailUrl}" class="top-card d-flex align-items-stretch text-decoration-none" style="height:120px;">
-              <div style="width:120px;flex-shrink:0;position:relative;">
-                ${img.replace("height:150px", "height:120px")}
-                <span class="rank-badge">#${item.rank_position}</span>
+            <a href="${detailUrl}" class="top-card d-flex align-items-stretch text-decoration-none shadow-sm mb-2" style="height:110px;">
+              <div style="width:110px; flex-shrink:0; position:relative;">
+                ${img.replace("height:150px", "height:110px").replace("height:120px", "height:110px")}
+                <span class="rank-badge" style="font-size: 0.65rem; padding: 2px 6px;">#${item.rank_position}</span>
               </div>
-              <div class="p-3 flex-grow-1 d-flex flex-column justify-content-between">
-                <div>
-                  <div class="fw-bold text-white">${item.park_name}</div>
-                  <small class="text-secondary">${item.country_name || ""}</small>
+              <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center" style="width: 0; min-width: 0;">
+                <div class="mb-1 pe-2">
+                  <div class="fw-bold text-white text-truncate" style="font-family: var(--rcw-font-title); font-size: 0.95rem; width: 100%;">${item.park_name}</div>
+                  <small class="text-muted text-truncate d-block" style="font-size: 0.72rem; width: 100%;">${item.country_name || ""}</small>
                 </div>
-                <div class="d-flex gap-3 flex-wrap">
-                  ${item.operating_coasters ? `<small class="text-info"><i class="fa-solid fa-ticket me-1"></i>${item.operating_coasters} coasters</small>` : ""}
-                  ${item.stars ? `<small class="text-warning"><i class="fa-solid fa-star me-1"></i>${parseFloat(item.stars).toFixed(1)}</small>` : ""}
+                <div class="d-flex gap-2 flex-wrap mt-1">
+                  ${item.operating_coasters ? `<small class="text-info d-flex align-items-center gap-1"><i class="fa-solid fa-ticket"></i>${item.operating_coasters} coasters</small>` : ""}
+                  ${item.stars ? `<small class="text-warning d-flex align-items-center gap-1"><i class="fa-solid fa-star"></i>${parseFloat(item.stars).toFixed(1)}</small>` : ""}
                 </div>
               </div>
             </a>
@@ -904,9 +945,9 @@ $(document).ready(function () {
         <div class="tops-edit-item" data-id="${item.coaster_id}">
           <i class="fa-solid fa-grip-lines drag-handle fs-5"></i>
           <span class="tops-rank-badge">#${i + 1}</span>
-          <div class="flex-grow-1">
-            <span class="fw-bold text-white">${item.coaster_name}</span>
-            <small class="text-secondary ms-2">${item.park_name}</small>
+          <div class="flex-grow-1 min-w-0 pe-3">
+            <div class="fw-bold text-white text-truncate">${item.coaster_name}</div>
+            <small class="text-secondary d-block text-truncate">${item.park_name}</small>
           </div>
           <button class="btn btn-sm btn-outline-danger border-0 square-box tops-remove-item"><i class="fa-solid fa-trash"></i></button>
         </div>`);
@@ -1453,7 +1494,7 @@ $(document).ready(function () {
   function showSection(sectionId) {
     // Ocultar todas las secciones principales
     $(
-      "#section-profile-content, #section-config-content, #section-tops-content, #section-reviews-content, #section-friends-content, #section-map-content",
+      "#section-profile-content, #section-config-content, #section-tops-content, #section-reviews-content, #section-friends-content, #section-trips-content, #section-map-content",
     ).addClass("d-none");
 
     // Quitar el active de todos los enlaces del menú
@@ -1475,6 +1516,9 @@ $(document).ready(function () {
     } else if (sectionId === "#profile-friends") {
       $("#section-friends-content").removeClass("d-none");
       $("#menu-friends").addClass("active");
+    } else if (sectionId === "#profile-trips") {
+      $("#section-trips-content").removeClass("d-none");
+      $("#menu-trips").addClass("active");
     } else if (sectionId === "#profile-map") {
       $("#section-map-content").removeClass("d-none");
       $("#menu-map").addClass("active");
@@ -1511,6 +1555,14 @@ $(document).ready(function () {
     showSection("#profile-friends");
   });
 
+  $("#menu-trips").on("click", function (e) {
+    e.preventDefault();
+    history.replaceState(null, null, "#trips");
+    showSection("#profile-trips");
+    loadTrips();
+    loadRanking();
+  });
+
   $("#menu-map").on("click", function (e) {
     e.preventDefault();
     history.replaceState(null, null, "#map");
@@ -1523,6 +1575,7 @@ $(document).ready(function () {
     "#config": "#profile-config",
     "#reviews": "#profile-reviews",
     "#friends": "#profile-friends",
+    "#trips": "#profile-trips",
     "#map": "#profile-map",
   };
 
@@ -2042,38 +2095,45 @@ $(document).ready(function () {
         : `<p class="mb-0 text-muted small fst-italic">Sin texto de reseña.</p>`;
 
       $list.append(`
-        <div class="top-card d-flex align-items-stretch mb-3" style="min-height:130px;" data-review-id="${r.id}" data-review-type="${r.type}" data-item-id="${r.item_id}">
+        <div class="top-card d-flex flex-row align-items-stretch mb-3" style="min-height:130px;" data-review-id="${r.id}" data-review-type="${r.type}" data-item-id="${r.item_id}">
           <!-- Miniatura -->
-          <div style="width:130px;flex-shrink:0;background:#0d1117;overflow:hidden;">
+          <div class="flex-shrink-0 bg-dark overflow-hidden d-none d-sm-block" style="width:130px;">
             ${imgHtml}
           </div>
+          <div class="flex-shrink-0 bg-dark overflow-hidden d-block d-sm-none" style="width:90px;">
+            ${imgHtml}
+          </div>
+          
           <!-- Contenido -->
-          <div class="p-3 flex-grow-1 d-flex flex-column justify-content-between" style="min-width:0;">
+          <div class="p-3 flex-grow-1 d-flex flex-column justify-content-between min-w-0">
             <div>
               <div class="d-flex justify-content-between align-items-start mb-1 gap-2">
-                <a href="${detailUrl}" class="fw-bold text-white text-decoration-none"
-                   style="font-size:0.95rem;word-break:break-word;flex:1 1 0;min-width:0;">${r.title}</a>
+                <a href="${detailUrl}" class="fw-bold text-white text-decoration-none text-truncate-2"
+                   style="font-size:0.95rem; line-height: 1.2; flex:1; min-width:0;">${r.title}</a>
                 <span class="badge rounded-0 fw-bold px-2 py-1 flex-shrink-0"
-                      style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.67rem;white-space:nowrap;">
-                  ${typeIcon}${typeLabel}
+                      style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.6rem;white-space:nowrap; height: fit-content;">
+                  ${typeLabel}
                 </span>
               </div>
-              <small class="text-secondary d-block mb-2">${r.subtitle || ""}</small>
+              <small class="text-secondary d-block mb-2 text-truncate" style="font-size: 0.75rem;">${r.subtitle || ""}</small>
               ${reviewText}
             </div>
-            <div class="d-flex justify-content-between align-items-center mt-2">
+            
+            <!-- Footer: Estrellas y Botón -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center mt-3 pt-2 border-top border-secondary border-opacity-10 gap-2">
               <div class="d-flex align-items-center gap-2">
-                ${starsHtml(r.note)}
-                <span class="fw-bold text-warning" style="font-size:0.85rem;">${notaText}/5</span>
+                <div class="stars-container d-flex gap-1" style="font-size: 0.75rem;">${starsHtml(r.note)}</div>
+                <span class="fw-bold text-warning" style="font-size:0.8rem;">${notaText}</span>
               </div>
-              <div class="d-flex align-items-center gap-2">
-                <small class="text-muted">${formatReviewDate(r.created_at)}</small>
-                <button class="btn btn-link p-0 text-warning profile-edit-review-btn"
+              
+              <div class="d-flex align-items-center gap-2 ms-auto">
+                <small class="text-muted d-none d-md-inline" style="font-size: 0.7rem;">${formatReviewDate(r.created_at)}</small>
+                <button class="btn btn-link p-0 text-warning profile-edit-review-btn d-flex align-items-center gap-1"
                         data-id="${r.id}" data-type="${r.type}"
                         data-note="${nota}" data-text="${encodeURIComponent(r.review || '')}"
-                        title="Editar reseña" style="font-size:1.1rem;text-decoration:none;">
-                  <i class="fa-solid fa-pen-to-square me-1"></i>
-                  <span style="font-size:0.75rem;font-weight:600;text-transform:uppercase;vertical-align:middle;">Editar reseña</span>
+                        title="Editar reseña" style="text-decoration:none;">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                  <span class="fw-bold text-uppercase" style="font-size:0.65rem;">Editar</span>
                 </button>
               </div>
             </div>
@@ -2768,5 +2828,288 @@ $(document).ready(function () {
 
   if (window.location.hash === "#map") {
     setTimeout(() => initMap(), 200);
+  }
+  if (window.location.hash === "#trips") {
+    loadTrips();
+    loadRanking();
+  }
+
+  // ─── VIAJES ──────────────────────────────────────────────────
+  async function loadTrips() {
+    const container = $("#trips-grid");
+    container.html('<div class="text-center py-4 text-muted small"><div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>Cargando viajes...</div>');
+    try {
+      const res = await fetch(`${BASE_URL}/api/php/trips.php?action=list`);
+      const j = await res.json();
+      const d = j.data || [];
+      if (!d.length) {
+        container.html('<div class="text-center py-4 text-muted"><i class="fa-solid fa-suitcase fa-2x mb-2 opacity-50"></i><br>Aún no tienes viajes registrados.</div>');
+        return;
+      }
+      let html = "";
+      d.forEach((t) => {
+        const start = new Date(t.start_date);
+        start.setHours(0,0,0,0);
+        const end = new Date(t.end_date);
+        end.setHours(23,59,59,999);
+        const diff = Math.ceil((end - start) / 86400000);
+        
+        const today = new Date();
+        let t_status = "upcoming";
+        if (today > end) t_status = "past";
+        else if (today >= start && today <= end) t_status = "active";
+        
+        const statusClass = t_status === "past" ? "bg-secondary" : t_status === "active" ? "bg-success" : "bg-warning text-dark";
+        const statusText = t_status === "past" ? "Pasado" : t_status === "active" ? "Activo" : "Próximo";
+        let imgUrl = window.BASE_URL + '/dummy.jpg';
+        if (t.cover_image) {
+            imgUrl = t.cover_image.startsWith('http') ? t.cover_image : (window.BASE_URL + t.cover_image);
+        }
+        const pNames = t.park_names ? t.park_names : 'Sin parques planificados';
+        const startStr = start.toLocaleDateString("es-ES", { day: "numeric", month: "short" });
+        const endStr = end.toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" });
+        
+        html += `
+          <div class="trip-card shadow-sm h-100 rounded-1" onclick="openTrip(${t.id})" style="background: #111;">
+            <div style="height: 140px; position: relative; overflow: hidden;">
+               ${t.cover_image ? `<img src="${imgUrl}" referrerpolicy="no-referrer" onerror="this.style.opacity='0'" class="w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease, opacity 0.3s ease;">` : ''}
+               <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(13,17,23,0.9));"></div>
+               <div class="position-absolute bottom-0 start-0 w-100 p-3 text-white">
+                 <div class="d-flex align-items-center gap-2 mb-1">
+                    <span class="badge ${statusClass}" style="font-size:0.6rem; letter-spacing:0.05em;">${statusText}</span>
+                    <span class="small opacity-75" style="font-size:0.75rem;"><i class="fa-regular fa-clock me-1"></i>${diff} d</span>
+                 </div>
+                 <h5 class="fw-bold mb-0 text-truncate" style="font-family: var(--rcw-font-title); font-size:1.1rem;">${t.title}</h5>
+               </div>
+            </div>
+            <div class="card-body p-3">
+              <div class="d-flex align-items-center gap-2 mb-2 text-muted small" style="font-size: 0.8rem; font-weight:600;">
+                <i class="fa-solid fa-calendar-day text-success"></i> ${startStr} — ${endStr}
+              </div>
+              <div class="small text-muted mb-2 text-truncate" style="font-size:0.75rem;"><i class="fa-solid fa-map-pin me-1 opacity-50"></i>${pNames}</div>
+              ${t.description ? `<div class="small text-white-50" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font-size:0.8rem; line-height:1.4;">${t.description}</div>` : ''}
+            </div>
+          </div>
+        `;
+      });
+      container.html(html);
+    } catch (e) {
+      container.html('<div class="text-center py-4 text-danger">Error cargando viajes.</div>');
+    }
+  }
+
+  // ─── RANKING ─────────────────────────────────────────────────
+  async function loadRanking() {
+    const sType = document.getElementById("rank-type-select");
+    const container = document.getElementById("ranking-container");
+    const pBtns = document.querySelectorAll(".rank-period-btn");
+    const sDate = document.getElementById("rank-start-date");
+    const eDate = document.getElementById("rank-end-date");
+    const prevBtn = document.getElementById("rank-prev-btn");
+    const nextBtn = document.getElementById("rank-next-btn");
+    const navLabel = document.getElementById("rank-nav-label");
+    let currentPeriod = "year";
+    let baseDate = new Date();
+    let customStart = "";
+    let customEnd = "";
+    let cachedData = null;
+
+    function updateLabel() {
+      const navContainer = document.getElementById("rank-nav-container");
+      if (currentPeriod === "all" || currentPeriod === "custom") {
+        if (navContainer) navContainer.classList.add("d-none");
+        navLabel.textContent = "Siempre";
+      } else {
+        if (navContainer) navContainer.classList.remove("d-none");
+        if (currentPeriod === "year") navLabel.textContent = baseDate.getFullYear();
+        else if (currentPeriod === "month") {
+          let s = baseDate.toLocaleString("es-ES", {month:"long", year:"numeric"});
+          navLabel.textContent = s.charAt(0).toUpperCase() + s.slice(1);
+        } else if (currentPeriod === "week") {
+          const wStart = new Date(baseDate);
+          wStart.setDate(wStart.getDate() - wStart.getDay() + 1);
+          navLabel.textContent = "Semana " + wStart.toLocaleDateString("es-ES", {day:"numeric", month:"short"});
+        }
+      }
+      
+      if (currentPeriod !== "custom" && currentPeriod !== "all") {
+        const d = getDates();
+        if (sDate) {
+          sDate.value = d.start || "";
+          if (eDate) eDate.min = d.start || "";
+        }
+        if (eDate) eDate.value = d.end || "";
+      } else if (currentPeriod === "all") {
+        if (sDate) sDate.value = "";
+        if (eDate) {
+          eDate.value = "";
+          eDate.min = "";
+        }
+      } else if (currentPeriod === "custom") {
+        // Si entramos en custom y están vacíos, ponemos el año actual como base
+        if (sDate && !sDate.value) {
+          const fmt = (date) => date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0");
+          const start = fmt(new Date(baseDate.getFullYear(), 0, 1));
+          const end = fmt(new Date(baseDate.getFullYear(), 11, 31));
+          
+          sDate.value = start;
+          eDate.value = end;
+          eDate.min = start;
+          customStart = start;
+          customEnd = end;
+        }
+      }
+    }
+
+    function getDates() {
+      let start, end;
+      const fmt = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+      
+      if (currentPeriod === "week") {
+        const d = new Date(baseDate);
+        const day = d.getDay() || 7;
+        d.setDate(d.getDate() - day + 1);
+        start = fmt(d);
+        const e = new Date(d);
+        e.setDate(e.getDate() + 6);
+        end = fmt(e);
+      } else if (currentPeriod === "month") {
+        start = fmt(new Date(baseDate.getFullYear(), baseDate.getMonth(), 1));
+        end = fmt(new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 0));
+      } else if (currentPeriod === "year") {
+        start = fmt(new Date(baseDate.getFullYear(), 0, 1));
+        end = fmt(new Date(baseDate.getFullYear(), 11, 31));
+      } else if (currentPeriod === "custom") {
+        start = customStart;
+        end = customEnd;
+      }
+      return { start, end };
+    }
+
+    async function fetchRanking() {
+      const { start, end } = getDates();
+      let url = `${BASE_URL}/api/php/trips.php?action=${sType.value === "coasters" ? "ride_ranking" : "park_ranking"}`;
+      if (start) url += `&start=${start}`;
+      if (end) url += `&end=${end}`;
+      
+      container.innerHTML = '<div class="text-center py-4 text-muted small"><div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>Cargando ranking...</div>';
+      try {
+        const res = await fetch(url);
+        const j = await res.json();
+        cachedData = j.data || [];
+        const tc = document.getElementById("rank-trip-count");
+        if (tc && j.total_trips !== undefined) tc.textContent = j.total_trips + (j.total_trips === 1 ? " viaje" : " viajes");
+        renderRanking();
+      } catch (e) {
+        container.innerHTML = '<div class="text-center py-4 text-danger">Error cargando ranking.</div>';
+      }
+    }
+
+    function renderRanking() {
+      if (!cachedData || !cachedData.length) {
+        container.innerHTML = '<div class="text-center py-5 text-muted"><i class="fa-solid fa-chart-line fa-2x mb-3 opacity-50"></i><br>No hay datos en este periodo.</div>';
+        return;
+      }
+      
+      const max = Math.max(...cachedData.map(i => parseInt(sType.value === "coasters" ? i.times_ridden : i.times_visited)));
+      let html = '<div class="list-group list-group-flush custom-scrollbar" style="max-height: 700px; overflow-y: auto; overflow-x: hidden;">';
+      
+      cachedData.forEach((item, idx) => {
+        const isC = sType.value === "coasters";
+        const title = isC ? item.coaster_name : item.park_name;
+        const sub = isC ? item.park_name : item.park_location;
+        const count = parseInt(isC ? item.times_ridden : item.times_visited);
+        const img = item.imagen_url || (window.BASE_URL + "/web/img/dummy.jpg");
+        const pct = (count / max) * 100;
+        
+        html += `
+          <div class="list-group-item bg-transparent border-bottom border-secondary border-opacity-25 px-4 py-3">
+            <div class="d-flex align-items-center gap-3">
+              <div class="fw-bold text-success fs-5" style="min-width:30px;">#${idx+1}</div>
+              <img src="${img}" onerror="this.src='${window.BASE_URL}/web/img/dummy.jpg'" style="width: 48px; height: 48px; object-fit: cover; border-radius: 4px; border: 1px solid var(--rcw-border);">
+              <div class="flex-grow-1 min-w-0">
+                <div class="d-flex justify-content-between align-items-end mb-1 gap-2">
+                  <div class="flex-grow-1 min-w-0">
+                    <h6 class="fw-bold text-white mb-0 text-truncate" title="${title}">${title}</h6>
+                    <small class="text-muted text-truncate d-block" title="${sub}">${sub}</small>
+                  </div>
+                  <div class="fw-bold text-success fs-5 text-nowrap flex-shrink-0">
+                    ${count} <span class="small text-muted fw-normal" style="font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">${isC ? (count === 1 ? 'vez montada' : 'veces montada') : (count === 1 ? 'visita' : 'visitas')}</span>
+                  </div>
+                </div>
+                <div class="progress rounded-pill bg-dark mt-2" style="height: 6px;">
+                  <div class="progress-bar bg-success" role="progressbar" style="width: ${pct}%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    sType.addEventListener("change", fetchRanking);
+    
+    pBtns.forEach(b => {
+      b.addEventListener("click", (e) => {
+        pBtns.forEach(btn => {
+            btn.classList.remove("btn-outline-success", "active");
+            btn.classList.add("btn-outline-secondary");
+        });
+        e.target.classList.remove("btn-outline-secondary");
+        e.target.classList.add("btn-outline-success", "active");
+        currentPeriod = e.target.dataset.period;
+        baseDate = new Date();
+        updateLabel();
+        if (currentPeriod !== "custom") fetchRanking();
+      });
+    });
+
+    function handleArrowClick(dir) {
+      if (currentPeriod === "all" || currentPeriod === "custom") {
+        currentPeriod = "year";
+        baseDate = new Date();
+        document.querySelectorAll(".rank-period-btn").forEach(btn => {
+          btn.classList.remove("btn-outline-success", "active");
+          btn.classList.add("btn-outline-secondary");
+          if(btn.dataset.period === "year") {
+            btn.classList.remove("btn-outline-secondary");
+            btn.classList.add("btn-outline-success", "active");
+          }
+        });
+      }
+      if (currentPeriod === "year") baseDate.setFullYear(baseDate.getFullYear() + dir);
+      else if (currentPeriod === "month") baseDate.setMonth(baseDate.getMonth() + dir);
+      else if (currentPeriod === "week") baseDate.setDate(baseDate.getDate() + (dir * 7));
+      updateLabel();
+      fetchRanking();
+    }
+
+    if(prevBtn) prevBtn.addEventListener("click", () => handleArrowClick(-1));
+    if(nextBtn) nextBtn.addEventListener("click", () => handleArrowClick(1));
+
+    sDate.addEventListener("change", (e) => { 
+      customStart = e.target.value; 
+      if (eDate) {
+        eDate.min = customStart;
+        if (eDate.value && eDate.value < customStart) {
+          eDate.value = customStart;
+          customEnd = customStart;
+        }
+      }
+      if(currentPeriod==="custom") fetchRanking(); 
+    });
+    eDate.addEventListener("change", (e) => { 
+      customEnd = e.target.value; 
+      if (sDate && customEnd && customEnd < sDate.value) {
+        eDate.value = sDate.value;
+        customEnd = sDate.value;
+      }
+      if(currentPeriod==="custom") fetchRanking(); 
+    });
+
+    updateLabel();
+    fetchRanking();
   }
 });

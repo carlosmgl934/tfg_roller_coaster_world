@@ -1,6 +1,7 @@
 <?php
-$page_css = ['web/css/profile.css'];
+$page_css = ['web/css/profile.css', 'web/css/trips.css'];
 require_once __DIR__ . '/../../partials/header.php';
+require_once __DIR__ . '/../../partials/modals/trip_modals.php';
 /** @var string $base_url */
 
 // Perfil público de otro usuario — no requiere login
@@ -60,6 +61,10 @@ $user_id = $_GET['id'] ?? null;
                             class="fa-solid fa-star-half-stroke me-2 w-20px text-center"></i> Sus Reseñas</a>
                     <a href="#" id="menu-friends" class="list-group-item list-group-item-action py-3"><i
                             class="fa-solid fa-user-group me-2 w-20px text-center"></i> Sus Amigos</a>
+                    <a href="#" id="menu-trips" class="list-group-item list-group-item-action py-3"><i
+                            class="fa-solid fa-suitcase-rolling me-2 w-20px text-center"></i> Sus Viajes</a>
+                    <a href="#" id="menu-ranking" class="list-group-item list-group-item-action py-3"><i
+                            class="fa-solid fa-chart-line me-2 w-20px text-center"></i> Sus Estadísticas</a>
                     <a href="<?= Router::url('trip_generator') ?>"
                         class="list-group-item list-group-item-action text-success mt-1 py-3 border-top fw-bold"><i
                             class="fa-solid fa-wand-magic-sparkles me-2 w-20px text-center"></i> Organizar un viaje
@@ -287,6 +292,67 @@ $user_id = $_GET['id'] ?? null;
                 </div>
             </div>
 
+            <!-- TAB 6: Viajes -->
+            <div class="content-section" id="section-trips" style="display:none;">
+                <div class="card profile-card mb-4">
+                    <div class="card-header pt-3 pb-3 d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-suitcase-rolling fs-5 text-success"></i>
+                            <h5 class="fw-bold mb-0">Viajes de este usuario</h5>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <div id="trips-grid" class="trips-grid-scrollable">
+                            <div class="text-center py-4 text-muted small">Cargando viajes...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 7: Ranking / Estadísticas de Viajes -->
+            <div class="content-section" id="section-ranking" style="display:none;">
+                <div class="card profile-card mb-4">
+                    <div class="card-header pt-3 pb-3 d-flex flex-column gap-3">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-chart-line fs-5 text-success"></i>
+                                Estadísticas de 
+                                <select id="rank-type-select" class="form-select form-select-sm ms-1 d-inline-block w-auto shadow-none fw-bold border-0 bg-transparent" style="color: var(--rcw-text-primary); cursor: pointer;">
+                                    <option value="coasters">Coasters</option>
+                                    <option value="parks">Parques</option>
+                                </select>
+                            </h5>
+                            <span class="badge bg-dark px-3 py-2" style="border:1px solid var(--rcw-border)">
+                                <i class="fa-solid fa-suitcase me-1 text-success"></i> <span id="rank-trip-count">0 viajes</span>
+                            </span>
+                        </div>
+                        <div class="d-flex flex-wrap gap-1" id="rank-filter-btns">
+                            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary" data-period="week">Semana</button>
+                            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary" data-period="month">Mes</button>
+                            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-success active" data-period="year">Año</button>
+                            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary" data-period="custom">Personalizado</button>
+                            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary" data-period="all">Siempre</button>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-1 pt-2 border-top border-secondary">
+                            <div class="d-flex align-items-center gap-2" id="rank-nav-container">
+                                <button class="btn btn-sm btn-outline-secondary rounded-0" id="rank-prev-btn" title="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
+                                <span id="rank-nav-label" class="fw-bold text-center" style="min-width: 100px;">2026</span>
+                                <button class="btn btn-sm btn-outline-secondary rounded-0" id="rank-next-btn" title="Siguiente"><i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 ms-auto">
+                                <small class="text-muted">Desde:</small>
+                                <input type="date" class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white" id="rank-start-date" style="max-width: 120px;">
+                                <small class="text-muted">Hasta:</small>
+                                <input type="date" class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white" id="rank-end-date" style="max-width: 120px;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0" id="ranking-container">
+                        <div class="text-center py-4 text-muted small">Cargando estadísticas...</div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -361,6 +427,7 @@ $user_id = $_GET['id'] ?? null;
     <p class="mt-3 text-muted fw-bold text-uppercase" style="letter-spacing: 0.05em;">Cargando perfil...</p>
 </div>
 
+<script src="<?= Router::asset('web/js/components/trip_modals.js') ?>?v=<?= time() ?>"></script>
 <script src="<?= Router::asset('web/js/users/user_profile.js') ?>?v=<?= time() ?>"></script>
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>

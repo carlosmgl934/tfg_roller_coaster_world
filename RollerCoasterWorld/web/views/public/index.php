@@ -99,7 +99,7 @@ $is_admin = !empty($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
             <div class="home-stat-divider"></div>
             <div class="home-stat-item">
                 <div class="home-stat-num" id="cnt-coasters">—</div>
-                <div class="home-stat-label">Montañas Rusas</div>
+                <div class="home-stat-label">Coasters</div>
             </div>
             <div class="home-stat-divider"></div>
             <div class="home-stat-item">
@@ -155,16 +155,12 @@ $is_admin = !empty($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
                 <div class="rcw-recs-header">
                     <div class="rcw-recs-title-group">
                         <div class="home-section-title" style="margin-bottom:0;">Especialmente para ti</div>
-                        <span class="rcw-recs-ai-badge">
-                            <span class="ai-dot"></span> IA
-                        </span>
                     </div>
                     <div class="d-flex align-items-center gap-2">
                         <span class="text-muted small d-none d-sm-inline">
                             Basado en tu perfil y actividad
                         </span>
-                        <button class="rcw-recs-refresh-btn" id="recs-refresh-btn"
-                                title="Actualizar recomendaciones">
+                        <button class="rcw-recs-refresh-btn" id="recs-refresh-btn" title="Actualizar recomendaciones">
                             <i class="fa-solid fa-rotate"></i>
                             <span class="d-none d-sm-inline">Actualizar</span>
                         </button>

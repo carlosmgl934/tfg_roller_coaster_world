@@ -1,18 +1,16 @@
--- Día de Visita al Parque en un Viaje --
+-- Registro de montadas en atracciones --
 CREATE TABLE IF NOT EXISTS ride_log (
-    -- Datos del día --
     id SERIAL PRIMARY KEY,
-    -- Vincular a un viaje en concreto (puede hacerse sobre un día suelto) --
-    trip_id INT DEFAULT NULL, 
-    -- Por si vas a un parque fuera del viaje organizado --
+    trip_id INT DEFAULT NULL,           -- NULL = visita suelta sin viaje organizado
     park_id INT NOT NULL,
-    -- Detalles de la experiencia --
-    coaster_id INT NOT NULL,    -- en que coaster has montado
+    coaster_id INT NOT NULL,
     user_id INT NOT NULL,
-    ridden_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- hora exacta
-    seat_row INT DEFAULT NULL, -- fila en la que has montado
-    first_time BOOLEAN DEFAULT TRUE,  -- si es la primera vez que lo haces
-    FOREIGN KEY (trip_id) REFERENCES trips(id) ON DELETE CASCADE,
+    visit_date DATE NOT NULL,           -- fecha del día de la visita
+    ridden_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    seat_row INT DEFAULT NULL,
+    first_time BOOLEAN DEFAULT TRUE,
+    notes VARCHAR(200) DEFAULT NULL,
+    FOREIGN KEY (trip_id) REFERENCES trips(id) ON DELETE SET NULL,
     FOREIGN KEY (park_id) REFERENCES parks(id) ON DELETE CASCADE,
     FOREIGN KEY (coaster_id) REFERENCES coasters(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

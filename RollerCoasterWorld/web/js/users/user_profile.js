@@ -168,8 +168,19 @@ $(document).ready(function () {
         "menu-photos": "#section-photos",
         "menu-friends": "#section-friends",
         "menu-reviews": "#section-reviews",
+        "menu-trips": "#section-trips",
+        "menu-ranking": "#section-ranking",
       };
       if (map[menuId]) $(map[menuId]).show();
+
+      if (menuId === "menu-trips" && !window._tripsLoaded) {
+          loadTrips(userId);
+          window._tripsLoaded = true;
+      }
+      if (menuId === "menu-ranking" && !window._rankingLoaded) {
+          loadRanking(userId);
+          window._rankingLoaded = true;
+      }
     }
 
     menuLinks.on("click", function (e) {
@@ -504,7 +515,13 @@ $(document).ready(function () {
             <!-- Nombre -->
             <div class="flex-grow-1 min-w-0">
               <div class="fw-bold text-white text-truncate" style="font-size: 0.95rem;">${friend.username}</div>
-              <small class="text-muted d-block text-truncate mt-1" style="font-size: 0.75rem;">${detailsHtml}</small>
+              <div class="text-muted d-flex flex-wrap align-items-center mt-1 gap-y-1" style="font-size: 0.75rem;">
+                ${details.map((d, index) => `
+                  <span class="d-flex align-items-center">
+                    ${d}${index < details.length - 1 ? '<span class="mx-2 opacity-25">&bull;</span>' : ''}
+                  </span>
+                `).join('')}
+              </div>
             </div>
           </div>
 
@@ -668,4 +685,289 @@ $(document).ready(function () {
     // Estado inicial: ordenar por más reciente (newest)
     sortSelect.val("newest").trigger("change");
   }
+
+  // ─── VIAJES ──────────────────────────────────────────────────
+  async function loadTrips(targetId) {
+    const container = $("#trips-grid");
+    container.html('<div class="text-center py-4 text-muted small"><div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>Cargando viajes...</div>');
+    try {
+      const res = await fetch(`${BASE_URL}/api/php/trips.php?action=list&target_user_id=${targetId}`);
+      const j = await res.json();
+      const d = j.data || [];
+      if (!d.length) {
+        container.html('<div class="text-center py-4 text-muted"><i class="fa-solid fa-suitcase fa-2x mb-2 opacity-50"></i><br>Este usuario no tiene viajes registrados.</div>');
+        return;
+      }
+      let html = "";
+      d.forEach((t) => {
+        const start = new Date(t.start_date);
+        start.setHours(0,0,0,0);
+        const end = new Date(t.end_date);
+        end.setHours(23,59,59,999);
+        const mon = start.toLocaleString("es-ES", { month: "short" });
+        const y = start.getFullYear();
+        const diff = Math.ceil((end - start) / 86400000);
+        
+        const today = new Date();
+        let t_status = "upcoming";
+        if (today > end) t_status = "past";
+        else if (today >= start && today <= end) t_status = "active";
+        
+        const statusClass = t_status === "past" ? "bg-secondary" : t_status === "active" ? "bg-success" : "bg-warning text-dark";
+        const statusText = t_status === "past" ? "Pasado" : t_status === "active" ? "Activo" : "Próximo";
+        let imgUrl = window.BASE_URL + '/dummy.jpg';
+        if (t.cover_image) {
+            imgUrl = t.cover_image.startsWith('http') ? t.cover_image : (window.BASE_URL + t.cover_image);
+        }
+        const pNames = t.park_names ? t.park_names : 'Sin parques planificados';
+        const startStr = start.toLocaleDateString("es-ES", { day: "numeric", month: "short" });
+        const endStr = end.toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" });
+        
+        html += `
+          <div class="trip-card shadow-sm h-100 rounded-1" onclick="openTrip(${t.id})" style="background: #111;">
+            <div style="height: 140px; position: relative; overflow: hidden;">
+               ${t.cover_image ? `<img src="${imgUrl}" referrerpolicy="no-referrer" onerror="this.style.opacity='0'" class="w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease, opacity 0.3s ease;">` : ''}
+               <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(13,17,23,0.9));"></div>
+               <div class="position-absolute bottom-0 start-0 w-100 p-3 text-white">
+                 <div class="d-flex align-items-center gap-2 mb-1">
+                    <span class="badge ${statusClass}" style="font-size:0.6rem; letter-spacing:0.05em;">${statusText}</span>
+                    <span class="small opacity-75" style="font-size:0.75rem;"><i class="fa-regular fa-clock me-1"></i>${diff} d</span>
+                 </div>
+                 <h5 class="fw-bold mb-0 text-truncate" style="font-family: var(--rcw-font-title); font-size:1.1rem;">${t.title}</h5>
+               </div>
+            </div>
+            <div class="card-body p-3">
+              <div class="d-flex align-items-center gap-2 mb-2 text-muted small" style="font-size: 0.8rem; font-weight:600;">
+                <i class="fa-solid fa-calendar-day text-success"></i> ${startStr} — ${endStr}
+              </div>
+              <div class="small text-muted mb-2 text-truncate" style="font-size:0.75rem;"><i class="fa-solid fa-map-pin me-1 opacity-50"></i>${pNames}</div>
+              ${t.description ? `<div class="small text-white-50" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font-size:0.8rem; line-height:1.4;">${t.description}</div>` : ''}
+            </div>
+          </div>
+        `;
+      });
+      container.html(html);
+    } catch (e) {
+      container.html('<div class="text-center py-4 text-danger">Error cargando viajes.</div>');
+    }
+  }
+
+  // ─── RANKING ─────────────────────────────────────────────────
+  async function loadRanking(targetId) {
+    const sType = document.getElementById("rank-type-select");
+    const container = document.getElementById("ranking-container");
+    const pBtns = document.querySelectorAll(".rank-period-btn");
+    const sDate = document.getElementById("rank-start-date");
+    const eDate = document.getElementById("rank-end-date");
+    const prevBtn = document.getElementById("rank-prev-btn");
+    const nextBtn = document.getElementById("rank-next-btn");
+    const navLabel = document.getElementById("rank-nav-label");
+    let currentPeriod = "year";
+    let baseDate = new Date();
+    let customStart = "";
+    let customEnd = "";
+    let cachedData = null;
+
+    function updateLabel() {
+      const navContainer = document.getElementById("rank-nav-container");
+      if (currentPeriod === "all" || currentPeriod === "custom") {
+        if (navContainer) navContainer.classList.add("d-none");
+        navLabel.textContent = "Siempre";
+      } else {
+        if (navContainer) navContainer.classList.remove("d-none");
+        if (currentPeriod === "year") navLabel.textContent = baseDate.getFullYear();
+        else if (currentPeriod === "month") {
+          let s = baseDate.toLocaleString("es-ES", {month:"long", year:"numeric"});
+          navLabel.textContent = s.charAt(0).toUpperCase() + s.slice(1);
+        } else if (currentPeriod === "week") {
+          const wStart = new Date(baseDate);
+          wStart.setDate(wStart.getDate() - wStart.getDay() + 1);
+          navLabel.textContent = "Semana " + wStart.toLocaleDateString("es-ES", {day:"numeric", month:"short"});
+        }
+      }
+      
+      if (currentPeriod !== "custom" && currentPeriod !== "all") {
+        const d = getDates();
+        if (sDate) {
+          sDate.value = d.start || "";
+          if (eDate) eDate.min = d.start || "";
+        }
+        if (eDate) eDate.value = d.end || "";
+      } else if (currentPeriod === "all") {
+        if (sDate) sDate.value = "";
+        if (eDate) {
+          eDate.value = "";
+          eDate.min = "";
+        }
+      } else if (currentPeriod === "custom") {
+        // Si entramos en custom y están vacíos, ponemos el año actual como base
+        if (sDate && !sDate.value) {
+          const d = getDates(); // Como currentPeriod ya es custom, esto fallaría si no lo manejamos antes
+          // Forzamos un periodo temporal para sacar fechas base
+          const tempPeriod = "year"; 
+          const fmt = (date) => date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0");
+          const start = fmt(new Date(baseDate.getFullYear(), 0, 1));
+          const end = fmt(new Date(baseDate.getFullYear(), 11, 31));
+          
+          sDate.value = start;
+          eDate.value = end;
+          eDate.min = start;
+          customStart = start;
+          customEnd = end;
+        }
+      }
+    }
+
+    function getDates() {
+      let start, end;
+      const fmt = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+      
+      if (currentPeriod === "week") {
+        const d = new Date(baseDate);
+        const day = d.getDay() || 7;
+        d.setDate(d.getDate() - day + 1);
+        start = fmt(d);
+        const e = new Date(d);
+        e.setDate(e.getDate() + 6);
+        end = fmt(e);
+      } else if (currentPeriod === "month") {
+        start = fmt(new Date(baseDate.getFullYear(), baseDate.getMonth(), 1));
+        end = fmt(new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 0));
+      } else if (currentPeriod === "year") {
+        start = fmt(new Date(baseDate.getFullYear(), 0, 1));
+        end = fmt(new Date(baseDate.getFullYear(), 11, 31));
+      } else if (currentPeriod === "custom") {
+        start = customStart;
+        end = customEnd;
+      }
+      return { start, end };
+    }
+
+    async function fetchRanking() {
+      const { start, end } = getDates();
+      let url = `${BASE_URL}/api/php/trips.php?action=${sType.value === "coasters" ? "ride_ranking" : "park_ranking"}&target_user_id=${targetId}`;
+      if (start) url += `&start=${start}`;
+      if (end) url += `&end=${end}`;
+      
+      container.innerHTML = '<div class="text-center py-4 text-muted small"><div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>Cargando ranking...</div>';
+      try {
+        const res = await fetch(url);
+        const j = await res.json();
+        cachedData = j.data || [];
+        const tc = document.getElementById("rank-trip-count");
+        if (tc && j.total_trips !== undefined) tc.textContent = j.total_trips + (j.total_trips === 1 ? " viaje" : " viajes");
+        renderRanking();
+      } catch (e) {
+        container.innerHTML = '<div class="text-center py-4 text-danger">Error cargando ranking.</div>';
+      }
+    }
+
+    function renderRanking() {
+      if (!cachedData || !cachedData.length) {
+        container.innerHTML = '<div class="text-center py-5 text-muted"><i class="fa-solid fa-chart-line fa-2x mb-3 opacity-50"></i><br>No hay datos en este periodo.</div>';
+        return;
+      }
+      
+      const max = Math.max(...cachedData.map(i => parseInt(sType.value === "coasters" ? i.times_ridden : i.times_visited)));
+      let html = '<div class="list-group list-group-flush custom-scrollbar" style="max-height: 700px; overflow-y: auto; overflow-x: hidden;">';
+      
+      cachedData.forEach((item, idx) => {
+        const isC = sType.value === "coasters";
+        const title = isC ? item.coaster_name : item.park_name;
+        const sub = isC ? item.park_name : item.park_location;
+        const count = parseInt(isC ? item.times_ridden : item.times_visited);
+        const img = item.imagen_url || (window.BASE_URL + "/web/img/dummy.jpg");
+        const pct = (count / max) * 100;
+        
+        html += `
+          <div class="list-group-item bg-transparent border-bottom border-secondary border-opacity-25 px-4 py-3">
+            <div class="d-flex align-items-center gap-3">
+              <div class="fw-bold text-success fs-5" style="min-width:30px;">#${idx+1}</div>
+              <img src="${img}" onerror="this.src='${window.BASE_URL}/web/img/dummy.jpg'" style="width: 48px; height: 48px; object-fit: cover; border-radius: 4px; border: 1px solid var(--rcw-border);">
+              <div class="flex-grow-1 min-w-0">
+                <div class="d-flex justify-content-between align-items-end mb-1 gap-2">
+                  <div class="flex-grow-1 min-w-0">
+                    <h6 class="fw-bold text-white mb-0 text-truncate" title="${title}">${title}</h6>
+                    <small class="text-muted text-truncate d-block" title="${sub}">${sub}</small>
+                  </div>
+                  <div class="fw-bold text-success fs-5 text-nowrap flex-shrink-0">
+                    ${count} <span class="small text-muted fw-normal" style="font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">${isC ? (count === 1 ? 'vez montada' : 'veces montada') : (count === 1 ? 'visita' : 'visitas')}</span>
+                  </div>
+                </div>
+                <div class="progress rounded-pill bg-dark mt-2" style="height: 6px;">
+                  <div class="progress-bar bg-success" role="progressbar" style="width: ${pct}%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    sType.addEventListener("change", fetchRanking);
+    
+    pBtns.forEach(b => {
+      b.addEventListener("click", (e) => {
+        pBtns.forEach(btn => {
+            btn.classList.remove("btn-outline-success", "active");
+            btn.classList.add("btn-outline-secondary");
+        });
+        e.target.classList.remove("btn-outline-secondary");
+        e.target.classList.add("btn-outline-success", "active");
+        currentPeriod = e.target.dataset.period;
+        baseDate = new Date();
+        updateLabel();
+        if (currentPeriod !== "custom") fetchRanking();
+      });
+    });
+
+    function handleArrowClick(dir) {
+      if (currentPeriod === "all" || currentPeriod === "custom") {
+        currentPeriod = "year";
+        baseDate = new Date();
+        document.querySelectorAll(".rank-period-btn").forEach(btn => {
+          btn.classList.remove("btn-outline-success", "active");
+          btn.classList.add("btn-outline-secondary");
+          if(btn.dataset.period === "year") {
+            btn.classList.remove("btn-outline-secondary");
+            btn.classList.add("btn-outline-success", "active");
+          }
+        });
+      }
+      if (currentPeriod === "year") baseDate.setFullYear(baseDate.getFullYear() + dir);
+      else if (currentPeriod === "month") baseDate.setMonth(baseDate.getMonth() + dir);
+      else if (currentPeriod === "week") baseDate.setDate(baseDate.getDate() + (dir * 7));
+      updateLabel();
+      fetchRanking();
+    }
+
+    if(prevBtn) prevBtn.addEventListener("click", () => handleArrowClick(-1));
+    if(nextBtn) nextBtn.addEventListener("click", () => handleArrowClick(1));
+
+    sDate.addEventListener("change", (e) => { 
+      customStart = e.target.value; 
+      if (eDate) {
+        eDate.min = customStart;
+        if (eDate.value && eDate.value < customStart) {
+          eDate.value = customStart;
+          customEnd = customStart;
+        }
+      }
+      if(currentPeriod==="custom") fetchRanking(); 
+    });
+    eDate.addEventListener("change", (e) => { 
+      customEnd = e.target.value; 
+      if (sDate && customEnd && customEnd < sDate.value) {
+        eDate.value = sDate.value;
+        customEnd = sDate.value;
+      }
+      if(currentPeriod==="custom") fetchRanking(); 
+    });
+
+    updateLabel();
+    fetchRanking();
+  }
+
 });
