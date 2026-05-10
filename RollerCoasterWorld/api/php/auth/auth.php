@@ -6,14 +6,16 @@ header('Access-Control-Allow-Headers: Content-Type');
 
 // ── CORS: solo orígenes permitidos ───────────────────────────────────────────
 $allowedOrigins = [
-    'http://localhost',
-    'http://localhost:80',
-    'http://127.0.0.1',
-    'http://localhost/servidor-25-26',
+  'http://localhost',
+  'http://localhost:80',
+  'http://127.0.0.1',
+  'http://localhost/servidor-25-26',
+  'https://rollercoasterworld.duckdns.org',
+  'http://rollercoasterworld.duckdns.org',
 ];
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 if (in_array($origin, $allowedOrigins, true)) {
-    header("Access-Control-Allow-Origin: {$origin}");
+  header("Access-Control-Allow-Origin: {$origin}");
 }
 
 // ── Rate Limiting: 10 intentos por IP cada 15 minutos ────────────────────────
@@ -23,7 +25,7 @@ RateLimiter::check('auth_login', 10, 900);
 // Archivo de log
 $logDir = __DIR__ . '/../../../logs';
 if (!is_dir($logDir)) {
-    mkdir($logDir, 0777, true);
+  mkdir($logDir, 0777, true);
 }
 $log = $logDir . '/auth_debug.log';
 file_put_contents($log, date('Y-m-d H:i:s') . " ── Nueva petición recibida ──\n", FILE_APPEND);
@@ -141,8 +143,8 @@ try {
   file_put_contents($log, "Query preparada OK\n", FILE_APPEND);
 
   $exec = $stmt->execute([
-    ':username'     => $username,
-    ':email'        => $email,
+    ':username' => $username,
+    ':email' => $email,
     ':firebase_uid' => $firebase_uid
   ]);
 
