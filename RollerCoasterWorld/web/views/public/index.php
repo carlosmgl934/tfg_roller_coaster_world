@@ -16,10 +16,7 @@ $is_admin = !empty($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
             <div class="home-hero-slide active" data-default-img=""
                 data-title="Bienvenido,&lt;br&gt;&lt;span style='color:var(--rcw-green)' id='hero-username'&gt;…&lt;/span&gt;"
                 data-sub="Bienvenido de nuevo a la comunidad de amantes de las montañas rusas. Sigue explorando y aumentando tus créditos."
-                data-tag="Tu Panel Personal" data-btn1-url="<?= Router::url('coaster_search') ?>"
-                data-btn1-label="Buscar coasters" data-btn1-icon="fa-magnifying-glass"
-                data-btn2-url="<?= Router::url('forum_search') ?>" data-btn2-label="Foros" data-btn2-icon="fa-users">
-            </div>
+                data-tag="Tu Panel Personal" data-btn1-url="<?= Router::url('coaster_search') ?>"></div>
 
             <!-- Slide 2: Voltron (Europa-Park) -->
             <div class="home-hero-slide"
@@ -27,9 +24,7 @@ $is_admin = !empty($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
                 data-default-img="<?= $base_url ?>/web/img/voltron_ep_opt.jpg"
                 data-title="Bienvenido,&lt;br&gt;&lt;span style='color:var(--rcw-green)' id='hero-username'&gt;…&lt;/span&gt;"
                 data-sub="Bienvenido de nuevo a la comunidad de amantes de las montañas rusas. Sigue explorando y aumentando tus créditos."
-                data-tag="Tu Panel Personal" data-btn1-url="<?= Router::url('coaster_search') ?>"
-                data-btn1-label="Buscar coasters" data-btn1-icon="fa-magnifying-glass"
-                data-btn2-url="<?= Router::url('forum_search') ?>" data-btn2-label="Foros" data-btn2-icon="fa-users">
+                data-tag="Tu Panel Personal" data-btn1-url="<?= Router::url('coaster_search') ?>">
             </div>
 
             <!-- Slide 3: Batman BGCE (Warner) -->
@@ -38,19 +33,14 @@ $is_admin = !empty($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
                 data-default-img="<?= $base_url ?>/web/img/bgce_warner_opt.jpg"
                 data-title="Bienvenido,&lt;br&gt;&lt;span style='color:var(--rcw-green)' id='hero-username'&gt;…&lt;/span&gt;"
                 data-sub="Bienvenido de nuevo a la comunidad de amantes de las montañas rusas. Sigue explorando y aumentando tus créditos."
-                data-tag="Tu Panel Personal" data-btn1-url="<?= Router::url('coaster_search') ?>"
-                data-btn1-label="Buscar coasters" data-btn1-icon="fa-magnifying-glass"
-                data-btn2-url="<?= Router::url('forum_search') ?>" data-btn2-label="Foros" data-btn2-icon="fa-users">
+                data-tag="Tu Panel Personal" data-btn1-url="<?= Router::url('coaster_search') ?>">
             </div>
 
             <!-- Slide 4: (imagen configurable desde admin) -->
             <div class="home-hero-slide" data-default-img=""
                 data-title="Bienvenido,&lt;br&gt;&lt;span style='color:var(--rcw-green)' id='hero-username'&gt;…&lt;/span&gt;"
                 data-sub="Bienvenido de nuevo a la comunidad de amantes de las montañas rusas. Sigue explorando y aumentando tus créditos."
-                data-tag="Tu Panel Personal" data-btn1-url="<?= Router::url('coaster_search') ?>"
-                data-btn1-label="Buscar coasters" data-btn1-icon="fa-magnifying-glass"
-                data-btn2-url="<?= Router::url('forum_search') ?>" data-btn2-label="Foros" data-btn2-icon="fa-users">
-            </div>
+                data-tag="Tu Panel Personal" data-btn1-url="<?= Router::url('coaster_search') ?>"></div>
 
             <!-- Contenido dinámico (actualizado por JS) -->
             <div class="home-hero-content" id="home-hero-content">
@@ -64,12 +54,7 @@ $is_admin = !empty($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
                 </h1>
                 <p class="home-hero-sub animate d3" id="hero-sub">Bienvenido de nuevo a la comunidad de amantes de las
                     montañas rusas. Sigue explorando y aumentando tus créditos.</p>
-                <div class="home-hero-btns animate d3" id="hero-btns">
-                    <a href="<?= Router::url('coaster_search') ?>" class="btn-green-rcw" id="hero-btn1"><i
-                            class="fa-solid fa-magnifying-glass"></i> Buscar coasters</a>
-                    <a href="<?= Router::url('forum_search') ?>" class="btn-ghost-rcw" id="hero-btn2"><i
-                            class="fa-solid fa-users"></i> Foros</a>
-                </div>
+
             </div>
 
             <!-- Dots -->

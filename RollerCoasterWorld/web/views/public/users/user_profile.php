@@ -174,37 +174,37 @@ $user_id = $_GET['id'] ?? null;
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 bg-transparent">
                                         <span class="text-muted">País más visitado</span>
-                                        <span class="fw-bold" id="stat-tech-country">—</span>
+                                        <span class="fw-bold text-end text-wrap ms-3" id="stat-tech-country" style="max-width: 60%;">—</span>
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 bg-transparent">
                                         <span class="text-muted">Fabricante favorito</span>
-                                        <span class="fw-bold" id="stat-tech-manufacturer">—</span>
+                                        <span class="fw-bold text-end text-wrap ms-3" id="stat-tech-manufacturer" style="max-width: 60%;">—</span>
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 border-bottom border-secondary border-opacity-25 bg-transparent mb-2">
                                         <span class="text-muted">Fabricantes totales</span>
-                                        <span class="fw-bold" id="stat-tech-total-manu">0</span>
+                                        <span class="fw-bold text-end ms-3" id="stat-tech-total-manu">0</span>
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 bg-transparent mt-2">
                                         <span class="text-muted">Altura total superada</span>
-                                        <span class="fw-bold"><span id="stat-tech-height">0</span> m</span>
+                                        <span class="fw-bold text-end ms-3"><span id="stat-tech-height">0</span> m</span>
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 bg-transparent">
                                         <span class="text-muted">Inversiones totales</span>
-                                        <span class="fw-bold" id="stat-tech-inversions">0</span>
+                                        <span class="fw-bold text-end ms-3" id="stat-tech-inversions">0</span>
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 bg-transparent">
                                         <span class="text-muted">Más rápida</span>
-                                        <span class="fw-bold" id="stat-tech-speed">—</span>
+                                        <span class="fw-bold text-end text-wrap ms-3" id="stat-tech-speed" style="max-width: 60%;">—</span>
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 bg-transparent">
                                         <span class="text-muted">Más larga</span>
-                                        <span class="fw-bold" id="stat-tech-length">—</span>
+                                        <span class="fw-bold text-end text-wrap ms-3" id="stat-tech-length" style="max-width: 60%;">—</span>
                                     </li>
                                 </ul>
                             </div>
@@ -326,12 +326,12 @@ $user_id = $_GET['id'] ?? null;
                                 <i class="fa-solid fa-suitcase me-1 text-success"></i> <span id="rank-trip-count">0 viajes</span>
                             </span>
                         </div>
-                        <div class="d-flex flex-wrap gap-1" id="rank-filter-btns">
-                            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary" data-period="week">Semana</button>
-                            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary" data-period="month">Mes</button>
-                            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-success active" data-period="year">Año</button>
-                            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary" data-period="custom">Personalizado</button>
-                            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary" data-period="all">Siempre</button>
+                        <div class="d-flex overflow-x-auto gap-1 pb-1" id="rank-filter-btns" style="scrollbar-width: none;">
+                            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary flex-shrink-0" data-period="week">Semana</button>
+                            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary flex-shrink-0" data-period="month">Mes</button>
+                            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-success active flex-shrink-0" data-period="year">Año</button>
+                            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary flex-shrink-0" data-period="custom">Personalizado</button>
+                            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary flex-shrink-0" data-period="all">Siempre</button>
                         </div>
                         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-1 pt-2 border-top border-secondary">
                             <div class="d-flex align-items-center gap-2" id="rank-nav-container">

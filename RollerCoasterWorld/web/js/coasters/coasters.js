@@ -866,7 +866,8 @@ $(document).ready(function () {
       const avatar = el.data("avatar");
       const caption = el.data("caption");
       const likes = el.data("likes");
-      const hasLiked = localStorage.getItem("liked_photo_" + id) === "true";
+      const userKey = window.CURRENT_USER_ID || 'guest';
+      const hasLiked = localStorage.getItem("liked_photo_" + userKey + "_" + id) === "true";
 
       $("#ig-modal-img").attr("src", url);
       $("#ig-modal-avatar").attr("src", avatar);
@@ -909,7 +910,8 @@ $(document).ready(function () {
         const avatar = $(this).data("avatar");
         const caption = $(this).data("caption");
         const likes = $(this).data("likes");
-        const hasLiked = localStorage.getItem("liked_photo_" + id) === "true";
+        const userKey = window.CURRENT_USER_ID || 'guest';
+        const hasLiked = localStorage.getItem("liked_photo_" + userKey + "_" + id) === "true";
 
         $("#ig-modal-img").attr("src", url);
         $("#ig-modal-avatar").attr("src", avatar);

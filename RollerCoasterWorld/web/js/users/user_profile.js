@@ -301,7 +301,7 @@ $(document).ready(function () {
         const html = `
             <a href="${link}" class="list-group-item list-group-item-action bg-transparent border-bottom border-secondary border-opacity-25 px-0 py-3" style="transition: all 0.2s ease-in-out;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.05)'" onmouseout="this.style.backgroundColor='transparent'">
                 <div class="d-flex align-items-center gap-3 px-3">
-                    <img src="${imgUrl}" alt="${title}" class="rounded-0 shadow-sm" style="width: 120px; height: 80px; object-fit: cover;" onerror="this.src='${fallbackImage}'">
+                    <img src="${imgUrl}" alt="${title}" class="rounded-0 shadow-sm flex-shrink-0" style="width: 120px; height: 80px; object-fit: cover;" onerror="this.src='${fallbackImage}'">
                     <div class="flex-grow-1 min-w-0">
                         <h5 class="fw-bold mb-1 text-light fs-5"><span class="text-success me-2">${rank}</span> ${title}</h5>
                         <p class="mb-0 text-muted small">${subtitleHTML}</p>
@@ -888,8 +888,8 @@ $(document).ready(function () {
                     <h6 class="fw-bold text-white mb-0 text-truncate" title="${title}">${title}</h6>
                     <small class="text-muted text-truncate d-block" title="${sub}">${sub}</small>
                   </div>
-                  <div class="fw-bold text-success fs-5 text-nowrap flex-shrink-0">
-                    ${count} <span class="small text-muted fw-normal" style="font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">${isC ? (count === 1 ? 'vez montada' : 'veces montada') : (count === 1 ? 'visita' : 'visitas')}</span>
+                  <div class="fw-bold text-success fs-6 fs-md-5 flex-shrink-0 text-end" style="min-width: 60px;">
+                    ${count} <span class="d-block d-sm-inline text-muted fw-normal" style="font-family: 'Outfit', sans-serif; letter-spacing: 0.5px; font-size: 0.7em;">${isC ? (count === 1 ? 'vez montada' : 'veces montada') : (count === 1 ? 'visita' : 'visitas')}</span>
                   </div>
                 </div>
                 <div class="progress rounded-pill bg-dark mt-2" style="height: 6px;">

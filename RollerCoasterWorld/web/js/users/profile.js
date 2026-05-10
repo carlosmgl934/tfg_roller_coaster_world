@@ -687,8 +687,8 @@ $(document).ready(function () {
         <a href="${BASE_URL}/web/views/public/coasters/coasters.php?id=${item.coaster_id}" class="tops-preview-item text-decoration-none">
           <span class="tops-preview-rank">#${i + 1}</span>
           <div class="flex-grow-1">
-            <div class="fw-bold text-white">${item.coaster_name}</div>
-            <small class="text-secondary">${item.park_name} · ${item.country_name || ""}</small>
+            <div class="fw-bold text-white" style="line-height: 1.2; margin-bottom: 2px;">${item.coaster_name}</div>
+            <small class="text-secondary" style="line-height: 1.1; display: block;">${item.park_name} · ${item.country_name || ""}</small>
           </div>
           <i class="fa-solid fa-chevron-right text-muted small ms-2"></i>
         </a>`);
@@ -711,8 +711,8 @@ $(document).ready(function () {
         <a href="${BASE_URL}/web/views/public/parks/parks.php?id=${item.park_id}" class="tops-preview-item text-decoration-none">
           <span class="tops-preview-rank">#${i + 1}</span>
           <div class="flex-grow-1">
-            <div class="fw-bold text-white">${item.park_name}</div>
-            <small class="text-secondary">${item.country_name || ""}</small>
+            <div class="fw-bold text-white" style="line-height: 1.2; margin-bottom: 2px;">${item.park_name}</div>
+            <small class="text-secondary" style="line-height: 1.1; display: block;">${item.country_name || ""}</small>
           </div>
           <i class="fa-solid fa-chevron-right text-muted small ms-2"></i>
         </a>`);
@@ -2825,8 +2825,8 @@ $(document).ready(function () {
                     <h6 class="fw-bold text-white mb-0 text-truncate" title="${title}">${title}</h6>
                     <small class="text-muted text-truncate d-block" title="${sub}">${sub}</small>
                   </div>
-                  <div class="fw-bold text-success fs-5 text-nowrap flex-shrink-0">
-                    ${count} <span class="small text-muted fw-normal" style="font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">${isC ? (count === 1 ? "vez montada" : "veces montada") : count === 1 ? "visita" : "visitas"}</span>
+                  <div class="fw-bold text-success fs-6 fs-md-5 flex-shrink-0 text-end" style="min-width: 60px;">
+                    ${count} <span class="d-block d-sm-inline text-muted fw-normal" style="font-family: 'Outfit', sans-serif; letter-spacing: 0.5px; font-size: 0.7em;">${isC ? (count === 1 ? "vez montada" : "veces montada") : count === 1 ? "visita" : "visitas"}</span>
                   </div>
                 </div>
                 <div class="progress rounded-pill bg-dark mt-2" style="height: 6px;">

@@ -210,36 +210,36 @@ $user_uid = $_SESSION['firebase_uid'];
               <ul class="list-group list-group-flush">
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
                   <span class="text-muted">País más visitado</span>
-                  <span class="fw-bold text-end text-dark" id="main-country">—</span>
+                  <span class="fw-bold text-end text-dark ms-3 text-wrap" id="main-country" style="max-width: 60%;">—</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
                   <span class="text-muted">Fabricante favorito</span>
-                  <span class="fw-bold text-end text-truncate ms-3 text-dark" id="main-manufacturer"
-                    style="max-width: 150px;">—</span>
+                  <span class="fw-bold text-end ms-3 text-dark text-wrap" id="main-manufacturer"
+                    style="max-width: 60%;">—</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
                   <span class="text-muted">Fabricantes totales</span>
-                  <span class="fw-bold text-end text-dark" id="total-manufacturers">0</span>
+                  <span class="fw-bold text-end ms-3 text-dark" id="total-manufacturers">0</span>
                 </li>
                 <li
                   class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 border-top mt-2 pt-3">
                   <span class="text-muted">Altura total superada</span>
-                  <span class="fw-bold text-dark fs-5"><span id="total-height">0</span><small class="text-muted fs-6">
+                  <span class="fw-bold text-end ms-3 text-dark fs-5"><span id="total-height">0</span><small class="text-muted fs-6">
                       m</small></span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
                   <span class="text-muted">Inversiones totales</span>
-                  <span class="fw-bold text-dark fs-5" id="total-investments">0</span>
+                  <span class="fw-bold text-end ms-3 text-dark fs-5" id="total-investments">0</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
                   <span class="text-muted">Más rápida</span>
-                  <span class="fw-bold text-end text-truncate ms-3 text-dark" id="fastest-coaster"
-                    style="max-width: 150px;">—</span>
+                  <span class="fw-bold text-end ms-3 text-dark text-wrap" id="fastest-coaster"
+                    style="max-width: 60%;">—</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
                   <span class="text-muted">Más larga</span>
-                  <span class="fw-bold text-end text-truncate ms-3 text-dark" id="longest-coaster"
-                    style="max-width: 150px;">—</span>
+                  <span class="fw-bold text-end ms-3 text-dark text-wrap" id="longest-coaster"
+                    style="max-width: 60%;">—</span>
                 </li>
               </ul>
             </div>
@@ -827,16 +827,16 @@ $user_uid = $_SESSION['firebase_uid'];
                 <i class="fa-solid fa-suitcase me-1 text-success"></i> <span id="rank-trip-count">0 viajes</span>
               </span>
             </div>
-            <div class="d-flex flex-wrap gap-1 mb-3" id="rank-filter-btns">
-              <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary"
+            <div class="d-flex overflow-x-auto gap-1 pb-1 mb-3" id="rank-filter-btns" style="scrollbar-width: none;">
+              <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary flex-shrink-0"
                 data-period="week">Semana</button>
-              <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary"
+              <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary flex-shrink-0"
                 data-period="month">Mes</button>
-              <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-success active"
+              <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-success active flex-shrink-0"
                 data-period="year">Año</button>
-              <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary"
+              <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary flex-shrink-0"
                 data-period="custom">Personalizado</button>
-              <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary"
+              <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary flex-shrink-0"
                 data-period="all">Siempre</button>
             </div>
             <div

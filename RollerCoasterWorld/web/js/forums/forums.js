@@ -383,17 +383,20 @@ $(document).ready(function () {
           : "";
         let autor = "";
         if (forum.author_name) {
-          autor = `<div class="d-flex align-items-center gap-1">
-                     <small class="text-muted"><i class="fa-solid fa-user me-1"></i>${forum.author_name}</small>`;
+          autor = `<div class="d-flex flex-wrap align-items-center gap-3">
+                     <div class="d-flex align-items-center">
+                       <small class="text-muted"><i class="fa-solid fa-user me-1"></i>${forum.author_name}</small>
+                     </div>`;
                      
           if (forum.collaborators_json) {
             try {
                let collabs = typeof forum.collaborators_json === "string" ? JSON.parse(forum.collaborators_json) : forum.collaborators_json;
                if (collabs && collabs.length > 0) {
-                 // Remove nulls if any
                  collabs = collabs.filter(c => c && c.username);
                  if (collabs.length > 0) {
-                   autor += `<small class="text-muted ms-1" style="font-size: 0.75rem;">colaborando con:</small><div class="d-flex ms-1">`;
+                   autor += `<div class="d-flex align-items-center bg-dark bg-opacity-50 px-2 py-1 rounded-pill border border-secondary border-opacity-25" title="Colaboradores">
+                               <small class="text-muted me-2 fw-semibold" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">Colabs</small>
+                               <div class="d-flex">`;
                    collabs.slice(0, 3).forEach(c => {
                        let imgSrc = window.BASE_URL + '/web/img/avatars/default_avatar.svg';
                        if (c.profile_image) {
@@ -401,12 +404,12 @@ $(document).ready(function () {
                            else if (c.profile_image.startsWith('/')) { imgSrc = c.profile_image.includes('/web/img/uploads/') ? window.BASE_URL + '/web/img/uploads/' + c.profile_image.split('/web/img/uploads/')[1] : window.BASE_URL + c.profile_image; }
                            else { imgSrc = 'https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/' + c.profile_image; }
                        }
-                       autor += `<img src="${imgSrc}" alt="${c.username}" title="${c.username}" class="rounded-circle border border-dark" style="width: 22px; height: 22px; object-fit: cover; margin-left: -5px; z-index: 1; position: relative;">`;
+                       autor += `<img src="${imgSrc}" alt="${c.username}" title="${c.username}" class="rounded-circle border border-dark shadow-sm" style="width: 24px; height: 24px; object-fit: cover; margin-left: -6px; z-index: 1; position: relative;">`;
                    });
                    if (collabs.length > 3) {
-                       autor += `<div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center border border-dark" style="width: 22px; height: 22px; font-size: 0.6rem; margin-left: -5px; z-index: 1; position: relative;">+${collabs.length - 3}</div>`;
+                       autor += `<div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center border border-dark shadow-sm" style="width: 24px; height: 24px; font-size: 0.65rem; margin-left: -6px; z-index: 1; position: relative;">+${collabs.length - 3}</div>`;
                    }
-                   autor += `</div>`;
+                   autor += `</div></div>`;
                  }
                }
             } catch(e) { console.warn("Error parsing collabs", e); }
@@ -418,7 +421,7 @@ $(document).ready(function () {
         const extraAttr = window.IS_LOGGED_IN ? '' : `data-bs-toggle="modal" data-bs-target="#loginModal" onclick="event.preventDefault();"`;
 
         return `
-        <a href="${href}" ${extraAttr} class="forum-card-item">
+        <a href="${href}" ${extraAttr} class="forum-card-item d-flex flex-column h-100">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0 text-white fw-bold d-flex align-items-center gap-2">
               <span class="forum-icon-bg"><i class="fa-regular fa-comments"></i></span>
@@ -431,11 +434,11 @@ $(document).ready(function () {
           <p class="mb-3 text-white-50 text-truncate" style="max-width: 90%; font-size: 0.95rem;">
             ${forum.forum_subject}
           </p>
-          <div class="d-flex justify-content-between align-items-center mt-auto">
+          <div class="mt-auto pt-3 border-top border-secondary border-opacity-10 d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
             ${autor}
-            <span class="text-secondary small">
+            <div class="text-secondary small text-nowrap ms-sm-auto bg-dark bg-opacity-25 px-2 py-1 rounded">
               <i class="fa-regular fa-calendar me-1"></i>${fecha}
-            </span>
+            </div>
           </div>
         </a>`;
       })

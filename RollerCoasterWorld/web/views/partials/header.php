@@ -13,7 +13,7 @@ if (!headers_sent()) {
   header(
     "Content-Security-Policy: " .
     "default-src 'self'; " .
-    "script-src 'self' 'unsafe-inline' https://www.gstatic.com https://code.jquery.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://js.stripe.com https://unpkg.com; " .
+    "script-src 'self' 'unsafe-inline' https://www.gstatic.com https://code.jquery.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://js.stripe.com https://unpkg.com https://apis.google.com; " .
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; " .
     "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; " .
     "img-src 'self' data: blob: https: https://*.openstreetmap.org https://*.supabase.co; " .
