@@ -1,27 +1,34 @@
 <?php
 
-class Router {
+class Router
+{
     private static $baseUrl = null;
     private static $routes = [];
 
     /**
      * Inicializa el router y define las rutas
      */
-    public static function init() {
+    public static function init()
+    {
         if (self::$baseUrl !== null) {
             return;
         }
 
         // Calcular URL base automáticamente
         // Busca /RollerCoasterWorld en el path y se queda con lo anterior + /RollerCoasterWorld
-        self::$baseUrl = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $_SERVER['SCRIPT_NAME']) ?? '';
+        $script = $_SERVER['SCRIPT_NAME'];
+        if (strpos($script, '/RollerCoasterWorld') !== false) {
+            self::$baseUrl = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $script);
+        } else {
+            self::$baseUrl = '';
+        }
 
         // Definición de TODAS las rutas del proyecto
         self::$routes = [
             // Públicas - Home
             'home' => '/web/views/public/index.php',
             'index' => '/web/views/public/index.php',
-            
+
             // Públicas - Coasters
             'coasters' => '/web/views/public/coasters/coasters.php',
             'coaster_search' => '/web/views/public/coasters/coaster_search.php',
@@ -40,11 +47,11 @@ class Router {
             'park_ranking' => '/web/views/public/parks/ranking.php',
 
             // Públicas - Foros
-            'forums'        => '/web/views/public/forums/forum_search.php',
-            'forum_search'  => '/web/views/public/forums/forum_search.php',
-            'forum_detail'  => '/web/views/public/forums/forums.php',
-            'forum'         => '/web/views/public/forums/forums.php',
-            'forum_config'  => '/web/views/public/forums/forum_config.php',
+            'forums' => '/web/views/public/forums/forum_search.php',
+            'forum_search' => '/web/views/public/forums/forum_search.php',
+            'forum_detail' => '/web/views/public/forums/forums.php',
+            'forum' => '/web/views/public/forums/forums.php',
+            'forum_config' => '/web/views/public/forums/forum_config.php',
 
             // Públicas - Legal/Info
             'contact' => '/web/views/public/contact.php',
@@ -59,10 +66,10 @@ class Router {
             'user_search' => '/web/views/public/users/user_search.php',
 
             // Tienda / Entradas
-            'tickets'  => '/web/views/public/shop/tickets.php',
-            'carrito'  => '/web/views/public/shop/carrito.php',
+            'tickets' => '/web/views/public/shop/tickets.php',
+            'carrito' => '/web/views/public/shop/carrito.php',
             'checkout' => '/web/views/public/shop/checkout.php',
-            'orders'   => '/web/views/public/shop/orders.php',
+            'orders' => '/web/views/public/shop/orders.php',
 
             // Viajes
             'trips' => '/web/views/public/trips/trips.php',
@@ -94,13 +101,15 @@ class Router {
      * @param string $name Nombre de la ruta (clave del array)
      * @return string URL completa
      */
-    public static function url($name) {
-        if (self::$baseUrl === null) self::init();
+    public static function url($name)
+    {
+        if (self::$baseUrl === null)
+            self::init();
 
         if (isset(self::$routes[$name])) {
             return self::$baseUrl . self::$routes[$name];
         }
-        
+
         // Si no existe la ruta, devolver base para evitar errores fatales, o loguear error
         error_log("Ruta no encontrada: $name");
         return self::$baseUrl;
@@ -109,8 +118,10 @@ class Router {
     /**
      * Obtiene la URL base del proyecto
      */
-    public static function getBaseUrl() {
-        if (self::$baseUrl === null) self::init();
+    public static function getBaseUrl()
+    {
+        if (self::$baseUrl === null)
+            self::init();
         return self::$baseUrl;
     }
 
@@ -118,15 +129,18 @@ class Router {
      * Genera una URL para un asset (CSS, JS, imágenes)
      * @param string $path Ruta relativa desde la raíz del proyecto (ej: 'web/css/style.css')
      */
-    public static function asset($path) {
-        if (self::$baseUrl === null) self::init();
+    public static function asset($path)
+    {
+        if (self::$baseUrl === null)
+            self::init();
         return self::$baseUrl . '/' . ltrim($path, '/');
     }
-    
+
     /**
      * Redirige a una ruta interna
      */
-    public static function redirect($name) {
+    public static function redirect($name)
+    {
         header('Location: ' . self::url($name));
         exit;
     }
@@ -134,8 +148,10 @@ class Router {
     /**
      * Devuelve todas las rutas (para compatibilidad si es necesario)
      */
-    public static function getRoutes() {
-        if (self::$baseUrl === null) self::init();
+    public static function getRoutes()
+    {
+        if (self::$baseUrl === null)
+            self::init();
         $fullRoutes = [];
         foreach (self::$routes as $key => $path) {
             $fullRoutes[$key] = self::$baseUrl . $path;
@@ -148,8 +164,10 @@ class Router {
      * @param string $name Nombre de la ruta
      * @return string Path relativo (ej: /web/views/...)
      */
-    public static function getRoutePath($name) {
-        if (self::$baseUrl === null) self::init();
+    public static function getRoutePath($name)
+    {
+        if (self::$baseUrl === null)
+            self::init();
         return self::$routes[$name] ?? '';
     }
 }
