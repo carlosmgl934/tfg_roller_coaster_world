@@ -54,7 +54,6 @@ $is_admin = !empty($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
                 </h1>
                 <p class="home-hero-sub animate d3" id="hero-sub">Bienvenido de nuevo a la comunidad de amantes de las
                     montañas rusas. Sigue explorando y aumentando tus créditos.</p>
-
             </div>
 
             <!-- Dots -->

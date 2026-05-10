@@ -25,7 +25,7 @@ if (!headers_sent()) {
 
 // ── Asegurar token CSRF para el frontend ────────────────────────────────────
 if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // Asegurar que tenemos el user_id de la BD si hay sesión de Firebase
@@ -37,10 +37,12 @@ if (isset($_SESSION['firebase_uid']) && !isset($_SESSION['user_id'])) {
     $stmt_h->execute([':uid' => $_SESSION['firebase_uid']]);
     $user_h = $stmt_h->fetch(PDO::FETCH_ASSOC);
     if ($user_h) {
-      $_SESSION['user_id'] = (int)$user_h['id'];
+      $_SESSION['user_id'] = (int) $user_h['id'];
       $_SESSION['user_rol'] = $user_h['user_rol'];
-      if (!isset($_SESSION['username'])) $_SESSION['username'] = $user_h['username'];
-      if (!isset($_SESSION['profile_image'])) $_SESSION['profile_image'] = $user_h['profile_image'];
+      if (!isset($_SESSION['username']))
+        $_SESSION['username'] = $user_h['username'];
+      if (!isset($_SESSION['profile_image']))
+        $_SESSION['profile_image'] = $user_h['profile_image'];
     }
   } catch (Exception $e) {
     // Ignorar errores de conexión aquí para no romper el sitio
@@ -113,7 +115,6 @@ if ($is_logged) {
 // Comprobar si la página actual es pública o privada
 $current_script = $_SERVER['SCRIPT_NAME'];
 $is_public = false;
-
 foreach ($public_pages as $page) {
   if (!empty($page) && strpos($current_script, $page) !== false) {
     $is_public = true;
@@ -166,21 +167,21 @@ header("Expires: 0"); // Proxies
   <script>
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     if (csrfToken) {
-        const originalFetch = window.fetch;
-        window.fetch = async function () {
-            let [resource, config] = arguments;
-            if (config && (config.method === 'POST' || config.method === 'PUT' || config.method === 'DELETE')) {
-                config.headers = config.headers || {};
-                if (typeof resource === 'string' && (resource.startsWith('/') || resource.startsWith('.') || resource.includes(window.location.origin))) {
-                    if (config.headers instanceof Headers) {
-                        config.headers.append('X-CSRF-Token', csrfToken);
-                    } else {
-                        config.headers['X-CSRF-Token'] = csrfToken;
-                    }
-                }
+      const originalFetch = window.fetch;
+      window.fetch = async function () {
+        let [resource, config] = arguments;
+        if (config && (config.method === 'POST' || config.method === 'PUT' || config.method === 'DELETE')) {
+          config.headers = config.headers || {};
+          if (typeof resource === 'string' && (resource.startsWith('/') || resource.startsWith('.') || resource.includes(window.location.origin))) {
+            if (config.headers instanceof Headers) {
+              config.headers.append('X-CSRF-Token', csrfToken);
+            } else {
+              config.headers['X-CSRF-Token'] = csrfToken;
             }
-            return originalFetch.apply(this, [resource, config]);
-        };
+          }
+        }
+        return originalFetch.apply(this, [resource, config]);
+      };
     }
   </script>
 
@@ -320,9 +321,12 @@ header("Expires: 0"); // Proxies
               <ul class="dropdown-menu shadow border-0">
                 <li><a class="dropdown-item py-2" href="<?= Router::url('trips') ?>"><i
                       class="fa-solid fa-calendar-days w-20px text-center me-2 text-success"></i> Mi Agenda</a></li>
-                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('trip_generator') ?>"><i
-                      class="fa-solid fa-wand-magic-sparkles w-20px text-center me-2 text-danger"></i> Generador IA</a></li>
+                      class="fa-solid fa-wand-magic-sparkles w-20px text-center me-2 text-danger"></i> Generador IA</a>
+                </li>
               </ul>
             </li>
           <?php endif; ?>
@@ -457,7 +461,8 @@ header("Expires: 0"); // Proxies
                 <span class="rcw-user-name d-none d-xl-inline"
                   id="header-username-display"><?= htmlspecialchars(ucfirst($user_display)) ?></span>
                 <!-- Icono carrito con badge (solo visual, no es enlace) -->
-                <span class="position-relative d-none d-xl-inline-flex align-items-center ms-1" id="cart-nav-icon-wrap" style="display:none!important;">
+                <span class="position-relative d-none d-xl-inline-flex align-items-center ms-1" id="cart-nav-icon-wrap"
+                  style="display:none!important;">
                   <i class="fa-solid fa-cart-shopping" style="font-size:.85rem;color:var(--rcw-text-muted);"></i>
                   <span class="cart-nav-badge position-absolute badge rounded-pill bg-success d-none"
                     style="font-size:.55rem;padding:.2em .45em;top:-6px;right:-8px;min-width:16px;line-height:1.2;">0</span>

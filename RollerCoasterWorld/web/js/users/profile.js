@@ -912,7 +912,6 @@ $(document).ready(function () {
       data.sort(
         (a, b) => (parseFloat(b.stars) || 0) - (parseFloat(a.stars) || 0),
       );
-
     const container = $("#top-parks-full-container").empty();
 
     // Update counter pill
@@ -992,7 +991,6 @@ $(document).ready(function () {
         handle: ".drag-handle",
         animation: 150,
         onEnd: function () {
-          // Sync DOM order back into topsData so adding new items doesn't reset positions
           const newOrder = [];
           $("#top-coasters-list-edit .tops-edit-item").each(function (i) {
             $(this)

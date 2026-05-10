@@ -85,13 +85,17 @@ $(document).ready(function () {
           `<img id="user-avatar" src="${resolved.src}"
                style="width:80px;height:80px;object-fit:cover;border-radius:50%;border:2px solid rgba(0,200,83,0.35);flex-shrink:0;"
                class="shadow-sm"
-               onerror="this.src='${window.BASE_URL}/web/img/avatars/default_avatar.svg'">`
+               onerror="this.src='${window.BASE_URL}/web/img/avatars/default_avatar.svg'">`,
         );
       } else {
-        avatarDiv.css({"font-size": "2rem"}).html('<i class="fa-solid fa-user"></i>');
+        avatarDiv
+          .css({ "font-size": "2rem" })
+          .html('<i class="fa-solid fa-user"></i>');
       }
     } else {
-      avatarDiv.css({"font-size": "2rem"}).html('<i class="fa-solid fa-user"></i>');
+      avatarDiv
+        .css({ "font-size": "2rem" })
+        .html('<i class="fa-solid fa-user"></i>');
     }
 
     // Stats generales
@@ -174,12 +178,12 @@ $(document).ready(function () {
       if (map[menuId]) $(map[menuId]).show();
 
       if (menuId === "menu-trips" && !window._tripsLoaded) {
-          loadTrips(userId);
-          window._tripsLoaded = true;
+        loadTrips(userId);
+        window._tripsLoaded = true;
       }
       if (menuId === "menu-ranking" && !window._rankingLoaded) {
-          loadRanking(userId);
-          window._rankingLoaded = true;
+        loadRanking(userId);
+        window._rankingLoaded = true;
       }
     }
 
@@ -245,10 +249,17 @@ $(document).ready(function () {
         };
 
         try {
-          const res = await fetch(`${BASE_URL}/api/php/users.php?action=${endpointMap[action]}`, {
+          const res = await fetch(
+            `${BASE_URL}/api/php/users.php?action=${endpointMap[action]}`,
+            {
               method: "POST",
               headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
+                "X-CSRF-Token":
+                  document
+                    .querySelector('meta[name="csrf-token"]')
+                    ?.getAttribute("content") ?? "",
+                "Content-Type": "application/json",
+              },
               body: JSON.stringify({ target_id: targetId }),
             },
           );
@@ -488,9 +499,9 @@ $(document).ready(function () {
       }
       if (friend.since) {
         const dateSince = new Date(friend.since);
-        const mesSince = new Intl.DateTimeFormat("es-ES", { month: "long" }).format(
-          dateSince,
-        );
+        const mesSince = new Intl.DateTimeFormat("es-ES", {
+          month: "long",
+        }).format(dateSince);
         const anioSince = dateSince.getFullYear();
         details.push(
           `<i class="fa-solid fa-handshake text-success opacity-75 me-1"></i>Amigos desde ${mesSince} de ${anioSince}`,
@@ -515,11 +526,15 @@ $(document).ready(function () {
             <div class="flex-grow-1 min-w-0">
               <div class="fw-bold text-white text-truncate" style="font-size: 0.95rem;">${friend.username}</div>
               <div class="text-muted d-flex flex-wrap align-items-center mt-1 gap-y-1" style="font-size: 0.75rem;">
-                ${details.map((d, index) => `
+                ${details
+                  .map(
+                    (d, index) => `
                   <span class="d-flex align-items-center">
-                    ${d}${index < details.length - 1 ? '<span class="mx-2 opacity-25">&bull;</span>' : ''}
+                    ${d}${index < details.length - 1 ? '<span class="mx-2 opacity-25">&bull;</span>' : ""}
                   </span>
-                `).join('')}
+                `,
+                  )
+                  .join("")}
               </div>
             </div>
           </div>
@@ -562,10 +577,17 @@ $(document).ready(function () {
       .html('<span class="spinner-border spinner-border-sm"></span>');
 
     try {
-      const res = await fetch(`${BASE_URL}/api/php/users.php?action=reject_remove_friend`, {
+      const res = await fetch(
+        `${BASE_URL}/api/php/users.php?action=reject_remove_friend`,
+        {
           method: "POST",
           headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({ target_id: targetId }),
         },
       );
@@ -687,44 +709,69 @@ $(document).ready(function () {
   // ─── VIAJES ──────────────────────────────────────────────────
   async function loadTrips(targetId) {
     const container = $("#trips-grid");
-    container.html('<div class="text-center py-4 text-muted small"><div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>Cargando viajes...</div>');
+    container.html(
+      '<div class="text-center py-4 text-muted small"><div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>Cargando viajes...</div>',
+    );
     try {
-      const res = await fetch(`${BASE_URL}/api/php/trips.php?action=list&target_user_id=${targetId}`);
+      const res = await fetch(
+        `${BASE_URL}/api/php/trips.php?action=list&target_user_id=${targetId}`,
+      );
       const j = await res.json();
       const d = j.data || [];
       if (!d.length) {
-        container.html('<div class="text-center py-4 text-muted"><i class="fa-solid fa-suitcase fa-2x mb-2 opacity-50"></i><br>Este usuario no tiene viajes registrados.</div>');
+        container.html(
+          '<div class="text-center py-4 text-muted"><i class="fa-solid fa-suitcase fa-2x mb-2 opacity-50"></i><br>Este usuario no tiene viajes registrados.</div>',
+        );
         return;
       }
       let html = "";
       d.forEach((t) => {
         const start = new Date(t.start_date);
-        start.setHours(0,0,0,0);
+        start.setHours(0, 0, 0, 0);
         const end = new Date(t.end_date);
-        end.setHours(23,59,59,999);
+        end.setHours(23, 59, 59, 999);
         const mon = start.toLocaleString("es-ES", { month: "short" });
         const y = start.getFullYear();
         const diff = Math.ceil((end - start) / 86400000);
-        
+
         const today = new Date();
         let t_status = "upcoming";
         if (today > end) t_status = "past";
         else if (today >= start && today <= end) t_status = "active";
-        
-        const statusClass = t_status === "past" ? "bg-secondary" : t_status === "active" ? "bg-success" : "bg-warning text-dark";
-        const statusText = t_status === "past" ? "Pasado" : t_status === "active" ? "Activo" : "Próximo";
-        let imgUrl = window.BASE_URL + '/dummy.jpg';
+
+        const statusClass =
+          t_status === "past"
+            ? "bg-secondary"
+            : t_status === "active"
+              ? "bg-success"
+              : "bg-warning text-dark";
+        const statusText =
+          t_status === "past"
+            ? "Pasado"
+            : t_status === "active"
+              ? "Activo"
+              : "Próximo";
+        let imgUrl = window.BASE_URL + "/dummy.jpg";
         if (t.cover_image) {
-            imgUrl = t.cover_image.startsWith('http') ? t.cover_image : (window.BASE_URL + t.cover_image);
+          imgUrl = t.cover_image.startsWith("http")
+            ? t.cover_image
+            : window.BASE_URL + t.cover_image;
         }
-        const pNames = t.park_names ? t.park_names : 'Sin parques planificados';
-        const startStr = start.toLocaleDateString("es-ES", { day: "numeric", month: "short" });
-        const endStr = end.toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" });
-        
+        const pNames = t.park_names ? t.park_names : "Sin parques planificados";
+        const startStr = start.toLocaleDateString("es-ES", {
+          day: "numeric",
+          month: "short",
+        });
+        const endStr = end.toLocaleDateString("es-ES", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+
         html += `
           <div class="trip-card shadow-sm h-100 rounded-1" onclick="openTrip(${t.id})" style="background: #111;">
             <div style="height: 140px; position: relative; overflow: hidden;">
-               ${t.cover_image ? `<img src="${imgUrl}" referrerpolicy="no-referrer" onerror="this.style.opacity='0'" class="w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease, opacity 0.3s ease;">` : ''}
+               ${t.cover_image ? `<img src="${imgUrl}" referrerpolicy="no-referrer" onerror="this.style.opacity='0'" class="w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease, opacity 0.3s ease;">` : ""}
                <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(13,17,23,0.9));"></div>
                <div class="position-absolute bottom-0 start-0 w-100 p-3 text-white">
                  <div class="d-flex align-items-center gap-2 mb-1">
@@ -739,14 +786,16 @@ $(document).ready(function () {
                 <i class="fa-solid fa-calendar-day text-success"></i> ${startStr} — ${endStr}
               </div>
               <div class="small text-muted mb-2 text-truncate" style="font-size:0.75rem;"><i class="fa-solid fa-map-pin me-1 opacity-50"></i>${pNames}</div>
-              ${t.description ? `<div class="small text-white-50" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font-size:0.8rem; line-height:1.4;">${t.description}</div>` : ''}
+              ${t.description ? `<div class="small text-white-50" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font-size:0.8rem; line-height:1.4;">${t.description}</div>` : ""}
             </div>
           </div>
         `;
       });
       container.html(html);
     } catch (e) {
-      container.html('<div class="text-center py-4 text-danger">Error cargando viajes.</div>');
+      container.html(
+        '<div class="text-center py-4 text-danger">Error cargando viajes.</div>',
+      );
     }
   }
 
@@ -773,17 +822,26 @@ $(document).ready(function () {
         navLabel.textContent = "Siempre";
       } else {
         if (navContainer) navContainer.classList.remove("d-none");
-        if (currentPeriod === "year") navLabel.textContent = baseDate.getFullYear();
+        if (currentPeriod === "year")
+          navLabel.textContent = baseDate.getFullYear();
         else if (currentPeriod === "month") {
-          let s = baseDate.toLocaleString("es-ES", {month:"long", year:"numeric"});
+          let s = baseDate.toLocaleString("es-ES", {
+            month: "long",
+            year: "numeric",
+          });
           navLabel.textContent = s.charAt(0).toUpperCase() + s.slice(1);
         } else if (currentPeriod === "week") {
           const wStart = new Date(baseDate);
           wStart.setDate(wStart.getDate() - wStart.getDay() + 1);
-          navLabel.textContent = "Semana " + wStart.toLocaleDateString("es-ES", {day:"numeric", month:"short"});
+          navLabel.textContent =
+            "Semana " +
+            wStart.toLocaleDateString("es-ES", {
+              day: "numeric",
+              month: "short",
+            });
         }
       }
-      
+
       if (currentPeriod !== "custom" && currentPeriod !== "all") {
         const d = getDates();
         if (sDate) {
@@ -802,11 +860,16 @@ $(document).ready(function () {
         if (sDate && !sDate.value) {
           const d = getDates(); // Como currentPeriod ya es custom, esto fallaría si no lo manejamos antes
           // Forzamos un periodo temporal para sacar fechas base
-          const tempPeriod = "year"; 
-          const fmt = (date) => date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0");
+          const tempPeriod = "year";
+          const fmt = (date) =>
+            date.getFullYear() +
+            "-" +
+            String(date.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(date.getDate()).padStart(2, "0");
           const start = fmt(new Date(baseDate.getFullYear(), 0, 1));
           const end = fmt(new Date(baseDate.getFullYear(), 11, 31));
-          
+
           sDate.value = start;
           eDate.value = end;
           eDate.min = start;
@@ -818,8 +881,13 @@ $(document).ready(function () {
 
     function getDates() {
       let start, end;
-      const fmt = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
-      
+      const fmt = (d) =>
+        d.getFullYear() +
+        "-" +
+        String(d.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(d.getDate()).padStart(2, "0");
+
       if (currentPeriod === "week") {
         const d = new Date(baseDate);
         const day = d.getDay() || 7;
@@ -846,41 +914,53 @@ $(document).ready(function () {
       let url = `${BASE_URL}/api/php/trips.php?action=${sType.value === "coasters" ? "ride_ranking" : "park_ranking"}&target_user_id=${targetId}`;
       if (start) url += `&start=${start}`;
       if (end) url += `&end=${end}`;
-      
-      container.innerHTML = '<div class="text-center py-4 text-muted small"><div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>Cargando ranking...</div>';
+
+      container.innerHTML =
+        '<div class="text-center py-4 text-muted small"><div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>Cargando ranking...</div>';
       try {
         const res = await fetch(url);
         const j = await res.json();
         cachedData = j.data || [];
         const tc = document.getElementById("rank-trip-count");
-        if (tc && j.total_trips !== undefined) tc.textContent = j.total_trips + (j.total_trips === 1 ? " viaje" : " viajes");
+        if (tc && j.total_trips !== undefined)
+          tc.textContent =
+            j.total_trips + (j.total_trips === 1 ? " viaje" : " viajes");
         renderRanking();
       } catch (e) {
-        container.innerHTML = '<div class="text-center py-4 text-danger">Error cargando ranking.</div>';
+        container.innerHTML =
+          '<div class="text-center py-4 text-danger">Error cargando ranking.</div>';
       }
     }
 
     function renderRanking() {
       if (!cachedData || !cachedData.length) {
-        container.innerHTML = '<div class="text-center py-5 text-muted"><i class="fa-solid fa-chart-line fa-2x mb-3 opacity-50"></i><br>No hay datos en este periodo.</div>';
+        container.innerHTML =
+          '<div class="text-center py-5 text-muted"><i class="fa-solid fa-chart-line fa-2x mb-3 opacity-50"></i><br>No hay datos en este periodo.</div>';
         return;
       }
-      
-      const max = Math.max(...cachedData.map(i => parseInt(sType.value === "coasters" ? i.times_ridden : i.times_visited)));
-      let html = '<div class="list-group list-group-flush custom-scrollbar" style="max-height: 700px; overflow-y: auto; overflow-x: hidden;">';
-      
+
+      const max = Math.max(
+        ...cachedData.map((i) =>
+          parseInt(
+            sType.value === "coasters" ? i.times_ridden : i.times_visited,
+          ),
+        ),
+      );
+      let html =
+        '<div class="list-group list-group-flush custom-scrollbar" style="max-height: 700px; overflow-y: auto; overflow-x: hidden;">';
+
       cachedData.forEach((item, idx) => {
         const isC = sType.value === "coasters";
         const title = isC ? item.coaster_name : item.park_name;
         const sub = isC ? item.park_name : item.park_location;
         const count = parseInt(isC ? item.times_ridden : item.times_visited);
-        const img = item.imagen_url || (window.BASE_URL + "/web/img/dummy.jpg");
+        const img = item.imagen_url || window.BASE_URL + "/web/img/dummy.jpg";
         const pct = (count / max) * 100;
-        
+
         html += `
           <div class="list-group-item bg-transparent border-bottom border-secondary border-opacity-25 px-4 py-3">
             <div class="d-flex align-items-center gap-3">
-              <div class="fw-bold text-success fs-5" style="min-width:30px;">#${idx+1}</div>
+              <div class="fw-bold text-success fs-5" style="min-width:30px;">#${idx + 1}</div>
               <img src="${img}" onerror="this.src='${window.BASE_URL}/web/img/dummy.jpg'" style="width: 48px; height: 48px; object-fit: cover; border-radius: 4px; border: 1px solid var(--rcw-border);">
               <div class="flex-grow-1 min-w-0">
                 <div class="d-flex justify-content-between align-items-end mb-1 gap-2">
@@ -889,7 +969,7 @@ $(document).ready(function () {
                     <small class="text-muted text-truncate d-block" title="${sub}">${sub}</small>
                   </div>
                   <div class="fw-bold text-success fs-6 fs-md-5 flex-shrink-0 text-end" style="min-width: 60px;">
-                    ${count} <span class="d-block d-sm-inline text-muted fw-normal" style="font-family: 'Outfit', sans-serif; letter-spacing: 0.5px; font-size: 0.7em;">${isC ? (count === 1 ? 'vez montada' : 'veces montada') : (count === 1 ? 'visita' : 'visitas')}</span>
+                    ${count} <span class="d-block d-sm-inline text-muted fw-normal" style="font-family: 'Outfit', sans-serif; letter-spacing: 0.5px; font-size: 0.7em;">${isC ? (count === 1 ? "vez montada" : "veces montada") : count === 1 ? "visita" : "visitas"}</span>
                   </div>
                 </div>
                 <div class="progress rounded-pill bg-dark mt-2" style="height: 6px;">
@@ -900,17 +980,16 @@ $(document).ready(function () {
           </div>
         `;
       });
-      html += '</div>';
+      html += "</div>";
       container.innerHTML = html;
     }
 
     sType.addEventListener("change", fetchRanking);
-    
-    pBtns.forEach(b => {
+    pBtns.forEach((b) => {
       b.addEventListener("click", (e) => {
-        pBtns.forEach(btn => {
-            btn.classList.remove("btn-outline-success", "active");
-            btn.classList.add("btn-outline-secondary");
+        pBtns.forEach((btn) => {
+          btn.classList.remove("btn-outline-success", "active");
+          btn.classList.add("btn-outline-secondary");
         });
         e.target.classList.remove("btn-outline-secondary");
         e.target.classList.add("btn-outline-success", "active");
@@ -925,27 +1004,30 @@ $(document).ready(function () {
       if (currentPeriod === "all" || currentPeriod === "custom") {
         currentPeriod = "year";
         baseDate = new Date();
-        document.querySelectorAll(".rank-period-btn").forEach(btn => {
+        document.querySelectorAll(".rank-period-btn").forEach((btn) => {
           btn.classList.remove("btn-outline-success", "active");
           btn.classList.add("btn-outline-secondary");
-          if(btn.dataset.period === "year") {
+          if (btn.dataset.period === "year") {
             btn.classList.remove("btn-outline-secondary");
             btn.classList.add("btn-outline-success", "active");
           }
         });
       }
-      if (currentPeriod === "year") baseDate.setFullYear(baseDate.getFullYear() + dir);
-      else if (currentPeriod === "month") baseDate.setMonth(baseDate.getMonth() + dir);
-      else if (currentPeriod === "week") baseDate.setDate(baseDate.getDate() + (dir * 7));
+      if (currentPeriod === "year")
+        baseDate.setFullYear(baseDate.getFullYear() + dir);
+      else if (currentPeriod === "month")
+        baseDate.setMonth(baseDate.getMonth() + dir);
+      else if (currentPeriod === "week")
+        baseDate.setDate(baseDate.getDate() + dir * 7);
       updateLabel();
       fetchRanking();
     }
 
-    if(prevBtn) prevBtn.addEventListener("click", () => handleArrowClick(-1));
-    if(nextBtn) nextBtn.addEventListener("click", () => handleArrowClick(1));
+    if (prevBtn) prevBtn.addEventListener("click", () => handleArrowClick(-1));
+    if (nextBtn) nextBtn.addEventListener("click", () => handleArrowClick(1));
 
-    sDate.addEventListener("change", (e) => { 
-      customStart = e.target.value; 
+    sDate.addEventListener("change", (e) => {
+      customStart = e.target.value;
       if (eDate) {
         eDate.min = customStart;
         if (eDate.value && eDate.value < customStart) {
@@ -953,19 +1035,18 @@ $(document).ready(function () {
           customEnd = customStart;
         }
       }
-      if(currentPeriod==="custom") fetchRanking(); 
+      if (currentPeriod === "custom") fetchRanking();
     });
-    eDate.addEventListener("change", (e) => { 
-      customEnd = e.target.value; 
+    eDate.addEventListener("change", (e) => {
+      customEnd = e.target.value;
       if (sDate && customEnd && customEnd < sDate.value) {
         eDate.value = sDate.value;
         customEnd = sDate.value;
       }
-      if(currentPeriod==="custom") fetchRanking(); 
+      if (currentPeriod === "custom") fetchRanking();
     });
 
     updateLabel();
     fetchRanking();
   }
-
 });

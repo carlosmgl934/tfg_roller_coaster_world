@@ -229,7 +229,6 @@
 #tops-tabs .nav-link:hover:not(.active) {
   background-color: rgba(25, 135, 84, 0.1);
 }
-
 /* Preview (compact top-10 list) */
 .tops-preview-item {
   display: flex;

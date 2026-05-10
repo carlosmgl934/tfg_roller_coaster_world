@@ -46,7 +46,7 @@ $user_uid = $_SESSION['firebase_uid'];
                 <?php echo htmlspecialchars($display_name); ?>
               </h5>
               <p class="text-muted small mb-0 text-truncate">
-                
+
                 <?php echo htmlspecialchars($user_email); ?>
               </p>
             </div>
@@ -210,7 +210,8 @@ $user_uid = $_SESSION['firebase_uid'];
               <ul class="list-group list-group-flush">
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
                   <span class="text-muted">País más visitado</span>
-                  <span class="fw-bold text-end text-dark ms-3 text-wrap" id="main-country" style="max-width: 60%;">—</span>
+                  <span class="fw-bold text-end text-dark ms-3 text-wrap" id="main-country"
+                    style="max-width: 60%;">—</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
                   <span class="text-muted">Fabricante favorito</span>
@@ -224,7 +225,8 @@ $user_uid = $_SESSION['firebase_uid'];
                 <li
                   class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 border-top mt-2 pt-3">
                   <span class="text-muted">Altura total superada</span>
-                  <span class="fw-bold text-end ms-3 text-dark fs-5"><span id="total-height">0</span><small class="text-muted fs-6">
+                  <span class="fw-bold text-end ms-3 text-dark fs-5"><span id="total-height">0</span><small
+                      class="text-muted fs-6">
                       m</small></span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
@@ -387,7 +389,7 @@ $user_uid = $_SESSION['firebase_uid'];
             <div>
               <p class="mb-0 fw-bold">ID de Firebase</p>
 
-                              <p class="text-muted mb-0 small font-monospace">
+              <p class="text-muted mb-0 small font-monospace">
                 <?php echo htmlspecialchars($user_uid); ?>
               </p>
             </div>
@@ -790,7 +792,6 @@ $user_uid = $_SESSION['firebase_uid'];
             <input type="radio" class="btn-check" name="trips-view-toggle" id="tv-list" value="list" checked>
             <label class="btn btn-sm btn-outline-success rounded-0 px-3 fw-bold" for="tv-list"><i
                 class="fa-solid fa-list me-1"></i>Viajes</label>
-
             <input type="radio" class="btn-check" name="trips-view-toggle" id="tv-stats" value="stats">
             <label class="btn btn-sm btn-outline-success rounded-0 px-3 fw-bold" for="tv-stats"><i
                 class="fa-solid fa-chart-pie me-1"></i>Estadísticas</label>
@@ -804,7 +805,8 @@ $user_uid = $_SESSION['firebase_uid'];
 
           <!-- Contenedor Vista Viajes -->
           <div id="trips-view-list">
-            <div id="trips-grid" class="trips-grid-scrollable" style="display:flex; flex-direction:column; align-items:center;">
+            <div id="trips-grid" class="trips-grid-scrollable"
+              style="display:flex; flex-direction:column; align-items:center;">
               <div class="text-center py-4 text-muted small">Cargando viajes...</div>
             </div>
           </div>

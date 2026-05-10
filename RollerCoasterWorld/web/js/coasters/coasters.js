@@ -788,9 +788,11 @@ $(document).ready(function () {
           const coasterName = coasterNameEl ? coasterNameEl.textContent : "";
 
           data.photos.forEach((photo, index) => {
-            const userKey = window.CURRENT_USER_ID || 'guest';
+            const userKey = window.CURRENT_USER_ID || "guest";
             const hasLiked =
-              localStorage.getItem("liked_photo_" + userKey + "_" + photo.id) === "true";
+              localStorage.getItem(
+                "liked_photo_" + userKey + "_" + photo.id,
+              ) === "true";
             const heartClass = hasLiked ? "fa-solid text-danger" : "fa-regular";
 
             const col = document.createElement("div");
@@ -812,7 +814,7 @@ $(document).ready(function () {
                            <button class="btn grid-like-btn d-flex align-items-center gap-1 px-2 py-1" 
                                    data-id="${photo.id}" 
                                    style="background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; font-size: 0.75rem; color: #fff; line-height: 1;">
-                               <i class="${heartClass} fa-heart ${photo.user_has_liked ? 'text-danger' : ''}"></i>
+                               <i class="${heartClass} fa-heart ${photo.user_has_liked ? "text-danger" : ""}"></i>
                                <span class="grid-likes-count fw-bold">${photo.likes || 0}</span>
                            </button>
                        </div>
@@ -828,9 +830,9 @@ $(document).ready(function () {
 
           // Ocultar el botón si hay pocas fotos (umbral diferente para PC y móvil)
           const isMobile = window.innerWidth < 992;
-          const threshold = isMobile ? 4 : 6; 
+          const threshold = isMobile ? 4 : 6;
           if (data.photos.length <= threshold) {
-              $("#btn-view-all-photos").hide();
+            $("#btn-view-all-photos").hide();
           }
         }
       } catch (e) {
@@ -839,16 +841,20 @@ $(document).ready(function () {
     }
 
     // Handler para expandir/contraer fotos
-    $("#btn-view-all-photos").on("click", function(e) {
-        e.preventDefault();
-        const grid = $("#photos-grid");
-        if (grid.hasClass("expanded")) {
-            grid.removeClass("expanded");
-            $(this).html('Ver todas las fotos <i class="fa-solid fa-arrow-right ms-1"></i>');
-        } else {
-            grid.addClass("expanded");
-            $(this).html('Contraer fotos <i class="fa-solid fa-arrow-up ms-1"></i>');
-        }
+    $("#btn-view-all-photos").on("click", function (e) {
+      e.preventDefault();
+      const grid = $("#photos-grid");
+      if (grid.hasClass("expanded")) {
+        grid.removeClass("expanded");
+        $(this).html(
+          'Ver todas las fotos <i class="fa-solid fa-arrow-right ms-1"></i>',
+        );
+      } else {
+        grid.addClass("expanded");
+        $(this).html(
+          'Contraer fotos <i class="fa-solid fa-arrow-up ms-1"></i>',
+        );
+      }
     });
 
     // Handlers para Lightbox IG y Likes
@@ -859,15 +865,15 @@ $(document).ready(function () {
       if (index < 0 || index >= allPhotosList.length) return;
       currentPhotoIndex = index;
       const el = $(allPhotosList[index]);
-
       const id = el.data("id");
       const url = el.data("url");
       const username = el.data("username");
       const avatar = el.data("avatar");
       const caption = el.data("caption");
       const likes = el.data("likes");
-      const userKey = window.CURRENT_USER_ID || 'guest';
-      const hasLiked = localStorage.getItem("liked_photo_" + userKey + "_" + id) === "true";
+      const userKey = window.CURRENT_USER_ID || "guest";
+      const hasLiked =
+        localStorage.getItem("liked_photo_" + userKey + "_" + id) === "true";
 
       $("#ig-modal-img").attr("src", url);
       $("#ig-modal-avatar").attr("src", avatar);
@@ -910,8 +916,9 @@ $(document).ready(function () {
         const avatar = $(this).data("avatar");
         const caption = $(this).data("caption");
         const likes = $(this).data("likes");
-        const userKey = window.CURRENT_USER_ID || 'guest';
-        const hasLiked = localStorage.getItem("liked_photo_" + userKey + "_" + id) === "true";
+        const userKey = window.CURRENT_USER_ID || "guest";
+        const hasLiked =
+          localStorage.getItem("liked_photo_" + userKey + "_" + id) === "true";
 
         $("#ig-modal-img").attr("src", url);
         $("#ig-modal-avatar").attr("src", avatar);
@@ -957,65 +964,83 @@ $(document).ready(function () {
 
     // Función única para gestionar likes (Sincronizada y con protección anti-doble click)
     async function togglePhotoLike(photoId, btnElement) {
-        if (!photoId || btnElement.prop('disabled')) return;
-        
-        const userKey = window.CURRENT_USER_ID || 'guest';
-        const hasLiked = localStorage.getItem("liked_photo_" + userKey + "_" + photoId) === "true";
-        
-        // Bloquear todos los botones relacionados con esta foto para evitar spam
-        const gridBtns = $(`.grid-like-btn[data-id='${photoId}']`);
-        const modalBtn = $("#ig-modal-like-btn");
-        
-        const allRelatedBtns = gridBtns.add(modalBtn);
-        allRelatedBtns.prop('disabled', true).addClass('opacity-50');
+      if (!photoId || btnElement.prop("disabled")) return;
 
-        try {
-            const formData = new FormData();
-            formData.append("photo_id", photoId);
-            formData.append("unlike", hasLiked);
+      const userKey = window.CURRENT_USER_ID || "guest";
+      const hasLiked =
+        localStorage.getItem("liked_photo_" + userKey + "_" + photoId) ===
+        "true";
 
-            const res = await fetch(`${window.BASE_URL}/api/php/coasters.php?action=like_photo`, {
-                method: "POST",
-                headers: {
-                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? ''
-                },
-                body: formData
-            });
-            const data = await res.json();
+      // Bloquear todos los botones relacionados con esta foto para evitar spam
+      const gridBtns = $(`.grid-like-btn[data-id='${photoId}']`);
+      const modalBtn = $("#ig-modal-like-btn");
 
-            if (data.success) {
-                const newHasLiked = !hasLiked;
-                if (newHasLiked) {
-                    localStorage.setItem("liked_photo_" + userKey + "_" + photoId, "true");
-                } else {
-                    localStorage.removeItem("liked_photo_" + userKey + "_" + photoId);
-                }
+      const allRelatedBtns = gridBtns.add(modalBtn);
+      allRelatedBtns.prop("disabled", true).addClass("opacity-50");
 
-                // 1. Actualizar el Grid (todos los botones de esa foto)
-                gridBtns.each(function() {
-                    const icon = $(this).find("i");
-                    if (newHasLiked) {
-                        icon.removeClass("fa-regular").addClass("fa-solid text-danger");
-                    } else {
-                        icon.removeClass("fa-solid text-danger").addClass("fa-regular");
-                    }
-                    $(this).find(".grid-likes-count").text(data.likes);
-                });
+      try {
+        const formData = new FormData();
+        formData.append("photo_id", photoId);
+        formData.append("unlike", hasLiked);
 
-                // 2. Sincronizar el dataset de la foto (para que el modal herede los likes actuales si se abre)
-                $(`.photo-square-container[data-id='${photoId}']`).data("likes", data.likes);
+        const res = await fetch(
+          `${window.BASE_URL}/api/php/coasters.php?action=like_photo`,
+          {
+            method: "POST",
+            headers: {
+              "X-CSRF-Token":
+                document
+                  .querySelector('meta[name="csrf-token"]')
+                  ?.getAttribute("content") ?? "",
+            },
+            body: formData,
+          },
+        );
+        const data = await res.json();
 
-                // 3. Sincronizar el Modal (si es la foto que estamos viendo)
-                if (modalBtn.data('id') == photoId) {
-                    modalBtn.html(newHasLiked ? '<i class="fa-solid fa-heart text-danger"></i>' : '<i class="fa-regular fa-heart"></i>');
-                    $("#ig-modal-likes").text(data.likes + " me gusta");
-                }
+        if (data.success) {
+          const newHasLiked = !hasLiked;
+          if (newHasLiked) {
+            localStorage.setItem(
+              "liked_photo_" + userKey + "_" + photoId,
+              "true",
+            );
+          } else {
+            localStorage.removeItem("liked_photo_" + userKey + "_" + photoId);
+          }
+
+          // 1. Actualizar el Grid (todos los botones de esa foto)
+          gridBtns.each(function () {
+            const icon = $(this).find("i");
+            if (newHasLiked) {
+              icon.removeClass("fa-regular").addClass("fa-solid text-danger");
+            } else {
+              icon.removeClass("fa-solid text-danger").addClass("fa-regular");
             }
-        } catch (e) {
-            console.error("Error toggle like:", e);
-        } finally {
-            allRelatedBtns.prop('disabled', false).removeClass('opacity-50');
+            $(this).find(".grid-likes-count").text(data.likes);
+          });
+
+          // 2. Sincronizar el dataset de la foto (para que el modal herede los likes actuales si se abre)
+          $(`.photo-square-container[data-id='${photoId}']`).data(
+            "likes",
+            data.likes,
+          );
+
+          // 3. Sincronizar el Modal (si es la foto que estamos viendo)
+          if (modalBtn.data("id") == photoId) {
+            modalBtn.html(
+              newHasLiked
+                ? '<i class="fa-solid fa-heart text-danger"></i>'
+                : '<i class="fa-regular fa-heart"></i>',
+            );
+            $("#ig-modal-likes").text(data.likes + " me gusta");
+          }
         }
+      } catch (e) {
+        console.error("Error toggle like:", e);
+      } finally {
+        allRelatedBtns.prop("disabled", false).removeClass("opacity-50");
+      }
     }
 
     $("#ig-modal-like-btn").on("click", function () {
@@ -1060,8 +1085,11 @@ $(document).ready(function () {
               tagsHtml += "</div>";
             }
 
-            const isOwn = (window.CURRENT_USER_ID && parseInt(review.user_id) === window.CURRENT_USER_ID) || 
-                          (window.CURRENT_USERNAME && review.username === window.CURRENT_USERNAME);
+            const isOwn =
+              (window.CURRENT_USER_ID &&
+                parseInt(review.user_id) === window.CURRENT_USER_ID) ||
+              (window.CURRENT_USERNAME &&
+                review.username === window.CURRENT_USERNAME);
 
             const editBtn = isOwn
               ? `<button class="btn btn-link p-0 text-warning edit-review-btn d-flex flex-column align-items-center lh-1"
@@ -1153,8 +1181,18 @@ $(document).ready(function () {
       fd.append("review", text);
 
       try {
-        const res = await fetch(`${BASE_URL}/api/php/coasters.php?action=update_review`, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST", body: fd },
+        const res = await fetch(
+          `${BASE_URL}/api/php/coasters.php?action=update_review`,
+          {
+            headers: {
+              "X-CSRF-Token":
+                document
+                  .querySelector('meta[name="csrf-token"]')
+                  ?.getAttribute("content") ?? "",
+            },
+            method: "POST",
+            body: fd,
+          },
         );
         const data = await res.json();
         if (data.success) {
@@ -1170,7 +1208,7 @@ $(document).ready(function () {
           .prop("disabled", false)
           .html('<i class="fa-solid fa-floppy-disk me-1"></i>Guardar cambios');
       }
-    } );
+    });
 
     if (coasterId) {
       loadCoastersData(coasterId);
@@ -1228,11 +1266,16 @@ $(document).ready(function () {
         submitBtn.innerHTML =
           'Publicando... <i class="fa-solid fa-spinner fa-spin ms-2"></i>';
 
-        fetch(window.BASE_URL + "/api/php/coasters.php?action=save_review", { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
+        fetch(window.BASE_URL + "/api/php/coasters.php?action=save_review", {
+          headers: {
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+          },
           method: "POST",
           body: formData,
-        } )
+        })
           .then((res) => res.json())
           .then((data) => {
             if (data.success) {
@@ -1333,7 +1376,10 @@ $(document).ready(function () {
               {
                 method: "POST",
                 headers: {
-                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? ''
+                  "X-CSRF-Token":
+                    document
+                      .querySelector('meta[name="csrf-token"]')
+                      ?.getAttribute("content") ?? "",
                 },
                 body: uploadForm,
               },
@@ -1369,7 +1415,10 @@ $(document).ready(function () {
               {
                 method: "POST",
                 headers: {
-                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? ''
+                  "X-CSRF-Token":
+                    document
+                      .querySelector('meta[name="csrf-token"]')
+                      ?.getAttribute("content") ?? "",
                 },
                 body: photoForm,
               },
@@ -1517,7 +1566,9 @@ $(document).ready(function () {
 
   // --- COMPARTIR ---
   $("#btn-share").on("click", async function () {
-    const title = document.getElementById("coaster-name")?.textContent || "RollerCoaster World";
+    const title =
+      document.getElementById("coaster-name")?.textContent ||
+      "RollerCoaster World";
     const text = `Mira esta montaña rusa en RollerCoaster World: ${title}`;
     const url = window.location.href;
 

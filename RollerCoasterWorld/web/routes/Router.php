@@ -13,7 +13,6 @@ class Router
         if (self::$baseUrl !== null) {
             return;
         }
-
         // Calcular URL base automáticamente
         // Busca /RollerCoasterWorld en el path y se queda con lo anterior + /RollerCoasterWorld
         $script = $_SERVER['SCRIPT_NAME'];

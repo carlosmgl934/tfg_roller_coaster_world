@@ -131,10 +131,13 @@ $(document).ready(function () {
       btn.disabled = true;
       btn.textContent = "Creando foro...";
 
-      fetch(window.BASE_URL + "/api/php/forums.php?action=create_forum", { 
+      fetch(window.BASE_URL + "/api/php/forums.php?action=create_forum", {
         method: "POST",
-        headers: { 
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' 
+        headers: {
+          "X-CSRF-Token":
+            document
+              .querySelector('meta[name="csrf-token"]')
+              ?.getAttribute("content") ?? "",
         },
         body: formData,
       })
@@ -182,7 +185,7 @@ $(document).ready(function () {
   let friendsLoaded = false;
 
   function getAvatarUrl(img, username) {
-    const fallback = window.BASE_URL + '/web/img/avatars/default_avatar.svg';
+    const fallback = window.BASE_URL + "/web/img/avatars/default_avatar.svg";
     if (!img) return fallback;
     if (img.startsWith("http://") || img.startsWith("https://")) return img;
     return `https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/${img}`;
@@ -387,38 +390,61 @@ $(document).ready(function () {
                      <div class="d-flex align-items-center">
                        <small class="text-muted"><i class="fa-solid fa-user me-1"></i>${forum.author_name}</small>
                      </div>`;
-                     
+
           if (forum.collaborators_json) {
             try {
-               let collabs = typeof forum.collaborators_json === "string" ? JSON.parse(forum.collaborators_json) : forum.collaborators_json;
-               if (collabs && collabs.length > 0) {
-                 collabs = collabs.filter(c => c && c.username);
-                 if (collabs.length > 0) {
-                   autor += `<div class="d-flex align-items-center bg-dark bg-opacity-50 px-2 py-1 rounded-pill border border-secondary border-opacity-25" title="Colaboradores">
+              let collabs =
+                typeof forum.collaborators_json === "string"
+                  ? JSON.parse(forum.collaborators_json)
+                  : forum.collaborators_json;
+              if (collabs && collabs.length > 0) {
+                collabs = collabs.filter((c) => c && c.username);
+                if (collabs.length > 0) {
+                  autor += `<div class="d-flex align-items-center bg-dark bg-opacity-50 px-2 py-1 rounded-pill border border-secondary border-opacity-25" title="Colaboradores">
                                <small class="text-muted me-2 fw-semibold" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">Colabs</small>
                                <div class="d-flex">`;
-                   collabs.slice(0, 3).forEach(c => {
-                       let imgSrc = window.BASE_URL + '/web/img/avatars/default_avatar.svg';
-                       if (c.profile_image) {
-                           if (c.profile_image.startsWith('http://') || c.profile_image.startsWith('https://')) { imgSrc = c.profile_image; }
-                           else if (c.profile_image.startsWith('/')) { imgSrc = c.profile_image.includes('/web/img/uploads/') ? window.BASE_URL + '/web/img/uploads/' + c.profile_image.split('/web/img/uploads/')[1] : window.BASE_URL + c.profile_image; }
-                           else { imgSrc = 'https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/' + c.profile_image; }
-                       }
-                       autor += `<img src="${imgSrc}" alt="${c.username}" title="${c.username}" class="rounded-circle border border-dark shadow-sm" style="width: 24px; height: 24px; object-fit: cover; margin-left: -6px; z-index: 1; position: relative;">`;
-                   });
-                   if (collabs.length > 3) {
-                       autor += `<div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center border border-dark shadow-sm" style="width: 24px; height: 24px; font-size: 0.65rem; margin-left: -6px; z-index: 1; position: relative;">+${collabs.length - 3}</div>`;
-                   }
-                   autor += `</div></div>`;
-                 }
-               }
-            } catch(e) { console.warn("Error parsing collabs", e); }
+                  collabs.slice(0, 3).forEach((c) => {
+                    let imgSrc =
+                      window.BASE_URL + "/web/img/avatars/default_avatar.svg";
+                    if (c.profile_image) {
+                      if (
+                        c.profile_image.startsWith("http://") ||
+                        c.profile_image.startsWith("https://")
+                      ) {
+                        imgSrc = c.profile_image;
+                      } else if (c.profile_image.startsWith("/")) {
+                        imgSrc = c.profile_image.includes("/web/img/uploads/")
+                          ? window.BASE_URL +
+                            "/web/img/uploads/" +
+                            c.profile_image.split("/web/img/uploads/")[1]
+                          : window.BASE_URL + c.profile_image;
+                      } else {
+                        imgSrc =
+                          "https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/" +
+                          c.profile_image;
+                      }
+                    }
+                    autor += `<img src="${imgSrc}" alt="${c.username}" title="${c.username}" class="rounded-circle border border-dark shadow-sm" style="width: 24px; height: 24px; object-fit: cover; margin-left: -6px; z-index: 1; position: relative;">`;
+                  });
+                  if (collabs.length > 3) {
+                    autor += `<div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center border border-dark shadow-sm" style="width: 24px; height: 24px; font-size: 0.65rem; margin-left: -6px; z-index: 1; position: relative;">+${collabs.length - 3}</div>`;
+                  }
+                  autor += `</div></div>`;
+                }
+              }
+            } catch (e) {
+              console.warn("Error parsing collabs", e);
+            }
           }
           autor += `</div>`;
         }
 
-        const href = window.IS_LOGGED_IN ? `${window.BASE_URL}/web/views/public/forums/forums.php?id=${forum.id}` : `#`;
-        const extraAttr = window.IS_LOGGED_IN ? '' : `data-bs-toggle="modal" data-bs-target="#loginModal" onclick="event.preventDefault();"`;
+        const href = window.IS_LOGGED_IN
+          ? `${window.BASE_URL}/web/views/public/forums/forums.php?id=${forum.id}`
+          : `#`;
+        const extraAttr = window.IS_LOGGED_IN
+          ? ""
+          : `data-bs-toggle="modal" data-bs-target="#loginModal" onclick="event.preventDefault();"`;
 
         return `
         <a href="${href}" ${extraAttr} class="forum-card-item d-flex flex-column h-100">
@@ -445,48 +471,48 @@ $(document).ready(function () {
       .join("");
   }
 
-  // ── Buscador de foros ────────────────────────────────────────────
+  // ── Buscador de foros ───────────────────────────────────────────
   const buscador = document.getElementById("forum-search-input");
   const btnMine = document.getElementById("filter-mine-btn");
   let isMineFilterActive = false;
 
   if (btnMine) {
-      btnMine.addEventListener("click", function () {
-          isMineFilterActive = !isMineFilterActive;
-          if (isMineFilterActive) {
-             btnMine.classList.remove("btn-outline-success");
-             btnMine.classList.add("btn-success");
-             btnMine.classList.add("text-white");
-          } else {
-             btnMine.classList.remove("btn-success");
-             btnMine.classList.remove("text-white");
-             btnMine.classList.add("btn-outline-success");
-          }
-          triggerSearch();
-      });
+    btnMine.addEventListener("click", function () {
+      isMineFilterActive = !isMineFilterActive;
+      if (isMineFilterActive) {
+        btnMine.classList.remove("btn-outline-success");
+        btnMine.classList.add("btn-success");
+        btnMine.classList.add("text-white");
+      } else {
+        btnMine.classList.remove("btn-success");
+        btnMine.classList.remove("text-white");
+        btnMine.classList.add("btn-outline-success");
+      }
+      triggerSearch();
+    });
   }
 
   function triggerSearch() {
-      const val = buscador ? buscador.value.trim() : "";
-      let url = window.BASE_URL + "/api/php/forums.php?";
+    const val = buscador ? buscador.value.trim() : "";
+    let url = window.BASE_URL + "/api/php/forums.php?";
 
-      if (val.length > 2) {
-          url += "action=search_forums&search=" + encodeURIComponent(val);
-      } else {
-          url += "action=list";
-      }
+    if (val.length > 2) {
+      url += "action=search_forums&search=" + encodeURIComponent(val);
+    } else {
+      url += "action=list";
+    }
 
-      if (isMineFilterActive) {
-          url += "&mine=true";
-      }
+    if (isMineFilterActive) {
+      url += "&mine=true";
+    }
 
-      fetch(url)
-        .then((res) => res.json())
-        .then((data) => {
-            if (data.success) listForums(data.forums);
-            else console.warn("Error al cargar los foros");
-        })
-        .catch(e => console.error("Error connecting to API", e));
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) listForums(data.forums);
+        else console.warn("Error al cargar los foros");
+      })
+      .catch((e) => console.error("Error connecting to API", e));
   }
 
   if (buscador) {
@@ -495,7 +521,7 @@ $(document).ready(function () {
 
     // Búsqueda dinámica
     buscador.addEventListener("input", function () {
-       triggerSearch();
+      triggerSearch();
     });
   }
 });

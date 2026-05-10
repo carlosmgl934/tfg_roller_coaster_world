@@ -147,7 +147,6 @@ try {
     ':email' => $email,
     ':firebase_uid' => $firebase_uid
   ]);
-
   if (!$exec) {
     $err = $stmt->errorInfo();
     file_put_contents($log, "Error execute: " . print_r($err, true) . "\n", FILE_APPEND);

@@ -887,7 +887,7 @@
     );
   };
 
-  // ── TRIP MODAL (Page 1) ─────────────
+  // ── TRIP MODAL (Page 1) ────────────
   window.openTrip = async (id) => {
     const body = document.getElementById("td-body");
     if (!body) return;
