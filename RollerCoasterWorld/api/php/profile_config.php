@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/utils/SessionManager.php';
 require_once __DIR__ . '/../database/db_conexion.php';
 
 header('Content-Type: application/json');
@@ -122,7 +122,7 @@ function saveProfile()
         if ($e->getCode() == 23505) {
             Response::error('El nombre de usuario ya está en uso');
         } else {
-            Response::error('Error al guardar los datos: ' . $e->getMessage());
+            error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
         }
     }
 }
@@ -292,7 +292,7 @@ function getProfile()
             Response::notFound('No se encontró el usuario');
         }
     } catch (PDOException $e) {
-        Response::error('Error al obtener los datos: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -323,7 +323,7 @@ function updateAvatar()
 
         Response::success();
     } catch (PDOException $e) {
-        Response::error('Error al actualizar el avatar: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -364,7 +364,7 @@ function getTopCoasters()
         $tops = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Response::success(['tops' => $tops]);
     } catch (PDOException $e) {
-        Response::error('Error al obtener el top de coasters: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -398,7 +398,7 @@ function getTopParks()
         $tops = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Response::success(['tops' => $tops]);
     } catch (PDOException $e) {
-        Response::error('Error al obtener el top de parques: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -442,7 +442,7 @@ function saveTopCoasters()
         Response::success(['message' => 'Top de coasters guardado']);
     } catch (PDOException $e) {
         $db->rollBack();
-        Response::error('Error al guardar el top de coasters: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -484,7 +484,7 @@ function saveTopParks()
         Response::success(['message' => 'Top de parques guardado']);
     } catch (PDOException $e) {
         $db->rollBack();
-        Response::error('Error al guardar el top de parques: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -535,7 +535,7 @@ function getMapParks()
         $parks = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Response::success(['parks' => $parks]);
     } catch (PDOException $e) {
-        Response::error('Error al obtener los parques del mapa: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -587,6 +587,6 @@ function getMyReviews()
         $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Response::success(['reviews' => $reviews]);
     } catch (PDOException $e) {
-        Response::error('Error al obtener reseñas: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }

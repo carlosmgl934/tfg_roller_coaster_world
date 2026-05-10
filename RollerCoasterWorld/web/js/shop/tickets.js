@@ -45,11 +45,12 @@ const statusBadge = (s) => {
 async function apiPost(url, data) {
   const fd = new FormData();
   Object.entries(data).forEach(([k, v]) => fd.append(k, v));
-  const r = await fetch(url, {
+  const r = await fetch(url, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
     method: "POST",
     body: fd,
     credentials: "include",
-  });
+  } );
   return r.json();
 }
 async function apiGet(url) {

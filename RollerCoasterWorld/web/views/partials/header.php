@@ -4,6 +4,30 @@ if (session_status() === PHP_SESSION_NONE) {
   session_start();
 }
 
+// ── Cabeceras de seguridad HTTP ───────────────────────────────────────────────
+if (!headers_sent()) {
+  header("X-Content-Type-Options: nosniff");
+  header("X-Frame-Options: SAMEORIGIN");
+  header("Referrer-Policy: strict-origin-when-cross-origin");
+  header("Permissions-Policy: geolocation=(), camera=(), microphone=()");
+  header(
+    "Content-Security-Policy: " .
+    "default-src 'self'; " .
+    "script-src 'self' 'unsafe-inline' https://www.gstatic.com https://code.jquery.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://js.stripe.com https://unpkg.com; " .
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; " .
+    "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; " .
+    "img-src 'self' data: blob: https: https://*.openstreetmap.org https://*.supabase.co; " .
+    "connect-src 'self' https://*.supabase.co https://*.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://nominatim.openstreetmap.org https://firebaseapp.com https://www.gstatic.com https://unpkg.com https://cdn.jsdelivr.net; " .
+    "frame-src https://js.stripe.com; " .
+    "frame-ancestors 'none';"
+  );
+}
+
+// ── Asegurar token CSRF para el frontend ────────────────────────────────────
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Asegurar que tenemos el user_id de la BD si hay sesión de Firebase
 if (isset($_SESSION['firebase_uid']) && !isset($_SESSION['user_id'])) {
   try {
@@ -138,6 +162,28 @@ header("Expires: 0"); // Proxies
   <!-- Firebase auth init (global) -->
   <script src="<?= Router::asset('web/js/auth/auth.js') ?>"></script>
 
+  <!-- Interceptor CSRF para window.fetch -->
+  <script>
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    if (csrfToken) {
+        const originalFetch = window.fetch;
+        window.fetch = async function () {
+            let [resource, config] = arguments;
+            if (config && (config.method === 'POST' || config.method === 'PUT' || config.method === 'DELETE')) {
+                config.headers = config.headers || {};
+                if (typeof resource === 'string' && (resource.startsWith('/') || resource.startsWith('.') || resource.includes(window.location.origin))) {
+                    if (config.headers instanceof Headers) {
+                        config.headers.append('X-CSRF-Token', csrfToken);
+                    } else {
+                        config.headers['X-CSRF-Token'] = csrfToken;
+                    }
+                }
+            }
+            return originalFetch.apply(this, [resource, config]);
+        };
+    }
+  </script>
+
   <!-- Funciones Nav para búsqueda de comunidad -->
   <?php if ($is_logged): ?>
     <script src="<?= Router::asset('web/js/social/header_friends.js') ?>"></script>
@@ -160,6 +206,9 @@ header("Expires: 0"); // Proxies
       <?php endif; ?>
     <?php endforeach; ?>
   <?php endif; ?>
+
+  <!-- CSRF Token para peticiones Fetch/AJAX -->
+  <meta name="csrf-token" content="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
 
 </head>
 

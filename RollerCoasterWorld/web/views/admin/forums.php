@@ -41,10 +41,12 @@ if (!$is_logged || !$is_admin) {
 
                     <!-- Botones -->
                     <div class="d-grid gap-2">
-                        <button type="button" class="btn btn-success fw-bold shadow-sm rounded-0" id="btn-forums-filtrar">
+                        <button type="button" class="btn btn-success fw-bold shadow-sm rounded-0"
+                            id="btn-forums-filtrar">
                             <i class="fa-solid fa-filter me-2"></i>Filtrar
                         </button>
-                        <button type="button" class="btn btn-outline-secondary shadow-sm rounded-0" id="btn-forums-borrar">
+                        <button type="button" class="btn btn-outline-secondary shadow-sm rounded-0"
+                            id="btn-forums-borrar">
                             <i class="fa-solid fa-eraser me-2"></i>Limpiar filtros
                         </button>
                     </div>
@@ -94,12 +96,10 @@ if (!$is_logged || !$is_admin) {
             <!-- Barra de búsqueda -->
             <div class="d-flex gap-2 mb-3 flex-wrap">
                 <div class="flex-grow-1 position-relative">
-                    <input type="text" id="forums-search"
-                           class="form-control shadow-sm pe-5 border-success rounded-0"
-                           placeholder="Buscar foro por título o asunto..."
-                           style="border-width: 2px;">
+                    <input type="text" id="forums-search" class="form-control shadow-sm pe-5 border-success rounded-0"
+                        placeholder="Buscar foro por título o asunto..." style="border-width: 2px;">
                     <i class="fa-solid fa-magnifying-glass text-muted position-absolute"
-                       style="right: 14px; top: 50%; transform: translateY(-50%);"></i>
+                        style="right: 14px; top: 50%; transform: translateY(-50%);"></i>
                 </div>
                 <button class="btn btn-outline-secondary rounded-0" onclick="loadForums()" title="Recargar">
                     <i class="fa-solid fa-arrows-rotate"></i>
@@ -158,10 +158,9 @@ if (!$is_logged || !$is_admin) {
                         </button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link fw-semibold" data-tab="banned"
-                            style="color:#94a3b8; border-radius:0;">
+                        <button class="nav-link fw-semibold" data-tab="banned" style="color:#94a3b8; border-radius:0;">
                             <i class="fa-solid fa-ban me-1"></i>
-                            Baneados <span class="badge bg-danger ms-1" id="tab-badge-bans">0</span>
+                            Participantes / Baneos <span class="badge bg-danger ms-1" id="tab-badge-bans">0</span>
                         </button>
                     </li>
                 </ul>
@@ -173,8 +172,10 @@ if (!$is_logged || !$is_admin) {
                         <!-- Filtro rápido -->
                         <div class="d-flex gap-2 mb-3">
                             <div class="form-check form-switch mb-0 d-flex align-items-center gap-2">
-                                <input class="form-check-input admin-toggle" type="checkbox" role="switch" id="filter-show-hidden">
-                                <label class="form-check-label small text-muted" for="filter-show-hidden">Mostrar solo ocultos</label>
+                                <input class="form-check-input admin-toggle" type="checkbox" role="switch"
+                                    id="filter-show-hidden">
+                                <label class="form-check-label small text-muted" for="filter-show-hidden">Mostrar solo
+                                    ocultos</label>
                             </div>
                         </div>
                         <div id="messages-list">
@@ -226,11 +227,13 @@ if (!$is_logged || !$is_admin) {
 
             </div><!-- /modal-body -->
 
-            <div class="modal-footer border-0 px-4 pb-4 pt-2 d-flex justify-content-between" style="background:#0d1117;">
+            <div class="modal-footer border-0 px-4 pb-4 pt-2 d-flex justify-content-between"
+                style="background:#0d1117;">
                 <button type="button" class="btn btn-danger rounded-0 fw-bold" id="btn-delete-forum-from-detail">
                     <i class="fa-solid fa-trash me-1"></i>Eliminar foro completo
                 </button>
-                <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-outline-secondary rounded-0"
+                    data-bs-dismiss="modal">Cerrar</button>
             </div>
 
         </div>
@@ -250,10 +253,12 @@ if (!$is_logged || !$is_admin) {
             <div class="modal-body" style="background:#161b22; color:#e6edf3;">
                 <p class="mb-1">¿Estás seguro de que quieres eliminar el foro:</p>
                 <p class="fw-bold text-danger mb-0" id="delete-forum-title">—</p>
-                <p class="text-muted small mt-2 mb-0">Esta acción eliminará también <strong>todos los mensajes, colaboradores y baneados</strong> de este foro. No se puede deshacer.</p>
+                <p class="text-muted small mt-2 mb-0">Esta acción eliminará también <strong>todos los mensajes,
+                        colaboradores y baneados</strong> de este foro. No se puede deshacer.</p>
             </div>
             <div class="modal-footer border-0" style="background:#161b22;">
-                <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-outline-secondary rounded-0"
+                    data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-danger rounded-0 fw-bold" id="confirm-delete-forum">
                     <i class="fa-solid fa-trash me-1"></i>Sí, eliminar
                 </button>
@@ -266,8 +271,7 @@ if (!$is_logged || !$is_admin) {
 <div class="modal fade" id="modal-ban-owner" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-0 border-0 shadow" style="background:#161b22;">
-            <div class="modal-header border-0 py-3 px-4"
-                 style="background: linear-gradient(135deg, #b91c1c, #7f1d1d);">
+            <div class="modal-header border-0 py-3 px-4" style="background: linear-gradient(135deg, #b91c1c, #7f1d1d);">
                 <div class="d-flex align-items-center gap-2">
                     <i class="fa-solid fa-crown fs-5 text-warning"></i>
                     <h5 class="modal-title fw-bold mb-0 text-white">Banear al creador del foro</h5>
@@ -283,14 +287,15 @@ if (!$is_logged || !$is_admin) {
                             es el <strong>creador</strong> de este foro.
                         </p>
                         <p class="text-muted small mb-0">
-                            Banear al creador provocará la <strong class="text-danger">eliminación completa del foro</strong>
+                            Banear al creador provocará la <strong class="text-danger">eliminación completa del
+                                foro</strong>
                             incluyendo todos sus mensajes, colaboradores y baneados.<br>
                             Esta acción <strong>no se puede deshacer</strong>.
                         </p>
                     </div>
                 </div>
                 <div class="alert rounded-0 border-0 mb-0 py-2 px-3"
-                     style="background:rgba(185,28,28,.15); border-left:3px solid #b91c1c !important;">
+                    style="background:rgba(185,28,28,.15); border-left:3px solid #b91c1c !important;">
                     <p class="small mb-0 text-danger fw-semibold">
                         <i class="fa-solid fa-fire me-1"></i>
                         Foro: <span id="ban-owner-forum-title">—</span>
@@ -321,10 +326,12 @@ if (!$is_logged || !$is_admin) {
             </div>
             <div class="modal-body" style="background:#161b22; color:#e6edf3;">
                 <p class="mb-1">¿Eliminar este mensaje permanentemente?</p>
-                <blockquote class="blockquote text-muted small border-start border-danger ps-3 mt-2 mb-0" id="delete-msg-preview">—</blockquote>
+                <blockquote class="blockquote text-muted small border-start border-danger ps-3 mt-2 mb-0"
+                    id="delete-msg-preview">—</blockquote>
             </div>
             <div class="modal-footer border-0" style="background:#161b22;">
-                <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-outline-secondary rounded-0"
+                    data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-danger rounded-0 fw-bold" id="confirm-delete-msg">
                     <i class="fa-solid fa-trash me-1"></i>Eliminar
                 </button>
@@ -347,7 +354,8 @@ if (!$is_logged || !$is_admin) {
                 <p class="mb-0">¿Desbanear a <strong id="unban-username">—</strong> de este foro?</p>
             </div>
             <div class="modal-footer border-0" style="background:#161b22;">
-                <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-outline-secondary rounded-0"
+                    data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-warning rounded-0 fw-bold text-dark" id="confirm-unban">
                     <i class="fa-solid fa-user-check me-1"></i>Desbanear
                 </button>
@@ -367,10 +375,12 @@ if (!$is_logged || !$is_admin) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" style="background:#161b22; color:#e6edf3;">
-                <p class="mb-0">¿Quitar a <strong id="remove-collab-username">—</strong> como colaborador de este foro?</p>
+                <p class="mb-0">¿Quitar a <strong id="remove-collab-username">—</strong> como colaborador de este foro?
+                </p>
             </div>
             <div class="modal-footer border-0" style="background:#161b22;">
-                <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-outline-secondary rounded-0"
+                    data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-warning rounded-0 fw-bold text-dark" id="confirm-remove-collab">
                     <i class="fa-solid fa-user-minus me-1"></i>Quitar
                 </button>

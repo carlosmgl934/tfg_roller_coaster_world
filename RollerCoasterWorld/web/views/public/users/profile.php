@@ -45,7 +45,10 @@ $user_uid = $_SESSION['firebase_uid'];
               <h5 class="card-title fw-bold mb-1 text-truncate" id="profile-display-name">
                 <?php echo htmlspecialchars($display_name); ?>
               </h5>
-              <p class="text-muted small mb-0 text-truncate"><?php echo htmlspecialchars($user_email); ?></p>
+              <p class="text-muted small mb-0 text-truncate">
+                
+                <?php echo htmlspecialchars($user_email); ?>
+              </p>
             </div>
           </div>
         </div>
@@ -383,7 +386,10 @@ $user_uid = $_SESSION['firebase_uid'];
             <i class="fa-brands fa-google text-muted fs-4 me-3"></i>
             <div>
               <p class="mb-0 fw-bold">ID de Firebase</p>
-              <p class="text-muted mb-0 small font-monospace"><?php echo htmlspecialchars($user_uid); ?></p>
+
+                              <p class="text-muted mb-0 small font-monospace">
+                <?php echo htmlspecialchars($user_uid); ?>
+              </p>
             </div>
           </div>
 
@@ -779,13 +785,15 @@ $user_uid = $_SESSION['firebase_uid'];
             <i class="fa-solid fa-suitcase-rolling fs-5"></i>
             <h5 class="fw-bold mb-0">Mis Viajes</h5>
           </div>
-          
+
           <div class="btn-group" role="group">
             <input type="radio" class="btn-check" name="trips-view-toggle" id="tv-list" value="list" checked>
-            <label class="btn btn-sm btn-outline-success rounded-0 px-3 fw-bold" for="tv-list"><i class="fa-solid fa-list me-1"></i>Viajes</label>
+            <label class="btn btn-sm btn-outline-success rounded-0 px-3 fw-bold" for="tv-list"><i
+                class="fa-solid fa-list me-1"></i>Viajes</label>
 
             <input type="radio" class="btn-check" name="trips-view-toggle" id="tv-stats" value="stats">
-            <label class="btn btn-sm btn-outline-success rounded-0 px-3 fw-bold" for="tv-stats"><i class="fa-solid fa-chart-pie me-1"></i>Estadísticas</label>
+            <label class="btn btn-sm btn-outline-success rounded-0 px-3 fw-bold" for="tv-stats"><i
+                class="fa-solid fa-chart-pie me-1"></i>Estadísticas</label>
           </div>
 
           <a href="<?= Router::url('trips') ?>" class="btn btn-sm btn-success rounded-0 px-3 fw-bold shadow-sm">
@@ -793,10 +801,10 @@ $user_uid = $_SESSION['firebase_uid'];
           </a>
         </div>
         <div class="card-body p-4">
-          
+
           <!-- Contenedor Vista Viajes -->
           <div id="trips-view-list">
-            <div id="trips-grid" class="trips-grid-scrollable">
+            <div id="trips-grid" class="trips-grid-scrollable" style="display:flex; flex-direction:column; align-items:center;">
               <div class="text-center py-4 text-muted small">Cargando viajes...</div>
             </div>
           </div>
@@ -804,53 +812,55 @@ $user_uid = $_SESSION['firebase_uid'];
           <!-- Contenedor Vista Estadísticas -->
           <div id="trips-view-stats" class="d-none">
             <!-- Estadísticas de Viajes (Unificadas) -->
-          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-            <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
-              <i class="fa-solid fa-chart-line fs-5 text-success"></i>
-              Estadísticas de
-              <select id="rank-type-select"
-                class="form-select form-select-sm ms-1 d-inline-block w-auto shadow-none fw-bold border-0 bg-transparent"
-                style="color: var(--rcw-text-primary); cursor: pointer;">
-                <option value="coasters">Coasters</option>
-                <option value="parks">Parques</option>
-              </select>
-            </h5>
-            <span class="badge bg-dark px-3 py-2" style="border:1px solid var(--rcw-border)">
-              <i class="fa-solid fa-suitcase me-1 text-success"></i> <span id="rank-trip-count">0 viajes</span>
-            </span>
-          </div>
-          <div class="d-flex flex-wrap gap-1 mb-3" id="rank-filter-btns">
-            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary"
-              data-period="week">Semana</button>
-            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary" data-period="month">Mes</button>
-            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-success active"
-              data-period="year">Año</button>
-            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary"
-              data-period="custom">Personalizado</button>
-            <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary"
-              data-period="all">Siempre</button>
-          </div>
-          <div
-            class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-2 pb-3 mb-3 border-bottom border-secondary border-opacity-25">
-            <div class="d-flex align-items-center gap-2" id="rank-nav-container">
-              <button class="btn btn-sm btn-outline-secondary rounded-0" id="rank-prev-btn" title="Anterior"><i
-                  class="fa-solid fa-chevron-left"></i></button>
-              <span id="rank-nav-label" class="fw-bold text-center" style="min-width: 100px;">2026</span>
-              <button class="btn btn-sm btn-outline-secondary rounded-0" id="rank-next-btn" title="Siguiente"><i
-                  class="fa-solid fa-chevron-right"></i></button>
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+              <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
+                <i class="fa-solid fa-chart-line fs-5 text-success"></i>
+                Estadísticas de
+                <select id="rank-type-select"
+                  class="form-select form-select-sm ms-1 d-inline-block w-auto shadow-none fw-bold border-0 bg-transparent"
+                  style="color: var(--rcw-text-primary); cursor: pointer;">
+                  <option value="coasters">Coasters</option>
+                  <option value="parks">Parques</option>
+                </select>
+              </h5>
+              <span class="badge bg-dark px-3 py-2" style="border:1px solid var(--rcw-border)">
+                <i class="fa-solid fa-suitcase me-1 text-success"></i> <span id="rank-trip-count">0 viajes</span>
+              </span>
             </div>
-            <div class="d-flex align-items-center gap-2 ms-auto">
-              <small class="text-muted">Desde:</small>
-              <input type="date" class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white"
-                id="rank-start-date" style="max-width: 120px;">
-              <small class="text-muted">Hasta:</small>
-              <input type="date" class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white"
-                id="rank-end-date" style="max-width: 120px;">
+            <div class="d-flex flex-wrap gap-1 mb-3" id="rank-filter-btns">
+              <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary"
+                data-period="week">Semana</button>
+              <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary"
+                data-period="month">Mes</button>
+              <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-success active"
+                data-period="year">Año</button>
+              <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary"
+                data-period="custom">Personalizado</button>
+              <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary"
+                data-period="all">Siempre</button>
             </div>
-          </div>
-          <div id="ranking-container" class="mt-4">
-              <div class="text-center py-4"><span class="spinner-border text-success spinner-border-sm me-2"></span>Cargando estadísticas...</div>
-          </div>
+            <div
+              class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-2 pb-3 mb-3 border-bottom border-secondary border-opacity-25">
+              <div class="d-flex align-items-center gap-2" id="rank-nav-container">
+                <button class="btn btn-sm btn-outline-secondary rounded-0" id="rank-prev-btn" title="Anterior"><i
+                    class="fa-solid fa-chevron-left"></i></button>
+                <span id="rank-nav-label" class="fw-bold text-center" style="min-width: 100px;">2026</span>
+                <button class="btn btn-sm btn-outline-secondary rounded-0" id="rank-next-btn" title="Siguiente"><i
+                    class="fa-solid fa-chevron-right"></i></button>
+              </div>
+              <div class="d-flex align-items-center gap-2 ms-auto">
+                <small class="text-muted">Desde:</small>
+                <input type="date" class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white"
+                  id="rank-start-date" style="max-width: 120px;">
+                <small class="text-muted">Hasta:</small>
+                <input type="date" class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white"
+                  id="rank-end-date" style="max-width: 120px;">
+              </div>
+            </div>
+            <div id="ranking-container" class="mt-4">
+              <div class="text-center py-4"><span
+                  class="spinner-border text-success spinner-border-sm me-2"></span>Cargando estadísticas...</div>
+            </div>
           </div> <!-- Fin Contenedor Vista Estadísticas -->
         </div>
       </div>
@@ -1167,6 +1177,7 @@ $user_uid = $_SESSION['firebase_uid'];
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="<?= Router::asset('web/js/components/trip_modals.js') ?>"></script>
+<script src="<?= Router::asset('web/js/users/map.js') ?>"></script>
 <script src="<?= Router::asset('web/js/users/profile.js') ?>"></script>
 
 

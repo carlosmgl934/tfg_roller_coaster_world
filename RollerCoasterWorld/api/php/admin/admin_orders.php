@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../utils/SessionManager.php';
 require_once __DIR__ . '/../../database/db_conexion.php';
 require_once __DIR__ . '/../utils/Response.php';
 require_once __DIR__ . '/../utils/ApiRouter.php';
@@ -71,7 +71,7 @@ function listAllOrders() {
         $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Response::success(['data' => $orders]);
     } catch (Exception $e) {
-        Response::error('Error: ' . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -91,7 +91,7 @@ function confirmOrder() {
             Response::error('Pedido no encontrado o ya procesado.', 404);
         }
     } catch (Exception $e) {
-        Response::error('Error: ' . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -111,7 +111,7 @@ function cancelOrder() {
             Response::error('Pedido no encontrado o ya procesado.', 404);
         }
     } catch (Exception $e) {
-        Response::error('Error: ' . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 

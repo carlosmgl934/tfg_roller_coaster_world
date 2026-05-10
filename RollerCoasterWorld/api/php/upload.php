@@ -9,7 +9,7 @@
  *   - path   : subcarpeta opcional (ej: "coasters/123")
  */
 
-session_start();
+require_once __DIR__ . '/utils/SessionManager.php';
 header('Content-Type: application/json');
 
 // ── DEBUG: función helper para loggear con timestamp ─────────────────────────
@@ -95,6 +95,10 @@ dbg('Cargando db_conexion.php...');
 require_once __DIR__ . '/../database/db_conexion.php';
 dbg('db_conexion.php OK');
 
+dbg('Cargando RateLimiter.php...');
+require_once __DIR__ . '/utils/RateLimiter.php';
+RateLimiter::check('upload', 20, 60); // 20 subidas/min por IP
+
 dbg('Cargando ImageHelper.php...');
 require_once __DIR__ . '/../utils/ImageHelper.php';
 dbg('ImageHelper.php OK');
@@ -112,19 +116,51 @@ $subpath = trim($_POST['path'] ?? '', '/');
 $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
 dbg('Parámetros resueltos', [
-    'bucket' => $bucket,
-    'subpath' => $subpath,
-    'ext' => $ext,
+    'bucket'       => $bucket,
+    'subpath'      => $subpath,
+    'ext'          => $ext,
     'mime_browser' => $file['type'],
 ]);
 
 // iOS puede enviar HEIC/HEIF; también aceptamos los formatos habituales
 $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif'];
 
-if (!in_array($ext, $allowed)) {
-    dbg('ABORT: extensión no permitida', $ext);
-    echo json_encode(['success' => false, 'error' => 'Tipo de archivo no permitido']);
-    exit;
+// ── Validación real de MIME type con finfo (no confiar en el browser) ─────────
+$allowedMimes = [
+    'image/jpeg' => ['jpg', 'jpeg'],
+    'image/png'  => ['png'],
+    'image/gif'  => ['gif'],
+    'image/webp' => ['webp'],
+    'image/heic' => ['heic', 'heif'],
+    'image/heif' => ['heic', 'heif'],
+];
+
+if (function_exists('finfo_open')) {
+    $finfo    = new finfo(FILEINFO_MIME_TYPE);
+    $realMime = $finfo->file($file['tmp_name']);
+    dbg('MIME real detectado', $realMime);
+
+    if (!array_key_exists($realMime, $allowedMimes)) {
+        dbg('ABORT: MIME real no permitido', $realMime);
+        echo json_encode(['success' => false, 'error' => 'Tipo de archivo no permitido']);
+        exit;
+    }
+
+    // Cross-check: extensión debe coincidir con el MIME real
+    $validExtsForMime = $allowedMimes[$realMime];
+    if (!in_array($ext, $validExtsForMime, true)) {
+        // Corregir la extensión automáticamente (ej: HEIC enviado como .jpg)
+        $ext = $validExtsForMime[0];
+        dbg('Extensión corregida al MIME real', $ext);
+    }
+} else {
+    // Fallback si finfo no está disponible: validar solo extensión
+    dbg('finfo no disponible, validando solo extensión');
+    if (!in_array($ext, $allowed, true)) {
+        dbg('ABORT: extensión no permitida', $ext);
+        echo json_encode(['success' => false, 'error' => 'Tipo de archivo no permitido']);
+        exit;
+    }
 }
 
 if ($file['size'] > 10 * 1024 * 1024) {

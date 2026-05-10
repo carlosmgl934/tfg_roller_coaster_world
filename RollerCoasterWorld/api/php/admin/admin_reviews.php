@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../utils/SessionManager.php';
 require_once __DIR__ . '/../../database/db_conexion.php';
 require_once __DIR__ . '/../utils/ApiRouter.php';
 require_once __DIR__ . '/../utils/Response.php';
@@ -105,7 +105,7 @@ function adminListReviews()
 
         Response::success(['reviews' => $reviews]);
     } catch (PDOException $e) {
-        Response::error('Error listando reseñas: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -137,7 +137,7 @@ function adminToggleVisibility()
         $msg = $hide ? 'Reseña ocultada correctamente' : 'Reseña restaurada correctamente';
         Response::success(['message' => $msg, 'is_hidden' => $hide]);
     } catch (PDOException $e) {
-        Response::error('Error cambiando visibilidad: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -168,6 +168,6 @@ function adminDeleteReview()
 
         Response::success(['message' => 'El texto de la reseña ha sido eliminado (la puntuación se mantiene)']);
     } catch (PDOException $e) {
-        Response::error('Error eliminando reseña: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }

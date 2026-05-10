@@ -131,8 +131,11 @@ $(document).ready(function () {
       btn.disabled = true;
       btn.textContent = "Creando foro...";
 
-      fetch(window.BASE_URL + "/api/php/forums.php?action=create_forum", {
+      fetch(window.BASE_URL + "/api/php/forums.php?action=create_forum", { 
         method: "POST",
+        headers: { 
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' 
+        },
         body: formData,
       })
         .then((res) => res.json())

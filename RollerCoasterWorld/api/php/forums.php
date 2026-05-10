@@ -1,10 +1,12 @@
 <?php
-session_start();
+require_once __DIR__ . '/utils/SessionManager.php';
 require_once __DIR__ . '/../database/db_conexion.php';
 require_once __DIR__ . '/utils/ApiRouter.php';
 require_once __DIR__ . '/utils/Response.php';
+require_once __DIR__ . '/utils/RateLimiter.php';
 
 $db = new DBConexion();
+RateLimiter::check('forums_api', 60, 60);
 
 $router = new ApiRouter('list');
 $router->register('create_forum',        'createForum',        'POST');
@@ -70,7 +72,7 @@ function createForum()
             }
         }
     } catch (PDOException $e) {
-        Response::error('Error al comprobar la fecha del último foro: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 
     try {
@@ -125,7 +127,7 @@ function createForum()
 
     } catch (PDOException $e) {
         $db->rollBack();
-        Response::error('Error al crear el foro: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -138,20 +140,22 @@ function listForums()
 
     try {
         global $db;
-        
-        $where = "";
+
+        $params = [];
+        $where  = '';
         if ($mine) {
-            $userId = (int)$_SESSION['user_id'];
-            $where = "WHERE f.author_id = $userId OR f.id IN (SELECT forum_id FROM forum_collaborators WHERE user_id = $userId)";
+            $userId  = (int)$_SESSION['user_id'];
+            $where   = 'WHERE f.author_id = :uid OR f.id IN (SELECT forum_id FROM forum_collaborators WHERE user_id = :uid2)';
+            $params  = [':uid' => $userId, ':uid2' => $userId];
         }
-        
+
         $sql = "
             SELECT f.id, f.title, f.forum_subject, f.privacy, f.created_at,
                    u.username AS author_name, u.profile_image AS author_image,
                    (
-                       SELECT json_agg(json_build_object('username', u2.username, 'profile_image', u2.profile_image)) 
-                       FROM forum_collaborators fc 
-                       JOIN users u2 ON fc.user_id = u2.id 
+                       SELECT json_agg(json_build_object('username', u2.username, 'profile_image', u2.profile_image))
+                       FROM forum_collaborators fc
+                       JOIN users u2 ON fc.user_id = u2.id
                        WHERE fc.forum_id = f.id
                    ) AS collaborators_json
             FROM forums f
@@ -161,11 +165,12 @@ function listForums()
         ";
 
         $stmt = $db->prepare($sql);
-        $stmt->execute();
+        $stmt->execute($params);
         $forums = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Response::success(['forums' => $forums]);
     } catch (PDOException $e) {
-        Response::error('Error obteniendo foros: ' . $e->getMessage());
+        error_log('[forums.php][listForums] ' . $e->getMessage());
+        Response::error('Error obteniendo foros', 500);
     }
 }
 
@@ -176,7 +181,7 @@ function searchForums()
     }
 
     $search = '%' . $_GET['search'] . '%';
-    
+
     $mine = isset($_GET['mine']) && $_GET['mine'] === 'true';
     if ($mine && empty($_SESSION['user_id'])) {
         Response::unauthorized('Debes iniciar sesión para usar este filtro');
@@ -184,20 +189,24 @@ function searchForums()
 
     try {
         global $db;
-        
-        $where = "WHERE (f.title ILIKE :search OR f.forum_subject ILIKE :search)";
+
+        $params = [':search' => $search];
+        $where  = 'WHERE (f.title ILIKE :search OR f.forum_subject ILIKE :search)';
+
         if ($mine) {
-            $userId = (int)$_SESSION['user_id'];
-            $where .= " AND (f.author_id = $userId OR f.id IN (SELECT forum_id FROM forum_collaborators WHERE user_id = $userId))";
+            $userId  = (int)$_SESSION['user_id'];
+            $where  .= ' AND (f.author_id = :uid OR f.id IN (SELECT forum_id FROM forum_collaborators WHERE user_id = :uid2))';
+            $params[':uid']  = $userId;
+            $params[':uid2'] = $userId;
         }
-        
+
         $sql = "
             SELECT f.id, f.title, f.forum_subject, f.privacy, f.created_at,
                    u.username AS author_name, u.profile_image AS author_image,
                    (
-                       SELECT json_agg(json_build_object('username', u2.username, 'profile_image', u2.profile_image)) 
-                       FROM forum_collaborators fc 
-                       JOIN users u2 ON fc.user_id = u2.id 
+                       SELECT json_agg(json_build_object('username', u2.username, 'profile_image', u2.profile_image))
+                       FROM forum_collaborators fc
+                       JOIN users u2 ON fc.user_id = u2.id
                        WHERE fc.forum_id = f.id
                    ) AS collaborators_json
             FROM forums f
@@ -207,12 +216,12 @@ function searchForums()
         ";
 
         $stmt = $db->prepare($sql);
-        $stmt->bindParam(':search', $search, PDO::PARAM_STR);
-        $stmt->execute();
+        $stmt->execute($params);
         $forums = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Response::success(['forums' => $forums]);
     } catch (PDOException $e) {
-        Response::error('Error obteniendo foros: ' . $e->getMessage());
+        error_log('[forums.php][searchForums] ' . $e->getMessage());
+        Response::error('Error obteniendo foros', 500);
     }
 }
 
@@ -246,7 +255,7 @@ function getFriends()
         $friends = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Response::success(['friends' => $friends]);
     } catch (PDOException $e) {
-        Response::error('Error obteniendo amigos: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -286,7 +295,7 @@ function acceptForumInvite()
         Response::success(['message' => 'Invitación aceptada']);
     } catch (PDOException $e) {
         $db->rollBack();
-        Response::error('Error: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -311,7 +320,7 @@ function declineForumInvite()
         $stmt->execute();
         Response::success(['message' => 'Invitación rechazada']);
     } catch (PDOException $e) {
-        Response::error('Error: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -379,7 +388,7 @@ function getForum()
 
         Response::success(['forum' => $forum, 'role' => $role, 'current_user_id' => $userId]);
     } catch (PDOException $e) {
-        Response::error('Error: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -450,7 +459,7 @@ function getMessages()
 
         Response::success(['messages' => $messages]);
     } catch (PDOException $e) {
-        Response::error('Error: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -542,7 +551,7 @@ function sendMessage()
 
         Response::success(['message_id' => $row['id'], 'created_at' => $row['created_at']]);
     } catch (PDOException $e) {
-        Response::error('Error: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -592,7 +601,7 @@ function deleteMessage()
 
         Response::success(['message' => 'Mensaje borrado']);
     } catch (PDOException $e) {
-        Response::error('Error: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -640,7 +649,7 @@ function hideMessage()
 
         Response::success(['message' => $hidden ? 'Mensaje ocultado' : 'Mensaje visible']);
     } catch (PDOException $e) {
-        Response::error('Error: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -709,7 +718,7 @@ function banUser()
 
         Response::success(['message' => 'Usuario baneado']);
     } catch (PDOException $e) {
-        Response::error('Error: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -751,7 +760,7 @@ function unbanUser()
 
         Response::success(['message' => 'Usuario desbaneado']);
     } catch (PDOException $e) {
-        Response::error('Error: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -798,7 +807,7 @@ function getBanned()
 
         Response::success(['banned' => $banned]);
     } catch (PDOException $e) {
-        Response::error('Error: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -849,7 +858,7 @@ function getCollaborators()
 
         Response::success(['collaborators' => $collaborators]);
     } catch (PDOException $e) {
-        Response::error('Error: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -886,7 +895,7 @@ function removeCollaborator()
 
         Response::success(['message' => 'Colaborador eliminado']);
     } catch (PDOException $e) {
-        Response::error('Error: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -961,7 +970,7 @@ function inviteCollaborator()
 
         Response::success(['message' => 'Invitación enviada al usuario con éxito']);
     } catch (PDOException $e) {
-        Response::error('Error de base de datos: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -1020,7 +1029,7 @@ function getParticipants()
             'author_id'    => (int)$forum['author_id'],
         ]);
     } catch (PDOException $e) {
-        Response::error('Error: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -1092,6 +1101,6 @@ function getForumState()
             'privileged'    => $isPrivileged,
         ]);
     } catch (PDOException $e) {
-        Response::error('Error: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }

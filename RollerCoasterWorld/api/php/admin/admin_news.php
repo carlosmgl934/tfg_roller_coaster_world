@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../utils/SessionManager.php';
 require_once __DIR__ . '/../../database/db_conexion.php';
 require_once __DIR__ . '/../utils/ApiRouter.php';
 require_once __DIR__ . '/../utils/Response.php';
@@ -170,7 +170,7 @@ function filterNews(): void
 
         Response::success(['news' => $news, 'total' => $total]);
     } catch (PDOException $e) {
-        Response::error('Error buscando noticias: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -234,7 +234,7 @@ function addNews(): void
 
         Response::success(['id' => $newId, 'message' => 'Noticia añadida correctamente.']);
     } catch (PDOException $e) {
-        Response::error('Error al añadir noticia: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -310,7 +310,7 @@ function updateNews(): void
 
         Response::success(['message' => 'Noticia actualizada correctamente.']);
     } catch (PDOException $e) {
-        Response::error('Error al actualizar noticia: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -346,6 +346,6 @@ function deleteNews(): void
             Response::error('La noticia no existe.', 404);
         }
     } catch (PDOException $e) {
-        Response::error('Error al eliminar: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }

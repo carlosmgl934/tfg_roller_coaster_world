@@ -3,7 +3,7 @@ require_once __DIR__ . '/../database/db_conexion.php';
 require_once __DIR__ . '/utils/Response.php';
 require_once __DIR__ . '/utils/ApiRouter.php';
 
-session_start();
+require_once __DIR__ . '/utils/SessionManager.php';
 
 header('Content-Type: application/json');
 
@@ -570,6 +570,6 @@ function getPublicProfile()
         ]);
 
     } catch (Exception $e) {
-        Response::error("Error cargando perfil: " . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }

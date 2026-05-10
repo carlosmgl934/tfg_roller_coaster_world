@@ -391,7 +391,8 @@
         const fd = new FormData();
         fd.append('message_id', msgId);
         fd.append('hidden', hidden);
-        const res  = await fetch(`${BASE}/api/php/forums.php?action=hide_message`, { method: 'POST', body: fd });
+        const res  = await fetch(`${BASE}/api/php/forums.php?action=hide_message`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: 'POST', body: fd } );
         const data = await res.json();
         if (data.success) {
           const wrap = document.querySelector(`[data-msg-id="${msgId}"]`);
@@ -453,7 +454,8 @@
         const fd = new FormData();
         fd.append('forum_id',       FORUM_ID);
         fd.append('target_user_id', pendingBanTargetId);
-        const res  = await fetch(`${BASE}/api/php/forums.php?action=ban_user`, { method: 'POST', body: fd });
+        const res  = await fetch(`${BASE}/api/php/forums.php?action=ban_user`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: 'POST', body: fd } );
         const data = await res.json();
 
         if (data.success) {
@@ -500,7 +502,8 @@
         if (!pendingDeleteId) return;
         const fd = new FormData();
         fd.append('message_id', pendingDeleteId);
-        const res  = await fetch(`${BASE}/api/php/forums.php?action=delete_message`, { method: 'POST', body: fd });
+        const res  = await fetch(`${BASE}/api/php/forums.php?action=delete_message`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: 'POST', body: fd } );
         const data = await res.json();
         bootstrap.Modal.getInstance(el('deleteModal'))?.hide();
         if (data.success) {
@@ -522,7 +525,8 @@
         const fd = new FormData();
         fd.append('forum_id',       FORUM_ID);
         fd.append('target_user_id', pendingRemoveCollabId);
-        const res  = await fetch(`${BASE}/api/php/forums.php?action=remove_collaborator`, { method: 'POST', body: fd });
+        const res  = await fetch(`${BASE}/api/php/forums.php?action=remove_collaborator`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: 'POST', body: fd } );
         const data = await res.json();
         bootstrap.Modal.getInstance(el('removeCollabModal'))?.hide();
         if (data.success) {
@@ -581,7 +585,8 @@
       if (attachUrl)  fd.append('attachment_url',  attachUrl);
       if (attachName) fd.append('file_name',       attachName);
 
-      const res  = await fetch(`${BASE}/api/php/forums.php?action=send_message`, { method: 'POST', body: fd });
+      const res  = await fetch(`${BASE}/api/php/forums.php?action=send_message`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: 'POST', body: fd } );
       const data = await res.json();
 
       if (data.success) {
@@ -625,6 +630,9 @@
       console.log("SUPER DEBUG FORUM: fetch a upload.php", [...fd.entries()]);
       const res = await fetch(`${BASE}/api/php/upload.php`, {
         method: 'POST',
+        headers: {
+            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? ''
+        },
         body: fd,
       });
 
@@ -993,7 +1001,8 @@
              btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
 
              try {
-                const iRes = await fetch(`${BASE}/api/php/forums.php?action=invite_collaborator`, { method: 'POST', body: fd });
+                const iRes = await fetch(`${BASE}/api/php/forums.php?action=invite_collaborator`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: 'POST', body: fd } );
                 const iData = await iRes.json();
                 if (iData.success) {
                    showToast(iData.message || 'Invitación enviada', 'success');
@@ -1053,7 +1062,8 @@
           const fd = new FormData();
           fd.append('forum_id',       FORUM_ID);
           fd.append('target_user_id', btn.dataset.userId);
-          const res  = await fetch(`${BASE}/api/php/forums.php?action=unban_user`, { method: 'POST', body: fd });
+          const res  = await fetch(`${BASE}/api/php/forums.php?action=unban_user`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: 'POST', body: fd } );
           const data = await res.json();
           if (data.success) {
             showToast(`"${btn.dataset.username}" desbaneado`, 'success');

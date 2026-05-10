@@ -23,45 +23,55 @@ $(document).ready(function () {
 
   function showSection(sectionId) {
     // Hide all contents
-    document.querySelectorAll('.col-lg-8 > div[id^="section-"]').forEach(el => {
-      el.classList.add('d-none');
-    });
+    document
+      .querySelectorAll('.col-lg-8 > div[id^="section-"]')
+      .forEach((el) => {
+        el.classList.add("d-none");
+      });
 
     // Remove active class from all menu items
-    document.querySelectorAll('#profile-menu .list-group-item').forEach(el => {
-      el.classList.remove('active');
-    });
+    document
+      .querySelectorAll("#profile-menu .list-group-item")
+      .forEach((el) => {
+        el.classList.remove("active");
+      });
 
     // Show the target section
     const targetEl = document.getElementById(sectionId);
-    if (targetEl) targetEl.classList.remove('d-none');
+    if (targetEl) targetEl.classList.remove("d-none");
 
     // Add active class to corresponding menu item
-    const menuItem = document.querySelector(`#profile-menu a[href="#${sectionId.replace('section-', '')}"]`);
-    if (menuItem) menuItem.classList.add('active');
-    
-    if (sectionId === 'section-reviews') {
+    const menuItem = document.querySelector(
+      `#profile-menu a[href="#${sectionId.replace("section-", "")}"]`,
+    );
+    if (menuItem) menuItem.classList.add("active");
+
+    if (sectionId === "section-reviews") {
       loadUserReviews();
-    } else if (sectionId === 'section-tops') {
+    } else if (sectionId === "section-tops") {
       window.loadUserTops();
-    } else if (sectionId === 'section-trips-content') {
-      if(window.loadTrips) window.loadTrips();
-      if(window.loadRanking) window.loadRanking();
+    } else if (sectionId === "section-trips-content") {
+      if (window.loadTrips) window.loadTrips();
+      if (window.loadRanking) window.loadRanking();
     }
   }
 
   // Setup trips view toggle (Grid vs Stats)
-  document.querySelectorAll('input[name="trips-view-toggle"]').forEach(radio => {
-    radio.addEventListener('change', function() {
-      if (this.value === 'list') {
-        document.getElementById('trips-view-list').classList.remove('d-none');
-        document.getElementById('trips-view-stats').classList.add('d-none');
-      } else {
-        document.getElementById('trips-view-list').classList.add('d-none');
-        document.getElementById('trips-view-stats').classList.remove('d-none');
-      }
+  document
+    .querySelectorAll('input[name="trips-view-toggle"]')
+    .forEach((radio) => {
+      radio.addEventListener("change", function () {
+        if (this.value === "list") {
+          document.getElementById("trips-view-list").classList.remove("d-none");
+          document.getElementById("trips-view-stats").classList.add("d-none");
+        } else {
+          document.getElementById("trips-view-list").classList.add("d-none");
+          document
+            .getElementById("trips-view-stats")
+            .classList.remove("d-none");
+        }
+      });
     });
-  });
 
   // ── Auto-relleno de país usando Nominatim (OpenStreetMap) ──────────────────
   const cityInput = document.getElementById("config-user-city");
@@ -794,23 +804,49 @@ $(document).ready(function () {
         : "";
 
       if (sortKey === "height") {
-        return (item.height ? `<small class="text-info d-flex align-items-center gap-1"><i class="fa-solid fa-ruler-vertical"></i>${item.height} m</small>` : "") + mfr;
+        return (
+          (item.height
+            ? `<small class="text-info d-flex align-items-center gap-1"><i class="fa-solid fa-ruler-vertical"></i>${item.height} m</small>`
+            : "") + mfr
+        );
       }
       if (sortKey === "speed") {
-        return (item.speed ? `<small class="text-warning d-flex align-items-center gap-1"><i class="fa-solid fa-bolt"></i>${item.speed} km/h</small>` : "") + mfr;
+        return (
+          (item.speed
+            ? `<small class="text-warning d-flex align-items-center gap-1"><i class="fa-solid fa-bolt"></i>${item.speed} km/h</small>`
+            : "") + mfr
+        );
       }
       if (sortKey === "length") {
-        return (item.coaster_length ? `<small class="text-info d-flex align-items-center gap-1"><i class="fa-solid fa-ruler-horizontal"></i>${item.coaster_length} m</small>` : "") + mfr;
+        return (
+          (item.coaster_length
+            ? `<small class="text-info d-flex align-items-center gap-1"><i class="fa-solid fa-ruler-horizontal"></i>${item.coaster_length} m</small>`
+            : "") + mfr
+        );
       }
       if (sortKey === "inversions") {
-        return (item.inversions != null ? `<small class="text-warning d-flex align-items-center gap-1"><i class="fa-solid fa-infinity"></i>${item.inversions} inv.</small>` : "") + mfr;
+        return (
+          (item.inversions != null
+            ? `<small class="text-warning d-flex align-items-center gap-1"><i class="fa-solid fa-infinity"></i>${item.inversions} inv.</small>`
+            : "") + mfr
+        );
       }
       if (sortKey === "year") {
-        return (item.opening_year ? `<small class="text-secondary d-flex align-items-center gap-1"><i class="fa-regular fa-calendar"></i>${item.opening_year}</small>` : "") + mfr;
+        return (
+          (item.opening_year
+            ? `<small class="text-secondary d-flex align-items-center gap-1"><i class="fa-regular fa-calendar"></i>${item.opening_year}</small>`
+            : "") + mfr
+        );
       }
-      return (item.height ? `<small class="text-info d-flex align-items-center gap-1"><i class="fa-solid fa-ruler-vertical"></i>${item.height}m</small>` : "")
-        + (item.speed ? `<small class="text-warning d-flex align-items-center gap-1"><i class="fa-solid fa-bolt"></i>${item.speed}km/h</small>` : "")
-        + mfr;
+      return (
+        (item.height
+          ? `<small class="text-info d-flex align-items-center gap-1"><i class="fa-solid fa-ruler-vertical"></i>${item.height}m</small>`
+          : "") +
+        (item.speed
+          ? `<small class="text-warning d-flex align-items-center gap-1"><i class="fa-solid fa-bolt"></i>${item.speed}km/h</small>`
+          : "") +
+        mfr
+      );
     }
 
     data.forEach((item) => {
@@ -854,7 +890,6 @@ $(document).ready(function () {
       }
     });
   }
-
 
   function renderParksFull() {
     const sort = $("#parks-sort").val();
@@ -1424,9 +1459,15 @@ $(document).ready(function () {
     const newDir = currentDir === "desc" ? "asc" : "desc";
     $(this).data("dir", newDir);
     if (newDir === "asc") {
-      $(this).find("i").removeClass("fa-arrow-down-wide-short").addClass("fa-arrow-up-wide-short");
+      $(this)
+        .find("i")
+        .removeClass("fa-arrow-down-wide-short")
+        .addClass("fa-arrow-up-wide-short");
     } else {
-      $(this).find("i").removeClass("fa-arrow-up-wide-short").addClass("fa-arrow-down-wide-short");
+      $(this)
+        .find("i")
+        .removeClass("fa-arrow-up-wide-short")
+        .addClass("fa-arrow-down-wide-short");
     }
     renderCoastersFull();
   });
@@ -2130,7 +2171,7 @@ $(document).ready(function () {
                 <small class="text-muted d-none d-md-inline" style="font-size: 0.7rem;">${formatReviewDate(r.created_at)}</small>
                 <button class="btn btn-link p-0 text-warning profile-edit-review-btn d-flex align-items-center gap-1"
                         data-id="${r.id}" data-type="${r.type}"
-                        data-note="${nota}" data-text="${encodeURIComponent(r.review || '')}"
+                        data-note="${nota}" data-text="${encodeURIComponent(r.review || "")}"
                         title="Editar reseña" style="text-decoration:none;">
                   <i class="fa-solid fa-pen-to-square"></i>
                   <span class="fw-bold text-uppercase" style="font-size:0.65rem;">Editar</span>
@@ -2234,12 +2275,14 @@ $(document).ready(function () {
             <div class="mb-3">
               <label class="form-label text-muted small fw-semibold">Puntuación</label>
               <div class="star-rating pedit-star-rating-container" style="font-size: 2rem;">
-                ${[10,9,8,7,6,5,4,3,2,1].map(i => {
-                  const val = i / 2;
-                  const half = (i % 2 !== 0);
-                  return `<input type="radio" name="pedit_note" id="pstar${i}" value="${val}">
-                          <label for="pstar${i}" class="${half ? 'half' : 'full'}" title="${val}"></label>`;
-                }).join('')}
+                ${[10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+                  .map((i) => {
+                    const val = i / 2;
+                    const half = i % 2 !== 0;
+                    return `<input type="radio" name="pedit_note" id="pstar${i}" value="${val}">
+                          <label for="pstar${i}" class="${half ? "half" : "full"}" title="${val}"></label>`;
+                  })
+                  .join("")}
               </div>
               <input type="hidden" id="pedit-review-note" value="0">
             </div>
@@ -2257,10 +2300,12 @@ $(document).ready(function () {
         </div>
       </div>
     </div>`;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.body.insertAdjacentHTML("beforeend", modalHtml);
   }
 
-  profileEditModal = new bootstrap.Modal(document.getElementById("profile-edit-review-modal"));
+  profileEditModal = new bootstrap.Modal(
+    document.getElementById("profile-edit-review-modal"),
+  );
 
   // Actualizar nota oculta cuando cambia el radio (perfil)
   $(document).on("change", 'input[name="pedit_note"]', function () {
@@ -2269,7 +2314,7 @@ $(document).ready(function () {
 
   // Abrir modal desde tarjeta de reseña del perfil
   $(document).on("click", ".profile-edit-review-btn", function () {
-    const id   = $(this).data("id");
+    const id = $(this).data("id");
     const type = $(this).data("type"); // 'coaster' | 'park'
     const note = parseFloat($(this).data("note")) || 0;
     const text = decodeURIComponent($(this).data("text") || "");
@@ -2284,29 +2329,37 @@ $(document).ready(function () {
 
   // Guardar cambios desde el perfil
   $(document).on("click", "#pedit-save-btn", async function () {
-    const btn      = $(this);
+    const btn = $(this);
     const reviewId = $("#pedit-review-id").val();
-    const type     = $("#pedit-review-type").val();
-    const note     = parseFloat($("#pedit-review-note").val()) || 0;
-    const text     = $("#pedit-review-text").val().trim();
-    if (!note) { alert("Por favor, selecciona una puntuación."); return; }
-    btn.prop("disabled", true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i>Guardando...');
+    const type = $("#pedit-review-type").val();
+    const note = parseFloat($("#pedit-review-note").val()) || 0;
+    const text = $("#pedit-review-text").val().trim();
+    if (!note) {
+      alert("Por favor, selecciona una puntuación.");
+      return;
+    }
+    btn
+      .prop("disabled", true)
+      .html('<i class="fa-solid fa-spinner fa-spin me-1"></i>Guardando...');
     const fd = new FormData();
     fd.append("review_id", reviewId);
     fd.append("note", note);
     fd.append("review", text);
-    const endpoint = type === "coaster"
-      ? `${BASE_URL}/api/php/coasters.php?action=update_review`
-      : `${BASE_URL}/api/php/parks.php?action=update_review`;
+    const endpoint =
+      type === "coaster"
+        ? `${BASE_URL}/api/php/coasters.php?action=update_review`
+        : `${BASE_URL}/api/php/parks.php?action=update_review`;
     try {
-      const res  = await fetch(endpoint, { method: "POST", body: fd });
+      const res = await fetch(endpoint, { method: "POST", body: fd });
       const data = await res.json();
       if (data.success) {
         profileEditModal.hide();
         // Actualizar localmente sin recargar toda la lista
-        const idx = reviewsData.findIndex(r => String(r.id) === String(reviewId));
+        const idx = reviewsData.findIndex(
+          (r) => String(r.id) === String(reviewId),
+        );
         if (idx !== -1) {
-          reviewsData[idx].note   = note;
+          reviewsData[idx].note = note;
           reviewsData[idx].review = text;
         }
         renderReviews();
@@ -2316,7 +2369,9 @@ $(document).ready(function () {
     } catch (e) {
       alert("Error de conexión.");
     } finally {
-      btn.prop("disabled", false).html('<i class="fa-solid fa-floppy-disk me-1"></i>Guardar cambios');
+      btn
+        .prop("disabled", false)
+        .html('<i class="fa-solid fa-floppy-disk me-1"></i>Guardar cambios');
     }
   });
   // ══════════════════════════════════════════════════════════════════
@@ -2504,397 +2559,103 @@ $(document).ready(function () {
     cargarAmigos();
   }
 
-  // ══════════════════════════════════════════════════════════════════
-  //  MI MAPA — Leaflet.js + Nominatim geocoding
-  // ══════════════════════════════════════════════════════════════════
-
-  let mapInstance = null;
-  let mapInitialized = false;
-  let mapMarkerCluster = null;
-
-  function createParkIcon(coasterCount) {
-    const color = "#00c853";
-    const size = coasterCount >= 5 ? 36 : coasterCount >= 2 ? 32 : 28;
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size + 8}" viewBox="0 0 36 44">
-      <circle cx="18" cy="18" r="16" fill="${color}" fill-opacity="0.2" stroke="${color}" stroke-width="2"/>
-      <circle cx="18" cy="18" r="9" fill="${color}"/>
-      <line x1="18" y1="34" x2="18" y2="42" stroke="${color}" stroke-width="2" stroke-linecap="round"/>
-    </svg>`;
-    return L.divIcon({
-      html: `<div class="rcw-map-marker">${svg}</div>`,
-      className: "",
-      iconSize: [size, size + 8],
-      iconAnchor: [size / 2, size + 8],
-      popupAnchor: [0, -(size + 4)],
-    });
-  }
-
-  function buildPopupHtml(park) {
-    const imgUrl = park.imagen_url
-      ? park.imagen_url.startsWith("/")
-        ? BASE_URL + park.imagen_url
-        : park.imagen_url
-      : null;
-    const imgBlock = imgUrl
-      ? `<img src="${imgUrl}" alt="${park.park_name}" class="rcw-map-popup-img" onerror="this.style.display='none'">`
-      : `<div class="rcw-map-popup-img-placeholder"><i class="fa-solid fa-image"></i></div>`;
-    const meta = [park.park_location, park.park_country]
-      .filter(Boolean)
-      .join(", ");
-    const detailUrl = `${BASE_URL}/web/views/public/parks/parks.php?id=${park.park_id}`;
-    const count = parseInt(park.coaster_count) || 1;
-    return `
-      <div class="rcw-map-popup">
-        ${imgBlock}
-        <div class="rcw-map-popup-body">
-          <div class="rcw-map-popup-name">${park.park_name}</div>
-          <div class="rcw-map-popup-meta">${meta}</div>
-          <div class="rcw-map-popup-badge">
-            <i class="fa-solid fa-ticket"></i> ${count} coaster${count !== 1 ? "s" : ""} en tu top
-          </div>
-        </div>
-        <a href="${detailUrl}" class="rcw-map-popup-link">
-          Ver parque <i class="fa-solid fa-arrow-right ms-1"></i>
-        </a>
-      </div>`;
-  }
-
-  // TTL de la cache de geocoding: 30 dias (en ms)
-  const GEOCODE_TTL = 30 * 24 * 60 * 60 * 1000;
-
-  async function geocodePark(park) {
-    const cacheKey = `rcw_geocode_${park.park_id}`;
-
-    // Intentar leer de localStorage (persiste entre sesiones)
-    try {
-      const raw = localStorage.getItem(cacheKey);
-      if (raw) {
-        const entry = JSON.parse(raw);
-        // Validar TTL: si han pasado menos de 30 dias, usar la cache
-        if (entry.ts && Date.now() - entry.ts < GEOCODE_TTL) {
-          return { lat: entry.lat, lng: entry.lng };
-        }
-        // Expirada: eliminar
-        localStorage.removeItem(cacheKey);
-      }
-    } catch (_) {}
-
-    // No hay cache valida -> llamar a Nominatim
-    const nominatimFetch = async (q) => {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`,
-        {
-          headers: {
-            "Accept-Language": "es",
-            "User-Agent": "RollerCoasterWorld/TFG",
-          },
-        },
-      );
-      return res.json();
-    };
-
-    try {
-      // Intento 1: nombre + localización + país (más preciso)
-      const query1 = [park.park_name, park.park_location, park.park_country]
-        .filter(Boolean)
-        .join(", ");
-      let data = await nominatimFetch(query1);
-
-      // Intento 2: localización + país (geográfico, seguro)
-      // Tiene prioridad sobre "nombre + país" para evitar coincidencias en otras regiones
-      if ((!data || !data.length) && park.park_location && park.park_country) {
-        await new Promise((r) => setTimeout(r, 1100));
-        data = await nominatimFetch(
-          [park.park_location, park.park_country].filter(Boolean).join(", "),
-        );
-      }
-
-      // Intento 3: nombre + país — SOLO si no hay localización
-      // (si hay localización ya se buscó geográficamente en intento 2)
-      if ((!data || !data.length) && park.park_country && !park.park_location) {
-        await new Promise((r) => setTimeout(r, 1100));
-        data = await nominatimFetch(
-          [park.park_name, park.park_country].filter(Boolean).join(", "),
-        );
-      }
-
-      if (data && data.length > 0) {
-        const coords = {
-          lat: parseFloat(data[0].lat),
-          lng: parseFloat(data[0].lon),
-          ts: Date.now(),
-        };
-        try {
-          localStorage.setItem(cacheKey, JSON.stringify(coords));
-        } catch (_) {}
-        return { lat: coords.lat, lng: coords.lng };
-      }
-    } catch (_) {}
-    return null;
-  }
-
-  // Devuelve las coords del localStorage sin llamar a la red (null si no hay cache valida)
-  function getCachedCoords(parkId) {
-    try {
-      const raw = localStorage.getItem(`rcw_geocode_${parkId}`);
-      if (!raw) return null;
-      const entry = JSON.parse(raw);
-      if (entry.ts && Date.now() - entry.ts < GEOCODE_TTL) {
-        return { lat: entry.lat, lng: entry.lng };
-      }
-    } catch (_) {}
-    return null;
-  }
-
-  function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
-  async function initMap() {
-    if (mapInitialized) {
-      if (mapInstance) mapInstance.invalidateSize();
-      return;
-    }
-    mapInitialized = true;
-
-    mapInstance = L.map("profile-map", {
-      center: [20, 0],
-      zoom: 2,
-      zoomControl: true,
-    });
-
-    // ── Control de pantalla completa (Fullscreen API nativa) ──────
-    const FullscreenControl = L.Control.extend({
-      options: { position: "topleft" },
-      onAdd: function () {
-        const btn = L.DomUtil.create(
-          "button",
-          "leaflet-bar leaflet-control rcw-fullscreen-btn",
-        );
-        btn.innerHTML = '<i class="fa-solid fa-expand"></i>';
-        btn.title = "Pantalla completa";
-        btn.setAttribute("type", "button");
-        L.DomEvent.disableClickPropagation(btn);
-        L.DomEvent.on(btn, "click", function () {
-          const mapEl = document.getElementById("profile-map");
-          const isFs = !!(
-            document.fullscreenElement || document.webkitFullscreenElement
-          );
-          if (!isFs) {
-            (mapEl.requestFullscreen || mapEl.webkitRequestFullscreen).call(
-              mapEl,
-            );
-            btn.innerHTML = '<i class="fa-solid fa-compress"></i>';
-            btn.title = "Salir de pantalla completa";
-          } else {
-            (document.exitFullscreen || document.webkitExitFullscreen).call(
-              document,
-            );
-            btn.innerHTML = '<i class="fa-solid fa-expand"></i>';
-            btn.title = "Pantalla completa";
-          }
-        });
-        document.addEventListener("fullscreenchange", function () {
-          if (!document.fullscreenElement) {
-            btn.innerHTML = '<i class="fa-solid fa-expand"></i>';
-            btn.title = "Pantalla completa";
-            if (mapInstance) mapInstance.invalidateSize();
-          }
-        });
-        return btn;
-      },
-    });
-    new FullscreenControl().addTo(mapInstance);
-
-    L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-      {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
-        subdomains: "abcd",
-        maxZoom: 19,
-      },
-    ).addTo(mapInstance);
-
-    mapMarkerCluster = L.markerClusterGroup({
-      showCoverageOnHover: false,
-      maxClusterRadius: 60,
-      spiderfyOnMaxZoom: true,
-    });
-    mapInstance.addLayer(mapMarkerCluster);
-
-    // Fetch lista de parques del usuario
-    let parks = [];
-    try {
-      const res = await fetch(
-        `${BASE_URL}/api/php/profile_config.php?action=get_map_parks`,
-      );
-      const data = await res.json();
-      parks = data.success && Array.isArray(data.parks) ? data.parks : [];
-    } catch (e) {
-      console.error("Error cargando parques del mapa:", e);
-    }
-
-    if (!parks.length) {
-      $("#profile-map").addClass("d-none");
-      $("#map-empty-state").removeClass("d-none");
-      return;
-    }
-
-    $("#map-parks-count").text(parks.length);
-    $("#map-parks-pill").show();
-
-    // ── Paso 1: parques YA en localStorage → marcadores instantaneos ──
-    const cached = [];
-    const toGeocode = [];
-    const bounds = [];
-
-    for (const park of parks) {
-      const coords = getCachedCoords(park.park_id);
-      if (coords) {
-        cached.push({ park, coords });
-      } else {
-        toGeocode.push(park);
-      }
-    }
-
-    // Añadir marcadores cacheados al instante
-    for (const { park, coords } of cached) {
-      bounds.push([coords.lat, coords.lng]);
-      const marker = L.marker([coords.lat, coords.lng], {
-        icon: createParkIcon(parseInt(park.coaster_count) || 1),
-      });
-      marker.bindPopup(buildPopupHtml(park), {
-        maxWidth: 260,
-        className: "rcw-leaflet-popup",
-      });
-      mapMarkerCluster.addLayer(marker);
-    }
-
-    // Ajustar vista con lo que ya tenemos (respuesta inmediata)
-    if (bounds.length > 0) {
-      mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 10 });
-    }
-    mapInstance.invalidateSize();
-
-    // ── Paso 2: parques SIN cache → geocodificar con Nominatim ────────
-    if (toGeocode.length > 0) {
-      const $bar = $("#map-geocoding-bar").removeClass("d-none");
-      const $status = $("#map-geocoding-status");
-      const $progress = $("#map-geocoding-progress");
-      const $pbBar = $("#map-geocoding-progressbar");
-      const total = toGeocode.length;
-      let done = 0;
-
-      for (const park of toGeocode) {
-        $status.text(`Localizando "${park.park_name}"...`);
-        $progress.text(`${done} / ${total}`);
-        $pbBar.css("width", `${Math.round((done / total) * 100)}%`);
-
-        const coords = await geocodePark(park); // llama Nominatim + guarda en localStorage
-        done++;
-
-        if (coords) {
-          bounds.push([coords.lat, coords.lng]);
-          const marker = L.marker([coords.lat, coords.lng], {
-            icon: createParkIcon(parseInt(park.coaster_count) || 1),
-          });
-          marker.bindPopup(buildPopupHtml(park), {
-            maxWidth: 260,
-            className: "rcw-leaflet-popup",
-          });
-          mapMarkerCluster.addLayer(marker);
-        }
-
-        if (done < total) await sleep(1100);
-      }
-
-      $bar.addClass("d-none");
-      $progress.text(`${done} / ${total}`);
-      $pbBar.css("width", "100%");
-
-      // Re-ajustar viewport ahora que tenemos todos los marcadores
-      if (bounds.length > 0) {
-        mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 10 });
-      }
-      mapInstance.invalidateSize();
-    }
-  }
-
-  $("#menu-map").on("click", function () {
-    setTimeout(() => initMap(), 80);
-  });
-
-
-  if (window.location.hash === "#map") {
-    setTimeout(() => initMap(), 200);
-  }
-  if (window.location.hash === "#trips") {
-    loadTrips();
-    loadRanking();
-  }
-
   // ─── VIAJES ──────────────────────────────────────────────────
+  const esc = (s) =>
+    String(s ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+
   async function loadTrips() {
     const container = $("#trips-grid");
-    container.html('<div class="text-center py-4 text-muted small"><div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>Cargando viajes...</div>');
+    container.html(
+      '<div class="d-flex align-items-center justify-content-center py-4 text-muted small"><div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>Cargando viajes...</div>',
+    );
     try {
       const res = await fetch(`${BASE_URL}/api/php/trips.php?action=list`);
       const j = await res.json();
       const d = j.data || [];
       if (!d.length) {
-        container.html('<div class="text-center py-4 text-muted"><i class="fa-solid fa-suitcase fa-2x mb-2 opacity-50"></i><br>Aún no tienes viajes registrados.</div>');
+        container.html(
+          '<div class="text-center py-4 text-muted"><i class="fa-solid fa-suitcase fa-2x mb-2 opacity-50"></i><br>Aún no tienes viajes registrados.</div>',
+        );
         return;
       }
       let html = "";
       d.forEach((t) => {
         const start = new Date(t.start_date);
-        start.setHours(0,0,0,0);
+        start.setHours(0, 0, 0, 0);
         const end = new Date(t.end_date);
-        end.setHours(23,59,59,999);
+        end.setHours(23, 59, 59, 999);
         const diff = Math.ceil((end - start) / 86400000);
-        
+
         const today = new Date();
         let t_status = "upcoming";
         if (today > end) t_status = "past";
         else if (today >= start && today <= end) t_status = "active";
-        
-        const statusClass = t_status === "past" ? "bg-secondary" : t_status === "active" ? "bg-success" : "bg-warning text-dark";
-        const statusText = t_status === "past" ? "Pasado" : t_status === "active" ? "Activo" : "Próximo";
-        let imgUrl = window.BASE_URL + '/dummy.jpg';
+
+        const statusClass =
+          t_status === "past"
+            ? "bg-secondary"
+            : t_status === "active"
+              ? "bg-success"
+              : "bg-warning text-dark";
+        const statusText =
+          t_status === "past"
+            ? "Pasado"
+            : t_status === "active"
+              ? "Activo"
+              : "Próximo";
+        let imgUrl = window.BASE_URL + "/dummy.jpg";
         if (t.cover_image) {
-            imgUrl = t.cover_image.startsWith('http') ? t.cover_image : (window.BASE_URL + t.cover_image);
+          imgUrl = t.cover_image.startsWith("http")
+            ? t.cover_image
+            : window.BASE_URL + t.cover_image;
         }
-        const pNames = t.park_names ? t.park_names : 'Sin parques planificados';
-        const startStr = start.toLocaleDateString("es-ES", { day: "numeric", month: "short" });
-        const endStr = end.toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" });
-        
+        const pNames = t.park_names ? t.park_names : "Sin parques planificados";
+        const startStr = start.toLocaleDateString("es-ES", {
+          day: "numeric",
+          month: "short",
+        });
+        const endStr = end.toLocaleDateString("es-ES", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+
         html += `
-          <div class="trip-card shadow-sm h-100 rounded-1" onclick="openTrip(${t.id})" style="background: #111;">
-            <div style="height: 140px; position: relative; overflow: hidden;">
-               ${t.cover_image ? `<img src="${imgUrl}" referrerpolicy="no-referrer" onerror="this.style.opacity='0'" class="w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease, opacity 0.3s ease;">` : ''}
-               <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(13,17,23,0.9));"></div>
-               <div class="position-absolute bottom-0 start-0 w-100 p-3 text-white">
+          <div class="col-12">
+          <div class="card shadow-sm h-100 border-0" style="background:#111; border-radius: 0; cursor:pointer; transition:transform 0.2s, box-shadow 0.2s;" onclick="openTrip(${t.id})" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--bs-shadow-sm)'">
+            <div style="height: 130px; position: relative; overflow: hidden; border-radius: 0;">
+               ${t.cover_image ? `<img src="${imgUrl}" referrerpolicy="no-referrer" onerror="this.style.opacity='0'" class="w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease, opacity 0.3s ease; z-index: 0; position:absolute;">` : ""}
+               <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to bottom, transparent 10%, rgba(10,12,16,0.95)); z-index: 1;"></div>
+               <div class="position-absolute bottom-0 start-0 w-100 p-3 pb-2 text-white" style="z-index: 2;">
                  <div class="d-flex align-items-center gap-2 mb-1">
                     <span class="badge ${statusClass}" style="font-size:0.6rem; letter-spacing:0.05em;">${statusText}</span>
                     <span class="small opacity-75" style="font-size:0.75rem;"><i class="fa-regular fa-clock me-1"></i>${diff} d</span>
                  </div>
-                 <h5 class="fw-bold mb-0 text-truncate" style="font-family: var(--rcw-font-title); font-size:1.1rem;">${t.title}</h5>
+                 <h5 class="fw-bold mb-1 text-truncate" style="font-family: var(--rcw-font-title); font-size:1.15rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">${esc(t.title)}</h5>
                </div>
             </div>
-            <div class="card-body p-3">
-              <div class="d-flex align-items-center gap-2 mb-2 text-muted small" style="font-size: 0.8rem; font-weight:600;">
-                <i class="fa-solid fa-calendar-day text-success"></i> ${startStr} — ${endStr}
+            <div class="card-body p-3 d-flex flex-column justify-content-start">
+              <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                <span class="badge bg-dark border border-secondary text-light fw-normal"><i class="fa-regular fa-calendar text-success me-1"></i>${startStr} — ${endStr}</span>
+                <div class="small text-truncate" style="color: #a3aed0; font-size: 0.8rem;"><i class="fa-solid fa-map-location-dot me-1"></i>${esc(pNames)}</div>
               </div>
-              <div class="small text-muted mb-2 text-truncate" style="font-size:0.75rem;"><i class="fa-solid fa-map-pin me-1 opacity-50"></i>${pNames}</div>
-              ${t.description ? `<div class="small text-white-50" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font-size:0.8rem; line-height:1.4;">${t.description}</div>` : ''}
+              ${t.description ? `<div class="small text-muted mt-1" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-height: 1.4;">${esc(t.description)}</div>` : ""}
             </div>
+          </div>
           </div>
         `;
       });
       container.html(html);
     } catch (e) {
-      container.html('<div class="text-center py-4 text-danger">Error cargando viajes.</div>');
+      console.error("loadTrips error:", e);
+      container.html(
+        '<div class="text-center py-4 text-danger">Error cargando viajes.</div>',
+      );
     }
   }
 
@@ -2921,17 +2682,26 @@ $(document).ready(function () {
         navLabel.textContent = "Siempre";
       } else {
         if (navContainer) navContainer.classList.remove("d-none");
-        if (currentPeriod === "year") navLabel.textContent = baseDate.getFullYear();
+        if (currentPeriod === "year")
+          navLabel.textContent = baseDate.getFullYear();
         else if (currentPeriod === "month") {
-          let s = baseDate.toLocaleString("es-ES", {month:"long", year:"numeric"});
+          let s = baseDate.toLocaleString("es-ES", {
+            month: "long",
+            year: "numeric",
+          });
           navLabel.textContent = s.charAt(0).toUpperCase() + s.slice(1);
         } else if (currentPeriod === "week") {
           const wStart = new Date(baseDate);
           wStart.setDate(wStart.getDate() - wStart.getDay() + 1);
-          navLabel.textContent = "Semana " + wStart.toLocaleDateString("es-ES", {day:"numeric", month:"short"});
+          navLabel.textContent =
+            "Semana " +
+            wStart.toLocaleDateString("es-ES", {
+              day: "numeric",
+              month: "short",
+            });
         }
       }
-      
+
       if (currentPeriod !== "custom" && currentPeriod !== "all") {
         const d = getDates();
         if (sDate) {
@@ -2948,10 +2718,15 @@ $(document).ready(function () {
       } else if (currentPeriod === "custom") {
         // Si entramos en custom y están vacíos, ponemos el año actual como base
         if (sDate && !sDate.value) {
-          const fmt = (date) => date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0");
+          const fmt = (date) =>
+            date.getFullYear() +
+            "-" +
+            String(date.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(date.getDate()).padStart(2, "0");
           const start = fmt(new Date(baseDate.getFullYear(), 0, 1));
           const end = fmt(new Date(baseDate.getFullYear(), 11, 31));
-          
+
           sDate.value = start;
           eDate.value = end;
           eDate.min = start;
@@ -2963,8 +2738,13 @@ $(document).ready(function () {
 
     function getDates() {
       let start, end;
-      const fmt = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
-      
+      const fmt = (d) =>
+        d.getFullYear() +
+        "-" +
+        String(d.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(d.getDate()).padStart(2, "0");
+
       if (currentPeriod === "week") {
         const d = new Date(baseDate);
         const day = d.getDay() || 7;
@@ -2991,41 +2771,53 @@ $(document).ready(function () {
       let url = `${BASE_URL}/api/php/trips.php?action=${sType.value === "coasters" ? "ride_ranking" : "park_ranking"}`;
       if (start) url += `&start=${start}`;
       if (end) url += `&end=${end}`;
-      
-      container.innerHTML = '<div class="text-center py-4 text-muted small"><div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>Cargando ranking...</div>';
+
+      container.innerHTML =
+        '<div class="text-center py-4 text-muted small"><div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>Cargando ranking...</div>';
       try {
         const res = await fetch(url);
         const j = await res.json();
         cachedData = j.data || [];
         const tc = document.getElementById("rank-trip-count");
-        if (tc && j.total_trips !== undefined) tc.textContent = j.total_trips + (j.total_trips === 1 ? " viaje" : " viajes");
+        if (tc && j.total_trips !== undefined)
+          tc.textContent =
+            j.total_trips + (j.total_trips === 1 ? " viaje" : " viajes");
         renderRanking();
       } catch (e) {
-        container.innerHTML = '<div class="text-center py-4 text-danger">Error cargando ranking.</div>';
+        container.innerHTML =
+          '<div class="text-center py-4 text-danger">Error cargando ranking.</div>';
       }
     }
 
     function renderRanking() {
       if (!cachedData || !cachedData.length) {
-        container.innerHTML = '<div class="text-center py-5 text-muted"><i class="fa-solid fa-chart-line fa-2x mb-3 opacity-50"></i><br>No hay datos en este periodo.</div>';
+        container.innerHTML =
+          '<div class="text-center py-5 text-muted"><i class="fa-solid fa-chart-line fa-2x mb-3 opacity-50"></i><br>No hay datos en este periodo.</div>';
         return;
       }
-      
-      const max = Math.max(...cachedData.map(i => parseInt(sType.value === "coasters" ? i.times_ridden : i.times_visited)));
-      let html = '<div class="list-group list-group-flush custom-scrollbar" style="max-height: 700px; overflow-y: auto; overflow-x: hidden;">';
-      
+
+      const max = Math.max(
+        ...cachedData.map((i) =>
+          parseInt(
+            sType.value === "coasters" ? i.times_ridden : i.times_visited,
+          ),
+        ),
+      );
+      let html =
+        '<div class="list-group list-group-flush custom-scrollbar" style="max-height: 700px; overflow-y: auto; overflow-x: hidden;">';
+
       cachedData.forEach((item, idx) => {
         const isC = sType.value === "coasters";
         const title = isC ? item.coaster_name : item.park_name;
         const sub = isC ? item.park_name : item.park_location;
         const count = parseInt(isC ? item.times_ridden : item.times_visited);
-        const img = item.imagen_url || (window.BASE_URL + "/web/img/dummy.jpg");
+        const img = item.imagen_url || window.BASE_URL + "/web/img/dummy.jpg";
         const pct = (count / max) * 100;
-        
+
         html += `
           <div class="list-group-item bg-transparent border-bottom border-secondary border-opacity-25 px-4 py-3">
             <div class="d-flex align-items-center gap-3">
-              <div class="fw-bold text-success fs-5" style="min-width:30px;">#${idx+1}</div>
+              <div class="fw-bold text-success fs-5" style="min-width:30px;">#${idx + 1}</div>
               <img src="${img}" onerror="this.src='${window.BASE_URL}/web/img/dummy.jpg'" style="width: 48px; height: 48px; object-fit: cover; border-radius: 4px; border: 1px solid var(--rcw-border);">
               <div class="flex-grow-1 min-w-0">
                 <div class="d-flex justify-content-between align-items-end mb-1 gap-2">
@@ -3034,7 +2826,7 @@ $(document).ready(function () {
                     <small class="text-muted text-truncate d-block" title="${sub}">${sub}</small>
                   </div>
                   <div class="fw-bold text-success fs-5 text-nowrap flex-shrink-0">
-                    ${count} <span class="small text-muted fw-normal" style="font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">${isC ? (count === 1 ? 'vez montada' : 'veces montada') : (count === 1 ? 'visita' : 'visitas')}</span>
+                    ${count} <span class="small text-muted fw-normal" style="font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">${isC ? (count === 1 ? "vez montada" : "veces montada") : count === 1 ? "visita" : "visitas"}</span>
                   </div>
                 </div>
                 <div class="progress rounded-pill bg-dark mt-2" style="height: 6px;">
@@ -3045,17 +2837,17 @@ $(document).ready(function () {
           </div>
         `;
       });
-      html += '</div>';
+      html += "</div>";
       container.innerHTML = html;
     }
 
     sType.addEventListener("change", fetchRanking);
-    
-    pBtns.forEach(b => {
+
+    pBtns.forEach((b) => {
       b.addEventListener("click", (e) => {
-        pBtns.forEach(btn => {
-            btn.classList.remove("btn-outline-success", "active");
-            btn.classList.add("btn-outline-secondary");
+        pBtns.forEach((btn) => {
+          btn.classList.remove("btn-outline-success", "active");
+          btn.classList.add("btn-outline-secondary");
         });
         e.target.classList.remove("btn-outline-secondary");
         e.target.classList.add("btn-outline-success", "active");
@@ -3070,27 +2862,30 @@ $(document).ready(function () {
       if (currentPeriod === "all" || currentPeriod === "custom") {
         currentPeriod = "year";
         baseDate = new Date();
-        document.querySelectorAll(".rank-period-btn").forEach(btn => {
+        document.querySelectorAll(".rank-period-btn").forEach((btn) => {
           btn.classList.remove("btn-outline-success", "active");
           btn.classList.add("btn-outline-secondary");
-          if(btn.dataset.period === "year") {
+          if (btn.dataset.period === "year") {
             btn.classList.remove("btn-outline-secondary");
             btn.classList.add("btn-outline-success", "active");
           }
         });
       }
-      if (currentPeriod === "year") baseDate.setFullYear(baseDate.getFullYear() + dir);
-      else if (currentPeriod === "month") baseDate.setMonth(baseDate.getMonth() + dir);
-      else if (currentPeriod === "week") baseDate.setDate(baseDate.getDate() + (dir * 7));
+      if (currentPeriod === "year")
+        baseDate.setFullYear(baseDate.getFullYear() + dir);
+      else if (currentPeriod === "month")
+        baseDate.setMonth(baseDate.getMonth() + dir);
+      else if (currentPeriod === "week")
+        baseDate.setDate(baseDate.getDate() + dir * 7);
       updateLabel();
       fetchRanking();
     }
 
-    if(prevBtn) prevBtn.addEventListener("click", () => handleArrowClick(-1));
-    if(nextBtn) nextBtn.addEventListener("click", () => handleArrowClick(1));
+    if (prevBtn) prevBtn.addEventListener("click", () => handleArrowClick(-1));
+    if (nextBtn) nextBtn.addEventListener("click", () => handleArrowClick(1));
 
-    sDate.addEventListener("change", (e) => { 
-      customStart = e.target.value; 
+    sDate.addEventListener("change", (e) => {
+      customStart = e.target.value;
       if (eDate) {
         eDate.min = customStart;
         if (eDate.value && eDate.value < customStart) {
@@ -3098,15 +2893,15 @@ $(document).ready(function () {
           customEnd = customStart;
         }
       }
-      if(currentPeriod==="custom") fetchRanking(); 
+      if (currentPeriod === "custom") fetchRanking();
     });
-    eDate.addEventListener("change", (e) => { 
-      customEnd = e.target.value; 
+    eDate.addEventListener("change", (e) => {
+      customEnd = e.target.value;
       if (sDate && customEnd && customEnd < sDate.value) {
         eDate.value = sDate.value;
         customEnd = sDate.value;
       }
-      if(currentPeriod==="custom") fetchRanking(); 
+      if (currentPeriod === "custom") fetchRanking();
     });
 
     updateLabel();

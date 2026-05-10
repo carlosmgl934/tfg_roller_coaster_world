@@ -109,10 +109,11 @@ document.addEventListener("DOMContentLoaded", () => {
     submitBtn.textContent = "Enviando...";
 
     try {
-      const response = await fetch(window.BASE_URL + "/api/php/contact.php", {
+      const response = await fetch(window.BASE_URL + "/api/php/contact.php", { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
         method: "POST",
         body: new FormData(form),
-      });
+      } );
       const result = await response.json();
 
       if (result.success) {
@@ -120,14 +121,16 @@ document.addEventListener("DOMContentLoaded", () => {
         form.reset();
         emailInput.style.borderColor = "";
         messageInput.style.borderColor = "";
-        emailError.textContent = "";
-        messageError.textContent = "";
+        document.getElementById("email-error").textContent = "";
+        document.getElementById("message-error").textContent = "";
+        charCount.textContent = "0";
+        charCount.style.color = "red";
         hideError();
 
         setTimeout(() => {
           hideSuccess();
-          window.location.href = window.BASE_URL + "/web/views/home.php";
-        }, 10000);
+          window.location.href = window.BASE_URL + "/web/views/public/index.php";
+        }, 5000);
       } else {
         showError("Error al enviar el mensaje: " + result.error);
         hideSuccess();

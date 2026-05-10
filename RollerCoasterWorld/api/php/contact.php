@@ -1,9 +1,13 @@
 <?php
 
 require_once __DIR__ . '/../database/db_conexion.php';
-session_start();
+require_once __DIR__ . '/utils/RateLimiter.php';
+require_once __DIR__ . '/utils/SessionManager.php';
 
 header('Content-Type: application/json');
+
+// Rate Limiting: 5 envíos por IP cada 10 minutos
+RateLimiter::check('contact_form', 5, 600);
 
 if (
 isset($_POST['name'], $_POST['email'], $_POST['reason'], $_POST['subject'], $_POST['message']) &&
@@ -25,10 +29,20 @@ trim($_POST['message']) !== ''
         $user_email = trim($_POST['email']);
     }
 
-    $reason = trim($_POST['reason']);
-    $subject = trim($_POST['subject']);
-    $message = trim($_POST['message']);
+    $reason      = trim($_POST['reason']);
+    $subject     = substr(trim($_POST['subject']), 0, 200);
+    $message     = trim($_POST['message']);
     $wants_reply = isset($_POST['wants_reply']);
+
+    // Validar longitudes
+    if (strlen($user_name) < 2 || strlen($user_name) > 100) {
+        echo json_encode(['success' => false, 'error' => 'El nombre debe tener entre 2 y 100 caracteres']);
+        exit;
+    }
+    if (strlen($subject) < 3) {
+        echo json_encode(['success' => false, 'error' => 'El asunto debe tener al menos 3 caracteres']);
+        exit;
+    }
 
     if (!filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
         echo json_encode(['success' => false, 'error' => 'El correo electrónico no es válido']);
@@ -36,7 +50,7 @@ trim($_POST['message']) !== ''
     }
 
     $valid_reasons = ['error', 'suggestion', 'report', 'info', 'other'];
-    if (!in_array($reason, $valid_reasons)) {
+    if (!in_array($reason, $valid_reasons, true)) {
         echo json_encode(['success' => false, 'error' => 'Selecciona una razón válida']);
         exit;
     }

@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/utils/SessionManager.php';
 
 // Asegurar que tenemos el user_id de la BD si hay sesión de Firebase
 if (isset($_SESSION['firebase_uid']) && !isset($_SESSION['user_id'])) {
@@ -182,7 +182,7 @@ function listCoasters()
             'total' => $total
         ]);
     } catch (PDOException $e) {
-        Response::error('Error mostrando montañas rusas: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -578,7 +578,7 @@ function saveReview()
         Response::success();
     } catch (PDOException $e) {
         $db->rollBack();
-        Response::error('Error al guardar reseña: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -669,7 +669,7 @@ function updateReview()
         Response::success();
     } catch (PDOException $e) {
         if ($db->inTransaction()) $db->rollBack();
-        Response::error('Error al actualizar reseña: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -848,7 +848,7 @@ function getUserCoasterTops()
         Response::success(['data' => $users]);
     } catch (Exception $e) {
         error_log('getUserCoasterTops error: ' . $e->getMessage());
-        Response::error('Error al obtener los tops de coasters: ' . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -896,7 +896,7 @@ function getRanking()
             'total' => $total
         ]);
     } catch (PDOException $e) {
-        Response::error('Error mostrando montañas rusas: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -982,6 +982,6 @@ function getAllReviews()
             'total'   => $total
         ]);
     } catch (PDOException $e) {
-        Response::error('Error mostrando reseñas: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }

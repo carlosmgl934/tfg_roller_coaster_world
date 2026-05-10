@@ -333,9 +333,10 @@
         try {
             // Paso A: Crear / actualizar pedido
             const bookResp = await fetch(API + '?action=book', {
-                method:      'POST',
+                method: 'POST',
                 credentials: 'same-origin',
-                headers:     { 'Content-Type': 'application/json' },
+                headers:     {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', 'Content-Type': 'application/json' },
                 body:        JSON.stringify({
                     park_id:  currentRec.park_id,
                     quantity: currentQty,
@@ -349,9 +350,10 @@
 
             // Paso B: Confirmar pago y generar agenda
             const confirmResp = await fetch(API + '?action=confirm', {
-                method:      'POST',
+                method: 'POST',
                 credentials: 'same-origin',
-                headers:     { 'Content-Type': 'application/json' },
+                headers:     {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', 'Content-Type': 'application/json' },
                 body:        JSON.stringify({
                     order_id:     currentOrderId,
                     park_id:      currentRec.park_id,

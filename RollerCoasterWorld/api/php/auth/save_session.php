@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../utils/SessionManager.php';
 header('Content-Type: application/json');
 
 // Log para depurar

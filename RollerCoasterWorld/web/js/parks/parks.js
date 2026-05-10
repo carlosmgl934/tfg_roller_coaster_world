@@ -905,7 +905,8 @@ $(document).ready(function () {
       fd.append("note", note);
       fd.append("review", text);
       try {
-        const res  = await fetch(`${window.BASE_URL}/api/php/parks.php?action=update_review`, { method: "POST", body: fd });
+        const res  = await fetch(`${window.BASE_URL}/api/php/parks.php?action=update_review`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST", body: fd } );
         const data = await res.json();
         if (data.success) {
           if (editReviewModalPark) editReviewModalPark.hide();
@@ -977,10 +978,11 @@ $(document).ready(function () {
         submitBtn.innerHTML =
           'Publicando... <i class="fa-solid fa-spinner fa-spin ms-2"></i>';
 
-        fetch(window.BASE_URL + "/api/php/parks.php?action=save_review", {
+        fetch(window.BASE_URL + "/api/php/parks.php?action=save_review", { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
           method: "POST",
           body: formData,
-        })
+        } )
           .then((res) => res.json())
           .then((data) => {
             if (data.success) {

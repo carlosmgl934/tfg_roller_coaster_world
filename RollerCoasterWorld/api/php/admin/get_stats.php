@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../utils/SessionManager.php';
 require_once __DIR__ . '/../../database/db_conexion.php';
 require_once __DIR__ . '/../utils/ApiRouter.php';
 require_once __DIR__ . '/../utils/Response.php';
@@ -54,7 +54,7 @@ function getSummary(): void
         echo json_encode(['success' => true, 'data' => $stats]);
         exit;
     } catch (PDOException $e) {
-        Response::error('Error obteniendo resumen: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -150,7 +150,7 @@ function getGrowth(): void
             echo json_encode(['success' => true, 'data' => $data]);
             exit;
         } catch (PDOException $e) {
-            Response::error('Error obteniendo rango personalizado: ' . $e->getMessage());
+            error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
         }
     }
 
@@ -217,7 +217,7 @@ function getGrowth(): void
         echo json_encode(['success' => true, 'data' => $data]);
         exit;
     } catch (PDOException $e) {
-        Response::error('Error obteniendo crecimiento: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -257,7 +257,7 @@ function getDistribution(): void
         echo json_encode(['success' => true, 'data' => $data]);
         exit;
     } catch (PDOException $e) {
-        Response::error('Error obteniendo distribución: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -283,6 +283,6 @@ function getRecentTrips(): void
         echo json_encode(['success' => true, 'data' => $data]);
         exit;
     } catch (PDOException $e) {
-        Response::error('Error obteniendo últimos viajes: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }

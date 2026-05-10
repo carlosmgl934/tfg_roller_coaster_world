@@ -7,7 +7,7 @@
  *   - dashboard → Datos personales del usuario logueado (requiere sesión)
  */
 
-session_start();
+require_once __DIR__ . '/utils/SessionManager.php';
 require_once __DIR__ . '/../database/db_conexion.php';
 require_once __DIR__ . '/utils/Response.php';
 

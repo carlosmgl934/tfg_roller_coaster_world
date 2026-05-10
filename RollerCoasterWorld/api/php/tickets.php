@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/utils/SessionManager.php';
 require_once __DIR__ . '/../database/db_conexion.php';
 require_once __DIR__ . '/utils/Response.php';
 require_once __DIR__ . '/utils/ApiRouter.php';
@@ -81,7 +81,7 @@ function listParksWithPrice()
         $parks = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Response::success(['parks' => $parks]);
     } catch (Exception $e) {
-        Response::error('Error al obtener parques: ' . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -340,7 +340,7 @@ function createOrder()
     } catch (Exception $e) {
         if ($db->inTransaction())
             $db->rollBack();
-        Response::error('Error al crear el pedido: ' . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 

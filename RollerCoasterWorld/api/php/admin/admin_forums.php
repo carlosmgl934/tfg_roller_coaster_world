@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../utils/SessionManager.php';
 require_once __DIR__ . '/../../database/db_conexion.php';
 require_once __DIR__ . '/../utils/ApiRouter.php';
 require_once __DIR__ . '/../utils/Response.php';
@@ -69,7 +69,7 @@ function adminListForums()
 
         Response::success(['forums' => $forums]);
     } catch (PDOException $e) {
-        Response::error('Error listando foros: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -96,6 +96,6 @@ function adminDeleteForum()
 
         Response::success(['message' => 'Foro eliminado correctamente']);
     } catch (PDOException $e) {
-        Response::error('Error eliminando foro: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }

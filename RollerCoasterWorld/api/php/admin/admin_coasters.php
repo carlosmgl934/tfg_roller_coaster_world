@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../utils/SessionManager.php';
 require_once __DIR__ . '/../../database/db_conexion.php';
 require_once __DIR__ . '/../utils/ApiRouter.php';
 require_once __DIR__ . '/../utils/Response.php';
@@ -92,7 +92,7 @@ function searchCoasters(): void
 
         Response::success(['coasters' => $coasters, 'total' => $total]);
     } catch (PDOException $e) {
-        Response::error('Error buscando coasters: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -218,7 +218,7 @@ function filterCoasters(): void
 
         Response::success(['coasters' => $coasters, 'total' => $total]);
     } catch (PDOException $e) {
-        Response::error('Error filtrando coasters: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -258,7 +258,7 @@ function listModels(): void
         $models = $stmt->fetchAll(PDO::FETCH_COLUMN);
         Response::success(['models' => array_map(fn($m) => ['coaster_model' => $m], $models)]);
     } catch (PDOException $e) {
-        Response::error('Error obteniendo modelos: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -298,7 +298,7 @@ function deleteCoaster(): void
 
         Response::success(['coaster_name' => $coasterName]);
     } catch (PDOException $e) {
-        Response::error('Error eliminando coaster: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -346,7 +346,7 @@ function bulkDeleteCoasters(): void
 
         Response::success(['deleted' => count($cleanIds)]);
     } catch (PDOException $e) {
-        Response::error('Error eliminando coasters en masa: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -456,7 +456,7 @@ function addCoaster(): void
 
         Response::success(['coaster' => $newCoaster]);
     } catch (PDOException $e) {
-        Response::error('Error añadiendo coaster: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -582,6 +582,6 @@ function updateCoaster(): void
 
         Response::success(['coaster' => $updatedCoaster]);
     } catch (PDOException $e) {
-        Response::error('Error actualizando coaster: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }

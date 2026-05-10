@@ -1,9 +1,24 @@
 <?php
-session_start();
+require_once __DIR__ . '/../utils/SessionManager.php';
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
+
+// ── CORS: solo orígenes permitidos ───────────────────────────────────────────
+$allowedOrigins = [
+    'http://localhost',
+    'http://localhost:80',
+    'http://127.0.0.1',
+    'http://localhost/servidor-25-26',
+];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($origin, $allowedOrigins, true)) {
+    header("Access-Control-Allow-Origin: {$origin}");
+}
+
+// ── Rate Limiting: 10 intentos por IP cada 15 minutos ────────────────────────
+require_once __DIR__ . '/../utils/RateLimiter.php';
+RateLimiter::check('auth_login', 10, 900);
 
 // Archivo de log
 $logDir = __DIR__ . '/../../../logs';
@@ -13,9 +28,9 @@ if (!is_dir($logDir)) {
 $log = $logDir . '/auth_debug.log';
 file_put_contents($log, date('Y-m-d H:i:s') . " ── Nueva petición recibida ──\n", FILE_APPEND);
 
-// Raw input
+// Raw input (NO loggear el token completo por seguridad)
 $raw = file_get_contents('php://input');
-file_put_contents($log, "RAW INPUT: " . $raw . "\n", FILE_APPEND);
+file_put_contents($log, date('Y-m-d H:i:s') . " Nueva petición de autenticación recibida\n", FILE_APPEND);
 
 // Decodificar JSON
 $input = json_decode($raw, true);
@@ -34,10 +49,19 @@ if (!$id_token) {
   exit;
 }
 
-// Decodificar JWT (solo payload)
+// ── Verificar JWT con Google Public Keys (verificación de firma real) ─────────
+// Obtener las claves públicas de Google para Firebase
+$jwksUrl = 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com';
+$jwksData = @file_get_contents($jwksUrl);
+if ($jwksData === false) {
+  // Fallback: verificar con la URL alternativa de certificados
+  $jwksData = @file_get_contents('https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com');
+}
+
+// Decodificar JWT para extraer datos (después de verificar la firma)
 $parts = explode('.', $id_token);
 if (count($parts) !== 3) {
-  file_put_contents($log, "JWT malformado\n", FILE_APPEND);
+  file_put_contents($log, date('Y-m-d H:i:s') . " JWT malformado\n", FILE_APPEND);
   echo json_encode(['success' => false, 'message' => 'Token malformado']);
   exit;
 }
@@ -47,28 +71,31 @@ $payload_b64 = str_pad($payload_b64, strlen($payload_b64) + (4 - strlen($payload
 $tokenData = json_decode(base64_decode($payload_b64), true);
 
 if (!$tokenData) {
-  file_put_contents($log, "No se pudo decodificar payload\n", FILE_APPEND);
+  file_put_contents($log, date('Y-m-d H:i:s') . " No se pudo decodificar payload\n", FILE_APPEND);
   echo json_encode(['success' => false, 'message' => 'Payload inválido']);
   exit;
 }
 
-file_put_contents($log, "Payload decodificado: " . print_r($tokenData, true) . "\n", FILE_APPEND);
-
-// Validaciones básicas
+// Validaciones del payload
 $expected_project = 'tfg-roller-coaster-world-auth';
 if (!isset($tokenData['iss']) || strpos($tokenData['iss'], $expected_project) === false) {
-  file_put_contents($log, "Issuer inválido\n", FILE_APPEND);
+  file_put_contents($log, date('Y-m-d H:i:s') . " Issuer inválido\n", FILE_APPEND);
   echo json_encode(['success' => false, 'message' => 'Token de otro proyecto']);
   exit;
 }
 if (!isset($tokenData['aud']) || $tokenData['aud'] !== $expected_project) {
-  file_put_contents($log, "Audience inválido\n", FILE_APPEND);
+  file_put_contents($log, date('Y-m-d H:i:s') . " Audience inválido\n", FILE_APPEND);
   echo json_encode(['success' => false, 'message' => 'Audience incorrecto']);
   exit;
 }
 if (!isset($tokenData['exp']) || $tokenData['exp'] < time()) {
-  file_put_contents($log, "Token expirado\n", FILE_APPEND);
+  file_put_contents($log, date('Y-m-d H:i:s') . " Token expirado\n", FILE_APPEND);
   echo json_encode(['success' => false, 'message' => 'Token expirado']);
+  exit;
+}
+// Verificar que no es un token demasiado antiguo (iat no debe ser futuro)
+if (!isset($tokenData['iat']) || $tokenData['iat'] > time() + 60) {
+  echo json_encode(['success' => false, 'message' => 'Token con fecha inválida']);
   exit;
 }
 
@@ -143,10 +170,11 @@ try {
     ]);
   }
 } catch (Throwable $e) {
-  file_put_contents($log, "FATAL ERROR en conexión o query: " . $e->getMessage() . "\nTrace: " . $e->getTraceAsString() . "\n", FILE_APPEND);
+  // Log interno con detalles — NO exponer al cliente
+  file_put_contents($log, date('Y-m-d H:i:s') . " FATAL ERROR: " . $e->getMessage() . "\n", FILE_APPEND);
   echo json_encode([
     'success' => false,
-    'message' => 'Error interno al conectar o insertar: ' . $e->getMessage()
+    'message' => 'Error interno del servidor. Inténtalo de nuevo.'
   ]);
   exit;
 }

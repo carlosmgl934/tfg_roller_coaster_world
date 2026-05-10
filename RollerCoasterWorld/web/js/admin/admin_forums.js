@@ -99,7 +99,8 @@ async function loadForums() {
     if (privacy) url += `&privacy=${encodeURIComponent(privacy)}`;
 
     try {
-        const resp = await fetch(url, { credentials: 'same-origin' });
+        const resp = await fetch(url, { 
+                credentials: 'same-origin' });
         const json = await resp.json();
 
         if (!json.success) throw new Error(json.error || 'Error');
@@ -345,7 +346,8 @@ async function toggleHideMessage(msgId, hidden) {
         const fd = new FormData();
         fd.append('message_id', msgId);
         fd.append('hidden', hidden);
-        const resp = await fetch(`${API_FORUMS}?action=hide_message`, {
+        const resp = await fetch(`${API_FORUMS}?action=hide_message`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
             method: 'POST', credentials: 'same-origin', body: fd
         });
         const json = await resp.json();
@@ -368,13 +370,17 @@ async function confirmDeleteMessage() {
     try {
         const fd = new FormData();
         fd.append('message_id', pendingDeleteMsgId);
-        const resp = await fetch(`${API_FORUMS}?action=delete_message`, {
+        const resp = await fetch(`${API_FORUMS}?action=delete_message`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
             method: 'POST', credentials: 'same-origin', body: fd
-        });
+        } );
         const json = await resp.json();
         if (!json.success) throw new Error(json.error || 'Error');
         modalDelMsg.hide();
-        await fetchMessages(currentForumId);
+        await Promise.all([
+            fetchMessages(currentForumId),
+            fetchParticipants(currentForumId)
+        ]);
         // actualizar stat en lista
         const f = allForums.find(f => f.id == currentForumId);
         if (f) { f.msg_count = Math.max(0, (+f.msg_count) - 1); updateStats(); renderForumList(); }
@@ -392,7 +398,8 @@ async function fetchCollaborators(forumId) {
     document.getElementById('collaborators-list').innerHTML =
         `<div class="text-center text-muted py-4"><i class="fa-solid fa-spinner fa-spin text-success me-2"></i>Cargando...</div>`;
     try {
-        const resp = await fetch(`${API_FORUMS}?action=get_collaborators&forum_id=${forumId}`, { credentials: 'same-origin' });
+        const resp = await fetch(`${API_FORUMS}?action=get_collaborators&forum_id=${forumId}`, { 
+                credentials: 'same-origin' });
         const json = await resp.json();
         const collabs = json.collaborators || [];
         document.getElementById('tab-badge-collabs').textContent = collabs.length;
@@ -442,7 +449,8 @@ async function confirmRemoveCollab() {
         const fd = new FormData();
         fd.append('forum_id', pendingRemCollab.forumId);
         fd.append('target_user_id', pendingRemCollab.userId);
-        const resp = await fetch(`${API_FORUMS}?action=remove_collaborator`, {
+        const resp = await fetch(`${API_FORUMS}?action=remove_collaborator`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
             method: 'POST', credentials: 'same-origin', body: fd
         });
         const json = await resp.json();
@@ -465,7 +473,8 @@ async function fetchBanned(forumId) {
     document.getElementById('banned-list').innerHTML =
         `<div class="text-center text-muted py-4"><i class="fa-solid fa-spinner fa-spin text-success me-2"></i>Cargando...</div>`;
     try {
-        const resp = await fetch(`${API_FORUMS}?action=get_banned&forum_id=${forumId}`, { credentials: 'same-origin' });
+        const resp = await fetch(`${API_FORUMS}?action=get_banned&forum_id=${forumId}`, { 
+                credentials: 'same-origin' });
         const json = await resp.json();
         const banned = json.banned || [];
         document.getElementById('tab-badge-bans').textContent = banned.length;
@@ -556,7 +565,8 @@ async function openBanUser(forumId, userId, username) {
         const fd = new FormData();
         fd.append('forum_id', forumId);
         fd.append('target_user_id', userId);
-        const resp = await fetch(`${API_FORUMS}?action=ban_user`, {
+        const resp = await fetch(`${API_FORUMS}?action=ban_user`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
             method: 'POST', credentials: 'same-origin', body: fd
         });
         const json = await resp.json();
@@ -619,9 +629,10 @@ async function confirmUnban() {
         const fd = new FormData();
         fd.append('forum_id', pendingUnban.forumId);
         fd.append('target_user_id', pendingUnban.userId);
-        const resp = await fetch(`${API_FORUMS}?action=unban_user`, {
+        const resp = await fetch(`${API_FORUMS}?action=unban_user`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
             method: 'POST', credentials: 'same-origin', body: fd
-        });
+        } );
         const json = await resp.json();
         if (!json.success) throw new Error(json.error || 'Error');
         modalUnban.hide();
@@ -655,7 +666,8 @@ async function confirmDeleteForum() {
         const resp = await fetch(`${API_ADMIN}?action=delete_forum`, {
             method: 'POST',
             credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', 'Content-Type': 'application/json' },
             body: JSON.stringify({ forum_id: pendingDeleteForumId }),
         });
         const json = await resp.json();

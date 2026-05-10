@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../utils/SessionManager.php';
 require_once __DIR__ . '/../../database/db_conexion.php';
 require_once __DIR__ . '/../utils/ApiRouter.php';
 require_once __DIR__ . '/../utils/Response.php';
@@ -174,7 +174,7 @@ function searchParks(): void
 
         Response::success(['parks' => $parks, 'total' => $total]);
     } catch (PDOException $e) {
-        Response::error('Error buscando parques: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -241,7 +241,7 @@ function filterParks(): void
 
         Response::success(['parks' => $parks, 'total' => $total]);
     } catch (PDOException $e) {
-        Response::error('Error filtrando parques: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -281,7 +281,7 @@ function unknownCoasters(): void
         $coasters = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Response::success(['coasters' => $coasters]);
     } catch (PDOException $e) {
-        Response::error('Error obteniendo coasters: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -373,7 +373,7 @@ function addPark(): void
 
         Response::success(['id' => $newId, 'message' => 'Parque añadido correctamente.']);
     } catch (PDOException $e) {
-        Response::error('Error al añadir el parque: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -399,7 +399,7 @@ function getPark(): void
         if (!$park) { Response::error('Parque no encontrado.', 404); return; }
         Response::success(['park' => $park]);
     } catch (PDOException $e) {
-        Response::error('Error: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -428,7 +428,7 @@ function deletePark(): void
         $stmt->execute();
         Response::success(['message' => 'Parque eliminado correctamente.']);
     } catch (PDOException $e) {
-        Response::error('Error al eliminar: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -522,7 +522,7 @@ function editPark(): void
 
         Response::success(['message' => 'Parque actualizado correctamente.']);
     } catch (PDOException $e) {
-        Response::error('Error al editar el parque: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -548,7 +548,7 @@ function duplicatePark(): void
         $newId = (int)$stmt->fetchColumn();
         Response::success(['id' => $newId, 'message' => 'Parque duplicado correctamente.']);
     } catch (PDOException $e) {
-        Response::error('Error al duplicar: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -594,6 +594,6 @@ function getParkCoasters(): void
         $all = array_merge($parkCoasters, $unknownCoasters);
         Response::success(['coasters' => $all]);
     } catch (PDOException $e) {
-        Response::error('Error: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }

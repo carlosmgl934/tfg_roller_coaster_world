@@ -153,6 +153,7 @@ window.toggleReviewVisibility = function (id, type, hide) {
   $.ajax({
     url: `${window.BASE_URL}/api/php/admin/admin_reviews.php?action=toggle_visibility`,
     method: "POST",
+    headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
     data: JSON.stringify({ id, type, hide }),
     contentType: "application/json",
     success(res) {
@@ -293,6 +294,7 @@ $(document).ready(function () {
     $.ajax({
       url: `${window.BASE_URL}/api/php/admin/admin_reviews.php?action=delete_review`,
       method: "POST",
+      headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
       data: JSON.stringify({ id, type }),
       contentType: "application/json",
       success(res) {

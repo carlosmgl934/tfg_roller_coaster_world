@@ -7,7 +7,7 @@
  *  GET  action=verify_session  → Verifica el pago y crea el pedido en BD
  */
 
-session_start();
+require_once __DIR__ . '/utils/SessionManager.php';
 require_once __DIR__ . '/../database/db_conexion.php';
 require_once __DIR__ . '/utils/Response.php';
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -132,7 +132,7 @@ function createCheckoutSession(array $env): void
             'session_id' => $session->id,
         ]);
     } catch (\Stripe\Exception\ApiErrorException $e) {
-        Response::error('Error de Stripe: ' . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -154,7 +154,7 @@ function verifySession(): void
     try {
         $session = \Stripe\Checkout\Session::retrieve($sessionId);
     } catch (\Stripe\Exception\ApiErrorException $e) {
-        Response::error('No se pudo verificar el pago: ' . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 
     if ($session->payment_status !== 'paid') {
@@ -229,10 +229,10 @@ function verifySession(): void
                 ':buyer_name'        => $buyerName,
                 ':buyer_email'       => $buyerEmail,
                 ':stripe_session_id' => $sessionId,
-                ':addon_pase_rapido' => !empty($item['addon_pase_rapido']),
-                ':addon_photopass'   => !empty($item['addon_photopass']),
-                ':addon_buffet'      => !empty($item['addon_buffet']),
-                ':addon_parking'     => !empty($item['addon_parking']),
+                ':addon_pase_rapido' => !empty($item['addon_pase_rapido']) ? 1 : 0,
+                ':addon_photopass'   => !empty($item['addon_photopass']) ? 1 : 0,
+                ':addon_buffet'      => !empty($item['addon_buffet']) ? 1 : 0,
+                ':addon_parking'     => !empty($item['addon_parking']) ? 1 : 0,
                 ':parking_price'     => (float)($item['parking_price'] ?? 0),
                 ':addon_label'       => implode(', ', $addonParts),
             ]);
@@ -267,7 +267,7 @@ function verifySession(): void
 
     } catch (\Exception $e) {
         if ($db->inTransaction()) $db->rollBack();
-        Response::error('Error al crear el pedido: ' . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 

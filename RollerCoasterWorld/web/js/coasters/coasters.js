@@ -788,8 +788,9 @@ $(document).ready(function () {
           const coasterName = coasterNameEl ? coasterNameEl.textContent : "";
 
           data.photos.forEach((photo, index) => {
+            const userKey = window.CURRENT_USER_ID || 'guest';
             const hasLiked =
-              localStorage.getItem("liked_photo_" + photo.id) === "true";
+              localStorage.getItem("liked_photo_" + userKey + "_" + photo.id) === "true";
             const heartClass = hasLiked ? "fa-solid text-danger" : "fa-regular";
 
             const col = document.createElement("div");
@@ -956,7 +957,8 @@ $(document).ready(function () {
     async function togglePhotoLike(photoId, btnElement) {
         if (!photoId || btnElement.prop('disabled')) return;
         
-        const hasLiked = localStorage.getItem("liked_photo_" + photoId) === "true";
+        const userKey = window.CURRENT_USER_ID || 'guest';
+        const hasLiked = localStorage.getItem("liked_photo_" + userKey + "_" + photoId) === "true";
         
         // Bloquear todos los botones relacionados con esta foto para evitar spam
         const gridBtns = $(`.grid-like-btn[data-id='${photoId}']`);
@@ -972,6 +974,9 @@ $(document).ready(function () {
 
             const res = await fetch(`${window.BASE_URL}/api/php/coasters.php?action=like_photo`, {
                 method: "POST",
+                headers: {
+                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? ''
+                },
                 body: formData
             });
             const data = await res.json();
@@ -979,9 +984,9 @@ $(document).ready(function () {
             if (data.success) {
                 const newHasLiked = !hasLiked;
                 if (newHasLiked) {
-                    localStorage.setItem("liked_photo_" + photoId, "true");
+                    localStorage.setItem("liked_photo_" + userKey + "_" + photoId, "true");
                 } else {
-                    localStorage.removeItem("liked_photo_" + photoId);
+                    localStorage.removeItem("liked_photo_" + userKey + "_" + photoId);
                 }
 
                 // 1. Actualizar el Grid (todos los botones de esa foto)
@@ -1146,9 +1151,8 @@ $(document).ready(function () {
       fd.append("review", text);
 
       try {
-        const res = await fetch(
-          `${BASE_URL}/api/php/coasters.php?action=update_review`,
-          { method: "POST", body: fd },
+        const res = await fetch(`${BASE_URL}/api/php/coasters.php?action=update_review`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST", body: fd },
         );
         const data = await res.json();
         if (data.success) {
@@ -1164,7 +1168,7 @@ $(document).ready(function () {
           .prop("disabled", false)
           .html('<i class="fa-solid fa-floppy-disk me-1"></i>Guardar cambios');
       }
-    });
+    } );
 
     if (coasterId) {
       loadCoastersData(coasterId);
@@ -1222,10 +1226,11 @@ $(document).ready(function () {
         submitBtn.innerHTML =
           'Publicando... <i class="fa-solid fa-spinner fa-spin ms-2"></i>';
 
-        fetch(window.BASE_URL + "/api/php/coasters.php?action=save_review", {
+        fetch(window.BASE_URL + "/api/php/coasters.php?action=save_review", { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
           method: "POST",
           body: formData,
-        })
+        } )
           .then((res) => res.json())
           .then((data) => {
             if (data.success) {
@@ -1325,6 +1330,9 @@ $(document).ready(function () {
               `${window.BASE_URL}/api/php/upload.php`,
               {
                 method: "POST",
+                headers: {
+                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? ''
+                },
                 body: uploadForm,
               },
             );
@@ -1358,6 +1366,9 @@ $(document).ready(function () {
               `${window.BASE_URL}/api/php/coasters.php?action=save_photo`,
               {
                 method: "POST",
+                headers: {
+                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? ''
+                },
                 body: photoForm,
               },
             );

@@ -2,7 +2,8 @@
 (function () {
   const B = window.BASE_URL || window.RCW_BASE_URL || "";
   const API = B + "/api/php/trips.php";
-  const SUPABASE_URL = "https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/";
+  const SUPABASE_URL =
+    "https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/";
 
   const resolveAvatar = (img) => {
     if (!img) return B + "/web/img/avatars/default_avatar.svg";
@@ -59,7 +60,13 @@
       ? {
           method: "POST",
           credentials: "same-origin",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+          },
           body: JSON.stringify(body),
         }
       : { credentials: "same-origin" };
@@ -124,7 +131,6 @@
       Italia: "🇮🇹",
       Italy: "🇮🇹",
       "Reino Unido": "🇬🇧",
-      UK: "🇬🇧",
       "United Kingdom": "🇬🇧",
       Suecia: "🇸🇪",
       Sweden: "🇸🇪",
@@ -136,7 +142,6 @@
       Finland: "🇫🇮",
       "Países Bajos": "🇳🇱",
       Netherlands: "🇳🇱",
-      Holland: "🇳🇱",
       Bélgica: "🇧🇪",
       Belgium: "🇧🇪",
       Polonia: "🇵🇱",
@@ -159,7 +164,6 @@
       Hungary: "🇭🇺",
       // América
       "Estados Unidos": "🇺🇸",
-      USA: "🇺🇸",
       "United States": "🇺🇸",
       Canadá: "🇨🇦",
       Canada: "🇨🇦",
@@ -181,18 +185,27 @@
       Australia: "🇦🇺",
       India: "🇮🇳",
       Tailandia: "🇹🇭",
+      Thailand: "🇹🇭",
       Malasia: "🇲🇾",
+      Malaysia: "🇲🇾",
       Singapur: "🇸🇬",
+      Singapore: "🇸🇬",
       Vietnam: "🇻🇳",
       Taiwán: "🇹🇼",
+      Taiwan: "🇹🇼",
       "Hong Kong": "🇭🇰",
       Indonesia: "🇮🇩",
       // Medio Oriente y África
       "Emiratos Árabes Unidos": "🇦🇪",
-      Sudáfrica: "🇿🇦",
-      Egipto: "🇪🇬",
-      Marruecos: "🇲🇦",
+      UAE: "🇦🇪",
       "Arabia Saudita": "🇸🇦",
+      "Saudi Arabia": "🇸🇦",
+      Egipto: "🇪🇬",
+      Egypt: "🇪🇬",
+      Marruecos: "🇲🇦",
+      Morocco: "🇲🇦",
+      Sudáfrica: "🇿🇦",
+      "South Africa": "🇿🇦",
     };
     return map[countryName] || "🌍";
   };
@@ -201,61 +214,189 @@
     if (!name) return "";
     const n = name.trim().toLowerCase();
     const map = {
+      // España
       spain: "España",
       españa: "España",
+      // Francia
       france: "Francia",
       francia: "Francia",
+      // Alemania
       germany: "Alemania",
       alemania: "Alemania",
+      // Italia
       italy: "Italia",
       italia: "Italia",
-      sweden: "Suecia",
-      suecia: "Suecia",
-      sweeden: "Suecia",
-      denmark: "Dinamarca",
-      dinamarca: "Dinamarca",
-      norway: "Noruega",
-      noruega: "Noruega",
-      finland: "Finlandia",
-      finlandia: "Finlandia",
-      netherlands: "Países Bajos",
-      "países bajos": "Países Bajos",
-      "paises bajos": "Países Bajos",
-      holland: "Países Bajos",
-      belgium: "Bélgica",
-      bélgica: "Bélgica",
-      belgica: "Bélgica",
+      // Reino Unido
       uk: "Reino Unido",
       "united kingdom": "Reino Unido",
       "reino unido": "Reino Unido",
-      usa: "Estados Unidos",
-      "united states": "Estados Unidos",
-      "estados unidos": "Estados Unidos",
+      // Suecia
+      sweden: "Suecia",
+      suecia: "Suecia",
+      sweeden: "Suecia",
+      // Dinamarca
+      denmark: "Dinamarca",
+      dinamarca: "Dinamarca",
+      // Noruega
+      norway: "Noruega",
+      noruega: "Noruega",
+      // Finlandia
+      finland: "Finlandia",
+      finlandia: "Finlandia",
+      // Países Bajos
+      netherlands: "Países Bajos",
+      holland: "Países Bajos",
+      "países bajos": "Países Bajos",
+      "paises bajos": "Países Bajos",
+      // Bélgica
+      belgium: "Bélgica",
+      bélgica: "Bélgica",
+      belgica: "Bélgica",
+      // Polonia
       poland: "Polonia",
       polonia: "Polonia",
+      // Suiza
       switzerland: "Suiza",
       suiza: "Suiza",
+      // Austria
       austria: "Austria",
+      // Portugal
       portugal: "Portugal",
+      // Irlanda
       ireland: "Irlanda",
       irlanda: "Irlanda",
+      // Grecia
       greece: "Grecia",
       grecia: "Grecia",
+      // Rusia
+      russia: "Rusia",
+      rusia: "Rusia",
+      // Turquía
+      turkey: "Turquía",
+      turquía: "Turquía",
+      turquia: "Turquía",
+      // República Checa
       "czech republic": "República Checa",
       "república checa": "República Checa",
       "republica checa": "República Checa",
+      // Hungría
       hungary: "Hungría",
       hungría: "Hungría",
       hungria: "Hungría",
+      // Estados Unidos
+      usa: "Estados Unidos",
+      "united states": "Estados Unidos",
+      "estados unidos": "Estados Unidos",
+      // Canadá
+      canada: "Canadá",
+      canadá: "Canadá",
+      // México
+      mexico: "México",
+      méxico: "México",
+      // Brasil
+      brazil: "Brasil",
+      brasil: "Brasil",
+      // Argentina
+      argentina: "Argentina",
+      // Chile
+      chile: "Chile",
+      // Colombia
+      colombia: "Colombia",
+      // Perú
+      peru: "Perú",
+      perú: "Perú",
+      // Japón
       japan: "Japón",
       japón: "Japón",
       japon: "Japón",
+      // China
       china: "China",
+      // Corea del Sur
       "south korea": "Corea del Sur",
       "corea del sur": "Corea del Sur",
+      // Australia
       australia: "Australia",
+      // India
+      india: "India",
+      // Tailandia
+      thailand: "Tailandia",
+      tailandia: "Tailandia",
+      // Malasia
+      malaysia: "Malasia",
+      malasia: "Malasia",
+      // Singapur
+      singapore: "Singapur",
+      singapur: "Singapur",
+      // Vietnam
+      vietnam: "Vietnam",
+      // Taiwán
+      taiwan: "Taiwán",
+      taiwán: "Taiwán",
+      // Hong Kong
+      "hong kong": "Hong Kong",
+      // Indonesia
+      indonesia: "Indonesia",
+      // Emiratos
+      uae: "Emiratos Árabes Unidos",
+      "emiratos árabes unidos": "Emiratos Árabes Unidos",
+      "emiratos arabes unidos": "Emiratos Árabes Unidos",
+      // Arabia Saudita
+      "saudi arabia": "Arabia Saudita",
+      "arabia saudita": "Arabia Saudita",
+      // Egipto
+      egypt: "Egipto",
+      egipto: "Egipto",
+      // Marruecos
+      morocco: "Marruecos",
+      marruecos: "Marruecos",
+      // Sudáfrica
+      "south africa": "Sudáfrica",
+      sudáfrica: "Sudáfrica",
+      sudafrica: "Sudáfrica",
     };
     return map[n] || name.trim().charAt(0).toUpperCase() + name.trim().slice(1);
+  };
+
+  const getTripCountdown = (start, end) => {
+    const now = new Date();
+    const s = new Date(start);
+    const e = new Date(end);
+    s.setHours(0, 0, 0, 0);
+    e.setHours(23, 59, 59, 999);
+
+    if (now > e)
+      return {
+        text: "Completado",
+        class: "bg-secondary",
+        customClass: "trip-countdown-done",
+      };
+    if (now >= s && now <= e)
+      return {
+        text: "En curso",
+        class: "bg-success",
+        customClass: "trip-countdown-active",
+      };
+
+    const diffMs = s - now;
+    const diffDays = Math.floor(diffMs / 864e5);
+
+    if (diffMs < 1728e5) {
+      // < 48h
+      const h = Math.floor(diffMs / 36e5);
+      const m = Math.floor((diffMs % 36e5) / 6e4);
+      return {
+        text: `Faltan ${h}h ${m}min`,
+        class: "bg-warning text-dark",
+        customClass: "trip-countdown-urgent",
+        urgent: true,
+      };
+    }
+
+    return {
+      text: `Faltan ${diffDays} días`,
+      class: "bg-warning text-dark",
+      customClass: "",
+    };
   };
   window.openDay = async function (ds, tripId = null) {
     const body = document.getElementById("day-modal-body");
@@ -277,6 +418,7 @@
       const j = await api(q);
       const d = j.data;
       const cbp = d.coasters_by_park || {};
+      const nbp = d.notes_by_park || {};
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -295,12 +437,28 @@
         riddenCountMap[id] = (riddenCountMap[id] || 0) + 1;
       });
 
-      // Configurar Hero Banner (tomar el primer parque si hay)
-      let heroImage = ""; // No image by default
+      // Configurar Hero Banner
+      let heroMediaHtml = "";
       let heroTitle = dw(ds);
       let heroSubtitle = "";
-      if (allParks.length > 0) {
-        heroImage = allParks[0].imagen_url || "";
+
+      if (allParks.length >= 2) {
+        // Dual diagonal image for multi-park days
+        const p1 = allParks[0];
+        const p2 = allParks[1];
+        const img1 = esc(p1.imagen_url || "");
+        const img2 = esc(p2.imagen_url || "");
+        heroMediaHtml = `
+          ${img1 ? `<img src="${img1}" class="day-detail-hero-dual-1" onerror="this.style.display='none'">` : `<div class="day-detail-hero-dual-1" style="background:linear-gradient(135deg,#0f2d1f,#1a3a2a);"></div>`}
+          ${img2 ? `<img src="${img2}" class="day-detail-hero-dual-2" onerror="this.style.display='none'">` : `<div class="day-detail-hero-dual-2" style="background:linear-gradient(135deg,#1a2040,#0d1530);"></div>`}
+          <div class="day-detail-hero-dual-sep"></div>`;
+        heroTitle = dw(ds);
+        heroSubtitle = allParks.map((p) => esc(p.park_name)).join(" · ");
+      } else if (allParks.length === 1) {
+        const heroImage = allParks[0].imagen_url || "";
+        heroMediaHtml = heroImage
+          ? `<img src="${esc(heroImage)}" class="day-detail-hero-img" onerror="this.onerror=null; this.src='${window.RCW_BASE_URL}/dummy.jpg';">`
+          : "";
         heroTitle = allParks[0].park_name;
         heroSubtitle =
           dw(ds) +
@@ -308,30 +466,66 @@
       }
 
       let h = `<div class="day-detail-hero" style="background: #111;">
-            ${heroImage ? `<img src="${esc(heroImage)}" class="day-detail-hero-img" onerror="this.style.display='none'">` : ''}
+            ${heroMediaHtml}
           <div class="day-detail-hero-overlay">
               <button type="button" class="btn-close btn-close-white position-absolute" data-bs-dismiss="modal" style="top: 15px; right: 15px;"></button>
               <h2 class="text-white fw-bold mb-1" style="font-family: var(--rcw-font-title); font-size: 1.5rem; letter-spacing:-0.02em;">${esc(heroTitle)}</h2>
-              <div class="text-white-50 small fw-semibold" style="letter-spacing:0.05em; text-transform:uppercase;">${esc(heroSubtitle)}</div>
+              <div class="text-white-50 small fw-semibold" style="letter-spacing:0.05em; text-transform:uppercase;">${heroSubtitle}</div>
           </div>
       </div>`;
 
       // Barra técnica compacta justo debajo del Hero
       if (allParks.length > 0) {
-        const p1 = allParks[0];
-        h += `<div class="day-tech-bar">`;
-        if (p1.operating_coasters !== undefined) {
-          h += `<div class="day-tech-item"><i class="fa-solid fa-roller-coaster text-success"></i><span><strong>${p1.operating_coasters}</strong> coasters operativas (de ${p1.num_coasters || 0})</span></div>`;
-          h += `<span class="opacity-25">·</span>`;
+        if (allParks.length === 1) {
+          const p1 = allParks[0];
+          h += `<div class="day-tech-bar">`;
+          const p1CoasterCount =
+            p1.operating_coasters > 0
+              ? p1.operating_coasters
+              : (cbp[+p1.park_id] || []).length;
+          if (p1CoasterCount > 0) {
+            h += `<div class="day-tech-item"><i class="fa-solid fa-roller-coaster text-success"></i><span><strong>${p1CoasterCount}</strong> ${p1CoasterCount === 1 ? "coaster operativa" : "coasters operativas"}</span></div>`;
+            h += `<span class="opacity-25">·</span>`;
+          }
+          if (p1.opening_year) {
+            h += `<div class="day-tech-item"><i class="fa-solid fa-calendar-check text-info"></i><span>Est. <strong>${p1.opening_year}</strong></span></div>`;
+            h += `<span class="opacity-25">·</span>`;
+          }
+          if (p1.stars > 0) {
+            h += `<div class="day-tech-item"><i class="fa-solid fa-star text-warning"></i><span><strong>${parseFloat(p1.stars).toFixed(1)}</strong> / 5.0</span></div>`;
+          }
+          h += `</div>`;
+        } else {
+          // Multi-park: one compact row per park
+          h += `<div class="day-tech-bar day-tech-bar-multi">`;
+          allParks.forEach((p, i) => {
+            const hasAny =
+              p.operating_coasters > 0 ||
+              (cbp[+p.park_id] || []).length > 0 ||
+              p.opening_year ||
+              p.stars > 0;
+            if (!hasAny) return;
+            if (i > 0) h += `<div class="day-tech-divider"></div>`;
+            h += `<div class="day-tech-park-block">
+              <span class="day-tech-park-name">${esc(p.park_name)}</span>
+              <div class="day-tech-park-stats">`;
+            const pCoasterCount =
+              p.operating_coasters > 0
+                ? p.operating_coasters
+                : (cbp[+p.park_id] || []).length;
+            if (pCoasterCount > 0) {
+              h += `<div class="day-tech-item"><i class="fa-solid fa-roller-coaster text-success"></i><span><strong>${pCoasterCount}</strong> ${pCoasterCount === 1 ? "coaster" : "coasters"}</span></div>`;
+            }
+            if (p.opening_year) {
+              h += `<div class="day-tech-item"><i class="fa-solid fa-calendar-check text-info"></i><span>Est. <strong>${p.opening_year}</strong></span></div>`;
+            }
+            if (p.stars > 0) {
+              h += `<div class="day-tech-item"><i class="fa-solid fa-star text-warning"></i><span><strong>${parseFloat(p.stars).toFixed(1)}</strong></span></div>`;
+            }
+            h += `</div></div>`;
+          });
+          h += `</div>`;
         }
-        if (p1.opening_year) {
-          h += `<div class="day-tech-item"><i class="fa-solid fa-calendar-check text-info"></i><span>Est. <strong>${p1.opening_year}</strong></span></div>`;
-          h += `<span class="opacity-25">·</span>`;
-        }
-        if (p1.stars > 0) {
-          h += `<div class="day-tech-item"><i class="fa-solid fa-star text-warning"></i><span><strong>${parseFloat(p1.stars).toFixed(1)}</strong> / 5.0</span></div>`;
-        }
-        h += `</div>`;
       }
 
       h += `<div class="container-fluid py-3 py-lg-4 overflow-x-hidden">
@@ -346,13 +540,17 @@
 
           h += `<div class="d-flex align-items-center justify-content-between mb-3 mt-2">
                   <h5 class="fw-bold text-success mb-0" style="font-size:1.1rem; font-family:var(--rcw-font-title)">${esc(p.park_name)}</h5>
-                  ${d.can_edit ? `
+                  ${
+                    d.can_edit
+                      ? `
                   <button class="btn btn-link text-danger p-0" style="text-decoration:none; opacity:0.6;" 
                     onclick="${isTrip ? `removeTripPark(${p.id},'${ds}')` : `removeVisit(${p.id},'${ds}')`}" 
                     title="Eliminar parque y sus registros de hoy">
                     <i class="fa-solid fa-trash-can"></i>
                   </button>
-                  ` : ""}
+                  `
+                      : ""
+                  }
                 </div>`;
 
           if (!isFuture && d.can_edit) {
@@ -364,7 +562,7 @@
                 const count = riddenCountMap[+c.id] || 0;
                 h += `<div class="day-coaster-row rounded-3" id="cr-${c.id}">
                   <div class="day-coaster-img-container shadow-sm">
-                    ${c.imagen_url ? `<img src="${esc(c.imagen_url)}" onerror="this.style.display='none'" class="day-coaster-img">` : ''}
+                    ${c.imagen_url ? `<img src="${esc(c.imagen_url)}" onerror="this.onerror=null; this.src='${window.RCW_BASE_URL}/dummy.jpg';" class="day-coaster-img">` : ""}
                   </div>
                   <div class="flex-grow-1 min-w-0 py-1">
                     <div class="day-coaster-name">${esc(c.coaster_name)}</div>
@@ -381,6 +579,28 @@
               });
               h += "</div></div>";
             }
+
+            // Notas del día
+            const notes = nbp[pid] || [];
+            h += `<div class="day-notes-section mt-3 mb-4">
+              <div class="px-0 pt-2 pb-2 text-muted fw-bold small text-uppercase" style="letter-spacing:0.1em; font-size:0.65rem;"><i class="fa-solid fa-note-sticky text-info me-2"></i>Notas del día</div>
+              <div class="day-notes-list d-flex flex-column gap-2" id="notes-list-${pid}">`;
+
+            notes.forEach((n) => {
+              h += `<div class="day-note-item d-flex align-items-start justify-content-between py-1">
+                <div class="flex-grow-1 text-light fw-semibold" style="font-size: 0.85rem; line-height: 1.4;">
+                  <span class="text-info me-2 fs-5" style="vertical-align: middle;">•</span>${esc(n.note_text)}
+                </div>
+                <button class="btn btn-link text-danger p-0 ms-2 opacity-50" style="margin-top: 2px; text-decoration: none;" onclick="deleteDailyNote(${n.id},'${ds}')" title="Eliminar nota"><i class="fa-solid fa-xmark"></i></button>
+              </div>`;
+            });
+
+            h += `</div>
+              <div class="mt-2 d-flex gap-2">
+                <input type="text" class="form-control form-control-sm rounded-3" id="new-note-input-${pid}" placeholder="Añadir nota..." style="background:rgba(255,255,255,0.06)!important; border:1px solid rgba(255,255,255,0.15)!important; color:var(--rcw-text-primary)!important;">
+                <button class="btn btn-info btn-sm rounded-3 fw-bold px-3" onclick="addDailyNote(${pid},'${ds}','new-note-input-${pid}')"><i class="fa-solid fa-plus"></i></button>
+              </div>
+            </div>`;
           }
         });
       } else {
@@ -467,9 +687,9 @@
           h += `<div class="text-center py-5 text-muted"><i class="fa-regular fa-clock mb-3 d-block" style="font-size:2.5rem;opacity:.2"></i>Aún no has montado en nada</div>`;
         }
       }
-      h += `</div></div></div>`; // End container and row
-
+      h += `</div></div></div>`;
       body.innerHTML = h;
+      if (typeof window.initFlatpickr === "function") window.initFlatpickr();
     } catch (e) {
       body.innerHTML =
         '<div class="p-4 text-danger text-center">Error cargando datos del día</div>';
@@ -531,13 +751,50 @@
     const j = await api("add_daily_visit", {
       park_id: +pid,
       visit_date: d,
-      notes: document.getElementById("av-notes").value,
     });
     if (j.success) {
+      const notesVal = document.getElementById("av-notes").value.trim();
+      if (notesVal) {
+        await api("add_daily_note", {
+          park_id: +pid,
+          visit_date: d,
+          note_text: notesVal,
+        });
+      }
       gm("add-visit-modal").hide();
       callReloads();
       setTimeout(() => openDay(d), 300);
     } else toast(j.error || "Error", "error");
+  };
+
+  window.addDailyNote = async (pid, ds, inputId) => {
+    const input = document.getElementById(inputId);
+    const text = input?.value.trim();
+    if (!text) return;
+    const j = await api("add_daily_note", {
+      park_id: pid,
+      visit_date: ds,
+      note_text: text,
+    });
+    if (j.success) {
+      input.value = "";
+      openDay(ds);
+    } else toast(j.error || "Error", "error");
+  };
+
+  window.deleteDailyNote = (id, ds) => {
+    confirmModal(
+      "¿Estás seguro de que quieres eliminar esta nota de forma permanente?",
+      async () => {
+        const j = await api("delete_daily_note", { note_id: id });
+        if (j.success) {
+          openDay(ds);
+          toast("Nota eliminada correctamente");
+        } else toast(j.error || "Error", "error");
+      },
+      "Eliminar nota",
+      "#dc3545",
+    );
   };
 
   window.openLogRide = (pid, pn, ds, tid) => {
@@ -705,12 +962,19 @@
            </div>`
           : "";
 
+      const countdown = getTripCountdown(t.start_date, t.end_date);
+
       let h = `<div class="pro-trip-hero" style="background: #111;">
-              ${heroImg ? `<img src="${esc(heroImg)}" class="pro-trip-hero-img" onerror="this.style.opacity='0'">` : ''}
+              ${heroImg ? `<img src="${esc(heroImg)}" class="pro-trip-hero-img" onerror="this.onerror=null; this.src='${window.RCW_BASE_URL}/dummy.jpg';">` : ""}
           <div class="pro-trip-hero-overlay"></div>
           <div class="pro-trip-hero-content d-flex justify-content-between align-items-end w-100 flex-wrap gap-3">
               <div style="flex-grow:1; max-width:800px;">
-                  <h2 class="pro-trip-title">${esc(t.title)}</h2>
+                  <div class="d-flex align-items-center gap-3 mb-2 flex-wrap">
+                    <h2 class="pro-trip-title mb-0">${esc(t.title)}</h2>
+                    <span class="trip-countdown-pill ${countdown.customClass || ""}">
+                      ${countdown.text}
+                    </span>
+                  </div>
                   <div class="pro-trip-desc pe-4 mb-3">${esc(t.description || "Sin descripción")}</div>
                   
                   <div class="d-flex align-items-center gap-3 flex-wrap">
@@ -727,10 +991,14 @@
                   </div>
               </div>
               <div class="d-flex gap-2 flex-shrink-0 align-self-end">
-                  ${t.can_edit ? `
-                  <button class="btn btn-warning text-dark px-3" style="border-radius:4px; font-weight:700;" onclick="openEditTrip(${t.id})"><i class="fa-solid fa-pen me-2"></i>Editar</button>
-                  <button class="btn btn-outline-info px-3" style="border-radius:4px; font-weight:700;" onclick="openCollabs(${t.id})"><i class="fa-solid fa-users me-2"></i>Equipo</button>
-                  ` : ""}
+                  ${
+                    t.can_edit
+                      ? `
+                  <button class="btn-hero-action btn-hero-edit" onclick="openEditTrip(${t.id})"><i class="fa-solid fa-pen"></i><span>Editar</span></button>
+                  <button class="btn-hero-action btn-hero-team" onclick="openCollabs(${t.id})"><i class="fa-solid fa-users"></i><span>Equipo</span></button>
+                  `
+                      : ""
+                  }
               </div>
           </div>
       </div>`;
@@ -783,7 +1051,7 @@
                 <div class="pro-stat-header"><span class="pro-stat-label">Equipo</span><i class="fa-solid fa-users pro-stat-icon"></i></div>
                 <div class="pro-stat-value">${(t.collaborators ? t.collaborators.length : 0) + 1}</div>
                 <div class="pro-stat-footer d-flex align-items-center gap-1">`;
-      
+
       // Dueño siempre primero
       const ownerImg = resolveAvatar(t.owner_image);
       h += `<img src="${ownerImg}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;border:2px solid #a78bfa;" title="Creador: ${esc(t.owner_name)}">`;
@@ -1180,4 +1448,261 @@
       if (!dr.contains(e.target) && e.target !== inp) dr.style.display = "none";
     });
   }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const popularCountries = [
+      "España",
+      "Francia",
+      "Alemania",
+      "Italia",
+      "Reino Unido",
+      "Suecia",
+      "Dinamarca",
+      "Noruega",
+      "Finlandia",
+      "Países Bajos",
+      "Bélgica",
+      "Polonia",
+      "Suiza",
+      "Austria",
+      "Portugal",
+      "Estados Unidos",
+      "Canadá",
+      "Japón",
+      "China",
+    ];
+
+    const hiddenInput = document.getElementById("ct-countries");
+    const container = document.getElementById("ct-countries-container");
+    const visualInput = document.getElementById("ct-countries-input");
+    const dropdown = document.getElementById("ct-countries-dropdown");
+
+    if (!hiddenInput || !container || !visualInput || !dropdown) return;
+
+    let tags = [];
+
+    window.renderCountryTags = () => {
+      const currentVal = hiddenInput.value.trim();
+      tags = currentVal
+        ? currentVal
+            .split(",")
+            .map((t) => t.trim())
+            .filter((t) => t)
+        : [];
+      container.querySelectorAll(".badge").forEach((e) => e.remove());
+      tags.forEach((tag) => {
+        const pill = document.createElement("span");
+        pill.className =
+          "badge bg-success rounded-pill d-flex align-items-center gap-1 my-1 px-2 py-1";
+        pill.style.fontSize = "0.85rem";
+        pill.innerHTML = `${esc(tag)} <i class="fa-solid fa-xmark" style="cursor:pointer" onclick="window.removeCountryTag('${esc(tag)}')"></i>`;
+        container.insertBefore(pill, visualInput);
+      });
+    };
+
+    window.removeCountryTag = (tagToRemove) => {
+      tags = tags.filter((t) => t !== tagToRemove);
+      hiddenInput.value = tags.join(", ");
+      window.renderCountryTags();
+    };
+
+    window.addCountryTag = (tagToAdd) => {
+      tagToAdd = tagToAdd.trim();
+      if (tagToAdd && !tags.includes(tagToAdd)) {
+        tags.push(tagToAdd);
+        hiddenInput.value = tags.join(", ");
+      }
+      visualInput.value = "";
+      dropdown.style.display = "none";
+      window.renderCountryTags();
+      visualInput.focus();
+    };
+
+    visualInput.addEventListener("input", (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) {
+        dropdown.style.display = "none";
+        return;
+      }
+      const matches = popularCountries.filter(
+        (c) => c.toLowerCase().includes(q) && !tags.includes(c),
+      );
+      if (matches.length > 0) {
+        dropdown.innerHTML = matches
+          .map(
+            (c) =>
+              `<li><a class="dropdown-item" href="#" onclick="event.preventDefault(); window.addCountryTag('${escJS(c)}')">${c}</a></li>`,
+          )
+          .join("");
+        dropdown.style.display = "block";
+      } else {
+        dropdown.innerHTML = `<li><a class="dropdown-item text-success" href="#" onclick="event.preventDefault(); window.addCountryTag('${escJS(q)}')"><i class="fa-solid fa-plus me-2"></i>Añadir "${esc(q)}"</a></li>`;
+        dropdown.style.display = "block";
+      }
+    });
+
+    visualInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === ",") {
+        e.preventDefault();
+        if (visualInput.value.trim()) {
+          window.addCountryTag(visualInput.value);
+        }
+      } else if (
+        e.key === "Backspace" &&
+        visualInput.value === "" &&
+        tags.length > 0
+      ) {
+        window.removeCountryTag(tags[tags.length - 1]);
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!container.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.style.display = "none";
+      }
+    });
+
+    container.addEventListener("click", () => visualInput.focus());
+  });
+
+  window.openEditTrip = async (id) => {
+    gm("trip-detail-modal").hide();
+
+    const j = await api("detail&trip_id=" + id);
+    if (!j.success) {
+      toast("Error al cargar el viaje para edición", "error");
+      return;
+    }
+    const t = j.data;
+
+    document.getElementById("ct-title").value = t.title || "";
+    document.getElementById("ct-desc").value = t.description || "";
+
+    if (document.getElementById("ct-start")._flatpickr) {
+      document.getElementById("ct-start")._flatpickr.setDate(t.start_date);
+    } else {
+      document.getElementById("ct-start").value = t.start_date || "";
+    }
+
+    if (document.getElementById("ct-end")._flatpickr) {
+      document.getElementById("ct-end")._flatpickr.setDate(t.end_date);
+    } else {
+      document.getElementById("ct-end").value = t.end_date || "";
+    }
+
+    const manualCountries = t.parks_visited
+      ? t.parks_visited
+          .split(",")
+          .map((c) => c.trim())
+          .filter((c) => c)
+      : [];
+
+    const allRaw = [...(t.countries || []), ...manualCountries];
+    const uniqueMap = new Map();
+    allRaw.forEach((c) => {
+      const key = c
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+      if (!uniqueMap.has(key)) uniqueMap.set(key, c);
+    });
+    const allCountries = Array.from(uniqueMap.values());
+
+    document.getElementById("ct-countries").value = allCountries.join(", ");
+    if (window.renderCountryTags) window.renderCountryTags();
+
+    document
+      .getElementById("create-trip-modal")
+      .querySelector(".modal-title").innerHTML =
+      '<i class="fa-solid fa-pen me-2"></i>Editar Viaje';
+    document.getElementById("ct-submit-btn").innerHTML =
+      '<i class="fa-solid fa-save me-1"></i>Guardar Cambios';
+
+    window.currentEditTripId = id;
+    document.getElementById("ct-days-container").classList.add("d-none");
+
+    setTimeout(() => gm("create-trip-modal").show(), 300);
+  };
+
+  async function submitCreate() {
+    const title = document.getElementById("ct-title").value.trim(),
+      desc = document.getElementById("ct-desc").value.trim();
+    const start = document.getElementById("ct-start").value,
+      end = document.getElementById("ct-end").value;
+    const err = document.getElementById("ct-error");
+    if (!title || !start || !end) {
+      err.textContent = "Completa los campos obligatorios";
+      err.classList.remove("d-none");
+      return;
+    }
+    if (new Date(end) < new Date(start)) {
+      err.textContent = "La fecha fin debe ser posterior";
+      err.classList.remove("d-none");
+      return;
+    }
+    const countries = document.getElementById("ct-countries").value.trim();
+
+    try {
+      const btn = document.getElementById("ct-submit-btn");
+      const oldHtml = btn.innerHTML;
+      btn.innerHTML = '<div class="spinner-border spinner-border-sm"></div>';
+      btn.disabled = true;
+
+      let j;
+      if (window.currentEditTripId) {
+        j = await api("update", {
+          trip_id: window.currentEditTripId,
+          title,
+          description: desc,
+          start_date: start,
+          end_date: end,
+          parks_visited: countries,
+        });
+      } else {
+        const parks = [];
+        document.querySelectorAll(".ct-park-id-input").forEach((h) => {
+          if (h.value)
+            parks.push({
+              park_id: +h.value,
+              visit_date: h.dataset.date,
+              visit_order: +h.dataset.order,
+            });
+        });
+        j = await api("create", {
+          title,
+          description: desc,
+          start_date: start,
+          end_date: end,
+          countries,
+          parks,
+        });
+      }
+
+      btn.innerHTML = oldHtml;
+      btn.disabled = false;
+
+      if (j.success) {
+        gm("create-trip-modal").hide();
+        callReloads();
+        toast(
+          window.currentEditTripId
+            ? "Viaje actualizado"
+            : "Viaje creado correctamente",
+        );
+        if (window.currentEditTripId && window.openTrip)
+          window.openTrip(window.currentEditTripId);
+      } else {
+        err.textContent = j.error || "Error";
+        err.classList.remove("d-none");
+      }
+    } catch (e) {
+      err.textContent = "Error de red";
+      err.classList.remove("d-none");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.getElementById("ct-submit-btn");
+    if (btn) btn.addEventListener("click", submitCreate);
+  });
 })();

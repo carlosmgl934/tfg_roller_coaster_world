@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../utils/SessionManager.php';
 require_once __DIR__ . '/../../database/db_conexion.php';
 require_once __DIR__ . '/../utils/ApiRouter.php';
 require_once __DIR__ . '/../utils/Response.php';
@@ -91,7 +91,7 @@ function listUsers(): void
 
         Response::success(['users' => $users, 'total' => $total, 'page' => $page, 'limit' => $limit]);
     } catch (PDOException $e) {
-        Response::error('Error al obtener usuarios: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -144,7 +144,7 @@ function updateUser(): void
 
         Response::success(['message' => 'Usuario actualizado correctamente.']);
     } catch (PDOException $e) {
-        Response::error('Error al actualizar usuario: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -247,7 +247,7 @@ function deleteUser(): void
         ]);
 
     } catch (PDOException $e) {
-        Response::error('Error al eliminar usuario: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -338,7 +338,7 @@ function deleteAvatar(): void
         }
 
     } catch (PDOException $e) {
-        Response::error('Error al eliminar foto de perfil: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -389,6 +389,6 @@ function updateAvatar(): void
         Response::success(['message' => 'Foto de perfil actualizada correctamente.']);
 
     } catch (PDOException $e) {
-        Response::error('Error al actualizar foto de perfil: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }

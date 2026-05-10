@@ -419,8 +419,9 @@ $(document).ready(function () {
 
     try {
       const res  = await fetch(`${BASE_URL}/api/php/users.php?action=${endpoint}`, {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
         body:    JSON.stringify({ invite_id: inviteId }),
       });
       const data = await res.json();
@@ -491,8 +492,9 @@ $(document).ready(function () {
 
     try {
       const res  = await fetch(`${BASE_URL}/api/php/users.php?action=${endpoint}`, {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
         body:    JSON.stringify({ invite_id: inviteId }),
       });
       const data = await res.json();
@@ -529,11 +531,10 @@ $(document).ready(function () {
       endpoint = "reject_remove_friend";
 
     try {
-      const res = await fetch(
-        `${BASE_URL}/api/php/users.php?action=${endpoint}`,
-        {
+      const res = await fetch(`${BASE_URL}/api/php/users.php?action=${endpoint}`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
           body: JSON.stringify({ target_id: targetId }),
         },
       );
@@ -574,11 +575,10 @@ $(document).ready(function () {
       .html('<span class="spinner-border spinner-border-sm"></span>');
 
     try {
-      const res = await fetch(
-        `${BASE_URL}/api/php/users.php?action=reject_remove_friend`,
-        {
+      const res = await fetch(`${BASE_URL}/api/php/users.php?action=reject_remove_friend`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
           body: JSON.stringify({ target_id: targetId }),
         },
       );
@@ -612,8 +612,9 @@ $(document).ready(function () {
 
     try {
       const res = await fetch(`${BASE_URL}/api/php/trips.php?action=respond_invite`, {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
         body:    JSON.stringify({ invite_id: inviteId, accept: accept }),
       });
       const data = await res.json();

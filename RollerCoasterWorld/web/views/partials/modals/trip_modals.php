@@ -193,3 +193,56 @@
         </div>
     </div>
 </div>
+
+<!-- ══ MODAL: Crear/Editar Viaje ══════════════════════════════════════ -->
+<div class="modal fade" id="create-trip-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content rounded-0">
+            <div class="modal-header bg-success text-white rounded-0">
+                <h5 class="modal-title fw-bold mb-0"><i class="fa-solid fa-plus-circle me-2"></i>Nuevo Viaje</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small mb-3"><span class="text-danger fw-bold">*</span> Campos obligatorios</p>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Nombre del viaje <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control rounded-0" id="ct-title" placeholder="Ej: Verano Europa 2026" maxlength="150">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Descripción</label>
+                    <textarea class="form-control rounded-0" id="ct-desc" rows="2" placeholder="Describe tu viaje..."></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Países visitados</label>
+                    <input type="hidden" id="ct-countries">
+                    <div id="ct-countries-container" class="form-control rounded-0 d-flex flex-wrap gap-1 p-1 align-items-center" style="min-height: 38px; cursor: text;">
+                        <input type="text" id="ct-countries-input" class="border-0 bg-transparent flex-grow-1 px-1" style="outline: none; min-width: 120px;" placeholder="Escribe y pulsa Enter..." autocomplete="off">
+                    </div>
+                    <div class="position-relative">
+                        <ul id="ct-countries-dropdown" class="dropdown-menu w-100 rounded-0 shadow-sm" style="max-height: 180px; overflow-y: auto; display: none;"></ul>
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="form-label fw-semibold">Fecha inicio <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control rounded-0" id="ct-start" placeholder="dd/mm/aaaa">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-semibold">Fecha fin <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control rounded-0" id="ct-end" placeholder="dd/mm/aaaa">
+                    </div>
+                </div>
+                <div id="ct-error" class="alert alert-danger border-0 rounded-0 d-none fw-bold small mt-3 mb-3" style="background-color: #dc3545 !important; color: #ffffff !important;"></div>
+                <div id="ct-days-container" class="d-none">
+                    <hr>
+                    <h6 class="fw-bold mb-3"><i class="fa-solid fa-map-location-dot text-success me-2"></i>Parques por día</h6>
+                    <div id="ct-days-list"></div>
+                </div>
+            </div>
+            <div class="modal-footer rounded-0">
+                <button type="button" class="btn btn-outline-secondary rounded-0 px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success rounded-0 px-4 fw-bold" id="ct-submit-btn"><i class="fa-solid fa-plus me-1"></i>Crear Viaje</button>
+            </div>
+        </div>
+    </div>
+</div>

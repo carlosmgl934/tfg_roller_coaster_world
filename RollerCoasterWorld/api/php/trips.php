@@ -2,10 +2,13 @@
 /**
  * api/php/trips.php — API completa de Viajes / Agenda
  */
-session_start();
+require_once __DIR__ . '/utils/SessionManager.php';
 require_once __DIR__ . '/../database/db_conexion.php';
 require_once __DIR__ . '/utils/Response.php';
+require_once __DIR__ . '/utils/RateLimiter.php';
 header('Content-Type: application/json');
+
+RateLimiter::check('trips_api', 120, 60);
 
 $uid = $_SESSION['firebase_uid'] ?? null;
 if (!$uid) {
@@ -55,6 +58,8 @@ try {
         $action === 'invite_collaborator' && $method === 'POST' => inviteCollaborator($db, $userId, $body),
         $action === 'respond_invite' && $method === 'POST' => respondInvite($db, $userId, $body),
         $action === 'remove_collaborator' && $method === 'POST' => removeCollaborator($db, $userId, $body),
+        $action === 'add_daily_note' && $method === 'POST' => addDailyNote($db, $userId, $body),
+        $action === 'delete_daily_note' && $method === 'POST' => deleteDailyNote($db, $userId, $body),
         default => Response::error("Acción no soportada: $action", 400),
     };
 } catch (Exception $e) {
@@ -65,7 +70,8 @@ try {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function canEditTrip(DBConexion $db, int $tripId, int $userId): bool
 {
-    $isAdmin = $_SESSION['is_admin'] ?? false;
+    // Corregido: la sesión usa 'user_rol', no 'is_admin'
+    $isAdmin = isset($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
     if ($isAdmin)
         return true;
 
@@ -164,7 +170,13 @@ function tripDetail(DBConexion $db, int $userId): void
 function calendarEvents(DBConexion $db, int $userId): void
 {
     $events = [];
-    // Trip parks: un evento por día por parque (no barras spanning)
+    // 1. Obtener los viajes para rellenar los días vacíos
+    $tripsStmt = $db->prepare("SELECT id, title, start_date, end_date FROM trips WHERE user_id=? OR id IN (SELECT trip_id FROM trip_collaborators WHERE user_id=? AND status='accepted')");
+    $tripsStmt->execute([$userId, $userId]);
+    $trips = $tripsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // 2. Trip parks: un evento por día por parque
+    $filledDays = [];
     $s = $db->prepare("SELECT tp.id, tp.visit_date, tp.visit_order, p.park_name, p.imagen_url, t.id as trip_id, t.title as trip_title
         FROM trip_parks tp
         JOIN parks p ON p.id=tp.park_id
@@ -173,6 +185,7 @@ function calendarEvents(DBConexion $db, int $userId): void
         ORDER BY tp.visit_date, tp.visit_order");
     $s->execute([$userId, $userId]);
     foreach ($s->fetchAll(PDO::FETCH_ASSOC) as $tp) {
+        $filledDays[$tp['trip_id']][$tp['visit_date']] = true;
         $events[] = [
             'id' => 'tp_' . $tp['id'],
             'title' => $tp['park_name'],
@@ -184,6 +197,31 @@ function calendarEvents(DBConexion $db, int $userId): void
             'visit_order' => (int) $tp['visit_order'],
             'imagen_url' => $tp['imagen_url']
         ];
+    }
+
+    // 3. Rellenar los días del viaje que no tienen parque
+    foreach ($trips as $t) {
+        $start = new DateTime($t['start_date']);
+        $end = new DateTime($t['end_date']);
+        $end->modify('+1 day'); // Para incluir el último día en DatePeriod
+        $interval = new DateInterval('P1D');
+        $period = new DatePeriod($start, $interval, $end);
+
+        foreach ($period as $dt) {
+            $dateStr = $dt->format('Y-m-d');
+            if (!isset($filledDays[$t['id']][$dateStr])) {
+                $events[] = [
+                    'id' => 'empty_' . $t['id'] . '_' . $dateStr,
+                    'title' => 'Día de viaje',
+                    'start' => $dateStr,
+                    'end' => $dateStr,
+                    'type' => 'trip_empty',
+                    'trip_id' => (int) $t['id'],
+                    'trip_title' => $t['title'],
+                    'imagen_url' => ''
+                ];
+            }
+        }
     }
     // Visitas sueltas
     $s2 = $db->prepare("SELECT dv.*, p.park_name, p.imagen_url FROM daily_visits dv JOIN parks p ON p.id=dv.park_id WHERE dv.user_id=?");
@@ -441,13 +479,24 @@ function dayDetail(DBConexion $db, int $userId): void
         array_column($visits, 'park_id')
     )));
     $coastersByPark = [];
+    $notesByPark = [];
     if (!empty($parkIds)) {
         $placeholders = implode(',', array_fill(0, count($parkIds), '?'));
+        
+        // Coasters
         $sc = $db->prepare("SELECT id,coaster_name,imagen_url,park_id FROM coasters
             WHERE park_id IN($placeholders) AND coaster_status = 'Operating' ORDER BY coaster_name");
         $sc->execute($parkIds);
         foreach ($sc->fetchAll(PDO::FETCH_ASSOC) as $c) {
             $coastersByPark[(int) $c['park_id']][] = $c;
+        }
+
+        // Notes
+        $sn = $db->prepare("SELECT id, note_text, created_at, park_id FROM daily_notes 
+            WHERE user_id = ? AND visit_date = ? AND park_id IN($placeholders) ORDER BY created_at ASC");
+        $sn->execute(array_merge([$userId, $date], $parkIds));
+        foreach ($sn->fetchAll(PDO::FETCH_ASSOC) as $n) {
+            $notesByPark[(int) $n['park_id']][] = $n;
         }
     }
 
@@ -457,6 +506,7 @@ function dayDetail(DBConexion $db, int $userId): void
             'trip_parks' => $tripParks,
             'rides' => $rides,
             'coasters_by_park' => $coastersByPark,
+            'notes_by_park' => $notesByPark,
             'can_edit' => $canEdit
         ]
     ]);
@@ -502,6 +552,14 @@ function createTrip(DBConexion $db, int $userId, array $body): void
         return;
     }
 
+    // Verificar solapamiento
+    $chk = $db->prepare("SELECT COUNT(*) FROM trips WHERE (user_id=? OR id IN (SELECT trip_id FROM trip_collaborators WHERE user_id=? AND status='accepted')) AND start_date <= ? AND end_date >= ?");
+    $chk->execute([$userId, $userId, $end, $start]);
+    if ((int)$chk->fetchColumn() > 0) {
+        Response::error('Ya tienes otro viaje programado que coincide con estas fechas', 409);
+        return;
+    }
+
     $db->beginTransaction();
     $s = $db->prepare("INSERT INTO trips(user_id,title,description,start_date,end_date,trip_type,parks_visited) VALUES(?,?,?,?,?,'manual',?) RETURNING id");
     $s->execute([$userId, $title, $desc, $start, $end, $countries]);
@@ -525,6 +583,22 @@ function updateTrip(DBConexion $db, int $userId, array $body): void
     if (!$tripId || !canEditTrip($db, $tripId, $userId)) {
         Response::error('Sin permisos', 403);
         return;
+    }
+
+    if (isset($body['start_date']) || isset($body['end_date'])) {
+        $currS = $db->prepare("SELECT start_date, end_date FROM trips WHERE id=?");
+        $currS->execute([$tripId]);
+        $curr = $currS->fetch(PDO::FETCH_ASSOC);
+        
+        $newStart = $body['start_date'] ?? $curr['start_date'];
+        $newEnd = $body['end_date'] ?? $curr['end_date'];
+        
+        $chk = $db->prepare("SELECT COUNT(*) FROM trips WHERE (user_id=? OR id IN (SELECT trip_id FROM trip_collaborators WHERE user_id=? AND status='accepted')) AND id != ? AND start_date <= ? AND end_date >= ?");
+        $chk->execute([$userId, $userId, $tripId, $newEnd, $newStart]);
+        if ((int)$chk->fetchColumn() > 0) {
+            Response::error('Ya tienes otro viaje programado que coincide con estas nuevas fechas', 409);
+            return;
+        }
     }
     $fields = [];
     $params = [];
@@ -614,6 +688,7 @@ function removeParkDay(DBConexion $db, int $userId, array $body): void
         return;
     }
     $db->prepare("DELETE FROM ride_log WHERE user_id=? AND park_id=? AND visit_date=? AND trip_id=?")->execute([$userId, $tp['park_id'], $tp['visit_date'], $tp['trip_id']]);
+    $db->prepare("DELETE FROM daily_notes WHERE user_id=? AND park_id=? AND visit_date=?")->execute([$userId, $tp['park_id'], $tp['visit_date']]);
     $db->prepare("DELETE FROM trip_parks WHERE id=?")->execute([$id]);
     Response::success(['message' => 'Parque eliminado del día']);
 }
@@ -654,6 +729,19 @@ function logRide(DBConexion $db, int $userId, array $body): void
     }
 
     $id = (int) $s->fetchColumn();
+
+    // AUTO-ADD A TOP PERSONAL (user_credits) SI NO EXISTE
+    $chkCred = $db->prepare("SELECT COUNT(*) FROM user_credits WHERE user_id=? AND coaster_id=?");
+    $chkCred->execute([$userId, $coasterId]);
+    if ((int) $chkCred->fetchColumn() === 0) {
+        $sRank = $db->prepare("SELECT COALESCE(MAX(rank_position), 0) FROM user_credits WHERE user_id=?");
+        $sRank->execute([$userId]);
+        $maxRank = (int) $sRank->fetchColumn();
+        
+        $insCred = $db->prepare("INSERT INTO user_credits(user_id, coaster_id, rank_position) VALUES(?, ?, ?)");
+        $insCred->execute([$userId, $coasterId, $maxRank + 1]);
+    }
+
     Response::success(['data' => ['ride_id' => $id, 'first_time' => $firstTime], 'message' => 'Ride registrado']);
 }
 
@@ -679,6 +767,26 @@ function addDailyVisit(DBConexion $db, int $userId, array $body): void
         Response::error('park_id requerido', 422);
         return;
     }
+
+    // Comprobar si la fecha cae dentro de un viaje activo (propio o como colaborador)
+    $stmt = $db->prepare("SELECT id FROM trips WHERE start_date <= ? AND end_date >= ? AND (user_id = ? OR id IN (SELECT trip_id FROM trip_collaborators WHERE user_id = ? AND status='accepted')) ORDER BY start_date DESC LIMIT 1");
+    $stmt->execute([$date, $date, $userId, $userId]);
+    $activeTripId = $stmt->fetchColumn();
+
+    if ($activeTripId) {
+        // Añadir al viaje en lugar de daily_visits
+        $so = $db->prepare("SELECT COALESCE(MAX(visit_order), 0) + 1 FROM trip_parks WHERE trip_id = ? AND visit_date = ?");
+        $so->execute([$activeTripId, $date]);
+        $order = $so->fetchColumn();
+
+        $db->prepare("INSERT INTO trip_parks(trip_id, park_id, visit_date, visit_order) VALUES(?,?,?,?)")
+            ->execute([$activeTripId, $parkId, $date, $order]);
+
+        Response::success(['message' => 'Parque añadido al viaje activo']);
+        return;
+    }
+
+    // Si no hay viaje, registrar como visita diaria normal
     $db->prepare("INSERT INTO daily_visits(user_id,park_id,visit_date,notes) VALUES(?,?,?,?) ON CONFLICT(user_id,park_id,visit_date) DO NOTHING")
         ->execute([$userId, $parkId, $date, $notes]);
     Response::success(['message' => 'Visita registrada']);
@@ -698,6 +806,7 @@ function removeDailyVisit(DBConexion $db, int $userId, array $body): void
     $v = $s->fetch(PDO::FETCH_ASSOC);
     if ($v) {
         $db->prepare("DELETE FROM ride_log WHERE user_id=? AND park_id=? AND visit_date=? AND trip_id IS NULL")->execute([$userId, $v['park_id'], $v['visit_date']]);
+        $db->prepare("DELETE FROM daily_notes WHERE user_id=? AND park_id=? AND visit_date=?")->execute([$userId, $v['park_id'], $v['visit_date']]);
         $db->prepare("DELETE FROM daily_visits WHERE id=? AND user_id=?")->execute([$id, $userId]);
     }
     Response::success(['message' => 'Visita eliminada']);
@@ -777,4 +886,30 @@ function removeCollaborator(DBConexion $db, int $userId, array $body): void
     }
     $db->prepare("DELETE FROM trip_collaborators WHERE trip_id=? AND user_id=?")->execute([$tripId, $targetId]);
     Response::success(['message' => 'Colaborador eliminado']);
+}
+
+// ── DAILY NOTES ──────────────────────────────────────────────────────────────
+function addDailyNote(DBConexion $db, int $userId, array $body): void
+{
+    $parkId = (int) ($body['park_id'] ?? 0);
+    $date = $body['visit_date'] ?? '';
+    $text = trim($body['note_text'] ?? '');
+    if (!$parkId || !$date || !$text) {
+        Response::error('Campos requeridos', 422);
+        return;
+    }
+    $db->prepare("INSERT INTO daily_notes(user_id,park_id,visit_date,note_text) VALUES(?,?,?,?)")
+        ->execute([$userId, $parkId, $date, $text]);
+    Response::success(['message' => 'Nota añadida']);
+}
+
+function deleteDailyNote(DBConexion $db, int $userId, array $body): void
+{
+    $noteId = (int) ($body['note_id'] ?? 0);
+    if (!$noteId) {
+        Response::error('note_id requerido', 422);
+        return;
+    }
+    $db->prepare("DELETE FROM daily_notes WHERE id=? AND user_id=?")->execute([$noteId, $userId]);
+    Response::success(['message' => 'Nota eliminada']);
 }

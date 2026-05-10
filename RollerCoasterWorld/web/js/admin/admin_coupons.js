@@ -3,7 +3,8 @@ const API_URL = window.ADMIN_COUPONS_API;
 async function apiPost(url, data) {
   const fd = new FormData();
   Object.entries(data).forEach(([k,v]) => fd.append(k, v));
-  const r = await fetch(url, { method: 'POST', body: fd, credentials: 'include' });
+  const r = await fetch(url, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: 'POST', body: fd, credentials: 'include' } );
   return r.json();
 }
 async function apiGet(url) {

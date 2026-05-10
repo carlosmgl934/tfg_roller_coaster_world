@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../utils/SessionManager.php';
 require_once __DIR__ . '/../../database/db_conexion.php';
 require_once __DIR__ . '/../utils/Response.php';
 require_once __DIR__ . '/../utils/ApiRouter.php';
@@ -31,7 +31,7 @@ function listCoupons() {
         $coupons = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Response::success(['data' => $coupons]);
     } catch (Exception $e) {
-        Response::error('Error al obtener cupones: ' . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -71,7 +71,7 @@ function createCoupon() {
         if ($e->getCode() == 23505) { // Unique violation Postgres
             Response::error('El código de cupón ya existe');
         }
-        Response::error('Error: ' . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -86,7 +86,7 @@ function toggleCoupon() {
         $stmt->execute([':active' => $active, ':id' => $id]);
         Response::success(['message' => 'Estado actualizado']);
     } catch (Exception $e) {
-        Response::error('Error: ' . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -100,6 +100,6 @@ function deleteCoupon() {
         $stmt->execute([':id' => $id]);
         Response::success(['message' => 'Cupón eliminado']);
     } catch (Exception $e) {
-        Response::error('Error: ' . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }

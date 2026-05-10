@@ -816,9 +816,37 @@
   object-fit: cover;
   transition: opacity 0.3s ease;
 }
+/* Dual images for multi-park days */
+.day-detail-hero-dual-1,
+.day-detail-hero-dual-2 {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.day-detail-hero-dual-1 {
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+.day-detail-hero-dual-2 {
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+.day-detail-hero-dual-sep {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom right,
+    transparent calc(50% - 1px),
+    rgba(0, 0, 0, 0.55) 50%,
+    transparent calc(50% + 1px)
+  );
+}
 .day-detail-hero-overlay {
   position: absolute;
   inset: 0;
+  z-index: 2;
   background: linear-gradient(
     to top,
     rgba(13, 17, 23, 0.95) 0%,
@@ -982,23 +1010,41 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 .pro-stat-card {
-  background: #1c2128;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-left: 4px solid var(--accent-color, #10b981);
-  border-radius: 6px;
-  padding: 1.25rem;
-  height: 110px; /* Más compacto, tipo stat chip */
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-top: 2px solid var(--accent-color, #10b981);
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem 1rem;
+  height: 105px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.22s ease;
   cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+.pro-stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: radial-gradient(
+    ellipse at top left,
+    rgba(255, 255, 255, 0.03) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
 }
 .pro-stat-card:hover {
-  background: #22272e;
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-3px);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 .pro-stat-header {
   display: flex;
@@ -1007,28 +1053,30 @@
   width: 100%;
 }
 .pro-stat-icon {
-  font-size: 1.1rem;
-  opacity: 0.5;
+  font-size: 0.9rem;
+  opacity: 0.35;
   color: var(--accent-color, #10b981);
 }
 .pro-stat-label {
-  font-size: 0.65rem;
-  font-weight: 800;
+  font-size: 0.6rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #8b949e;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.38);
 }
 .pro-stat-value {
-  font-size: 2.4rem;
-  font-weight: 900;
+  font-size: 2rem;
+  font-weight: 800;
   color: #fff;
   line-height: 1;
-  margin: 0.2rem 0;
+  letter-spacing: -0.03em;
 }
 .pro-stat-footer {
-  font-size: 0.7rem;
-  color: #6e7681;
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.28);
   font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -1085,6 +1133,7 @@
 .pro-timeline-overlay {
   position: absolute;
   inset: 0;
+  z-index: 3;
   background: linear-gradient(
     to top,
     rgba(0, 0, 0, 0.9) 0%,
@@ -1332,5 +1381,264 @@
   .day-coaster-time {
     width: 85px !important;
     font-size: 0.75rem !important;
+  }
+}
+
+/* ── UPCOMING TRIPS & NOTES ENHANCEMENTS ─────────────────────── */
+#upcoming-trips-grid {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+#upcoming-trips-grid::-webkit-scrollbar {
+  height: 6px;
+}
+#upcoming-trips-grid::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.4);
+  border-radius: 10px;
+}
+#upcoming-trips-grid::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.day-note-item {
+  transition: all 0.2s ease;
+  border: none !important;
+  background: transparent !important;
+}
+.day-note-item:hover {
+  transform: translateX(4px);
+}
+.day-note-item .btn-link {
+  transition: opacity 0.2s;
+}
+.day-note-item:hover .btn-link {
+  opacity: 1 !important;
+}
+
+/* ── FLATPICKR PREMIUM DARK THEME OVERRIDES ─────────────────── */
+.flatpickr-calendar {
+  background: var(--rcw-bg-card) !important;
+  border: 1px solid var(--rcw-border) !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5) !important;
+  border-radius: 8px !important;
+  font-family: "Outfit", sans-serif !important;
+}
+.flatpickr-calendar.arrowTop:after,
+.flatpickr-calendar.arrowTop:before {
+  border-bottom-color: var(--rcw-bg-card) !important;
+}
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.selected.inRange,
+.flatpickr-day.startRange.inRange,
+.flatpickr-day.endRange.inRange,
+.flatpickr-day.selected:focus,
+.flatpickr-day.startRange:focus,
+.flatpickr-day.endRange:focus,
+.flatpickr-day.selected:hover,
+.flatpickr-day.startRange:hover,
+.flatpickr-day.endRange:hover,
+.flatpickr-day.selected.prevMonthDay,
+.flatpickr-day.startRange.prevMonthDay,
+.flatpickr-day.endRange.prevMonthDay,
+.flatpickr-day.selected.nextMonthDay,
+.flatpickr-day.startRange.nextMonthDay,
+.flatpickr-day.endRange.nextMonthDay {
+  background: var(--rcw-green-neon) !important;
+  border-color: var(--rcw-green-neon) !important;
+  color: #000 !important;
+  font-weight: 700 !important;
+}
+.flatpickr-day.today {
+  border-color: var(--rcw-green-dim) !important;
+}
+.flatpickr-day.today:hover {
+  background: var(--rcw-green-dim) !important;
+  color: #fff !important;
+}
+.flatpickr-day:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+  background: var(--rcw-bg-card) !important;
+}
+.flatpickr-months .flatpickr-month {
+  color: #fff !important;
+  fill: #fff !important;
+}
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month {
+  color: #fff !important;
+  fill: #fff !important;
+}
+.flatpickr-weekday {
+  color: var(--rcw-text-muted) !important;
+  font-weight: 700 !important;
+}
+.flatpickr-time {
+  border-top: 1px solid var(--rcw-border) !important;
+}
+.flatpickr-time input:hover,
+.flatpickr-time .flatpickr-am-pm:hover,
+.flatpickr-time input:focus,
+.flatpickr-time .flatpickr-am-pm:focus {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* ── TRIP COUNTDOWN PILL ─────────────────────────────────────── */
+.trip-countdown-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.28rem 0.7rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-radius: 4px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+  backdrop-filter: blur(6px);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.trip-countdown-pill::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+.trip-countdown-urgent {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #fbbf24;
+  animation: countdownPulse 1.5s ease-in-out infinite;
+}
+.trip-countdown-done {
+  background: rgba(148, 163, 184, 0.07);
+  border-color: rgba(148, 163, 184, 0.18);
+  color: #64748b;
+}
+.trip-countdown-active {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #10b981;
+}
+@keyframes countdownPulse {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: none;
+  }
+  50% {
+    opacity: 0.75;
+    box-shadow: 0 0 8px rgba(251, 191, 36, 0.3);
+  }
+}
+
+/* ── HERO ACTION BUTTONS ─────────────────────────────────────── */
+.btn-hero-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+  line-height: 1;
+}
+.btn-hero-action:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+.btn-hero-action:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+.btn-hero-action i {
+  font-size: 0.72rem;
+  opacity: 0.8;
+}
+.btn-hero-edit {
+  background: rgba(251, 191, 36, 0.09);
+  border-color: rgba(251, 191, 36, 0.28);
+  color: #fbbf24;
+}
+.btn-hero-edit:hover {
+  background: rgba(251, 191, 36, 0.17);
+  border-color: rgba(251, 191, 36, 0.48);
+  color: #fcd34d;
+}
+.btn-hero-team {
+  background: rgba(99, 102, 241, 0.09);
+  border-color: rgba(99, 102, 241, 0.28);
+  color: #a5b4fc;
+}
+.btn-hero-team:hover {
+  background: rgba(99, 102, 241, 0.17);
+  border-color: rgba(99, 102, 241, 0.48);
+  color: #c7d2fe;
+}
+
+/* ── DAY TECH BAR MULTI-PARK ─────────────────────────────────── */
+.day-tech-bar-multi {
+  flex-wrap: nowrap;
+  gap: 0;
+  padding: 0;
+  align-items: stretch;
+}
+.day-tech-park-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem 1.25rem;
+  flex: 1;
+  min-width: 0;
+}
+.day-tech-park-name {
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.45);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.day-tech-park-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+}
+.day-tech-divider {
+  width: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  align-self: stretch;
+  flex-shrink: 0;
+}
+@media (max-width: 576px) {
+  .day-tech-bar-multi {
+    flex-direction: column;
+    gap: 0;
+  }
+  .day-tech-divider {
+    width: auto;
+    height: 1px;
   }
 }

@@ -22,9 +22,8 @@ $(document).ready(function () {
       $("#loading-spinner").show();
       $("#empty-state").addClass("d-none");
       try {
-        const res = await fetch(
-          `${BASE_URL}/api/php/admin/admin_photos.php?action=getPendingPhotos`,
-          { credentials: "include" },
+        const res = await fetch(`${BASE_URL}/api/php/admin/admin_photos.php?action=getPendingPhotos`, { 
+                credentials: "include" },
         );
         const data = await res.json();
         if (data.success) {
@@ -111,9 +110,8 @@ $(document).ready(function () {
     $container.on("click", ".btn-approve", async function () {
       const tarjeta = $(this).closest(".col-12");
       const photoId = $(this).data("id");
-      const res = await fetch(
-        `${BASE_URL}/api/php/admin/admin_photos.php?action=approvePhoto&id=${photoId}`,
-        { method: "POST", credentials: "include" },
+      const res = await fetch(`${BASE_URL}/api/php/admin/admin_photos.php?action=approvePhoto&id=${photoId}`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST", credentials: "include" },
       );
       const data = await res.json();
       if (data.success) {
@@ -130,15 +128,14 @@ $(document).ready(function () {
     $container.on("click", ".btn-reject", async function () {
       const tarjeta = $(this).closest(".col-12");
       const photoId = $(this).data("id");
-      const res = await fetch(
-        `${BASE_URL}/api/php/admin/admin_photos.php?action=rejectPhoto&id=${photoId}`,
-        { method: "POST", credentials: "include" },
+      const res = await fetch(`${BASE_URL}/api/php/admin/admin_photos.php?action=rejectPhoto&id=${photoId}`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST", credentials: "include" },
       );
       const data = await res.json();
       if (data.success) {
         tarjeta.fadeOut(300, function () {
           $(this).remove();
-        });
+        } );
         let newCount = Math.max(0, parseInt($("#pending-count").text()) - 1);
         $("#pending-count").text(newCount);
         if (newCount === 0) $("#empty-state").removeClass("d-none");
@@ -152,9 +149,8 @@ $(document).ready(function () {
       btn
         .prop("disabled", true)
         .html('<i class="fa-solid fa-spinner fa-spin"></i>');
-      const res = await fetch(
-        `${BASE_URL}/api/php/admin/admin_photos.php?action=clearCaption&id=${photoId}`,
-        { method: "POST", credentials: "include" },
+      const res = await fetch(`${BASE_URL}/api/php/admin/admin_photos.php?action=clearCaption&id=${photoId}`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST", credentials: "include" },
       );
       const data = await res.json();
       if (data.success) {
@@ -169,7 +165,7 @@ $(document).ready(function () {
           .prop("disabled", false)
           .html('<i class="fa-solid fa-trash-can"></i>');
       }
-    });
+    } );
 
     // Buscador en tiempo real
     $("#search-pending").on("input", function () {
@@ -613,7 +609,8 @@ $(document).ready(function () {
           `${BASE_URL}/api/php/admin/admin_coasters.php?action=bulkDeleteCoasters`,
           {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
             body: JSON.stringify({ coasterIds: Array.from(selectedCoasters) }),
           },
         );
@@ -644,11 +641,10 @@ $(document).ready(function () {
         .prop("disabled", true)
         .html('<i class="fa-solid fa-spinner fa-spin"></i>');
       try {
-        const res = await fetch(
-          `${BASE_URL}/api/php/admin/admin_coasters.php?action=deleteCoaster`,
-          {
+        const res = await fetch(`${BASE_URL}/api/php/admin/admin_coasters.php?action=deleteCoaster`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
             body: JSON.stringify({ coasterId: id }),
           },
         );
@@ -1275,6 +1271,9 @@ $(document).ready(function () {
 
           const uploadRes = await fetch(`${BASE_URL}/api/php/upload.php`, {
             method: "POST",
+            headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? ''
+            },
             body: uploadForm,
           });
           const uploadData = await uploadRes.json();
@@ -1289,9 +1288,8 @@ $(document).ready(function () {
           formData.append("imagenUrl", existingImg);
         }
 
-        const response = await fetch(
-          `${BASE_URL}/api/php/admin/admin_coasters.php?action=addCoaster`,
-          {
+        const response = await fetch(`${BASE_URL}/api/php/admin/admin_coasters.php?action=addCoaster`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
             method: "POST",
             body: formData,
           },
@@ -1332,7 +1330,7 @@ $(document).ready(function () {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-plus me-2"></i>Añadir coaster';
       }
-    });
+    } );
 
   function showModalError(msg) {
     const container = document.getElementById("add-coaster-messages");
@@ -1796,7 +1794,8 @@ $(document).ready(function () {
           url = `${BASE_URL}/api/php/admin/admin_parks.php?${params}`;
         }
 
-        const res = await fetch(url, { credentials: "include" });
+        const res = await fetch(url, { 
+                credentials: "include" });
         const data = await res.json();
 
         if (data.success) {
@@ -1870,9 +1869,8 @@ $(document).ready(function () {
       try {
         const fd = new FormData();
         fd.append("id", id);
-        const res = await fetch(
-          `${BASE_URL}/api/php/admin/admin_parks.php?action=deletePark`,
-          {
+        const res = await fetch(`${BASE_URL}/api/php/admin/admin_parks.php?action=deletePark`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
             method: "POST",
             credentials: "include",
             body: fd,
@@ -1913,9 +1911,8 @@ $(document).ready(function () {
       try {
         const fd = new FormData();
         fd.append("id", id);
-        const res = await fetch(
-          `${BASE_URL}/api/php/admin/admin_parks.php?action=duplicatePark`,
-          {
+        const res = await fetch(`${BASE_URL}/api/php/admin/admin_parks.php?action=duplicatePark`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
             method: "POST",
             credentials: "include",
             body: fd,
@@ -1936,7 +1933,7 @@ $(document).ready(function () {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-copy me-1"></i>Duplicar';
       }
-    });
+    } );
 
   }
 
@@ -2020,7 +2017,8 @@ $(document).ready(function () {
         '<div class="text-center text-muted py-3"><div class="spinner-border spinner-border-sm text-success"></div> Cargando...</div>';
       try {
         const url = `${BASE_URL}/api/php/admin/admin_parks.php?action=unknownCoasters${q ? "&q=" + encodeURIComponent(q) : ""}`;
-        const res = await fetch(url, { credentials: "include" });
+        const res = await fetch(url, { 
+                credentials: "include" });
         const data = await res.json();
         if (!data.success) throw new Error(data.error);
 
@@ -2206,9 +2204,8 @@ $(document).ready(function () {
             formData.append("image", imageFile);
           }
 
-          const res = await fetch(
-            `${BASE_URL}/api/php/admin/admin_parks.php?action=addPark`,
-            {
+          const res = await fetch(`${BASE_URL}/api/php/admin/admin_parks.php?action=addPark`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
               method: "POST",
               credentials: "include",
               body: formData,
@@ -2299,7 +2296,8 @@ $(document).ready(function () {
         '<div class="text-center text-muted py-3"><div class="spinner-border spinner-border-sm text-primary"></div> Cargando...</div>';
       try {
         const url = `${BASE_URL}/api/php/admin/admin_parks.php?action=getParkCoasters&park_id=${parkId}${q ? "&q=" + encodeURIComponent(q) : ""}`;
-        const res = await fetch(url, { credentials: "include" });
+        const res = await fetch(url, { 
+                credentials: "include" });
         const data = await res.json();
         if (!data.success) throw new Error(data.error);
         window.renderEditCoastersList(
@@ -2540,9 +2538,8 @@ $(document).ready(function () {
           fd.append("coasterIds", coasterIds);
           if (imgFile) fd.append("image", imgFile);
 
-          const res = await fetch(
-            `${BASE_URL}/api/php/admin/admin_parks.php?action=editPark`,
-            {
+          const res = await fetch(`${BASE_URL}/api/php/admin/admin_parks.php?action=editPark`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
               method: "POST",
               credentials: "include",
               body: fd,
@@ -2649,9 +2646,7 @@ $(document).ready(function () {
       // Cargamos datos y abrimos el modal directamente
       (async () => {
         try {
-          const res = await fetch(
-            `${BASE_URL}/api/php/admin/admin_parks.php?action=getPark&id=${parkId}`,
-            { credentials: "include" },
+          const res = await fetch(`${BASE_URL}/api/php/admin/admin_parks.php?action=getPark&id=${parkId}`, { credentials: "include" },
           );
           const data = await res.json();
           if (!data.success) {
@@ -2736,7 +2731,8 @@ $(document).ready(function () {
           {
             method: "POST",
             credentials: "include",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
             body: JSON.stringify({ coasterId }),
           },
         );
@@ -3095,6 +3091,9 @@ if (_confirmEditCoaster) {
 
         const uploadRes = await fetch(`${BASE_URL}/api/php/upload.php`, {
           method: "POST",
+          headers: {
+              'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? ''
+          },
           body: uploadForm,
         });
         const uploadData = await uploadRes.json();
@@ -3105,9 +3104,8 @@ if (_confirmEditCoaster) {
         }
       }
 
-      const response = await fetch(
-        `${BASE_URL}/api/php/admin/admin_coasters.php?action=updateCoaster`,
-        { method: "POST", body: formData },
+      const response = await fetch(`${BASE_URL}/api/php/admin/admin_coasters.php?action=updateCoaster`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST", body: formData },
       );
 
       let data = {};
@@ -3150,7 +3148,7 @@ if (_confirmEditCoaster) {
       btn.innerHTML =
         '<i class="fa-solid fa-arrows-rotate me-2"></i>Actualizar Atracción';
     }
-  });
+  } );
 }
 
 /****************************************
@@ -3182,9 +3180,8 @@ window.loadAdminNews = async function (page) {
       featured: featured,
     });
 
-    const res = await fetch(
-      `${BASE_URL}/api/php/admin/admin_news.php?${params}`,
-      {
+    const res = await fetch(`${BASE_URL}/api/php/admin/admin_news.php?${params}`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
         credentials: "include",
       },
     );
@@ -3405,9 +3402,8 @@ if ($("#admin-news-list").length) {
     btn.prop("disabled", true).text("Guardando...");
 
     try {
-      const res = await fetch(
-        `${BASE_URL}/api/php/admin/admin_news.php?action=${action}`,
-        {
+      const res = await fetch(`${BASE_URL}/api/php/admin/admin_news.php?action=${action}`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
           method: "POST",
           body: formData,
         },
@@ -3446,9 +3442,8 @@ if ($("#admin-news-list").length) {
     const btn = $(this);
     const id = btn.attr("data-id");
     try {
-      const res = await fetch(
-        `${BASE_URL}/api/php/admin/admin_news.php?action=deleteNews&id=${id}`,
-        { method: "POST" },
+      const res = await fetch(`${BASE_URL}/api/php/admin/admin_news.php?action=deleteNews&id=${id}`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST" },
       );
       const data = await res.json();
       if (data.success) {
@@ -3460,7 +3455,7 @@ if ($("#admin-news-list").length) {
     } catch (err) {
       console.error("Error deleting news:", err);
     }
-  });
+  } );
 
 function showNewsModalError(msg) {
   const container = document.getElementById("news-form-messages");
@@ -3545,7 +3540,8 @@ function clearNewsErrors() {
       if (year) params.set("year", year);
 
       try {
-        const res = await fetch(`${BASE_URL}/api/php/parks.php?${params}`, {
+        const res = await fetch(`${BASE_URL}/api/php/parks.php?${params}`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
           credentials: "include",
         });
         const data = await res.json();
@@ -3869,7 +3865,8 @@ function clearNewsErrors() {
       if (imageFile) fd.append("image", imageFile);
 
       try {
-        const res = await fetch(`${parksApi}`, {
+        const res = await fetch(`${parksApi}`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
           method: "POST",
           body: fd,
           credentials: "include",
@@ -4015,11 +4012,12 @@ function clearNewsErrors() {
         .html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Guardando...');
 
       try {
-        const res = await fetch(`${parksApi}`, {
+        const res = await fetch(`${parksApi}`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
           method: "POST",
           body: fd,
           credentials: "include",
-        });
+        } );
         const data = await res.json();
         document
           .getElementById("edit-park-messages")
@@ -4071,11 +4069,12 @@ function clearNewsErrors() {
         const fd = new FormData();
         fd.append("action", "deletePark");
         fd.append("id", id);
-        const res = await fetch(`${parksApi}`, {
+        const res = await fetch(`${parksApi}`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
           method: "POST",
           body: fd,
           credentials: "include",
-        });
+        } );
         const data = await res.json();
         if (data.success) {
           bootstrap.Modal.getInstance(
@@ -4114,11 +4113,12 @@ function clearNewsErrors() {
         const fd = new FormData();
         fd.append("action", "duplicatePark");
         fd.append("id", id);
-        const res = await fetch(`${parksApi}`, {
+        const res = await fetch(`${parksApi}`, { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
           method: "POST",
           body: fd,
           credentials: "include",
-        });
+        } );
         const data = await res.json();
         if (data.success) {
           bootstrap.Modal.getInstance(

@@ -254,7 +254,8 @@ $(document).ready(function () {
 
         $.ajax({
             url:         `${window.BASE_URL}/api/php/admin/gestion_users.php?action=update`,
-            method:      'POST',
+            method: 'POST',
+            headers:     { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
             data:        JSON.stringify({
                 id:       $('#edit-user-id').val(),
                 username: $('#edit-username').val().trim(),
@@ -294,7 +295,8 @@ $(document).ready(function () {
 
         $.ajax({
             url:         `${window.BASE_URL}/api/php/admin/gestion_users.php?action=delete_avatar`,
-            method:      'POST',
+            method: 'POST',
+            headers:     { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
             data:        JSON.stringify({ id: $('#edit-user-id').val() }),
             contentType: 'application/json',
             success(res) {
@@ -374,7 +376,13 @@ $(document).ready(function () {
             formData.append("file", compressedBlob, filename);
             formData.append("bucket", "avatars");
 
-            const uploadRes = await fetch(`${window.BASE_URL}/api/php/upload.php`, { method: "POST", body: formData });
+            const uploadRes = await fetch(`${window.BASE_URL}/api/php/upload.php`, { 
+                method: "POST", 
+                headers: {
+                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? ''
+                },
+                body: formData 
+            });
             const uploadData = await uploadRes.json();
             
             if (!uploadData.success) throw new Error(uploadData.error || "Error al subir la foto");
@@ -383,6 +391,7 @@ $(document).ready(function () {
             $.ajax({
                 url: `${window.BASE_URL}/api/php/admin/gestion_users.php?action=update_avatar`,
                 method: 'POST',
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
                 data: JSON.stringify({ id: $('#edit-user-id').val(), photo_url: uploadData.url }),
                 contentType: 'application/json',
                 success(res) {
@@ -426,7 +435,8 @@ $(document).ready(function () {
 
         $.ajax({
             url:         `${window.BASE_URL}/api/php/admin/gestion_users.php?action=delete`,
-            method:      'POST',
+            method: 'POST',
+            headers:     { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
             data:        JSON.stringify({ id }),
             contentType: 'application/json',
             success(res) {

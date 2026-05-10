@@ -160,7 +160,12 @@
                 form.append('path',   'carousel');
 
                 const upRes  = await fetch(BASE_URL + '/api/php/upload.php', {
-                    method: 'POST', body: form, credentials: 'include'
+                    method: 'POST', 
+                    headers: {
+                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? ''
+                    },
+                    body: form, 
+                    credentials: 'include'
                 });
                 const upData = await upRes.json();
 
@@ -169,11 +174,10 @@
                     return;
                 }
 
-                const saveRes  = await fetch(
-                    BASE_URL + '/api/php/admin/admin_carousel.php?action=update',
-                    {
-                        method:  'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                const saveRes  = await fetch(BASE_URL + '/api/php/admin/admin_carousel.php?action=update', {
+                        method: 'POST',
+                        headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', 'Content-Type': 'application/json' },
                         body:    JSON.stringify({ position: _cropSlotPos, image_url: upData.url }),
                         credentials: 'include',
                     }

@@ -245,11 +245,10 @@ $(document).ready(function () {
         };
 
         try {
-          const res = await fetch(
-            `${BASE_URL}/api/php/users.php?action=${endpointMap[action]}`,
-            {
+          const res = await fetch(`${BASE_URL}/api/php/users.php?action=${endpointMap[action]}`, {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
               body: JSON.stringify({ target_id: targetId }),
             },
           );
@@ -563,11 +562,10 @@ $(document).ready(function () {
       .html('<span class="spinner-border spinner-border-sm"></span>');
 
     try {
-      const res = await fetch(
-        `${BASE_URL}/api/php/users.php?action=reject_remove_friend`,
-        {
+      const res = await fetch(`${BASE_URL}/api/php/users.php?action=reject_remove_friend`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
           body: JSON.stringify({ target_id: targetId }),
         },
       );

@@ -191,10 +191,12 @@ $(document).ready(function () {
     btn.addEventListener("click", function (e) {
       e.preventDefault();
       // Vaciar carrito + destruir sesión PHP + cerrar sesión Firebase
-      fetch(BASE + "/api/php/tickets.php?action=clear_cart", { method: "POST", credentials: "include" })
+      fetch(BASE + "/api/php/tickets.php?action=clear_cart", { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST", credentials: "include" } )
         .catch(() => {})
         .finally(() => {
-          fetch(BASE + "/api/php/auth/logout.php", { method: "POST" }).finally(() => {
+          fetch(BASE + "/api/php/auth/logout.php", { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST" } ).finally(() => {
             window.auth.signOut().then(() => {
               window.location.href = BASE + "/web/views/auth/login.php";
             });
@@ -228,7 +230,9 @@ $(document).ready(function () {
             <h3 class="fw-bold mb-3">Revisa tu correo</h3>
             <p class="text-muted mb-4">
               Hemos enviado un enlace de verificación a <br><strong>${user.email}</strong>.<br><br>
-              Haz clic en el enlace para activar tu cuenta. Esta ventana te iniciará sesión automáticamente cuando lo hagas.
+              Haz clic en el enlace para activar tu cuenta.<br>
+              <span class="text-warning fw-bold">⚠️ Revisa tu carpeta de SPAM o correo no deseado por si acaso.</span><br><br>
+              Esta ventana te iniciará sesión automáticamente cuando lo hagas.
             </p>
             <div class="spinner-border text-success" role="status">
               <span class="visually-hidden">Esperando verificación...</span>
@@ -260,7 +264,8 @@ $(document).ready(function () {
       // Sincronizar con Supabase en paralelo (no bloqueante)
       fetch(BASE + "/api/php/auth/auth.php", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
         body: JSON.stringify({
           id_token: idToken,
           username: user.displayName || user.email.split("@")[0],
@@ -276,7 +281,8 @@ $(document).ready(function () {
 
       fetch(BASE + "/api/php/auth/save_session.php", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
         body: JSON.stringify({ firebase_uid: user.uid, email: user.email }),
       })
         .then((r) => r.json())
@@ -328,7 +334,8 @@ $(document).ready(function () {
         user.getIdToken().then((idToken) => {
           fetch(BASE + "/api/php/auth/auth.php", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
             body: JSON.stringify({
               id_token: idToken,
               username: document.getElementById("username") ? document.getElementById("username").value.trim() : (user.displayName || user.email.split("@")[0]),
@@ -390,7 +397,8 @@ $(document).ready(function () {
             .then(() => {
               fetch(BASE + "/api/php/auth/delete_user.php", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
                 body: JSON.stringify({ firebase_uid: user.uid }),
               }).catch((e) => console.error("Error borrando de Supabase:", e));
               showAlert("Cuenta eliminada correctamente.");
@@ -485,7 +493,8 @@ $(document).ready(function () {
             .then(() => {
               fetch(BASE + "/api/php/auth/delete_user.php", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
                 body: JSON.stringify({ firebase_uid: user.uid }),
               }).catch((e) => console.error("Error borrando de Supabase:", e));
               showAlert("Cuenta eliminada correctamente.");
@@ -500,7 +509,8 @@ $(document).ready(function () {
         user.getIdToken().then((idToken) => {
           fetch(BASE + "/api/php/auth/auth.php", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
             body: JSON.stringify({
               id_token: idToken,
               username: user.displayName || user.email.split("@")[0],
@@ -515,7 +525,8 @@ $(document).ready(function () {
 
           fetch(BASE + "/api/php/auth/save_session.php", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
             body: JSON.stringify({ firebase_uid: user.uid, email: user.email }),
           })
             .then((r) => r.json())
@@ -550,7 +561,8 @@ $(document).ready(function () {
         user.getIdToken().then((idToken) => {
           fetch(BASE + "/api/php/auth/auth.php", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
             body: JSON.stringify({
               id_token: idToken,
               username: user.displayName || user.email.split("@")[0],
@@ -565,7 +577,8 @@ $(document).ready(function () {
 
           fetch(BASE + "/api/php/auth/save_session.php", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
             body: JSON.stringify({ firebase_uid: user.uid, email: user.email }),
           })
             .then((r) => r.json())
@@ -675,7 +688,8 @@ $(document).ready(function () {
           .then(() => {
             fetch(BASE + "/api/php/auth/delete_user.php", {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
               body: JSON.stringify({ firebase_uid: user.uid }),
             })
               .then((r) => r.json())
@@ -691,7 +705,8 @@ $(document).ready(function () {
               showAlert(
                 "Por seguridad, necesitas volver a iniciar sesión antes de eliminar tu cuenta. Inicia sesión y la cuenta se eliminará automáticamente.",
               );
-              fetch(BASE + "/api/php/auth/logout.php", { method: "POST" }).finally(
+              fetch(BASE + "/api/php/auth/logout.php", { 
+                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST" } ).finally(
                 () => {
                   window.auth.signOut().then(() => {
                     window.location.href = BASE + "/web/views/auth/login.php";

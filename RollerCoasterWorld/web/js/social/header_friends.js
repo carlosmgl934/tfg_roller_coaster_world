@@ -152,7 +152,8 @@ $(document).ready(function () {
       try {
         const res = await fetch(`${BASE_URL}/api/php/users.php?action=friend_request`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
           body: JSON.stringify({ target_id: targetId })
         });
         const data = await res.json();
@@ -177,7 +178,8 @@ $(document).ready(function () {
       try {
         const res = await fetch(`${BASE_URL}/api/php/users.php?action=accept_friend`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
           body: JSON.stringify({ target_id: targetId })
         });
         const data = await res.json();

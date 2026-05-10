@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/utils/SessionManager.php';
 require_once __DIR__ . '/../database/db_conexion.php';
 require_once __DIR__ . '/utils/Response.php';
 require_once __DIR__ . '/utils/ApiRouter.php';
@@ -62,7 +62,7 @@ function getMyOrders() {
             'unnotified_refunds' => $unnotified
         ]);
     } catch (Exception $e) {
-        Response::error('Error al obtener pedidos: ' . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -94,7 +94,7 @@ function requestCancel() {
             Response::error('No es posible solicitar la cancelación de este pedido.', 400);
         }
     } catch (Exception $e) {
-        Response::error('Error: ' . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -109,6 +109,6 @@ function markRefundsNotified() {
         $stmt->execute([':uid' => $userId]);
         Response::success(['message' => 'Notificaciones actualizadas.']);
     } catch (Exception $e) {
-        Response::error('Error: ' . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }

@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/utils/SessionManager.php';
 
 // Asegurar que tenemos el user_id de la BD si hay sesión de Firebase
 if (isset($_SESSION['firebase_uid']) && !isset($_SESSION['user_id'])) {
@@ -493,7 +493,7 @@ function saveReview()
     } catch (Exception $e) {
         if ($db->inTransaction())
             $db->rollBack();
-        Response::error("Error al guardar la reseña: " . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -580,7 +580,7 @@ function updateReview()
         Response::success();
     } catch (Exception $e) {
         if ($db->inTransaction()) $db->rollBack();
-        Response::error('Error al actualizar reseña: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -604,7 +604,7 @@ function getTopGlobalParks()
         $parks = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Response::success(['data' => $parks]);
     } catch (Exception $e) {
-        Response::error("Error al obtener el top global de parques: " . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -731,7 +731,7 @@ function getUserParkTops()
         Response::success(['data' => $users]);
     } catch (Exception $e) {
         error_log('getUserParkTops error: ' . $e->getMessage());
-        Response::error('Error al obtener los tops de parques: ' . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -759,7 +759,7 @@ function getParkPhotos()
 
         Response::success(['data' => $photos]);
     } catch (Exception $e) {
-        Response::error('Error al obtener fotos: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -797,7 +797,7 @@ function addParkPhoto()
 
         Response::success(['message' => 'Foto guardada correctamente.']);
     } catch (Exception $e) {
-        Response::error('Error al guardar la foto: ' . $e->getMessage());
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -841,7 +841,7 @@ function getRanking()
             'total' => $total
         ]);
     } catch (Exception $e) {
-        Response::error('Error al obtener el ranking global: ' . $e->getMessage(), 500);
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
