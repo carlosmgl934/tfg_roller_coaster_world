@@ -331,40 +331,28 @@ $(document).ready(function () {
           : `${BASE_URL}/web/views/public/parks/parks.php?id=${item.id}`;
         const rank = parseInt(item.rank_position) || index + 1;
         const title = isCoaster ? item.coaster_name : item.park_name;
-        
-        const isMobile = window.innerWidth < 768;
-        // Solo colapsamos por defecto en móvil para ahorrar espacio inicial
-        const shouldCollapse = isMobile;
-        const cardHeight = shouldCollapse ? "85px" : "140px";
+        const subtitle = isCoaster 
+          ? `${item.park_name || ""} · ${item.park_country || item.country_name || ""}`
+          : (item.park_country || item.country_name || "");
 
         const html = `
           <div class="mb-2">
             <a href="${link}" class="top-card d-flex align-items-stretch text-decoration-none shadow-sm" 
-               style="height:${cardHeight}; transition: height 0.2s ease-out; overflow: hidden; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
-              <div class="rank-img-container" style="width:${cardHeight}; height:${cardHeight}; flex-shrink:0; position:relative; transition: all 0.2s ease-out;">
-                <img src="${imgUrl}" alt="${title}" class="w-100 h-100 object-fit-cover" style="height:${cardHeight};" onerror="this.src='${fallbackImage}'">
-                <span class="rank-badge" style="position:absolute; top:5px; left:5px; background:var(--rcw-green); color:white; font-size: 0.65rem; padding: 2px 6px; font-weight:bold; border-radius:2px;">#${rank}</span>
+               style="height:90px; overflow: hidden; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 0;">
+              <div class="rank-img-container" style="width:90px; height:90px; flex-shrink:0; position:relative;">
+                <img src="${imgUrl}" alt="${title}" class="w-100 h-100 object-fit-cover" onerror="this.src='${fallbackImage}'">
+                <div style="position:absolute; top:0; left:0; background:var(--rcw-green); color:white; font-size: 0.85rem; padding: 4px 8px; font-weight:900; font-family:var(--rcw-font-title);">#${rank}</div>
               </div>
-              <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center position-relative" style="width: 0; min-width: 0;">
-                <button class="btn btn-sm btn-toggle-stats text-secondary p-0 position-absolute" style="top:8px; right:12px; z-index:10; width:24px; height:24px; background: rgba(255,255,255,0.05); border-radius:50%;" title="Ver detalles">
-                  <i class="fa-solid fa-${shouldCollapse ? "plus" : "minus"}"></i>
-                </button>
-                <div class="mb-1 pe-4">
-                  <div class="fw-bold text-white text-truncate" style="font-family: var(--rcw-font-title); font-size: 0.95rem; width: 100%;">${title}</div>
-                  <small class="text-muted text-truncate d-block" style="font-size: 0.72rem; width: 100%;">
-                    ${isCoaster ? (item.manufacturer || "Desconocido") : (item.park_location || "Desconocida")} · ${item.park_country || item.country_name || ""}
+              <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center" style="width: 0; min-width: 0;">
+                <div class="pe-2">
+                  <div class="fw-bold text-white text-truncate" style="font-family: var(--rcw-font-title); font-size: 1.05rem; width: 100%; letter-spacing: -0.02em;">${title}</div>
+                  <small class="text-muted text-truncate d-block mt-1" style="font-size: 0.8rem; width: 100%; opacity: 0.7;">
+                    ${subtitle}
                   </small>
                 </div>
-                <div class="stats-expandable ${shouldCollapse ? "d-none" : ""} d-flex gap-2 flex-wrap mt-1">
-                   ${isCoaster ? `
-                    <small class="badge bg-dark border border-secondary border-opacity-25 text-light fw-normal" style="font-size:0.65rem;"><i class="fa-solid fa-ruler-vertical text-success me-1"></i>${item.height || "0"}m</small>
-                    <small class="badge bg-dark border border-secondary border-opacity-25 text-light fw-normal" style="font-size:0.65rem;"><i class="fa-solid fa-bolt text-warning me-1"></i>${item.speed || "0"}km/h</small>
-                    <small class="badge bg-dark border border-secondary border-opacity-25 text-light fw-normal" style="font-size:0.65rem;"><i class="fa-solid fa-industry text-info me-1"></i>${item.manufacturer || "N/A"}</small>
-                   ` : `
-                    <small class="badge bg-dark border border-secondary border-opacity-25 text-light fw-normal" style="font-size:0.65rem;"><i class="fa-solid fa-bolt text-success me-1"></i>${item.operating_coasters || "0"} coasters</small>
-                    <small class="badge bg-dark border border-secondary border-opacity-25 text-light fw-normal" style="font-size:0.65rem;"><i class="fa-solid fa-star text-warning me-1"></i>${item.stars || "0.00"}</small>
-                   `}
-                </div>
+              </div>
+              <div class="d-flex align-items-center pe-3 opacity-25">
+                 <i class="fa-solid fa-chevron-right fs-6"></i>
               </div>
             </a>
           </div>`;
