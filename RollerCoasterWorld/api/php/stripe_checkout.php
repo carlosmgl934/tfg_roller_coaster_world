@@ -10,14 +10,26 @@
 require_once __DIR__ . '/utils/SessionManager.php';
 require_once __DIR__ . '/../database/db_conexion.php';
 require_once __DIR__ . '/utils/Response.php';
-require_once __DIR__ . '/../../vendor/autoload.php';
+// Intentar encontrar vendor/autoload.php subiendo niveles
+$autoloadPath = __DIR__ . '/../../vendor/autoload.php';
+if (!file_exists($autoloadPath)) {
+    $autoloadPath = __DIR__ . '/../../../vendor/autoload.php';
+}
+if (file_exists($autoloadPath)) {
+    require_once $autoloadPath;
+} else {
+    die("Autoload no encontrado.");
+}
 
 define('CART_TTL', 15 * 60);
 
 header('Content-Type: application/json');
 
-// ── Leer .env ────────────────────────────────────────────────────────────────
+// ── Leer .env (ruta flexible) ────────────────────────────────────────────────
 $envFile = __DIR__ . '/../../.env';
+if (!file_exists($envFile)) {
+    $envFile = __DIR__ . '/../../../.env';
+}
 $env = [];
 if (file_exists($envFile)) {
     foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
@@ -308,6 +320,9 @@ function sendTicketsByEmailStripe(string $email, string $name, array $orderIds, 
 {
     try {
         $envFile = __DIR__ . '/../../.env';
+        if (!file_exists($envFile)) {
+            $envFile = __DIR__ . '/../../../.env';
+        }
         $env = [];
         if (file_exists($envFile)) {
             foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
@@ -324,6 +339,9 @@ function sendTicketsByEmailStripe(string $email, string $name, array $orderIds, 
         }
 
         $autoload = __DIR__ . '/../../vendor/autoload.php';
+        if (!file_exists($autoload)) {
+            $autoload = __DIR__ . '/../../../vendor/autoload.php';
+        }
         if (!file_exists($autoload)) return;
         require_once $autoload;
 
