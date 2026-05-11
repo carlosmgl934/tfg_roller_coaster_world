@@ -1033,15 +1033,16 @@ $(document).ready(function () {
       } else {
         const isRankSort = sort === "rank_position";
         const detailUrl = `${BASE_URL}/web/views/public/parks/parks.php?id=${item.park_id}`;
-        
+
         // Estrellas
         const starsVal = parseFloat(item.stars) || 0;
-        const starsHtml = starsVal > 0 
-          ? `<div class="d-flex align-items-center gap-1 text-warning fw-bold" style="font-size:0.9rem;">
+        const starsHtml =
+          starsVal > 0
+            ? `<div class="d-flex align-items-center gap-1 text-warning fw-bold" style="font-size:0.9rem;">
                <span>${starsVal.toFixed(1)}</span>
                <i class="fa-solid fa-star" style="font-size:0.75rem;"></i>
-             </div>` 
-          : "";
+             </div>`
+            : "";
 
         container.append(`
           <div class="${colClass} mb-3">
@@ -1078,11 +1079,15 @@ $(document).ready(function () {
                   ${item.operating_coasters ? `<small class="badge bg-dark border border-secondary text-info fw-normal px-2 py-1"><i class="fa-solid fa-ticket me-1"></i>${item.operating_coasters} coasters</small>` : ""}
                 </div>
 
-                ${isRankSort ? `
+                ${
+                  isRankSort
+                    ? `
                 <button class="btn btn-sm btn-toggle-stats text-muted p-0 mt-2 d-flex align-items-center gap-1" style="font-size: 0.7rem; background:transparent; border:none;">
                    <i class="fa-solid fa-plus-circle"></i>
                    <span>Ver detalles</span>
-                </button>` : ""}
+                </button>`
+                    : ""
+                }
               </div>
 
               <!-- Acceso rápido -->
@@ -2268,8 +2273,8 @@ $(document).ready(function () {
       if (r.tags && r.tags.length > 0) {
         tagsHtml = '<div class="d-flex flex-wrap gap-1 mt-2 mb-2">';
         r.tags.forEach((t) => {
-          const cls = t.type === "pro" ? "success" : "danger";
-          tagsHtml += `<span class="badge bg-${cls} text-white rounded-pill px-2 py-0" style="font-weight:600;font-size:0.6rem;opacity:0.8;">${t.tag.replace(/_/g, " ").toUpperCase()}</span>`;
+          const bgColor = t.type === "pro" ? "#05c46b" : "#ff3f34";
+          tagsHtml += `<span class="badge text-white rounded-pill px-2 py-1" style="background-color:${bgColor}; font-weight:600; font-size:0.65rem;">${t.tag.replace(/_/g, " ").toUpperCase()}</span>`;
         });
         tagsHtml += "</div>";
       }

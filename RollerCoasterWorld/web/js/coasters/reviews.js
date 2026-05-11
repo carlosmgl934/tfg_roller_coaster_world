@@ -228,8 +228,8 @@ $(document).ready(function () {
     if (review.tags && review.tags.length > 0) {
       tagsHtml = '<div class="d-flex flex-wrap gap-2 mt-2 mb-2">';
       review.tags.forEach((t) => {
-        const cls = t.type === "pro" ? "success" : "danger";
-        tagsHtml += `<span class="badge bg-${cls} text-white rounded-pill px-3 py-1" style="font-weight:600;font-size:0.75rem;">${t.tag.replace(/_/g, " ").toUpperCase()}</span>`;
+        const bgColor = t.type === "pro" ? "#05c46b" : "#ff3f34";
+        tagsHtml += `<span class="badge text-white rounded-pill px-3 py-1" style="background-color:${bgColor}; font-weight:600; font-size:0.75rem;">${t.tag.replace(/_/g, " ").toUpperCase()}</span>`;
       });
       tagsHtml += "</div>";
     }
