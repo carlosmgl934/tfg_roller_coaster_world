@@ -1138,6 +1138,7 @@ $(document).ready(function () {
     }
 
     // ── Lógica modal de edición de reseña (coasters) ─────────────────────────
+    // SFTP Sync Trigger
     let editReviewModal = null;
     const editModalEl = document.getElementById("edit-review-modal");
     if (editModalEl && typeof bootstrap !== "undefined") {
@@ -1148,17 +1149,32 @@ $(document).ready(function () {
     let editContrasChoices = null;
 
     function initEditChoices() {
-      if (!editProsChoices && document.getElementById("edit-pros-select")) {
-        editProsChoices = new Choices("#edit-pros-select", {
-          removeItemButton: true,
-          placeholderValue: "Selecciona las ventajas...",
-        });
-      }
-      if (!editContrasChoices && document.getElementById("edit-contras-select")) {
-        editContrasChoices = new Choices("#edit-contras-select", {
-          removeItemButton: true,
-          placeholderValue: "Selecciona las contras...",
-        });
+      try {
+        if (typeof Choices === "undefined") {
+          console.error("Choices.js not loaded!");
+          return;
+        }
+        if (!editProsChoices && document.getElementById("edit-pros-select")) {
+          editProsChoices = new Choices("#edit-pros-select", {
+            removeItemButton: true,
+            placeholderValue: "Selecciona las ventajas...",
+            noChoicesText: "No hay más opciones",
+            itemSelectText: "Presiona para seleccionar",
+          });
+        }
+        if (
+          !editContrasChoices &&
+          document.getElementById("edit-contras-select")
+        ) {
+          editContrasChoices = new Choices("#edit-contras-select", {
+            removeItemButton: true,
+            placeholderValue: "Selecciona las contras...",
+            noChoicesText: "No hay más opciones",
+            itemSelectText: "Presiona para seleccionar",
+          });
+        }
+      } catch (e) {
+        console.error("Error initializing Choices.js:", e);
       }
     }
 
@@ -1184,18 +1200,22 @@ $(document).ready(function () {
       initEditChoices();
       const rawTags = $(this).attr("data-tags") || "[]";
       let tags = [];
-      try { tags = JSON.parse(rawTags); } catch(e) { tags = []; }
+      try {
+        tags = JSON.parse(rawTags);
+      } catch (e) {
+        tags = [];
+      }
 
       if (tags && tags.length > 0) {
-          const pros = tags.filter(t => t.type === 'pro').map(t => t.tag);
-          const contras = tags.filter(t => t.type === 'con').map(t => t.tag);
-          editProsChoices.removeActiveItems();
-          editProsChoices.setChoiceByValue(pros);
-          editContrasChoices.removeActiveItems();
-          editContrasChoices.setChoiceByValue(contras);
+        const pros = tags.filter((t) => t.type === "pro").map((t) => t.tag);
+        const contras = tags.filter((t) => t.type === "con").map((t) => t.tag);
+        editProsChoices.removeActiveItems();
+        editProsChoices.setChoiceByValue(pros);
+        editContrasChoices.removeActiveItems();
+        editContrasChoices.setChoiceByValue(contras);
       } else {
-          editProsChoices.removeActiveItems();
-          editContrasChoices.removeActiveItems();
+        editProsChoices.removeActiveItems();
+        editContrasChoices.removeActiveItems();
       }
 
       if (editReviewModal) editReviewModal.show();
@@ -1225,8 +1245,8 @@ $(document).ready(function () {
       // Añadir tags
       const pros = editProsChoices.getValue(true);
       const contras = editContrasChoices.getValue(true);
-      pros.forEach(p => fd.append('pros[]', p));
-      contras.forEach(c => fd.append('contras[]', c));
+      pros.forEach((p) => fd.append("pros[]", p));
+      contras.forEach((c) => fd.append("contras[]", c));
 
       try {
         const res = await fetch(

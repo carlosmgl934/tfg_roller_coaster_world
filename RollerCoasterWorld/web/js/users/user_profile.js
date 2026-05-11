@@ -329,16 +329,23 @@ $(document).ready(function () {
         const link = isCoaster
           ? `${BASE_URL}/web/views/public/coasters/coasters.php?id=${item.id}`
           : `${BASE_URL}/web/views/public/parks/parks.php?id=${item.id}`;
-        
+
         const rank = parseInt(item.rank_position) || index + 1;
         const title = isCoaster ? item.coaster_name : item.park_name;
-        
+
         // Colores de ranking sutiles
         let badgeBg = "rgba(0,0,0,0.85)";
         let badgeColor = "#fff";
-        if (rank === 1) { badgeBg = "#FFD700"; badgeColor = "#000"; }
-        else if (rank === 2) { badgeBg = "#C0C0C0"; badgeColor = "#000"; }
-        else if (rank === 3) { badgeBg = "#CD7F32"; badgeColor = "#000"; }
+        if (rank === 1) {
+          badgeBg = "#FFD700";
+          badgeColor = "#000";
+        } else if (rank === 2) {
+          badgeBg = "#C0C0C0";
+          badgeColor = "#000";
+        } else if (rank === 3) {
+          badgeBg = "#CD7F32";
+          badgeColor = "#000";
+        }
 
         // PARQUE · PAÍS — el campo del parque en coasters viene como 'location' de la API
         const parkName = item.location || "";
@@ -751,7 +758,6 @@ $(document).ready(function () {
     // Estado inicial: ordenar por más reciente (newest)
     sortSelect.val("newest").trigger("change");
   }
-
   // ─── VIAJES ──────────────────────────────────────────────────
   async function loadTrips(targetId) {
     const container = $("#trips-grid");

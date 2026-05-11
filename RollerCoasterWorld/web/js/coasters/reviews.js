@@ -23,16 +23,23 @@ $(document).ready(function () {
     }, 300);
   });
 
-  sortSelect.on("change", () => { currentPage = 1; loadReviews(); });
+  sortSelect.on("change", () => {
+    currentPage = 1;
+    loadReviews();
+  });
 
   btnSortOrder.on("click", function () {
     let currentOrder = $(this).attr("data-order");
     if (currentOrder === "desc") {
       $(this).attr("data-order", "asc");
-      iconSortOrder.removeClass("fa-arrow-down-short-wide").addClass("fa-arrow-up-wide-short");
+      iconSortOrder
+        .removeClass("fa-arrow-down-short-wide")
+        .addClass("fa-arrow-up-wide-short");
     } else {
       $(this).attr("data-order", "desc");
-      iconSortOrder.removeClass("fa-arrow-up-wide-short").addClass("fa-arrow-down-short-wide");
+      iconSortOrder
+        .removeClass("fa-arrow-up-wide-short")
+        .addClass("fa-arrow-down-short-wide");
     }
     currentPage = 1;
     loadReviews();
@@ -129,18 +136,30 @@ $(document).ready(function () {
     const right = Math.min(totalPages, currentPage + delta);
 
     if (left > 1) {
-      ul.append(`<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`);
-      if (left > 2) ul.append(`<li class="page-item disabled"><span class="page-link">…</span></li>`);
+      ul.append(
+        `<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`,
+      );
+      if (left > 2)
+        ul.append(
+          `<li class="page-item disabled"><span class="page-link">…</span></li>`,
+        );
     }
 
     for (let p = left; p <= right; p++) {
       const active = p === currentPage ? "active" : "";
-      ul.append(`<li class="page-item ${active}"><a class="page-link" href="#" data-page="${p}">${p}</a></li>`);
+      ul.append(
+        `<li class="page-item ${active}"><a class="page-link" href="#" data-page="${p}">${p}</a></li>`,
+      );
     }
 
     if (right < totalPages) {
-      if (right < totalPages - 1) ul.append(`<li class="page-item disabled"><span class="page-link">…</span></li>`);
-      ul.append(`<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">${totalPages}</a></li>`);
+      if (right < totalPages - 1)
+        ul.append(
+          `<li class="page-item disabled"><span class="page-link">…</span></li>`,
+        );
+      ul.append(
+        `<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">${totalPages}</a></li>`,
+      );
     }
 
     // Botón Siguiente
@@ -156,7 +175,8 @@ $(document).ready(function () {
     // Info de resultados
     const start = (currentPage - 1) * LIMIT + 1;
     const end = Math.min(currentPage * LIMIT, totalReviews);
-    const info = $(`<span class="text-secondary ms-3 align-self-center" style="font-size:0.85rem;">
+    const info =
+      $(`<span class="text-secondary ms-3 align-self-center" style="font-size:0.85rem;">
       Mostrando ${start}–${end} de ${totalReviews} reseñas
     </span>`);
 
@@ -169,7 +189,10 @@ $(document).ready(function () {
       if (isNaN(page) || page < 1 || page > totalPages) return;
       currentPage = page;
       fetchReviews();
-      $("html, body").animate({ scrollTop: reviewContainer.offset().top - 80 }, 300);
+      $("html, body").animate(
+        { scrollTop: reviewContainer.offset().top - 80 },
+        300,
+      );
     });
   }
 
@@ -210,7 +233,6 @@ $(document).ready(function () {
       });
       tagsHtml += "</div>";
     }
-
     const reviewText = review.review
       ? `"${review.review}"`
       : '<span class="fst-italic text-secondary">El usuario dejó una puntuación sin reseña escrita.</span>';

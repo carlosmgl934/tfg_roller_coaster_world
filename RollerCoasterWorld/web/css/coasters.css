@@ -316,14 +316,26 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
 /* ============================================================
    CONTRAS MULTIPLE CHOICES (OVERRIDE A ROJO)
    ============================================================ */
-.wrapper-contras .choices__list--multiple .choices__item {
-  background-color: #dc3545 !important;
-  border-color: #bb2d3b !important;
-  color: #fff !important;
+.wrapper-pros .choices__inner, .wrapper-pros .choices__list--multiple .choices__item {
+    background-color: #05c46b !important;
+    border-color: #05c46b !important;
 }
-.wrapper-contras .choices__list--multiple .choices__button {
-  border-left-color: rgba(255, 255, 255, 0.2) !important;
-  opacity: 0.9;
+
+.wrapper-contras .choices__inner, .wrapper-contras .choices__list--multiple .choices__item {
+    background-color: #ff3f34 !important;
+    border-color: #ff3f34 !important;
+}
+
+.choices__list--multiple .choices__item {
+    border-radius: 20px !important;
+    padding: 3px 10px !important;
+    font-weight: 600 !important;
+}
+
+.choices__inner {
+    background-color: rgba(0,0,0,0.2) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 8px !important;
 }
 
 /* ============================================================
@@ -651,4 +663,14 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
     padding: 4px 8px !important;
     font-size: 0.75rem !important;
   }
+}
+.hover-green { transition: color 0.2s ease; }
+.hover-green:hover { color: var(--rcw-green-neon) !important; }
+
+.hover-opacity-100:hover { opacity: 1 !important; }
+
+.top-card:hover {
+    background: rgba(255,255,255,0.06) !important;
+    border-color: rgba(255,255,255,0.2) !important;
+    transform: translateY(-2px);
 }

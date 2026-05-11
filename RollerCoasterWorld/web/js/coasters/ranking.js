@@ -37,7 +37,8 @@ $(document).ready(function () {
 
       let validImgUrl = coaster.imagen_url;
       if (validImgUrl && !validImgUrl.startsWith("http")) {
-        validImgUrl = BASE_URL + (validImgUrl.startsWith("/") ? "" : "/") + validImgUrl;
+        validImgUrl =
+          BASE_URL + (validImgUrl.startsWith("/") ? "" : "/") + validImgUrl;
       }
       const img = validImgUrl
         ? `<img src="${validImgUrl}" alt="${coaster.coaster_name}" class="rounded-0 shadow-sm" referrerpolicy="no-referrer" style="width:100px; height:100px; object-fit:cover; margin-right:20px;">`
@@ -53,24 +54,38 @@ $(document).ready(function () {
       const infoLine = infoParts.join(" • ");
 
       // Color del podio
-      const podiumColor = position === 1 ? "#FFD700"
-        : position === 2 ? "#C0C0C0"
-        : position === 3 ? "#CD7F32"
-        : "#6e7681";
+      const podiumColor =
+        position === 1
+          ? "#FFD700"
+          : position === 2
+            ? "#C0C0C0"
+            : position === 3
+              ? "#CD7F32"
+              : "#6e7681";
 
       const card = document.createElement("a");
-      card.href = BASE_URL + `/web/views/public/coasters/coasters.php?id=${coaster.id}`;
-      card.classList.add("list-group-item", "list-group-item-action", "d-flex", "flex-column", "flex-md-row", "align-items-center", "p-3", "gap-3");
-
+      card.href =
+        BASE_URL + `/web/views/public/coasters/coasters.php?id=${coaster.id}`;
+      card.classList.add(
+        "list-group-item",
+        "list-group-item-action",
+        "d-flex",
+        "flex-column",
+        "flex-md-row",
+        "align-items-center",
+        "p-3",
+        "gap-3",
+      );
       card.innerHTML = `
         <div class="d-flex align-items-center w-100 w-md-auto">
           <div class="flex-shrink-0 text-center me-3" style="width:30px;">
             <span class="fw-black" style="font-size:1.15rem; color:${podiumColor};">#${position}</span>
           </div>
           <div class="flex-shrink-0">
-            ${validImgUrl 
-              ? `<img src="${validImgUrl}" alt="${coaster.coaster_name}" class="rounded shadow-sm" referrerpolicy="no-referrer" style="width:80px; height:80px; object-fit:cover;">`
-              : `<img src="https://www.hussrides.com/fileadmin/_processed_/5/e/csm_giant-frisbee-cedarpoint-01_0697df513a.jpg" alt="Sin imagen" class="rounded shadow-sm" style="width:80px; height:80px; object-fit:cover;">`
+            ${
+              validImgUrl
+                ? `<img src="${validImgUrl}" alt="${coaster.coaster_name}" class="rounded shadow-sm" referrerpolicy="no-referrer" style="width:80px; height:80px; object-fit:cover;">`
+                : `<img src="https://www.hussrides.com/fileadmin/_processed_/5/e/csm_giant-frisbee-cedarpoint-01_0697df513a.jpg" alt="Sin imagen" class="rounded shadow-sm" style="width:80px; height:80px; object-fit:cover;">`
             }
           </div>
         </div>
@@ -80,12 +95,16 @@ $(document).ready(function () {
           ${infoLine ? `<small class="text-secondary opacity-75">${infoLine}</small>` : ""}
         </div>
         <div class="flex-shrink-0 d-flex align-items-center justify-content-between justify-content-md-end w-100 w-md-auto gap-4">
-          ${starsVal > 0 ? `
+          ${
+            starsVal > 0
+              ? `
             <div class="d-flex align-items-center gap-1">
               <span class="fw-bold text-warning" style="font-size:1.1rem;">${starsVal.toFixed(2)}</span>
               <i class="fa-solid fa-star text-warning" style="font-size:0.9rem;"></i>
             </div>
-          ` : ""}
+          `
+              : ""
+          }
           <i class="fa-solid fa-chevron-right text-muted opacity-25 d-none d-md-block"></i>
         </div>
       `;
@@ -104,13 +123,22 @@ $(document).ready(function () {
     prevBtn.className = "btn btn-outline-success mx-1";
     prevBtn.textContent = "«";
     if (page === 1) prevBtn.disabled = true;
-    prevBtn.addEventListener("click", () => { window.scrollTo({ top: 10, behavior: "smooth" }); loadCoasters(page - 1); });
+    prevBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 10, behavior: "smooth" });
+      loadCoasters(page - 1);
+    });
     pageBtn.appendChild(prevBtn);
 
     const btnFirst = document.createElement("button");
-    btnFirst.className = page === 1 ? "btn btn-success mx-1 text-white" : "btn btn-light text-success border mx-1";
+    btnFirst.className =
+      page === 1
+        ? "btn btn-success mx-1 text-white"
+        : "btn btn-light text-success border mx-1";
     btnFirst.textContent = "1";
-    btnFirst.addEventListener("click", () => { window.scrollTo({ top: 10, behavior: "smooth" }); loadCoasters(1); });
+    btnFirst.addEventListener("click", () => {
+      window.scrollTo({ top: 10, behavior: "smooth" });
+      loadCoasters(1);
+    });
     pageBtn.appendChild(btnFirst);
 
     const btnDots = document.createElement("button");
@@ -124,9 +152,15 @@ $(document).ready(function () {
     start = Math.max(2, end - 2);
     for (let i = start; i <= end; i++) {
       const pb = document.createElement("button");
-      pb.className = i === page ? "btn btn-success text-white mx-1" : "btn btn-light text-success border mx-1";
+      pb.className =
+        i === page
+          ? "btn btn-success text-white mx-1"
+          : "btn btn-light text-success border mx-1";
       pb.textContent = i;
-      pb.addEventListener("click", () => { window.scrollTo({ top: 10, behavior: "smooth" }); loadCoasters(i); });
+      pb.addEventListener("click", () => {
+        window.scrollTo({ top: 10, behavior: "smooth" });
+        loadCoasters(i);
+      });
       pageBtn.appendChild(pb);
     }
 
@@ -137,16 +171,25 @@ $(document).ready(function () {
     pageBtn.appendChild(btnDots2);
 
     const btnLast = document.createElement("button");
-    btnLast.className = page === totalPages ? "btn btn-success mx-1 text-white" : "btn btn-light text-success border mx-1";
+    btnLast.className =
+      page === totalPages
+        ? "btn btn-success mx-1 text-white"
+        : "btn btn-light text-success border mx-1";
     btnLast.textContent = `${totalPages}`;
-    btnLast.addEventListener("click", () => { window.scrollTo({ top: 10, behavior: "smooth" }); loadCoasters(totalPages); });
+    btnLast.addEventListener("click", () => {
+      window.scrollTo({ top: 10, behavior: "smooth" });
+      loadCoasters(totalPages);
+    });
     pageBtn.appendChild(btnLast);
 
     const nextBtn = document.createElement("button");
     nextBtn.className = "btn btn-outline-success mx-1";
     nextBtn.textContent = "»";
     if (page === totalPages) nextBtn.disabled = true;
-    nextBtn.addEventListener("click", () => { window.scrollTo({ top: 10, behavior: "smooth" }); loadCoasters(page + 1); });
+    nextBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 10, behavior: "smooth" });
+      loadCoasters(page + 1);
+    });
     pageBtn.appendChild(nextBtn);
 
     paginationEl.appendChild(pageBtn);

@@ -286,7 +286,6 @@ require_once __DIR__ . '/../../partials/header.php';
             </div>
         </div>
     </div>
-
     <!-- VALORACIONES -->
     <div class="row mb-5">
         <div class="col-12">
@@ -359,7 +358,7 @@ require_once __DIR__ . '/../../partials/header.php';
           <textarea class="form-control bg-dark text-white border-secondary rounded-0" id="edit-review-text" rows="4" placeholder="Escribe tu opinión..."></textarea>
         </div>
         <!-- Pros -->
-        <div class="mb-3">
+        <div class="mb-3 wrapper-pros">
             <label class="form-label text-muted small fw-semibold"><i class="fa-solid fa-plus-circle text-success me-1"></i> Ventajas</label>
             <select id="edit-pros-select" multiple>
                 <option value="airtime">Airtime</option>
@@ -379,7 +378,7 @@ require_once __DIR__ . '/../../partials/header.php';
             </select>
         </div>
         <!-- Contras -->
-        <div class="mb-3">
+        <div class="mb-3 wrapper-contras">
             <label class="form-label text-muted small fw-semibold"><i class="fa-solid fa-minus-circle text-danger me-1"></i> Contras</label>
             <select id="edit-contras-select" multiple>
                 <option value="airtime">Airtime</option>

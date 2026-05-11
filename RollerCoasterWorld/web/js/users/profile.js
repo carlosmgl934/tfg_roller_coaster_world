@@ -112,26 +112,20 @@ $(document).ready(function () {
 
     const $btn = $(this);
     const $card = $btn.closest(".top-card");
-    const $imgContainer = $card.find(".rank-img-container");
-    const $img = $imgContainer.find("img, div[style*='background']");
     const $stats = $card.find(".stats-expandable");
+    const $icon = $btn.find("i");
+    const $label = $btn.find("span");
 
-    const isExpanded = !$stats.hasClass("d-none");
-
-    if (isExpanded) {
-      // Contraer
-      $stats.addClass("d-none");
-      $card.css("height", "85px");
-      $imgContainer.css({ width: "85px", height: "85px" });
-      $img.css("height", "85px");
-      $btn.html('<i class="fa-solid fa-plus"></i>');
-    } else {
+    if ($stats.hasClass("d-none")) {
       // Expandir
       $stats.removeClass("d-none");
-      $card.css("height", "140px");
-      $imgContainer.css({ width: "140px", height: "140px" });
-      $img.css("height", "140px");
-      $btn.html('<i class="fa-solid fa-minus"></i>');
+      $icon.removeClass("fa-plus-circle fa-plus").addClass("fa-minus-circle");
+      if ($label.length) $label.text("Contraer");
+    } else {
+      // Contraer
+      $stats.addClass("d-none");
+      $icon.removeClass("fa-minus-circle fa-minus").addClass("fa-plus-circle");
+      if ($label.length) $label.text("Ver detalles");
     }
   });
 
@@ -908,38 +902,78 @@ $(document).ready(function () {
             </a>
           </div>`);
       } else {
-        const isRankSort = sort === "rank" || sort === "rank_position";
-        const isNameSort = sort === "name";
         const isMobile = window.innerWidth < 768;
-        
-        // El botón "+" solo se muestra si ordenamos por Ranking o por Nombre (A-Z)
-        const hasToggle = isRankSort || isNameSort;
-        // Colapsar por defecto en móvil si hay toggle
+        const isRankSort = sort === "rank" || sort === "rank_position";
+        const hasToggle = isRankSort || sort === "name";
         const shouldCollapse = hasToggle && (isMobile || isRankSort);
-        const cardHeight = shouldCollapse ? "85px" : "140px";
+
+        // Estrellas
+        const starsVal = parseFloat(item.stars) || 0;
+        const starsHtml =
+          starsVal > 0
+            ? `<div class="d-flex align-items-center gap-1 text-warning fw-bold" style="font-size:0.9rem;">
+               <span>${starsVal.toFixed(1)}</span>
+               <i class="fa-solid fa-star" style="font-size:0.75rem;"></i>
+             </div>`
+            : "";
 
         container.append(`
-          <div class="${colClass}">
-            <a href="${detailUrl}" class="top-card d-flex align-items-stretch text-decoration-none shadow-sm mb-2" 
-               style="height:${cardHeight}; transition: height 0.2s ease-out; overflow: hidden;">
-              <div class="rank-img-container" style="width:${cardHeight}; height:${cardHeight}; flex-shrink:0; position:relative; transition: all 0.2s ease-out;">
-                ${img.replace(/height:\d+px/g, "height:" + cardHeight)}
-                <span class="rank-badge" style="font-size: 0.65rem; padding: 2px 6px;">#${item.rank_position}</span>
-              </div>
-              <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center position-relative" style="width: 0; min-width: 0;">
-                ${hasToggle ? `
-                <button class="btn btn-sm btn-toggle-stats text-secondary p-0 position-absolute" style="top:8px; right:12px; z-index:10; width:24px; height:24px; background: rgba(255,255,255,0.05); border-radius:50%;" title="Ver más detalles">
-                  <i class="fa-solid fa-${shouldCollapse ? "plus" : "minus"}"></i>
-                </button>` : ""}
-                <div class="mb-1 pe-4">
-                  <div class="fw-bold text-white text-truncate" style="font-family: var(--rcw-font-title); font-size: 0.95rem; width: 100%;">${item.coaster_name}</div>
-                  <small class="text-muted d-block" style="font-size: 0.72rem;">${item.park_name} · ${item.country_name || ""}</small>
-                </div>
-                <div class="stats-expandable ${shouldCollapse ? "d-none" : ""} d-flex gap-2 flex-wrap mt-1">
-                  ${getStatBadges(item, sort).replace(/<small/g, '<small style="font-size: 0.65rem;"').replace(/fa-industry/g, 'fa-industry me-1').replace(/fa-bolt/g, 'fa-bolt me-1')}
+          <div class="${colClass} mb-3">
+            <div class="top-card d-flex flex-column flex-md-row text-decoration-none shadow-sm position-relative" 
+               style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; transition: all 0.3s ease;">
+              
+              <!-- Imagen y Ranking -->
+              <div class="rank-img-container p-2 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.2); border-radius: 8px 0 0 8px; min-width: 110px;">
+                <div class="position-relative">
+                  <img src="${item.imagen_url.startsWith("/") ? BASE_URL + item.imagen_url : item.imagen_url}" 
+                       alt="${item.coaster_name}" 
+                       class="rounded" 
+                       style="width: 90px; height: 90px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1);">
+                  <span class="rank-badge" style="position: absolute; top: -5px; left: -5px; font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">#${item.rank_position}</span>
                 </div>
               </div>
-            </a>
+
+              <!-- Contenido -->
+              <div class="p-3 flex-grow-1 d-flex flex-column justify-content-center">
+                <div class="d-flex justify-content-between align-items-start mb-1">
+                  <div class="pe-3">
+                    <a href="${detailUrl}" class="fw-bold text-white text-decoration-none d-block hover-green" style="font-family: var(--rcw-font-title); font-size: 1.1rem; line-height: 1.2;">
+                      ${item.coaster_name}
+                    </a>
+                    <small class="text-muted d-block mt-1" style="font-size: 0.75rem; opacity: 0.8;">
+                      <i class="fa-solid fa-location-dot me-1"></i>${item.park_name} · ${item.country_name || ""}
+                    </small>
+                  </div>
+                  ${starsHtml}
+                </div>
+
+                <!-- Stats Expandibles -->
+                <div class="stats-expandable mt-2 d-flex gap-2 flex-wrap ${shouldCollapse ? "d-none" : ""}">
+                  ${getStatBadges(item, sort)
+                    .replace(
+                      /<small/g,
+                      '<small class="badge bg-dark border border-secondary text-secondary fw-normal px-2 py-1"',
+                    )
+                    .replace(/fa-industry/g, "fa-industry me-1")
+                    .replace(/fa-bolt/g, "fa-bolt me-1")}
+                </div>
+
+                ${
+                  hasToggle
+                    ? `
+                <button class="btn btn-sm btn-toggle-stats text-muted p-0 mt-2 d-flex align-items-center gap-1" style="font-size: 0.7rem; background:transparent; border:none;">
+                   <i class="fa-solid fa-${shouldCollapse ? "plus" : "minus"}-circle"></i>
+                   <span>${shouldCollapse ? "Ver detalles" : "Contraer"}</span>
+                </button>`
+                    : ""
+                }
+              </div>
+
+              <!-- Acceso rápido -->
+              <a href="${detailUrl}" class="d-none d-md-flex align-items-center px-3 border-start border-secondary border-opacity-10 opacity-25 hover-opacity-100" style="transition: opacity 0.2s;">
+                 <i class="fa-solid fa-chevron-right fs-5 text-white"></i>
+              </a>
+            </div>
           </div>`);
       }
     });
@@ -999,26 +1033,63 @@ $(document).ready(function () {
       } else {
         const isRankSort = sort === "rank_position";
         const detailUrl = `${BASE_URL}/web/views/public/parks/parks.php?id=${item.park_id}`;
+        
+        // Estrellas
+        const starsVal = parseFloat(item.stars) || 0;
+        const starsHtml = starsVal > 0 
+          ? `<div class="d-flex align-items-center gap-1 text-warning fw-bold" style="font-size:0.9rem;">
+               <span>${starsVal.toFixed(1)}</span>
+               <i class="fa-solid fa-star" style="font-size:0.75rem;"></i>
+             </div>` 
+          : "";
+
         container.append(`
-          <div class="${colClass}">
-            <a href="${detailUrl}" class="top-card d-flex align-items-stretch text-decoration-none shadow-sm mb-2" 
-               style="height:${isRankSort ? "85px" : "110px"}; transition: height 0.2s ease-out; overflow: hidden;">
-              <div class="rank-img-container" style="width:${isRankSort ? "85px" : "110px"}; height:${isRankSort ? "85px" : "110px"}; flex-shrink:0; position:relative; transition: all 0.2s ease-out;">
-                ${img.replace(/height:\d+px/g, isRankSort ? "height:85px" : "height:110px")}
-                <span class="rank-badge" style="font-size: 0.65rem; padding: 2px 6px;">#${item.rank_position}</span>
-              </div>
-              <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center position-relative" style="width: 0; min-width: 0;">
-                ${isRankSort ? `<button class="btn btn-sm btn-toggle-stats text-secondary p-0 position-absolute" style="top:8px; right:12px; z-index:10; width:24px; height:24px; background: rgba(255,255,255,0.05); border-radius:50%;" title="Ver más detalles"><i class="fa-solid fa-plus"></i></button>` : ""}
-                <div class="mb-1 pe-4">
-                  <div class="fw-bold text-white text-truncate" style="font-family: var(--rcw-font-title); font-size: 0.95rem; width: 100%;">${item.park_name}</div>
-                  <small class="text-muted text-truncate d-block" style="font-size: 0.72rem; width: 100%;">${item.country_name || ""}</small>
-                </div>
-                <div class="stats-expandable ${isRankSort ? "d-none" : ""} d-flex gap-2 flex-wrap mt-1">
-                  ${item.operating_coasters ? `<small class="text-info d-flex align-items-center gap-1"><i class="fa-solid fa-ticket"></i>${item.operating_coasters} coasters</small>` : ""}
-                  ${item.stars ? `<small class="text-warning d-flex align-items-center gap-1"><i class="fa-solid fa-star"></i>${parseFloat(item.stars).toFixed(1)}</small>` : ""}
+          <div class="${colClass} mb-3">
+            <div class="top-card d-flex flex-column flex-md-row text-decoration-none shadow-sm position-relative" 
+               style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; transition: all 0.3s ease;">
+              
+              <!-- Imagen y Ranking -->
+              <div class="rank-img-container p-2 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.2); border-radius: 8px 0 0 8px; min-width: 110px;">
+                <div class="position-relative">
+                   <img src="${item.imagen_url.startsWith("/") ? BASE_URL + item.imagen_url : item.imagen_url}" 
+                       alt="${item.park_name}" 
+                       class="rounded" 
+                       style="width: 90px; height: 90px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1);">
+                  <span class="rank-badge" style="position: absolute; top: -5px; left: -5px; font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">#${item.rank_position}</span>
                 </div>
               </div>
-            </a>
+
+              <!-- Contenido -->
+              <div class="p-3 flex-grow-1 d-flex flex-column justify-content-center">
+                <div class="d-flex justify-content-between align-items-start mb-1">
+                  <div class="pe-3">
+                    <a href="${detailUrl}" class="fw-bold text-white text-decoration-none d-block hover-green" style="font-family: var(--rcw-font-title); font-size: 1.1rem; line-height: 1.2;">
+                      ${item.park_name}
+                    </a>
+                    <small class="text-muted d-block mt-1" style="font-size: 0.75rem; opacity: 0.8;">
+                      <i class="fa-solid fa-location-dot me-1"></i>${item.country_name || ""}
+                    </small>
+                  </div>
+                  ${starsHtml}
+                </div>
+
+                <!-- Stats Expandibles -->
+                <div class="stats-expandable mt-2 d-flex gap-2 flex-wrap ${isRankSort ? "d-none" : ""}">
+                  ${item.operating_coasters ? `<small class="badge bg-dark border border-secondary text-info fw-normal px-2 py-1"><i class="fa-solid fa-ticket me-1"></i>${item.operating_coasters} coasters</small>` : ""}
+                </div>
+
+                ${isRankSort ? `
+                <button class="btn btn-sm btn-toggle-stats text-muted p-0 mt-2 d-flex align-items-center gap-1" style="font-size: 0.7rem; background:transparent; border:none;">
+                   <i class="fa-solid fa-plus-circle"></i>
+                   <span>Ver detalles</span>
+                </button>` : ""}
+              </div>
+
+              <!-- Acceso rápido -->
+              <a href="${detailUrl}" class="d-none d-md-flex align-items-center px-3 border-start border-secondary border-opacity-10 opacity-25 hover-opacity-100" style="transition: opacity 0.2s;">
+                 <i class="fa-solid fa-chevron-right fs-5 text-white"></i>
+              </a>
+            </div>
           </div>`);
       }
     });
@@ -1441,7 +1512,10 @@ $(document).ready(function () {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '',
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
           },
           body: JSON.stringify({ items }),
         },
@@ -1482,7 +1556,10 @@ $(document).ready(function () {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '',
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
           },
           body: JSON.stringify({ items }),
         },
@@ -2187,7 +2264,6 @@ $(document).ready(function () {
 
       const nota = parseFloat(r.note) || 0;
       const notaText = nota % 1 === 0 ? nota.toFixed(0) : nota.toFixed(1);
-      
       let tagsHtml = "";
       if (r.tags && r.tags.length > 0) {
         tagsHtml = '<div class="d-flex flex-wrap gap-1 mt-2 mb-2">';
@@ -2360,12 +2436,12 @@ $(document).ready(function () {
               <textarea class="form-control bg-dark text-white border-secondary rounded-0" id="pedit-review-text" rows="4" placeholder="Escribe tu opinión..."></textarea>
             </div>
             <!-- Pros -->
-            <div class="mb-3">
+            <div class="mb-3 wrapper-pros">
                 <label class="form-label text-muted small fw-semibold"><i class="fa-solid fa-plus-circle text-success me-1"></i> Ventajas</label>
                 <select id="pedit-pros-select" multiple></select>
             </div>
             <!-- Contras -->
-            <div class="mb-3">
+            <div class="mb-3 wrapper-contras">
                 <label class="form-label text-muted small fw-semibold"><i class="fa-solid fa-minus-circle text-danger me-1"></i> Contras</label>
                 <select id="pedit-contras-select" multiple></select>
             </div>
@@ -2396,7 +2472,10 @@ $(document).ready(function () {
         placeholderValue: "Selecciona las ventajas...",
       });
     }
-    if (!peditContrasChoices && document.getElementById("pedit-contras-select")) {
+    if (
+      !peditContrasChoices &&
+      document.getElementById("pedit-contras-select")
+    ) {
       peditContrasChoices = new Choices("#pedit-contras-select", {
         removeItemButton: true,
         placeholderValue: "Selecciona las contras...",
@@ -2405,63 +2484,63 @@ $(document).ready(function () {
   }
 
   const COASTER_PROS = [
-    { value: 'airtime', label: 'Airtime' },
-    { value: 'arnes', label: 'Arnés' },
-    { value: 'capacidad', label: 'Capacidad' },
-    { value: 'comodidad', label: 'Comodidad' },
-    { value: 'duracion', label: 'Duración' },
-    { value: 'hangtime', label: 'Hangtime' },
-    { value: 'intensidad', label: 'Intensidad' },
-    { value: 'inversiones', label: 'Inversiones' },
-    { value: 'launch', label: 'Launch' },
-    { value: 'caidas', label: 'Caídas' },
-    { value: 'suavidad', label: 'Suavidad' },
-    { value: 'recorrido', label: 'Layout' },
-    { value: 'tematizacion', label: 'Tematización' },
-    { value: 'velocidad', label: 'Velocidad' }
+    { value: "airtime", label: "Airtime" },
+    { value: "arnes", label: "Arnés" },
+    { value: "capacidad", label: "Capacidad" },
+    { value: "comodidad", label: "Comodidad" },
+    { value: "duracion", label: "Duración" },
+    { value: "hangtime", label: "Hangtime" },
+    { value: "intensidad", label: "Intensidad" },
+    { value: "inversiones", label: "Inversiones" },
+    { value: "launch", label: "Launch" },
+    { value: "caidas", label: "Caídas" },
+    { value: "suavidad", label: "Suavidad" },
+    { value: "recorrido", label: "Layout" },
+    { value: "tematizacion", label: "Tematización" },
+    { value: "velocidad", label: "Velocidad" },
   ];
   const COASTER_CONTRAS = [
-    { value: 'airtime', label: 'Airtime' },
-    { value: 'arnes', label: 'Arnés' },
-    { value: 'capacidad', label: 'Capacidad' },
-    { value: 'comodidad', label: 'Comodidad' },
-    { value: 'mantenimiento', label: 'Mantenimiento' },
-    { value: 'duracion_corta', label: 'Corta duración' },
-    { value: 'intensidad', label: 'Intensidad' },
-    { value: 'inversiones', label: 'Inversiones' },
-    { value: 'launch', label: 'Launch' },
-    { value: 'recorrido', label: 'Layout' },
-    { value: 'vibracion', label: 'Vibración' },
-    { value: 'dolorosa', label: 'Dolorosa' },
-    { value: 'decepcionante', label: 'Decepcionante' },
-    { value: 'tematizacion', label: 'Tematización' },
-    { value: 'velocidad_nula', label: 'Poca velocidad' }
+    { value: "airtime", label: "Airtime" },
+    { value: "arnes", label: "Arnés" },
+    { value: "capacidad", label: "Capacidad" },
+    { value: "comodidad", label: "Comodidad" },
+    { value: "mantenimiento", label: "Mantenimiento" },
+    { value: "duracion_corta", label: "Corta duración" },
+    { value: "intensidad", label: "Intensidad" },
+    { value: "inversiones", label: "Inversiones" },
+    { value: "launch", label: "Launch" },
+    { value: "recorrido", label: "Layout" },
+    { value: "vibracion", label: "Vibración" },
+    { value: "dolorosa", label: "Dolorosa" },
+    { value: "decepcionante", label: "Decepcionante" },
+    { value: "tematizacion", label: "Tematización" },
+    { value: "velocidad_nula", label: "Poca velocidad" },
   ];
   const PARK_PROS = [
-    { value: 'limpieza', label: 'Limpieza' },
-    { value: 'personal', label: 'Personal / atención' },
-    { value: 'comida', label: 'Comida y restaurantes' },
-    { value: 'tematizacion', label: 'Tematización / ambiente' },
-    { value: 'precio', label: 'Relación calidad-precio' },
-    { value: 'colas', label: 'Gestión de colas' },
-    { value: 'atracciones', label: 'Variedad de atracciones' },
-    { value: 'mantenimiento', label: 'Mantenimiento de instalaciones' },
-    { value: 'accesibilidad', label: 'Accesibilidad (discapacitados)' },
-    { value: 'entretenimiento', label: 'Shows y entretenimiento' },
-    { value: 'tiendas', label: 'Tiendas y merchandising' }
+    { value: "limpieza", label: "Limpieza" },
+    { value: "personal", label: "Personal / atención" },
+    { value: "comida", label: "Comida y restaurantes" },
+    { value: "tematizacion", label: "Tematización / ambiente" },
+    { value: "precio", label: "Relación calidad-precio" },
+    { value: "colas", label: "Gestión de colas" },
+    { value: "atracciones", label: "Variedad de atracciones" },
+    { value: "mantenimiento", label: "Mantenimiento de instalaciones" },
+    { value: "accesibilidad", label: "Accesibilidad (discapacitados)" },
+    { value: "entretenimiento", label: "Shows y entretenimiento" },
+    { value: "tiendas", label: "Tiendas y merchandising" },
   ];
   const PARK_CONTRAS = [
-    { value: 'suciedad', label: 'Suciedad' },
-    { value: 'personal', label: 'Mal personal / atención' },
-    { value: 'comida', label: 'Mala comida / precios abusivos' },
-    { value: 'tematizacion', label: 'Poca tematización' },
-    { value: 'precio', label: 'Mala relación calidad-precio' },
-    { value: 'colas', label: 'Largas colas / mala gestión' },
-    { value: 'pocas_atracciones', label: 'Pocas atracciones' },
-    { value: 'mantenimiento', label: 'Mal mantenimiento' },
-    { value: 'accesibilidad', label: 'Poca accesibilidad' },
-    { value: 'entretenimiento', label: 'Falta de entretenimiento' },
-    { value: 'masificacion', label: 'Masificación' }
+    { value: "suciedad", label: "Suciedad" },
+    { value: "personal", label: "Mal personal / atención" },
+    { value: "comida", label: "Mala comida / precios abusivos" },
+    { value: "tematizacion", label: "Poca tematización" },
+    { value: "precio", label: "Mala relación calidad-precio" },
+    { value: "colas", label: "Largas colas / mala gestión" },
+    { value: "pocas_atracciones", label: "Pocas atracciones" },
+    { value: "mantenimiento", label: "Mal mantenimiento" },
+    { value: "accesibilidad", label: "Poca accesibilidad" },
+    { value: "entretenimiento", label: "Falta de entretenimiento" },
+    { value: "masificacion", label: "Masificación" },
   ];
 
   // Actualizar nota oculta cuando cambia el radio (perfil)
@@ -2484,28 +2563,34 @@ $(document).ready(function () {
 
     // Cargar tags
     initPeditChoices();
-    const prosList = type === 'coaster' ? COASTER_PROS : PARK_PROS;
-    const contrasList = type === 'coaster' ? COASTER_CONTRAS : PARK_CONTRAS;
+    const prosList = type === "coaster" ? COASTER_PROS : PARK_PROS;
+    const contrasList = type === "coaster" ? COASTER_CONTRAS : PARK_CONTRAS;
 
     peditProsChoices.clearChoices();
-    peditProsChoices.setChoices(prosList, 'value', 'label', true);
+    peditProsChoices.setChoices(prosList, "value", "label", true);
     peditContrasChoices.clearChoices();
-    peditContrasChoices.setChoices(contrasList, 'value', 'label', true);
+    peditContrasChoices.setChoices(contrasList, "value", "label", true);
 
     const rawTags = $(this).attr("data-tags") || "[]";
     let tags = [];
-    try { tags = JSON.parse(rawTags); } catch(e) { tags = []; }
+    try {
+      tags = JSON.parse(rawTags);
+    } catch (e) {
+      tags = [];
+    }
 
     if (tags && tags.length > 0) {
-        const activePros = tags.filter(t => t.type === 'pro').map(t => t.tag);
-        const activeContras = tags.filter(t => t.type === 'con').map(t => t.tag);
-        peditProsChoices.removeActiveItems();
-        peditProsChoices.setChoiceByValue(activePros);
-        peditContrasChoices.removeActiveItems();
-        peditContrasChoices.setChoiceByValue(activeContras);
+      const activePros = tags.filter((t) => t.type === "pro").map((t) => t.tag);
+      const activeContras = tags
+        .filter((t) => t.type === "con")
+        .map((t) => t.tag);
+      peditProsChoices.removeActiveItems();
+      peditProsChoices.setChoiceByValue(activePros);
+      peditContrasChoices.removeActiveItems();
+      peditContrasChoices.setChoiceByValue(activeContras);
     } else {
-        peditProsChoices.removeActiveItems();
-        peditContrasChoices.removeActiveItems();
+      peditProsChoices.removeActiveItems();
+      peditContrasChoices.removeActiveItems();
     }
 
     profileEditModal.show();
@@ -2533,8 +2618,8 @@ $(document).ready(function () {
     // Añadir tags
     const pros = peditProsChoices.getValue(true);
     const contras = peditContrasChoices.getValue(true);
-    pros.forEach(p => fd.append('pros[]', p));
-    contras.forEach(c => fd.append('contras[]', c));
+    pros.forEach((p) => fd.append("pros[]", p));
+    contras.forEach((c) => fd.append("contras[]", c));
     const endpoint =
       type === "coaster"
         ? `${BASE_URL}/api/php/coasters.php?action=update_review`
@@ -2542,7 +2627,12 @@ $(document).ready(function () {
     try {
       const res = await fetch(endpoint, {
         method: "POST",
-        headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
+        headers: {
+          "X-CSRF-Token":
+            document
+              .querySelector('meta[name="csrf-token"]')
+              ?.getAttribute("content") ?? "",
+        },
         body: fd,
       });
       const data = await res.json();
@@ -2557,8 +2647,8 @@ $(document).ready(function () {
           reviewsData[idx].review = text;
           // Actualizar tags localmente
           reviewsData[idx].tags = [
-              ...pros.map(p => ({ type: 'pro', tag: p })),
-              ...contras.map(c => ({ type: 'con', tag: c }))
+            ...pros.map((p) => ({ type: "pro", tag: p })),
+            ...contras.map((c) => ({ type: "con", tag: c })),
           ];
         }
         renderReviews();
