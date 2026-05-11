@@ -71,8 +71,8 @@ require_once __DIR__ . '/../partials/header.php';
             <div class="privacy-section privacy-section--last">
                 <h2><i class="fa-solid fa-envelope me-2 text-success"></i>7. Contacto</h2>
                 <p>Si tienes alguna pregunta sobre esta Política de Privacidad, puedes contactarnos en:</p>
-                <a href="mailto:[EMAIL_ADDRESS]" class="privacy-email">
-                    <i class="fa-solid fa-at me-2"></i>[EMAIL_ADDRESS]
+                <a href="mailto:tfgrollercoaster@gmail.com" class="privacy-email">
+                    <i class="fa-solid fa-at me-2"></i>tfgrollercoaster@gmail.com
                 </a>
             </div>
 
