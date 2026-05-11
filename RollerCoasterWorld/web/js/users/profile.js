@@ -2016,7 +2016,10 @@ $(document).ready(function () {
               else statusText = statusText.toUpperCase();
 
               dropdown.append(
-                `<li class="list-group-item list-group-item-action bg-dark text-white border-secondary py-2" style="cursor:pointer;" data-id="${coaster.id}">
+                `<li class="list-group-item list-group-item-action bg-dark text-white border-secondary py-2" style="cursor:pointer;" 
+                    data-id="${coaster.id}" 
+                    data-name="${coaster.coaster_name}" 
+                    data-park="${coaster.park_name}">
                   <div class="fw-bold text-truncate" style="font-size:0.95rem;">${coaster.coaster_name}</div>
                   <div class="text-secondary" style="font-size:0.78rem;">${coaster.park_name}
                     <span class="mx-1 opacity-40">•</span>${statusText}
@@ -2089,8 +2092,8 @@ $(document).ready(function () {
     "#top-coasters-dropdown li.list-group-item-action",
     function () {
       const coasterId = $(this).data("id");
-      const coasterName = $(this).find("strong").text();
-      const parkName = $(this).find("small").text().replace("en ", "");
+      const coasterName = $(this).attr("data-name");
+      const parkName = $(this).attr("data-park");
 
       // Evitar duplicados
       if (topsData.coasters.find((d) => d.coaster_id == coasterId)) {
@@ -2166,12 +2169,15 @@ $(document).ready(function () {
           } else {
             data.forEach(function (park) {
               dropdown.append(
-                `<li class="list-group-item list-group-item-action bg-dark text-white border-secondary py-2" style="cursor:pointer;" data-id="${park.park_id}">
-                  <div class="fw-bold text-truncate" style="font-size:0.95rem;">${park.park_name}</div>
-                  <div class="text-secondary" style="font-size:0.78rem;">
-                    <i class="fa-solid fa-location-dot me-1 opacity-50"></i>${park.country_name || ""}
-                  </div>
-                </li>`,
+                `<li class="list-group-item list-group-item-action bg-dark text-white border-secondary py-2" style="cursor:pointer;" 
+                      data-id="${park.park_id}" 
+                      data-name="${park.park_name}" 
+                      data-country="${park.country_name || ""}">
+                    <div class="fw-bold text-truncate" style="font-size:0.95rem;">${park.park_name}</div>
+                    <div class="text-secondary" style="font-size:0.78rem;">
+                      <i class="fa-solid fa-location-dot me-1 opacity-50"></i>${park.country_name || ""}
+                    </div>
+                  </li>`,
               );
             });
           }
@@ -2238,8 +2244,8 @@ $(document).ready(function () {
     "#top-parks-dropdown li.list-group-item-action",
     function () {
       const parkId = $(this).data("id");
-      const parkName = $(this).find("strong").text();
-      const countryName = $(this).find("small").text();
+      const parkName = $(this).attr("data-name");
+      const countryName = $(this).attr("data-country");
 
       // Avoid duplicates
       if (topsData.parks.find((d) => d.park_id == parkId)) {
