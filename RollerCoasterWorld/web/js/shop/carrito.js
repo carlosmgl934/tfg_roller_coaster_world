@@ -150,11 +150,11 @@ async function loadCart() {
                onerror="this.src='https://placehold.co/52x40/0d1117/444?text=P'">
           <div>
             <span class="fw-semibold text-white" style="font-size:.88rem;">${item.park_name}</span>
-            <div class="mt-1 d-flex flex-wrap gap-1">
-              ${item.addon_pase_rapido  ? '<span class="badge rounded-0" style="background:#92400e;font-size:.6rem;"><i class="fa-solid fa-bolt me-1"></i>Pase Rápido</span>' : ''}
-              ${item.addon_photopass    ? '<span class="badge rounded-0" style="background:#164e63;font-size:.6rem;"><i class="fa-solid fa-camera me-1"></i>PhotoPass</span>' : ''}
-              ${item.addon_buffet       ? '<span class="badge rounded-0" style="background:#14532d;font-size:.6rem;"><i class="fa-solid fa-utensils me-1"></i>Buffet</span>' : ''}
-              ${item.addon_parking      ? '<span class="badge rounded-0" style="background:#1e3a5f;font-size:.6rem;"><i class="fa-solid fa-square-parking me-1"></i>Parking</span>' : ''}
+            <div class="mt-1 d-flex flex-column gap-1">
+              ${item.addon_pase_rapido  ? '<span class="badge rounded-0 w-fit" style="background:#92400e;font-size:.6rem;width:fit-content;"><i class="fa-solid fa-bolt me-1"></i>Pase&nbsp;Rápido</span>' : ''}
+              ${item.addon_photopass    ? '<span class="badge rounded-0 w-fit" style="background:#164e63;font-size:.6rem;width:fit-content;"><i class="fa-solid fa-camera me-1"></i>PhotoPass</span>' : ''}
+              ${item.addon_buffet       ? '<span class="badge rounded-0 w-fit" style="background:#14532d;font-size:.6rem;width:fit-content;"><i class="fa-solid fa-utensils me-1"></i>Buffet</span>' : ''}
+              ${item.addon_parking      ? '<span class="badge rounded-0 w-fit" style="background:#1e3a5f;font-size:.6rem;width:fit-content;"><i class="fa-solid fa-square-parking me-1"></i>Parking</span>' : ''}
             </div>
           </div>
         </div>

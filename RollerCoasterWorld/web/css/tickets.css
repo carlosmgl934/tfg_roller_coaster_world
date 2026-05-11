@@ -223,13 +223,16 @@
   }
   #cart-tbody td, 
   .table thead th {
-    white-space: nowrap !important; /* Prohibido romper líneas en celdas y cabeceras */
+    white-space: nowrap !important; /* Prohibido romper líneas solo en el carrito */
     vertical-align: middle !important;
     padding-top: 1.5rem !important;
     padding-bottom: 1.5rem !important;
+    padding-left: 1.5rem !important; /* Más separación entre columnas */
+    padding-right: 1.5rem !important;
   }
-  /* Forzar que los precios y el símbolo € no se separen jamás */
-  .text-success.fw-bold, .text-muted {
+  /* Forzar que los precios y el símbolo € no se separen jamás en el carrito */
+  #cart-tbody .text-success.fw-bold, 
+  #cart-tbody .text-muted {
     white-space: nowrap !important;
   }
 }
