@@ -933,7 +933,7 @@ $(document).ready(function () {
                 </button>` : ""}
                 <div class="mb-1 pe-4">
                   <div class="fw-bold text-white text-truncate" style="font-family: var(--rcw-font-title); font-size: 0.95rem; width: 100%;">${item.coaster_name}</div>
-                  <small class="text-muted text-truncate d-block" style="font-size: 0.72rem; width: 100%;">${item.park_name} · ${item.country_name || ""}</small>
+                  <small class="text-muted d-block" style="font-size: 0.72rem;">${item.park_name} · ${item.country_name || ""}</small>
                 </div>
                 <div class="stats-expandable ${shouldCollapse ? "d-none" : ""} d-flex gap-2 flex-wrap mt-1">
                   ${getStatBadges(item, sort).replace(/<small/g, '<small style="font-size: 0.65rem;"').replace(/fa-industry/g, 'fa-industry me-1').replace(/fa-bolt/g, 'fa-bolt me-1')}
