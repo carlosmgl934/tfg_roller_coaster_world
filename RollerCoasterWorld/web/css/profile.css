@@ -915,24 +915,24 @@ span.flatpickr-weekday {
 
 /* ── AJUSTES USER PROFILE ESPECÍFICOS ────────────────────────── */
 .rcw-stats-select {
-  padding: 0.35rem 0.75rem !important;
+  padding: 0.3rem 1.8rem 0.3rem 0.6rem !important;
   font-weight: 700 !important;
-  font-size: 0.85rem !important;
-  background-color: rgba(22, 27, 34, 0.6) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  font-size: 0.82rem !important;
+  background-color: rgba(22, 27, 34, 0.85) !important;
+  border: 1px solid rgba(0, 200, 83, 0.4) !important;
   color: var(--rcw-green-neon) !important;
   cursor: pointer;
-  min-width: 130px;
+  min-width: 120px;
   border-radius: 4px !important;
-  appearance: auto !important;
-}
-.rcw-stats-select:focus {
-  border-color: var(--rcw-green-neon) !important;
-  box-shadow: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2300c853' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.6rem center !important;
 }
 
 .trips-empty-notice {
-  padding: 3rem 1rem !important;
+  min-height: 250px !important;
   width: 100% !important;
   display: flex !important;
   flex-direction: column !important;

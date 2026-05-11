@@ -822,11 +822,10 @@ $user_uid = $_SESSION['firebase_uid'];
                 <div>
                   <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">Estadísticas de</h5>
                   <div class="stats-type-wrapper" style="cursor: pointer; margin-top: 2px; width: fit-content;">
-                    <select id="rank-type-select">
+                    <select id="rank-type-select" class="rcw-stats-select">
                       <option value="coasters">Coasters</option>
                       <option value="parks">Parques</option>
                     </select>
-                    <i class="fa-solid fa-chevron-down text-success opacity-50" style="font-size: 0.6rem;"></i>
                   </div>
                 </div>
               </div>

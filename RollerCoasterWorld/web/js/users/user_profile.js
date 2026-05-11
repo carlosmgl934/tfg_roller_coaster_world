@@ -315,7 +315,7 @@ $(document).ready(function () {
       container.empty();
       if (!items || items.length === 0) {
         container.html(
-          `<div class="trips-empty-notice text-muted py-4"><i class="fa-solid fa-suitcase fa-2x mb-2 opacity-50"></i><br>Este usuario no tiene viajes registrados.</div>`,
+          `<div class="trips-empty-notice text-muted"><i class="fa-solid fa-suitcase fa-3x mb-3 opacity-50"></i><br>Este usuario no tiene viajes registrados.</div>`,
         );
         return;
       }
@@ -333,29 +333,29 @@ $(document).ready(function () {
         const rank = parseInt(item.rank_position) || index + 1;
         const title = isCoaster ? item.coaster_name : item.park_name;
         
-        // Determinar color del badge según el puesto (más sutil)
-        let badgeBg = "rgba(0,0,0,0.8)";
+        // Colores de ranking sutiles
+        let badgeBg = "rgba(0,0,0,0.85)";
         let badgeColor = "#fff";
-        if (rank === 1) { badgeBg = "rgba(255, 215, 0, 0.9)"; badgeColor = "#000"; }
-        else if (rank === 2) { badgeBg = "rgba(192, 192, 192, 0.9)"; badgeColor = "#000"; }
-        else if (rank === 3) { badgeBg = "rgba(205, 127, 50, 0.9)"; badgeColor = "#000"; }
+        if (rank === 1) { badgeBg = "#FFD700"; badgeColor = "#000"; }
+        else if (rank === 2) { badgeBg = "#C0C0C0"; badgeColor = "#000"; }
+        else if (rank === 3) { badgeBg = "#CD7F32"; badgeColor = "#000"; }
 
-        // Asegurar que sacamos el parque si es coaster
-        const parkName = item.park_name || item.subtitle || "";
-        const country = item.park_country || item.country_name || "";
+        // PARQUE · PAÍS (Asegurando que park_name no esté vacío)
+        const parkName = item.park_name || item.nombre_parque || "";
+        const country = item.park_country || item.country_name || item.nombre_pais || "";
         const subtitle = isCoaster ? `${parkName} · ${country}` : country;
 
         const html = `
           <div class="mb-2">
             <a href="${link}" class="top-card d-flex align-items-stretch text-decoration-none shadow-sm" 
-               style="height:90px; overflow: hidden; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 0;">
+               style="height:90px; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 0;">
               <div class="rank-img-container" style="width:90px; height:90px; flex-shrink:0; position:relative;">
                 <img src="${imgUrl}" alt="${title}" class="w-100 h-100 object-fit-cover" onerror="this.src='${fallbackImage}'">
-                <div style="position:absolute; top:4px; left:4px; background:${badgeBg}; color:${badgeColor}; font-size: 0.7rem; padding: 2px 6px; font-weight:800; font-family:var(--rcw-font-title); border-radius: 2px;">#${rank}</div>
+                <div style="position:absolute; top:4px; left:4px; background:${badgeBg}; color:${badgeColor}; font-size: 0.72rem; padding: 2px 7px; font-weight:800; font-family:var(--rcw-font-title); border-radius: 2px;">#${rank}</div>
               </div>
               <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center" style="width: 0; min-width: 0;">
                 <div class="pe-2">
-                  <div class="fw-bold text-white text-truncate" style="font-family: var(--rcw-font-title); font-size: 1.05rem; width: 100%; letter-spacing: -0.02em;">${title}</div>
+                  <div class="fw-bold text-white text-truncate" style="font-family: var(--rcw-font-title); font-size: 1.05rem; width: 100%; letter-spacing: -0.01em;">${title}</div>
                   <small class="text-muted text-truncate d-block mt-1" style="font-size: 0.8rem; width: 100%; opacity: 0.7;">
                     ${subtitle}
                   </small>
