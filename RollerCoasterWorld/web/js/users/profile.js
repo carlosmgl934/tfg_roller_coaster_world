@@ -1,4 +1,4 @@
-﻿// profile.js — Lógica del perfil, amigos y top personal
+// profile.js — Lógica del perfil, amigos y top personal
 // TODO: editar bio/avatar, gestionar solicitudes de amistad, top personal
 
 $(document).ready(function () {
@@ -104,30 +104,6 @@ $(document).ready(function () {
 
     cityInput.addEventListener("blur", fetchCountry);
   }
-
-  // Delegación de eventos para expandir tarjetas de Top (Coasters/Parques)
-  $(document).on("click", ".btn-toggle-stats", function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const $btn = $(this);
-    const $card = $btn.closest(".top-card");
-    const $stats = $card.find(".stats-expandable");
-    const $icon = $btn.find("i");
-    const $label = $btn.find("span");
-
-    if ($stats.hasClass("d-none")) {
-      // Expandir
-      $stats.removeClass("d-none");
-      $icon.removeClass("fa-plus-circle fa-plus").addClass("fa-minus-circle");
-      if ($label.length) $label.text("Contraer");
-    } else {
-      // Contraer
-      $stats.addClass("d-none");
-      $icon.removeClass("fa-minus-circle fa-minus").addClass("fa-plus-circle");
-      if ($label.length) $label.text("Ver detalles");
-    }
-  });
 
   // Cargar datos del usuario
   const btnGuardar = document.getElementById("guardar-config-btn");
