@@ -2471,6 +2471,10 @@ $(document).ready(function () {
   let peditContrasChoices = null;
 
   function initPeditChoices() {
+    if (typeof Choices === "undefined") {
+      console.error("Choices.js not loaded in profile.js!");
+      return;
+    }
     if (!peditProsChoices && document.getElementById("pedit-pros-select")) {
       peditProsChoices = new Choices("#pedit-pros-select", {
         removeItemButton: true,

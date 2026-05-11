@@ -70,7 +70,16 @@ $(document).ready(function () {
 
       const card = document.createElement("a");
       card.href = BASE_URL + `/web/views/public/parks/parks.php?id=${park.id}`;
-      card.classList.add("list-group-item", "list-group-item-action", "d-flex", "flex-column", "flex-md-row", "align-items-center", "p-3", "gap-3");
+      card.classList.add(
+        "list-group-item",
+        "list-group-item-action",
+        "d-flex",
+        "flex-column",
+        "flex-md-row",
+        "align-items-center",
+        "p-3",
+        "gap-3",
+      );
 
       card.innerHTML = `
         <div class="d-flex align-items-center flex-shrink-0" style="min-width: 140px;">
@@ -78,7 +87,7 @@ $(document).ready(function () {
             <span class="fw-black" style="font-size:1.2rem; color:${podiumColor};">#${position}</span>
           </div>
           <div class="flex-shrink-0">
-            <img src="${validImgUrl || 'https://www.hussrides.com/fileadmin/_processed_/5/e/csm_giant-frisbee-cedarpoint-01_0697df513a.jpg'}" 
+            <img src="${validImgUrl || "https://www.hussrides.com/fileadmin/_processed_/5/e/csm_giant-frisbee-cedarpoint-01_0697df513a.jpg"}" 
                  alt="${park.park_name}" 
                  class="rounded shadow-sm" 
                  referrerpolicy="no-referrer" 
@@ -93,12 +102,16 @@ $(document).ready(function () {
         </div>
 
         <div class="flex-shrink-0 d-flex align-items-center justify-content-end gap-4" style="min-width: 100px;">
-          ${starsVal > 0 ? `
+          ${
+            starsVal > 0
+              ? `
             <div class="d-flex align-items-center gap-1">
               <span class="fw-bold text-warning" style="font-size:1.15rem;">${starsVal.toFixed(2)}</span>
               <i class="fa-solid fa-star text-warning" style="font-size:0.95rem;"></i>
             </div>
-          ` : ""}
+          `
+              : ""
+          }
           <i class="fa-solid fa-chevron-right text-muted opacity-25 d-none d-md-block ms-2"></i>
         </div>
       `;
