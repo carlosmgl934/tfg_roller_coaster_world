@@ -814,6 +814,12 @@ $(document).ready(function () {
         const yb = parseInt(b.opening_year) || 9999;
         return asc ? ya - yb : yb - ya;
       });
+    } else if (sort === "rank") {
+      data.sort((a, b) => {
+        const ra = parseInt(a.rank_position) || 9999;
+        const rb = parseInt(b.rank_position) || 9999;
+        return asc ? ra - rb : rb - ra;
+      });
     }
 
     const container = $("#top-coasters-full-container").empty();
