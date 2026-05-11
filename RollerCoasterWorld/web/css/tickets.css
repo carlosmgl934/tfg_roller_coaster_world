@@ -103,12 +103,19 @@
   min-width: 130px;
   gap: 0.75rem;
 }
-.ticket-card .tc-code {
-  font-size: 0.62rem;
-  font-family: monospace;
-  word-break: break-all;
-  text-align: center;
+.ticket-card .tc-code { 
+  font-size: .62rem; 
+  font-family: monospace; 
+  word-break: keep-all; 
+  white-space: nowrap; 
+  text-align: center; 
+  opacity: 0.7;
 }
+.ticket-card .tc-total {
+  white-space: nowrap;
+  font-weight: 800;
+}
+
 
 /* ── Status badges ────────────────────────────────────────── */
 .badge-pendiente {
@@ -144,20 +151,27 @@
 
 /* ── Responsive tickets ───────────────────────────────────── */
 @media (max-width: 768px) {
-  .ticket-card {
-    grid-template-columns: 1fr;
-  }
+  .ticket-card { grid-template-columns: 1fr; }
   .ticket-card .tc-img,
-  .ticket-card .tc-img-placeholder {
-    width: 100%;
-    height: 140px;
-  }
+  .ticket-card .tc-img-placeholder { width: 100%; height: 160px; }
   .ticket-card .tc-side {
     border-left: none;
-    border-top: 2px dashed rgba(25, 135, 84, 0.35);
-    flex-direction: row;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    flex-direction: column; 
     min-width: auto;
+    padding: 1.25rem;
+    gap: 1rem;
+    align-items: stretch;
   }
+  .ticket-card .tc-side > div:first-child {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 0.25rem;
+  }
+  .ticket-card .tc-total { font-size: 1.4rem; }
+  .ticket-card .tc-code { font-size: 0.75rem; text-align: right; }
 }
 
 /* -- Wizard de compra (2 pasos) ----------------------------- */

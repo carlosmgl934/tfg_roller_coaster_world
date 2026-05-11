@@ -616,8 +616,10 @@ function renderTicket(o) {
         </div>
       </div>
       <div class="tc-side">
-        <div class="tc-total">${fmt(o.price)}</div>
-        <div class="tc-code">${code}</div>
+        <div class="d-flex justify-content-between align-items-center w-100 mb-md-auto">
+          <div class="tc-total">${fmt(o.price)}</div>
+          <div class="tc-code">${code}</div>
+        </div>
         ${pdfLink}
         ${refundAction}
       </div>
