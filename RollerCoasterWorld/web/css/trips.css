@@ -1364,8 +1364,8 @@
 @media (max-width: 991px) {
   .day-modal-left-col {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    padding-bottom: 2rem;
-    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    margin-bottom: 0.5rem;
   }
 }
 .day-coaster-row-right {

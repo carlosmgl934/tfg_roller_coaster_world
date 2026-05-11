@@ -609,7 +609,7 @@
       }
 
       if (d.can_edit) {
-        h += `<div class="mt-4"><button class="btn btn-outline-secondary w-100 py-2 fw-bold" style="border-radius:6px; font-size:0.85rem; letter-spacing:0.04em;" onclick="openAddVisit('${ds}')"><i class="fa-solid fa-location-dot me-2 text-success"></i>Añadir otro parque visitado hoy</button></div>`;
+        h += `<div class="mt-3"><button class="btn btn-outline-secondary w-100 py-2 fw-bold" style="border-radius:6px; font-size:0.85rem; letter-spacing:0.04em;" onclick="openAddVisit('${ds}')"><i class="fa-solid fa-location-dot me-2 text-success"></i>Añadir otro parque visitado hoy</button></div>`;
       }
       h += `</div>`; // End col-lg-6
 
@@ -632,7 +632,7 @@
           h += `<h6 class="fw-bold text-warning mb-2 d-flex align-items-center gap-2" style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:.5rem; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.1em;">
             <i class="fa-solid fa-list-check"></i>
             Agenda de hoy (${d.rides.length})</h6>
-            <div class="ride-timeline custom-scrollbar" style="max-height: 450px; overflow-y: auto; padding-right: 8px; overscroll-behavior: contain;">`;
+            <div class="ride-timeline custom-scrollbar" style="max-height: 650px; overflow-y: auto; padding-right: 8px; overscroll-behavior: contain;">`;
 
           let lastTime = null;
           let lastParkId = null;
