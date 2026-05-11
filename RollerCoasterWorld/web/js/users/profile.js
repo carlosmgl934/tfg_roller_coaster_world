@@ -1439,7 +1439,10 @@ $(document).ready(function () {
         `${BASE_URL}/api/php/profile_config.php?action=save_top_coasters`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '',
+          },
           body: JSON.stringify({ items }),
         },
       );
@@ -1477,7 +1480,10 @@ $(document).ready(function () {
         `${BASE_URL}/api/php/profile_config.php?action=save_top_parks`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '',
+          },
           body: JSON.stringify({ items }),
         },
       );
@@ -2400,7 +2406,11 @@ $(document).ready(function () {
         ? `${BASE_URL}/api/php/coasters.php?action=update_review`
         : `${BASE_URL}/api/php/parks.php?action=update_review`;
     try {
-      const res = await fetch(endpoint, { method: "POST", body: fd });
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
+        body: fd,
+      });
       const data = await res.json();
       if (data.success) {
         profileEditModal.hide();
