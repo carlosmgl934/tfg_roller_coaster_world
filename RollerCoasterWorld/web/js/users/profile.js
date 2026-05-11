@@ -1151,7 +1151,16 @@ $(document).ready(function () {
         forceFallback: true,
         fallbackTolerance: 3,
         touchStartThreshold: 3,
+        delay: 50,
+        delayOnTouchOnly: true,
+        ghostClass: "sortable-ghost",
+        dragClass: "sortable-drag",
+        onStart: function () {
+          document.body.classList.add("is-dragging");
+          window.getSelection().removeAllRanges();
+        },
         onEnd: function () {
+          document.body.classList.remove("is-dragging");
           const newOrder = [];
           $("#top-coasters-list-edit .tops-edit-item").each(function (i) {
             $(this)
@@ -1218,7 +1227,16 @@ $(document).ready(function () {
         forceFallback: true,
         fallbackTolerance: 3,
         touchStartThreshold: 3,
+        delay: 50,
+        delayOnTouchOnly: true,
+        ghostClass: "sortable-ghost",
+        dragClass: "sortable-drag",
+        onStart: function () {
+          document.body.classList.add("is-dragging");
+          window.getSelection().removeAllRanges();
+        },
         onEnd: function () {
+          document.body.classList.remove("is-dragging");
           const newOrder = [];
           $("#top-parks-list-edit .tops-edit-item").each(function (i) {
             $(this)
@@ -1848,6 +1866,11 @@ $(document).ready(function () {
       renderParksPreview(topsData.parks);
     },
   );
+
+  // -- Delegación de mousedown para prevenir selección en escritorio (Capa 1)
+  $(document).on("mousedown", ".drag-handle", function (e) {
+    e.preventDefault();
+  });
 
   function showSection(sectionId) {
     // Ocultar todas las secciones principales

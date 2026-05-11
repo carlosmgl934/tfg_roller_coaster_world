@@ -969,3 +969,44 @@ span.flatpickr-weekday {
   cursor: grabbing;
 }
 
+
+/* Prevenir selecci�n de texto al arrastrar en el top */
+.tops-edit-item {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Estilo mientras se arrastra */
+.sortable-ghost {
+  opacity: 0.4;
+  border: 2px dashed #4e73df !important;
+}
+.sortable-drag {
+  background: #2e59d9 !important;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  z-index: 9999;
+}
+
+
+/* Force no selection */
+.tops-edit-item * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+} 
+
+
+/* Solución definitiva de selección: Capa 2 y 3 */
+#top-coasters-list-edit, #top-parks-list-edit {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+}
+
+body.is-dragging, body.is-dragging * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  cursor: grabbing !important;
+}
+
