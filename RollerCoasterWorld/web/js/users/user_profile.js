@@ -157,6 +157,35 @@ $(document).ready(function () {
     setupTabs();
   }
 
+  // Manejador para expandir/contraer estadísticas en las tarjetas del Top
+  $(document).on("click", ".btn-toggle-stats", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const $btn = $(this);
+    const $card = $btn.closest(".top-card");
+    const $stats = $card.find(".stats-expandable");
+    const $imgContainer = $card.find(".rank-img-container");
+    const $img = $imgContainer.find("img");
+
+    const isExpanded = !$stats.hasClass("d-none");
+
+    if (isExpanded) {
+      // Contraer
+      $stats.addClass("d-none");
+      $card.css("height", "85px");
+      $imgContainer.css({ width: "85px", height: "85px" });
+      $img.css("height", "85px");
+      $btn.html('<i class="fa-solid fa-plus"></i>');
+    } else {
+      // Expandir
+      $stats.removeClass("d-none");
+      $card.css("height", "140px");
+      $imgContainer.css({ width: "140px", height: "140px" });
+      $img.css("height", "140px");
+      $btn.html('<i class="fa-solid fa-minus"></i>');
+    }
+  });
+
   function setupTabs() {
     const menuLinks = $("#sidebar-menu a.list-group-item").not(
       'a[href*="trip_generator"]',
@@ -302,24 +331,43 @@ $(document).ready(function () {
           : `${BASE_URL}/web/views/public/parks/parks.php?id=${item.id}`;
         const rank = parseInt(item.rank_position) || index + 1;
         const title = isCoaster ? item.coaster_name : item.park_name;
-        const subtitle1 = isCoaster ? item.manufacturer : item.park_country;
-        const subtitle2 = isCoaster ? item.location : "";
-
-        const subtitleHTML = subtitle2
-          ? `${subtitle1} &bull; <span class="text-secondary">${subtitle2}</span>`
-          : `${subtitle1}`;
+        
+        const isMobile = window.innerWidth < 768;
+        // Solo colapsamos por defecto en móvil para ahorrar espacio inicial
+        const shouldCollapse = isMobile;
+        const cardHeight = shouldCollapse ? "85px" : "140px";
 
         const html = `
-            <a href="${link}" class="list-group-item list-group-item-action bg-transparent border-bottom border-secondary border-opacity-25 px-0 py-3" style="transition: all 0.2s ease-in-out;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.05)'" onmouseout="this.style.backgroundColor='transparent'">
-                <div class="d-flex align-items-center gap-3 px-3">
-                    <img src="${imgUrl}" alt="${title}" class="rounded-0 shadow-sm flex-shrink-0" style="width: 120px; height: 80px; object-fit: cover;" onerror="this.src='${fallbackImage}'">
-                    <div class="flex-grow-1 min-w-0">
-                        <h5 class="fw-bold mb-1 text-light fs-5"><span class="text-success me-2">${rank}</span> ${title}</h5>
-                        <p class="mb-0 text-muted small">${subtitleHTML}</p>
-                    </div>
+          <div class="mb-2">
+            <a href="${link}" class="top-card d-flex align-items-stretch text-decoration-none shadow-sm" 
+               style="height:${cardHeight}; transition: height 0.2s ease-out; overflow: hidden; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+              <div class="rank-img-container" style="width:${cardHeight}; height:${cardHeight}; flex-shrink:0; position:relative; transition: all 0.2s ease-out;">
+                <img src="${imgUrl}" alt="${title}" class="w-100 h-100 object-fit-cover" style="height:${cardHeight};" onerror="this.src='${fallbackImage}'">
+                <span class="rank-badge" style="position:absolute; top:5px; left:5px; background:var(--rcw-green); color:white; font-size: 0.65rem; padding: 2px 6px; font-weight:bold; border-radius:2px;">#${rank}</span>
+              </div>
+              <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center position-relative" style="width: 0; min-width: 0;">
+                <button class="btn btn-sm btn-toggle-stats text-secondary p-0 position-absolute" style="top:8px; right:12px; z-index:10; width:24px; height:24px; background: rgba(255,255,255,0.05); border-radius:50%;" title="Ver detalles">
+                  <i class="fa-solid fa-${shouldCollapse ? "plus" : "minus"}"></i>
+                </button>
+                <div class="mb-1 pe-4">
+                  <div class="fw-bold text-white text-truncate" style="font-family: var(--rcw-font-title); font-size: 0.95rem; width: 100%;">${title}</div>
+                  <small class="text-muted text-truncate d-block" style="font-size: 0.72rem; width: 100%;">
+                    ${isCoaster ? (item.manufacturer || "Desconocido") : (item.park_location || "Desconocida")} · ${item.park_country || item.country_name || ""}
+                  </small>
                 </div>
+                <div class="stats-expandable ${shouldCollapse ? "d-none" : ""} d-flex gap-2 flex-wrap mt-1">
+                   ${isCoaster ? `
+                    <small class="badge bg-dark border border-secondary border-opacity-25 text-light fw-normal" style="font-size:0.65rem;"><i class="fa-solid fa-ruler-vertical text-success me-1"></i>${item.height || "0"}m</small>
+                    <small class="badge bg-dark border border-secondary border-opacity-25 text-light fw-normal" style="font-size:0.65rem;"><i class="fa-solid fa-bolt text-warning me-1"></i>${item.speed || "0"}km/h</small>
+                    <small class="badge bg-dark border border-secondary border-opacity-25 text-light fw-normal" style="font-size:0.65rem;"><i class="fa-solid fa-industry text-info me-1"></i>${item.manufacturer || "N/A"}</small>
+                   ` : `
+                    <small class="badge bg-dark border border-secondary border-opacity-25 text-light fw-normal" style="font-size:0.65rem;"><i class="fa-solid fa-bolt text-success me-1"></i>${item.operating_coasters || "0"} coasters</small>
+                    <small class="badge bg-dark border border-secondary border-opacity-25 text-light fw-normal" style="font-size:0.65rem;"><i class="fa-solid fa-star text-warning me-1"></i>${item.stars || "0.00"}</small>
+                   `}
+                </div>
+              </div>
             </a>
-            `;
+          </div>`;
         container.append(html);
       });
     }

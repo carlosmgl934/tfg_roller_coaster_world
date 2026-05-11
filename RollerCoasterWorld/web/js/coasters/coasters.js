@@ -386,8 +386,8 @@ $(document).ready(function () {
         }
 
         const img = validImgUrl
-          ? `<img src="${validImgUrl}" alt="${coaster.coaster_name}" class="rounded-0 shadow-sm" referrerpolicy="no-referrer" style="width: 100px; height: 100px; object-fit: cover; margin-right: 20px;">`
-          : `<img src="https://www.hussrides.com/fileadmin/_processed_/5/e/csm_giant-frisbee-cedarpoint-01_0697df513a.jpg" alt="Sin imagen" class="rounded-0 shadow-sm" style="width: 100px; height: 100px; object-fit: cover; margin-right: 20px;">`;
+          ? `<img src="${validImgUrl}" alt="${coaster.coaster_name}" class="rounded-0 shadow-sm" referrerpolicy="no-referrer" style="width: 110px; height: 110px; object-fit: cover; margin-right: 20px; flex-shrink:0;">`
+          : `<img src="https://www.hussrides.com/fileadmin/_processed_/5/e/csm_giant-frisbee-cedarpoint-01_0697df513a.jpg" alt="Sin imagen" class="rounded-0 shadow-sm" style="width: 110px; height: 110px; object-fit: cover; margin-right: 20px; flex-shrink:0;">`;
 
         const manufacter = coaster.manufacter || "Desconocido";
         const modelo = coaster.modelo || "Desconocido";

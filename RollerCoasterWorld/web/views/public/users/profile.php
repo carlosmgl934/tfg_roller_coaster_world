@@ -522,45 +522,44 @@ $user_uid = $_SESSION['firebase_uid'];
                 <div class="tops-filters-bar mb-3">
                   <div class="tops-filters-grid">
                     <div class="tops-filter-item">
-                      <label class="tops-filter-label"><i class="fa-solid fa-sort me-1"></i>Ordenar</label>
+                      <label class="tops-filter-label"><i class="fa-solid fa-arrow-down-short-wide"></i>Criterio</label>
                       <div class="tops-sort-row">
                         <select id="coasters-sort" class="tops-filter-select tops-sort-select">
                           <option value="rank">Mi Ranking</option>
-                          <option value="name">A-Z</option>
+                          <option value="name">Nombre (A-Z)</option>
                           <option value="height">Altura</option>
                           <option value="speed">Velocidad</option>
                           <option value="length">Longitud</option>
                           <option value="inversions">Inversiones</option>
-                          <option value="year">Antigüedad</option>
+                          <option value="year">Apertura</option>
                         </select>
-                        <button id="coasters-sort-dir" class="tops-sort-dir-btn" title="Cambiar dirección"
-                          data-dir="desc">
-                          <i class="fa-solid fa-arrow-down-wide-short"></i>
+                        <button id="coasters-sort-dir" class="tops-sort-dir-btn" title="Dirección" data-dir="desc">
+                          <i class="fa-solid fa-sort"></i>
                         </button>
                       </div>
                     </div>
                     <div class="tops-filter-item">
-                      <label class="tops-filter-label"><i class="fa-solid fa-map-pin me-1"></i>Parque</label>
+                      <label class="tops-filter-label"><i class="fa-solid fa-tree-city"></i>Parque</label>
                       <select id="coasters-filter-park" class="tops-filter-select">
-                        <option value="">Todos los parques</option>
+                        <option value="">Todos</option>
                       </select>
                     </div>
                     <div class="tops-filter-item">
-                      <label class="tops-filter-label"><i class="fa-solid fa-earth-europe me-1"></i>País</label>
+                      <label class="tops-filter-label"><i class="fa-solid fa-earth-americas"></i>País</label>
                       <select id="coasters-filter-country" class="tops-filter-select">
-                        <option value="">Todos los países</option>
+                        <option value="">Todos</option>
                       </select>
                     </div>
                     <div class="tops-filter-item">
-                      <label class="tops-filter-label"><i class="fa-solid fa-industry me-1"></i>Fabricante</label>
+                      <label class="tops-filter-label"><i class="fa-solid fa-industry"></i>Fabricante</label>
                       <select id="coasters-filter-manufacter" class="tops-filter-select">
-                        <option value="">Todos los fabricantes</option>
+                        <option value="">Todos</option>
                       </select>
                     </div>
                     <div class="tops-filter-item">
-                      <label class="tops-filter-label"><i class="fa-solid fa-gears me-1"></i>Modelo</label>
+                      <label class="tops-filter-label"><i class="fa-solid fa-gears"></i>Modelo</label>
                       <select id="coasters-filter-model" class="tops-filter-select">
-                        <option value="">Todos los modelos</option>
+                        <option value="">Todos</option>
                       </select>
                     </div>
                   </div>

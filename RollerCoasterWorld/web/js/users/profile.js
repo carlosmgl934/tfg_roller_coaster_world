@@ -128,9 +128,9 @@ $(document).ready(function () {
     } else {
       // Expandir
       $stats.removeClass("d-none");
-      $card.css("height", "115px");
-      $imgContainer.css({ width: "115px", height: "115px" });
-      $img.css("height", "115px");
+      $card.css("height", "140px");
+      $imgContainer.css({ width: "140px", height: "140px" });
+      $img.css("height", "140px");
       $btn.html('<i class="fa-solid fa-minus"></i>');
     }
   });
@@ -893,30 +893,35 @@ $(document).ready(function () {
             </a>
           </div>`);
       } else {
-        const isRankSort = sort === "rank_position";
+        const isRankSort = sort === "rank" || sort === "rank_position";
+        const isNameSort = sort === "name";
         const isMobile = window.innerWidth < 768;
-        // En móvil siempre colapsamos por defecto para ahorrar espacio, a menos que no sea orden por ranking (donde el usuario espera ver el dato por el que ordenó)
-        // Pero el usuario dice "se sigue sin ver bien por tanta información", así que forzamos colapso en móvil si hay mucha info.
-        const shouldCollapse = isMobile || isRankSort;
+        
+        // El botón "+" solo se muestra si ordenamos por Ranking o por Nombre (A-Z)
+        const hasToggle = isRankSort || isNameSort;
+        // Colapsar por defecto en móvil si hay toggle
+        const shouldCollapse = hasToggle && (isMobile || isRankSort);
+        const cardHeight = shouldCollapse ? "85px" : "140px";
 
         container.append(`
           <div class="${colClass}">
             <a href="${detailUrl}" class="top-card d-flex align-items-stretch text-decoration-none shadow-sm mb-2" 
-               style="height:${shouldCollapse ? "85px" : "110px"}; transition: height 0.2s ease-out; overflow: hidden;">
-              <div class="rank-img-container" style="width:${shouldCollapse ? "85px" : "110px"}; height:${shouldCollapse ? "85px" : "110px"}; flex-shrink:0; position:relative; transition: all 0.2s ease-out;">
-                ${img.replace(/height:\d+px/g, shouldCollapse ? "height:85px" : "height:110px")}
+               style="height:${cardHeight}; transition: height 0.2s ease-out; overflow: hidden;">
+              <div class="rank-img-container" style="width:${cardHeight}; height:${cardHeight}; flex-shrink:0; position:relative; transition: all 0.2s ease-out;">
+                ${img.replace(/height:\d+px/g, "height:" + cardHeight)}
                 <span class="rank-badge" style="font-size: 0.65rem; padding: 2px 6px;">#${item.rank_position}</span>
               </div>
               <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center position-relative" style="width: 0; min-width: 0;">
-                <button class="btn btn-sm btn-toggle-stats text-secondary p-0 position-absolute ${!shouldCollapse && !isMobile ? "d-none" : ""}" style="top:8px; right:12px; z-index:10; width:24px; height:24px; background: rgba(255,255,255,0.05); border-radius:50%;" title="Ver más detalles">
+                ${hasToggle ? `
+                <button class="btn btn-sm btn-toggle-stats text-secondary p-0 position-absolute" style="top:8px; right:12px; z-index:10; width:24px; height:24px; background: rgba(255,255,255,0.05); border-radius:50%;" title="Ver más detalles">
                   <i class="fa-solid fa-${shouldCollapse ? "plus" : "minus"}"></i>
-                </button>
+                </button>` : ""}
                 <div class="mb-1 pe-4">
                   <div class="fw-bold text-white text-truncate" style="font-family: var(--rcw-font-title); font-size: 0.95rem; width: 100%;">${item.coaster_name}</div>
                   <small class="text-muted text-truncate d-block" style="font-size: 0.72rem; width: 100%;">${item.park_name} · ${item.country_name || ""}</small>
                 </div>
                 <div class="stats-expandable ${shouldCollapse ? "d-none" : ""} d-flex gap-2 flex-wrap mt-1">
-                  ${getStatBadges(item, sort)}
+                  ${getStatBadges(item, sort).replace(/<small/g, '<small style="font-size: 0.65rem;"').replace(/fa-industry/g, 'fa-industry me-1').replace(/fa-bolt/g, 'fa-bolt me-1')}
                 </div>
               </div>
             </a>

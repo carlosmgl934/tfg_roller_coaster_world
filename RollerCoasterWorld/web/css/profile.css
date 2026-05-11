@@ -445,92 +445,86 @@ span.flatpickr-weekday {
 
 /* ── TOPS: SYMMETRIC FILTER BAR ──────────────────────────────── */
 .tops-filters-bar {
-  background: var(--rcw-bg-card-alt);
-  border: 1px solid var(--rcw-border);
-  border-radius: 0;
-  padding: 12px 14px;
+  background: rgba(22, 27, 34, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1.25rem;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
 }
 .tops-filters-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-  margin-bottom: 10px;
-}
-.tops-filters-grid--2col {
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 0;
 }
 .tops-filter-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.5rem;
 }
 .tops-filter-label {
-  font-size: 0.68rem;
-  font-weight: 700;
+  font-size: 0.62rem;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--rcw-text-muted);
-  margin: 0;
+  letter-spacing: 0.08em;
+  color: #8b949e;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 .tops-filter-label i {
-  color: var(--rcw-green-neon);
+  color: var(--rcw-green);
+  font-size: 0.75rem;
+  width: 14px;
+  text-align: center;
 }
 .tops-filter-select {
-  background-color: var(--rcw-bg-input);
-  border: 1px solid var(--rcw-border-strong);
-  color: var(--rcw-text-primary);
-  font-size: 0.8rem;
-  font-weight: 500;
-  padding: 5px 10px;
-  border-radius: 0 !important;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  color: #c9d1d9;
+  font-size: 0.82rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 6px;
   width: 100%;
+  outline: none;
+  transition: all 0.2s ease;
   cursor: pointer;
   appearance: auto;
-  transition: border-color 0.2s ease;
 }
 .tops-filter-select:focus {
-  outline: none;
-  border-color: var(--rcw-green-neon);
-  box-shadow: 0 0 0 2px rgba(0, 200, 83, 0.15);
+  border-color: var(--rcw-green);
+  background: rgba(25, 135, 84, 0.05);
+  box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.15);
 }
 
 /* ── Sort row: select + direction button ────────────────────── */
 .tops-sort-row {
   display: flex;
-  gap: 4px;
+  gap: 0.5rem;
   align-items: stretch;
 }
 .tops-sort-select {
   flex: 1;
-  min-width: 0;
 }
 .tops-sort-dir-btn {
-  flex-shrink: 0;
-  width: 34px;
-  height: 100%;
-  min-height: 30px;
-  background: var(--rcw-bg-input);
-  border: 1px solid var(--rcw-border-strong);
-  color: var(--rcw-green-neon);
-  font-size: 0.85rem;
+  width: 40px;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  color: var(--rcw-green);
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border-radius: 0 !important;
-  transition:
-    background 0.2s,
-    border-color 0.2s,
-    color 0.2s;
+  transition: all 0.2s;
   padding: 0;
 }
 .tops-sort-dir-btn:hover {
-  background: rgba(0, 200, 83, 0.12);
-  border-color: var(--rcw-green-neon);
-  color: #fff;
+  background: rgba(25, 135, 84, 0.15);
+  border-color: var(--rcw-green);
 }
 .tops-sort-dir-btn i {
-  transition: transform 0.25s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tops-filters-footer {

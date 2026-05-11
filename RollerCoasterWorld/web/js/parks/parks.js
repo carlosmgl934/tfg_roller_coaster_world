@@ -168,7 +168,7 @@ $(document).ready(function () {
               : fallbackImg;
             html += `
               <a href="${window.BASE_URL || ""}/web/views/public/parks/parks.php?id=${park.id}" class="list-group-item list-group-item-action d-flex align-items-center p-3">
-                <img src="${imgSrc}" class="rounded-0 shadow-sm object-fit-cover me-3" style="width:100px; height:100px;">
+                <img src="${imgSrc}" class="rounded-0 shadow-sm object-fit-cover me-3" style="width:110px; height:110px; flex-shrink:0;">
                 <div class="flex-grow-1">
                   <h5 class="mb-1 fw-bold text-success">${park.park_name || "Sin nombre"}</h5>
                   <p class="mb-1 text-muted"><i class="fa-solid fa-map-pin me-1"></i>${park.park_location || "N/A"}, ${park.park_country || ""}</p>
