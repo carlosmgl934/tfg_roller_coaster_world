@@ -559,7 +559,13 @@ $(document).ready(function () {
           {
             method: "POST",
             body: JSON.stringify({ photo_url: photoUrl }),
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRF-Token":
+                document
+                  .querySelector('meta[name="csrf-token"]')
+                  ?.getAttribute("content") ?? "",
+            },
           },
         );
         const data = await res.json();
