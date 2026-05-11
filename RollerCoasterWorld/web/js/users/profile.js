@@ -1724,7 +1724,9 @@ $(document).ready(function () {
 
   function reindexTopsDOM(listId) {
     $(`#${listId} .tops-edit-item`).each(function (i) {
-      $(this).find(".tops-rank-badge").text("#" + (i + 1));
+      $(this)
+        .find(".tops-rank-badge")
+        .text("#" + (i + 1));
     });
   }
 
@@ -1753,35 +1755,63 @@ $(document).ready(function () {
   }
 
   // -- Coasters: mover al principio
-  $(document).on("click", "#top-coasters-list-edit .tops-move-first", function () {
-    const $item = $(this).closest(".tops-edit-item");
-    moveTopsItem("top-coasters-list-edit", $item, 0);
-    topsData.coasters = syncTopsDataFromDOM("top-coasters-list-edit", topsData.coasters, "coaster_id");
-    renderCoastersPreview(topsData.coasters);
-  });
+  $(document).on(
+    "click",
+    "#top-coasters-list-edit .tops-move-first",
+    function () {
+      const $item = $(this).closest(".tops-edit-item");
+      moveTopsItem("top-coasters-list-edit", $item, 0);
+      topsData.coasters = syncTopsDataFromDOM(
+        "top-coasters-list-edit",
+        topsData.coasters,
+        "coaster_id",
+      );
+      renderCoastersPreview(topsData.coasters);
+    },
+  );
   // -- Coasters: mover al final
-  $(document).on("click", "#top-coasters-list-edit .tops-move-last", function () {
-    const $item = $(this).closest(".tops-edit-item");
-    const total = $("#top-coasters-list-edit .tops-edit-item").length;
-    moveTopsItem("top-coasters-list-edit", $item, total);
-    topsData.coasters = syncTopsDataFromDOM("top-coasters-list-edit", topsData.coasters, "coaster_id");
-    renderCoastersPreview(topsData.coasters);
-  });
+  $(document).on(
+    "click",
+    "#top-coasters-list-edit .tops-move-last",
+    function () {
+      const $item = $(this).closest(".tops-edit-item");
+      const total = $("#top-coasters-list-edit .tops-edit-item").length;
+      moveTopsItem("top-coasters-list-edit", $item, total);
+      topsData.coasters = syncTopsDataFromDOM(
+        "top-coasters-list-edit",
+        topsData.coasters,
+        "coaster_id",
+      );
+      renderCoastersPreview(topsData.coasters);
+    },
+  );
   // -- Coasters: mover a posición específica
-  $(document).on("click", "#top-coasters-list-edit .tops-move-pos-btn", function () {
-    const $item = $(this).closest(".tops-edit-item");
-    const pos = parseInt($(this).siblings(".tops-move-pos-input").val(), 10);
-    if (!pos || pos < 1) return;
-    moveTopsItem("top-coasters-list-edit", $item, pos - 1);
-    topsData.coasters = syncTopsDataFromDOM("top-coasters-list-edit", topsData.coasters, "coaster_id");
-    renderCoastersPreview(topsData.coasters);
-  });
+  $(document).on(
+    "click",
+    "#top-coasters-list-edit .tops-move-pos-btn",
+    function () {
+      const $item = $(this).closest(".tops-edit-item");
+      const pos = parseInt($(this).siblings(".tops-move-pos-input").val(), 10);
+      if (!pos || pos < 1) return;
+      moveTopsItem("top-coasters-list-edit", $item, pos - 1);
+      topsData.coasters = syncTopsDataFromDOM(
+        "top-coasters-list-edit",
+        topsData.coasters,
+        "coaster_id",
+      );
+      renderCoastersPreview(topsData.coasters);
+    },
+  );
 
   // -- Parks: mover al principio
   $(document).on("click", "#top-parks-list-edit .tops-move-first", function () {
     const $item = $(this).closest(".tops-edit-item");
     moveTopsItem("top-parks-list-edit", $item, 0);
-    topsData.parks = syncTopsDataFromDOM("top-parks-list-edit", topsData.parks, "park_id");
+    topsData.parks = syncTopsDataFromDOM(
+      "top-parks-list-edit",
+      topsData.parks,
+      "park_id",
+    );
     renderParksPreview(topsData.parks);
   });
   // -- Parks: mover al final
@@ -1789,18 +1819,30 @@ $(document).ready(function () {
     const $item = $(this).closest(".tops-edit-item");
     const total = $("#top-parks-list-edit .tops-edit-item").length;
     moveTopsItem("top-parks-list-edit", $item, total);
-    topsData.parks = syncTopsDataFromDOM("top-parks-list-edit", topsData.parks, "park_id");
+    topsData.parks = syncTopsDataFromDOM(
+      "top-parks-list-edit",
+      topsData.parks,
+      "park_id",
+    );
     renderParksPreview(topsData.parks);
   });
   // -- Parks: mover a posición específica
-  $(document).on("click", "#top-parks-list-edit .tops-move-pos-btn", function () {
-    const $item = $(this).closest(".tops-edit-item");
-    const pos = parseInt($(this).siblings(".tops-move-pos-input").val(), 10);
-    if (!pos || pos < 1) return;
-    moveTopsItem("top-parks-list-edit", $item, pos - 1);
-    topsData.parks = syncTopsDataFromDOM("top-parks-list-edit", topsData.parks, "park_id");
-    renderParksPreview(topsData.parks);
-  });
+  $(document).on(
+    "click",
+    "#top-parks-list-edit .tops-move-pos-btn",
+    function () {
+      const $item = $(this).closest(".tops-edit-item");
+      const pos = parseInt($(this).siblings(".tops-move-pos-input").val(), 10);
+      if (!pos || pos < 1) return;
+      moveTopsItem("top-parks-list-edit", $item, pos - 1);
+      topsData.parks = syncTopsDataFromDOM(
+        "top-parks-list-edit",
+        topsData.parks,
+        "park_id",
+      );
+      renderParksPreview(topsData.parks);
+    },
+  );
 
   function showSection(sectionId) {
     // Ocultar todas las secciones principales
@@ -1969,12 +2011,12 @@ $(document).ready(function () {
               else statusText = statusText.toUpperCase();
 
               dropdown.append(
-                `<li class="list-group-item list-group-item-action bg-dark text-white border-secondary d-flex justify-content-between align-items-center" style="cursor:pointer;" data-id="${coaster.id}">
-                  <div class="text-truncate">
-                    <strong>${coaster.coaster_name}</strong> <small class="text-secondary ms-2">en ${coaster.park_name}</small>
-                  </div>
-                  <div class="opacity-50 text-nowrap ms-3 text-end" style="font-size: 0.8em; min-width: max-content;">
-                    ${statusText} • ${coaster.park_country || "Desconocido"}
+                `<li class="list-group-item list-group-item-action bg-dark text-white border-secondary py-2" style="cursor:pointer;" data-id="${coaster.id}">
+                  <div class="fw-bold text-truncate" style="font-size:0.95rem;">${coaster.coaster_name}</div>
+                  <div class="text-secondary" style="font-size:0.78rem;">
+                    <i class="fa-solid fa-tree-city me-1 opacity-50"></i>${coaster.park_name}
+                    <span class="mx-1 opacity-40">•</span>${statusText}
+                    <span class="mx-1 opacity-40">•</span>${coaster.park_country || ""}
                   </div>
                 </li>`,
               );
@@ -2120,8 +2162,11 @@ $(document).ready(function () {
           } else {
             data.forEach(function (park) {
               dropdown.append(
-                `<li class="list-group-item list-group-item-action bg-dark text-white border-secondary" style="cursor:pointer;" data-id="${park.park_id}">
-                  <strong>${park.park_name}</strong> <small class="text-secondary text-nowrap ms-2">${park.country_name || ""}</small>
+                `<li class="list-group-item list-group-item-action bg-dark text-white border-secondary py-2" style="cursor:pointer;" data-id="${park.park_id}">
+                  <div class="fw-bold text-truncate" style="font-size:0.95rem;">${park.park_name}</div>
+                  <div class="text-secondary" style="font-size:0.78rem;">
+                    <i class="fa-solid fa-location-dot me-1 opacity-50"></i>${park.country_name || ""}
+                  </div>
                 </li>`,
               );
             });
