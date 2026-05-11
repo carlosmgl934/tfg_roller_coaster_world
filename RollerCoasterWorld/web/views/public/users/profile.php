@@ -819,6 +819,8 @@ $user_uid = $_SESSION['firebase_uid'];
                   style="width: 40px; height: 40px;">
                   <i class="fa-solid fa-chart-line fs-5 text-success"></i>
                 </div>
+                <div>
+                  <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">Estadísticas de</h5>
                   <div class="stats-type-wrapper" style="cursor: pointer; margin-top: 2px; width: fit-content;">
                     <select id="rank-type-select">
                       <option value="coasters">Coasters</option>
