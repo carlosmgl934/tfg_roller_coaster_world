@@ -1116,7 +1116,32 @@ $(document).ready(function () {
             <div class="fw-bold text-white text-truncate">${item.coaster_name}</div>
             <small class="text-secondary d-block text-truncate">${item.park_name}</small>
           </div>
-          <button class="btn btn-sm btn-outline-danger border-0 square-box tops-remove-item"><i class="fa-solid fa-trash"></i></button>
+          <div class="d-flex gap-1">
+            <div class="dropdown">
+              <button class="btn btn-sm btn-outline-secondary border-0 square-box dropdown-toggle dropdown-toggle-split"
+                data-bs-toggle="dropdown" aria-expanded="false" title="Mover a...">
+                <i class="fa-solid fa-arrows-up-down"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="min-width:200px;">
+                <li><button class="dropdown-item tops-move-first" type="button">
+                  <i class="fa-solid fa-angles-up me-2 text-success"></i>Mover al principio
+                </button></li>
+                <li><button class="dropdown-item tops-move-last" type="button">
+                  <i class="fa-solid fa-angles-down me-2 text-warning"></i>Mover al final
+                </button></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <div class="px-3 py-1 d-flex align-items-center gap-2">
+                    <span style="font-size:0.85rem;white-space:nowrap;">Pos.:</span>
+                    <input type="number" min="1" class="form-control form-control-sm bg-dark text-white border-secondary tops-move-pos-input"
+                      style="width:60px;" placeholder="#">
+                    <button class="btn btn-sm btn-success rounded-0 tops-move-pos-btn" type="button">OK</button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <button class="btn btn-sm btn-outline-danger border-0 square-box tops-remove-item"><i class="fa-solid fa-trash"></i></button>
+          </div>
         </div>`);
     });
     if (window.Sortable) {
@@ -1155,7 +1180,32 @@ $(document).ready(function () {
             <span class="fw-bold text-white">${item.park_name}</span>
             <small class="text-secondary ms-2">${item.country_name || ""}</small>
           </div>
-          <button class="btn btn-sm btn-outline-danger border-0 square-box tops-remove-item"><i class="fa-solid fa-trash"></i></button>
+          <div class="d-flex gap-1">
+            <div class="dropdown">
+              <button class="btn btn-sm btn-outline-secondary border-0 square-box dropdown-toggle dropdown-toggle-split"
+                data-bs-toggle="dropdown" aria-expanded="false" title="Mover a...">
+                <i class="fa-solid fa-arrows-up-down"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="min-width:200px;">
+                <li><button class="dropdown-item tops-move-first" type="button">
+                  <i class="fa-solid fa-angles-up me-2 text-success"></i>Mover al principio
+                </button></li>
+                <li><button class="dropdown-item tops-move-last" type="button">
+                  <i class="fa-solid fa-angles-down me-2 text-warning"></i>Mover al final
+                </button></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <div class="px-3 py-1 d-flex align-items-center gap-2">
+                    <span style="font-size:0.85rem;white-space:nowrap;">Pos.:</span>
+                    <input type="number" min="1" class="form-control form-control-sm bg-dark text-white border-secondary tops-move-pos-input"
+                      style="width:60px;" placeholder="#">
+                    <button class="btn btn-sm btn-success rounded-0 tops-move-pos-btn" type="button">OK</button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <button class="btn btn-sm btn-outline-danger border-0 square-box tops-remove-item"><i class="fa-solid fa-trash"></i></button>
+          </div>
         </div>`);
     });
     if (window.Sortable) {
@@ -1669,6 +1719,88 @@ $(document).ready(function () {
       renderParksPreview(topsData.parks);
     },
   );
+
+  // ── Mover items en modo edición ───────────────────────────────────
+
+  function reindexTopsDOM(listId) {
+    $(`#${listId} .tops-edit-item`).each(function (i) {
+      $(this).find(".tops-rank-badge").text("#" + (i + 1));
+    });
+  }
+
+  function moveTopsItem(listId, $item, targetIndex) {
+    const $list = $(`#${listId}`);
+    $item.detach();
+    const $remaining = $list.find(".tops-edit-item");
+    const total = $remaining.length;
+    targetIndex = Math.max(0, Math.min(targetIndex, total));
+    if (targetIndex >= total) {
+      $list.append($item);
+    } else {
+      $remaining.eq(targetIndex).before($item);
+    }
+    reindexTopsDOM(listId);
+  }
+
+  function syncTopsDataFromDOM(listId, dataArray, idKey) {
+    const newOrder = [];
+    $(`#${listId} .tops-edit-item`).each(function (i) {
+      const id = $(this).data("id");
+      const found = dataArray.find((d) => d[idKey] == id);
+      if (found) newOrder.push({ ...found, rank_position: i + 1 });
+    });
+    return newOrder;
+  }
+
+  // -- Coasters: mover al principio
+  $(document).on("click", "#top-coasters-list-edit .tops-move-first", function () {
+    const $item = $(this).closest(".tops-edit-item");
+    moveTopsItem("top-coasters-list-edit", $item, 0);
+    topsData.coasters = syncTopsDataFromDOM("top-coasters-list-edit", topsData.coasters, "coaster_id");
+    renderCoastersPreview(topsData.coasters);
+  });
+  // -- Coasters: mover al final
+  $(document).on("click", "#top-coasters-list-edit .tops-move-last", function () {
+    const $item = $(this).closest(".tops-edit-item");
+    const total = $("#top-coasters-list-edit .tops-edit-item").length;
+    moveTopsItem("top-coasters-list-edit", $item, total);
+    topsData.coasters = syncTopsDataFromDOM("top-coasters-list-edit", topsData.coasters, "coaster_id");
+    renderCoastersPreview(topsData.coasters);
+  });
+  // -- Coasters: mover a posición específica
+  $(document).on("click", "#top-coasters-list-edit .tops-move-pos-btn", function () {
+    const $item = $(this).closest(".tops-edit-item");
+    const pos = parseInt($(this).siblings(".tops-move-pos-input").val(), 10);
+    if (!pos || pos < 1) return;
+    moveTopsItem("top-coasters-list-edit", $item, pos - 1);
+    topsData.coasters = syncTopsDataFromDOM("top-coasters-list-edit", topsData.coasters, "coaster_id");
+    renderCoastersPreview(topsData.coasters);
+  });
+
+  // -- Parks: mover al principio
+  $(document).on("click", "#top-parks-list-edit .tops-move-first", function () {
+    const $item = $(this).closest(".tops-edit-item");
+    moveTopsItem("top-parks-list-edit", $item, 0);
+    topsData.parks = syncTopsDataFromDOM("top-parks-list-edit", topsData.parks, "park_id");
+    renderParksPreview(topsData.parks);
+  });
+  // -- Parks: mover al final
+  $(document).on("click", "#top-parks-list-edit .tops-move-last", function () {
+    const $item = $(this).closest(".tops-edit-item");
+    const total = $("#top-parks-list-edit .tops-edit-item").length;
+    moveTopsItem("top-parks-list-edit", $item, total);
+    topsData.parks = syncTopsDataFromDOM("top-parks-list-edit", topsData.parks, "park_id");
+    renderParksPreview(topsData.parks);
+  });
+  // -- Parks: mover a posición específica
+  $(document).on("click", "#top-parks-list-edit .tops-move-pos-btn", function () {
+    const $item = $(this).closest(".tops-edit-item");
+    const pos = parseInt($(this).siblings(".tops-move-pos-input").val(), 10);
+    if (!pos || pos < 1) return;
+    moveTopsItem("top-parks-list-edit", $item, pos - 1);
+    topsData.parks = syncTopsDataFromDOM("top-parks-list-edit", topsData.parks, "park_id");
+    renderParksPreview(topsData.parks);
+  });
 
   function showSection(sectionId) {
     // Ocultar todas las secciones principales
