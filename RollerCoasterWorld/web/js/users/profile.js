@@ -923,18 +923,15 @@ $(document).ready(function () {
                style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(4px);">
               
               <!-- Imagen y Ranking -->
-              <div class="rank-img-container p-3 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.15); min-width: 130px;">
-                <div class="position-relative">
+              <div class="rank-img-container position-relative d-flex" style="flex-shrink: 0; min-width: 130px; min-height: 130px;">
                   <img src="${item.imagen_url.startsWith("/") ? BASE_URL + item.imagen_url : item.imagen_url}" 
                        alt="${item.coaster_name}" 
-                       class="rounded-3 shadow" 
-                       style="width: 100px; height: 100px; object-fit: cover; border: 2px solid rgba(255,255,255,0.05);">
-                  <span class="rank-badge" style="position: absolute; top: -8px; left: -8px; font-size: 0.8rem; font-weight: 800; padding: 4px 10px; border-radius: 6px; background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 12px rgba(16,185,129,0.4); border: 1px solid rgba(255,255,255,0.1);">#${item.rank_position}</span>
-                </div>
+                       style="width: 100%; height: 100%; object-fit: cover; border-radius: 0;">
+                  <span class="rank-badge" style="position: absolute; top: 0; left: 0; font-size: 0.8rem; font-weight: 800; padding: 4px 10px; background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 12px rgba(16,185,129,0.4); border-bottom-right-radius: 6px;">#${item.rank_position}</span>
               </div>
 
               <!-- Contenido -->
-              <div class="p-4 flex-grow-1 d-flex flex-column justify-content-center">
+              <div class="p-3 flex-grow-1 d-flex flex-column justify-content-center">
                 <div class="d-flex justify-content-between align-items-start mb-2">
                   <div class="pe-3">
                     <a href="${detailUrl}" class="fw-bold text-white text-decoration-none d-block hover-green" style="font-family: var(--rcw-font-title); font-size: 1.25rem; line-height: 1.2; letter-spacing: -0.01em;">
@@ -948,15 +945,29 @@ $(document).ready(function () {
                   ${starsHtml}
                 </div>
 
-                <!-- Stats Secundarias -->
-                <div class="d-flex gap-3 mt-3 flex-wrap opacity-60">
-                   ${item.manufacter ? `<small class="d-flex align-items-center gap-1" style="font-size:0.75rem;"><i class="fa-solid fa-industry"></i> ${item.manufacter}</small>` : ""}
-                   ${item.height ? `<small class="d-flex align-items-center gap-1" style="font-size:0.75rem;"><i class="fa-solid fa-ruler-vertical"></i> ${item.height}m</small>` : ""}
-                   ${item.speed ? `<small class="d-flex align-items-center gap-1" style="font-size:0.75rem;"><i class="fa-solid fa-bolt"></i> ${item.speed}km/h</small>` : ""}
+                <!-- Stats Expandibles -->
+                <div class="stats-expandable mt-2 d-flex gap-2 flex-wrap ${shouldCollapse ? "d-none" : ""}">
+                  ${getStatBadges(item, sort)
+                    .replace(
+                      /<small/g,
+                      '<small class="badge bg-dark border border-secondary text-secondary fw-normal px-2 py-1"',
+                    )
+                    .replace(/fa-industry/g, "fa-industry me-1")
+                    .replace(/fa-bolt/g, "fa-bolt me-1")}
                 </div>
+
+                ${
+                  hasToggle
+                    ? `
+                <button class="btn btn-sm btn-toggle-stats text-muted p-0 mt-2 d-flex align-items-center gap-1" style="font-size: 0.7rem; background:transparent; border:none;">
+                   <i class="fa-solid fa-${shouldCollapse ? "plus" : "minus"}-circle"></i>
+                   <span>${shouldCollapse ? "Ver detalles" : "Contraer"}</span>
+                </button>`
+                    : ""
+                }
               </div>
 
-              <!-- Acceso rÃ¡pido premium -->
+              <!-- Acceso rápido premium -->
               <a href="${detailUrl}" class="d-none d-md-flex align-items-center px-4 border-start border-white border-opacity-5 hover-bg-white-5" style="transition: all 0.2s; background: rgba(255,255,255,0.01);">
                  <i class="fa-solid fa-arrow-right fs-5 text-success opacity-50"></i>
               </a>
@@ -1019,6 +1030,11 @@ $(document).ready(function () {
             </a>
           </div>`);
       } else {
+        const isMobile = window.innerWidth < 768;
+        const isRankSort = sort === "rank" || sort === "rank_position";
+        const hasToggle = isRankSort || sort === "name";
+        const shouldCollapse = hasToggle && (isMobile || isRankSort);
+
         // Estrellas
         const starsVal = parseFloat(item.stars) || 0;
         const starsHtml =
@@ -1035,18 +1051,15 @@ $(document).ready(function () {
                style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(4px);">
               
               <!-- Imagen y Ranking -->
-              <div class="rank-img-container p-3 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.15); min-width: 130px;">
-                <div class="position-relative">
+              <div class="rank-img-container position-relative d-flex" style="flex-shrink: 0; min-width: 130px; min-height: 130px;">
                   <img src="${item.imagen_url.startsWith("/") ? BASE_URL + item.imagen_url : item.imagen_url}" 
                        alt="${item.park_name}" 
-                       class="rounded-3 shadow" 
-                       style="width: 100px; height: 100px; object-fit: cover; border: 2px solid rgba(255,255,255,0.05);">
-                  <span class="rank-badge" style="position: absolute; top: -8px; left: -8px; font-size: 0.8rem; font-weight: 800; padding: 4px 10px; border-radius: 6px; background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 12px rgba(16,185,129,0.4); border: 1px solid rgba(255,255,255,0.1);">#${item.rank_position}</span>
-                </div>
+                       style="width: 100%; height: 100%; object-fit: cover; border-radius: 0;">
+                  <span class="rank-badge" style="position: absolute; top: 0; left: 0; font-size: 0.8rem; font-weight: 800; padding: 4px 10px; background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 12px rgba(16,185,129,0.4); border-bottom-right-radius: 6px;">#${item.rank_position}</span>
               </div>
 
               <!-- Contenido -->
-              <div class="p-4 flex-grow-1 d-flex flex-column justify-content-center">
+              <div class="p-3 flex-grow-1 d-flex flex-column justify-content-center">
                 <div class="d-flex justify-content-between align-items-start mb-2">
                   <div class="pe-3">
                     <a href="${detailUrl}" class="fw-bold text-white text-decoration-none d-block hover-green" style="font-family: var(--rcw-font-title); font-size: 1.25rem; line-height: 1.2; letter-spacing: -0.01em;">
@@ -1060,13 +1073,23 @@ $(document).ready(function () {
                   ${starsHtml}
                 </div>
 
-                <!-- Stats Secundarias -->
-                <div class="d-flex gap-3 mt-3 flex-wrap opacity-60">
-                   ${item.operating_coasters ? `<small class="d-flex align-items-center gap-1" style="font-size:0.75rem;"><i class="fa-solid fa-ticket"></i> ${item.operating_coasters} coasters</small>` : ""}
+                <!-- Stats Expandibles -->
+                <div class="stats-expandable mt-2 d-flex gap-2 flex-wrap ${shouldCollapse ? "d-none" : ""}">
+                  ${item.operating_coasters ? `<small class="badge bg-dark border border-secondary text-info fw-normal px-2 py-1"><i class="fa-solid fa-ticket me-1"></i>${item.operating_coasters} coasters</small>` : ""}
                 </div>
+
+                ${
+                  hasToggle
+                    ? `
+                <button class="btn btn-sm btn-toggle-stats text-muted p-0 mt-2 d-flex align-items-center gap-1" style="font-size: 0.7rem; background:transparent; border:none;">
+                   <i class="fa-solid fa-${shouldCollapse ? "plus" : "minus"}-circle"></i>
+                   <span>${shouldCollapse ? "Ver detalles" : "Contraer"}</span>
+                </button>`
+                    : ""
+                }
               </div>
 
-              <!-- Acceso rÃ¡pido premium -->
+              <!-- Acceso rápido premium -->
               <a href="${detailUrl}" class="d-none d-md-flex align-items-center px-4 border-start border-white border-opacity-5 hover-bg-white-5" style="transition: all 0.2s; background: rgba(255,255,255,0.01);">
                  <i class="fa-solid fa-arrow-right fs-5 text-success opacity-50"></i>
               </a>
@@ -1084,25 +1107,15 @@ $(document).ready(function () {
       return;
     }
     topsData.coasters.forEach((item, i) => {
-      const imgUrl = item.imagen_url
-        ? item.imagen_url.startsWith("/")
-          ? BASE_URL + item.imagen_url
-          : item.imagen_url
-        : "";
-      const imgHtml = imgUrl
-        ? `<img src="${imgUrl}" class="tops-edit-thumb" alt="">`
-        : `<div class="tops-edit-thumb-placeholder"><i class="fa-solid fa-image"></i></div>`;
-
       el.append(`
         <div class="tops-edit-item" data-id="${item.coaster_id}">
-          <i class="fa-solid fa-grip-lines drag-handle"></i>
-          <div class="tops-edit-rank">${i + 1}</div>
-          ${imgHtml}
-          <div class="tops-edit-info">
-            <div class="tops-edit-name">${item.coaster_name}</div>
-            <div class="tops-edit-sub">${item.manufacter || "Fabricante"} · ${item.park_name}</div>
+          <i class="fa-solid fa-grip-lines drag-handle fs-5"></i>
+          <span class="tops-rank-badge">#${i + 1}</span>
+          <div class="flex-grow-1 min-w-0 pe-3">
+            <div class="fw-bold text-white text-truncate">${item.coaster_name}</div>
+            <small class="text-secondary d-block text-truncate">${item.park_name}</small>
           </div>
-          <div class="tops-edit-actions">
+          <div class="d-flex gap-1">
             <div class="dropdown">
               <button class="btn btn-sm btn-outline-secondary border-0 square-box dropdown-toggle dropdown-toggle-split"
                 data-bs-toggle="dropdown" aria-expanded="false" title="Mover a...">
@@ -1170,25 +1183,15 @@ $(document).ready(function () {
       return;
     }
     topsData.parks.forEach((item, i) => {
-      const imgUrl = item.imagen_url
-        ? item.imagen_url.startsWith("/")
-          ? BASE_URL + item.imagen_url
-          : item.imagen_url
-        : "";
-      const imgHtml = imgUrl
-        ? `<img src="${imgUrl}" class="tops-edit-thumb" alt="">`
-        : `<div class="tops-edit-thumb-placeholder"><i class="fa-solid fa-image"></i></div>`;
-
       el.append(`
         <div class="tops-edit-item" data-id="${item.park_id}">
-          <i class="fa-solid fa-grip-lines drag-handle"></i>
-          <div class="tops-edit-rank">${i + 1}</div>
-          ${imgHtml}
-          <div class="tops-edit-info">
-            <div class="tops-edit-name">${item.park_name}</div>
-            <div class="tops-edit-sub">${item.country_name || "PaÃ­s"}</div>
+          <i class="fa-solid fa-grip-lines drag-handle fs-5"></i>
+          <span class="tops-rank-badge">#${i + 1}</span>
+          <div class="flex-grow-1">
+            <span class="fw-bold text-white">${item.park_name}</span>
+            <small class="text-secondary ms-2">${item.country_name || ""}</small>
           </div>
-          <div class="tops-edit-actions">
+          <div class="d-flex gap-1">
             <div class="dropdown">
               <button class="btn btn-sm btn-outline-secondary border-0 square-box dropdown-toggle dropdown-toggle-split"
                 data-bs-toggle="dropdown" aria-expanded="false" title="Mover a...">

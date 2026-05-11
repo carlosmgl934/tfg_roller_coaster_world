@@ -1,8 +1,8 @@
-/* ============================================================
-   profile.css — Dark mode premium · RollerCoaster World
+﻿/* ============================================================
+   profile.css â€” Dark mode premium Â· RollerCoaster World
    ============================================================ */
 
-/* ── AVATAR ──────────────────────────────────────────────────── */
+/* â”€â”€ AVATAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .avatar-circle {
   width: 140px;
   height: 140px;
@@ -23,7 +23,7 @@
   overflow: hidden;
 }
 
-/* ── PROFILE CARD ────────────────────────────────────────────── */
+/* â”€â”€ PROFILE CARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .profile-card {
   border-radius: 0 !important;
   border: 1px solid var(--rcw-border) !important;
@@ -56,7 +56,7 @@
   font-family: var(--rcw-font-title);
 }
 
-/* ── MENÚ LATERAL ────────────────────────────────────────────── */
+/* â”€â”€ MENÃš LATERAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .profile-menu .list-group-item {
   border-radius: 0 !important;
   border: none;
@@ -82,7 +82,7 @@
   border-left: 3px solid var(--rcw-green-neon) !important;
 }
 
-/* ── FORMULARIO ──────────────────────────────────────────────── */
+/* â”€â”€ FORMULARIO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .form-label {
   color: var(--rcw-text-muted);
   font-weight: 700;
@@ -126,7 +126,7 @@
   color: var(--rcw-text-muted);
 }
 
-/* ── BADGE PERFIL ────────────────────────────────────────────── */
+/* â”€â”€ BADGE PERFIL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .badge-profile {
   background-color: var(--rcw-green-neon);
   color: #000;
@@ -149,7 +149,7 @@
   font-weight: 700;
 }
 
-/* ── DATA/FAV BOXES ──────────────────────────────────────────── */
+/* â”€â”€ DATA/FAV BOXES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .data-box {
   background-color: var(--rcw-bg-card-alt);
   border: 1px solid var(--rcw-border);
@@ -217,9 +217,9 @@
   border-radius: 0 !important;
 }
 
-/* ── MIS TOPS ────────────────────────────────────────────────── */
+/* â”€â”€ MIS TOPS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
-/* ── MIS TOPS ────────────────────────────────────────────────── */
+/* â”€â”€ MIS TOPS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 /* Tabs */
 #tops-tabs .nav-link.active {
@@ -291,13 +291,13 @@
 /* Full-view scrollable containers */
 #top-coasters-full-container,
 #top-parks-full-container {
-  max-height: 1250px; /* ~10 list rows × 125px each */
+  max-height: 1250px; /* ~10 list rows Ã— 125px each */
   overflow-y: auto;
   overflow-x: hidden;
   padding-right: 6px;
 }
 
-/* Custom scrollbars for edit lists and full-view — dark theme */
+/* Custom scrollbars for edit lists and full-view â€” dark theme */
 #top-coasters-list-edit::-webkit-scrollbar,
 #top-parks-list-edit::-webkit-scrollbar,
 #top-coasters-full-container::-webkit-scrollbar,
@@ -343,7 +343,7 @@
   cursor: grabbing;
 }
 
-/* ── FLATPICKR DARK THEME ────────────────────────────────────── */
+/* â”€â”€ FLATPICKR DARK THEME â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .flatpickr-calendar {
   background: #161c22 !important;
   border: 1px solid #232a31 !important;
@@ -413,7 +413,7 @@ span.flatpickr-weekday {
   display: none !important;
 }
 
-/* ── CONTRAST FIX PARA BOTONES OUTLINE-SUCCESS EN HOVER ──────── */
+/* â”€â”€ CONTRAST FIX PARA BOTONES OUTLINE-SUCCESS EN HOVER â”€â”€â”€â”€â”€â”€â”€â”€ */
 /* Cuando se hace hover, el fondo se vuelve verde de forma nativa en Bootstrap. 
    Forzamos a que el texto y el icono sean negros para que destaquen. */
 .btn-outline-success:hover,
@@ -421,7 +421,7 @@ span.flatpickr-weekday {
   color: #000 !important;
 }
 
-/* ── TOPS: PREVIEW SCROLLABLE ────────────────────────────────── */
+/* â”€â”€ TOPS: PREVIEW SCROLLABLE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .tops-preview-scroll {
   max-height: 680px;
   overflow-y: auto;
@@ -443,7 +443,7 @@ span.flatpickr-weekday {
   background: var(--rcw-text-muted);
 }
 
-/* ── TOPS: SYMMETRIC FILTER BAR ──────────────────────────────── */
+/* â”€â”€ TOPS: SYMMETRIC FILTER BAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .stats-type-wrapper {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -539,7 +539,7 @@ span.flatpickr-weekday {
   background: transparent;
 }
 
-/* ── Sort row: select + direction button ────────────────────── */
+/* â”€â”€ Sort row: select + direction button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .tops-sort-row {
   display: flex;
   gap: 0.5rem;
@@ -590,7 +590,7 @@ span.flatpickr-weekday {
   letter-spacing: 0.03em;
 }
 
-/* ── TOPS: STATS SIDEBAR ─────────────────────────────────────── */
+/* â”€â”€ TOPS: STATS SIDEBAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .tops-legend-card {
   position: sticky;
   top: 80px;
@@ -681,7 +681,7 @@ span.flatpickr-weekday {
   }
 }
 
-/* ── FRIENDS MANAGER (from friends.php) ──────────────────────── */
+/* â”€â”€ FRIENDS MANAGER (from friends.php) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #requests-list .list-group-item,
 #sent-list .list-group-item {
   background-color: transparent;
@@ -702,7 +702,7 @@ span.flatpickr-weekday {
   filter: brightness(0) invert(0.7);
 }
 
-/* ── FORUM INVITE BUTTONS HOVER ──────────────────────────────── */
+/* â”€â”€ FORUM INVITE BUTTONS HOVER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .rcw-forum-accept-btn {
   background: #7c3aed !important;
   color: #fff !important;
@@ -723,7 +723,7 @@ span.flatpickr-weekday {
   transform: scale(1.05);
 }
 
-/* ── MI MAPA (Leaflet) ───────────────────────────────────────── */
+/* â”€â”€ MI MAPA (Leaflet) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #profile-map {
   height: 520px;
   width: 100%;
@@ -882,7 +882,7 @@ span.flatpickr-weekday {
   color: #00c853 !important;
 }
 
-/* Botón de pantalla completa */
+/* BotÃ³n de pantalla completa */
 .rcw-fullscreen-btn {
   width: 30px !important;
   height: 30px !important;
@@ -913,9 +913,9 @@ span.flatpickr-weekday {
   border-radius: 0 !important;
 }
 
-/* ── AJUSTES USER PROFILE ESPECÍFICOS ────────────────────────── */
+/* â”€â”€ AJUSTES USER PROFILE ESPECÃFICOS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
-/* Select de tipo en estadísticas: anula el CSS transparent del ID */
+/* Select de tipo en estadÃ­sticas: anula el CSS transparent del ID */
 #rank-type-select.rcw-stats-select,
 .rcw-stats-select {
   padding: 0.3rem 1.6rem 0.3rem 0.6rem !important;
@@ -952,7 +952,7 @@ span.flatpickr-weekday {
   padding: 2rem !important;
 }
 
-/* Cuando el grid sólo tiene el notice, convertirlo en bloque */
+/* Cuando el grid sÃ³lo tiene el notice, convertirlo en bloque */
 .trips-grid-scrollable:has(> .trips-empty-notice:only-child) {
   display: flex !important;
   align-items: center !important;
@@ -960,7 +960,7 @@ span.flatpickr-weekday {
   min-height: 220px !important;
 }
 
-/* Drag handle: prevenir interferencia con scroll en m�vil */
+/* Drag handle: prevenir interferencia con scroll en móvil */
 .drag-handle {
   touch-action: none;
   cursor: grab;
@@ -970,7 +970,7 @@ span.flatpickr-weekday {
 }
 
 
-/* Prevenir selecci�n de texto al arrastrar en el top */
+/* Prevenir selección de texto al arrastrar en el top */
 .tops-edit-item {
   user-select: none;
   -webkit-user-select: none;
@@ -997,7 +997,7 @@ span.flatpickr-weekday {
 } 
 
 
-/* Solución definitiva de selección: Capa 2 y 3 */
+/* SoluciÃ³n definitiva de selecciÃ³n: Capa 2 y 3 */
 #top-coasters-list-edit, #top-parks-list-edit {
   user-select: none !important;
   -webkit-user-select: none !important;
@@ -1011,88 +1011,5 @@ body.is-dragging, body.is-dragging * {
 }
 
 
-/* --- Rediseño Compacto Tops Edit --- */
-.tops-edit-item {
-  display: flex !important;
-  align-items: center !important;
-  height: 75px !important;
-  background: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 8px !important;
-  margin-bottom: 8px !important;
-  padding: 0 15px !important;
-  gap: 15px !important;
-  position: relative !important;
-  transition: all 0.2s ease !important;
-}
-
-.tops-edit-item:hover {
-  background: rgba(255, 255, 255, 0.06) !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
-}
-
-.tops-edit-rank {
-  font-size: 1.4rem !important;
-  font-weight: 800 !important;
-  color: #10b981 !important;
-  min-width: 35px !important;
-  text-align: center !important;
-}
-
-.tops-edit-thumb {
-  width: 60px !important;
-  height: 60px !important;
-  object-fit: cover !important;
-  border-radius: 6px !important;
-  flex-shrink: 0 !important;
-  background: #0d1117 !important;
-}
-
-.tops-edit-thumb-placeholder {
-  width: 60px !important;
-  height: 60px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background: #0d1117 !important;
-  border-radius: 6px !important;
-  color: rgba(255, 255, 255, 0.1) !important;
-  flex-shrink: 0 !important;
-}
-
-.tops-edit-info {
-  flex-grow: 1 !important;
-  min-width: 0 !important;
-}
-
-.tops-edit-name {
-  font-weight: 700 !important;
-  color: #fff !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  font-size: 0.95rem !important;
-}
-
-.tops-edit-sub {
-  font-size: 0.8rem !important;
-  color: #94a3b8 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  margin-top: 2px !important;
-}
-
-.tops-edit-actions {
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  flex-shrink: 0 !important;
-}
-
-
-.tops-edit-item .drag-handle {
-  color: rgba(255, 255, 255, 0.3) !important;
-  padding: 10px 5px !important;
-} 
+.tops-filter-select option, .tops-sort-select option, .form-select option { background-color: #161c22; color: #fff; }
 
