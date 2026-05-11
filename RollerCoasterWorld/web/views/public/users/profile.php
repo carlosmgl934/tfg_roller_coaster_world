@@ -533,8 +533,8 @@ $user_uid = $_SESSION['firebase_uid'];
                           <option value="inversions">Inversiones</option>
                           <option value="year">Antigüedad</option>
                         </select>
-                        <button id="coasters-sort-dir" class="tops-sort-dir-btn" title="Dirección" data-dir="desc">
-                          <i class="fa-solid fa-sort"></i>
+                        <button id="coasters-sort-dir" class="tops-sort-dir-btn" title="Dirección" data-dir="asc">
+                          <i class="fa-solid fa-caret-up"></i>
                         </button>
                       </div>
                     </div>
