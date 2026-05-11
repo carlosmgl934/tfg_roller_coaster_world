@@ -819,18 +819,12 @@ $user_uid = $_SESSION['firebase_uid'];
                   style="width: 40px; height: 40px;">
                   <i class="fa-solid fa-chart-line fs-5 text-success"></i>
                 </div>
-                <div>
-                  <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">Estadísticas de</h5>
-                  <div
-                    class="d-flex align-items-center gap-1 bg-dark bg-opacity-25 px-2 py-1 rounded-2 border border-secondary border-opacity-25"
-                    style="cursor: pointer; margin-top: 2px; width: fit-content;">
-                    <select id="rank-type-select"
-                      class="form-select form-select-sm p-0 shadow-none fw-bold border-0 bg-transparent text-success"
-                      style="cursor: pointer; font-size: 0.95rem; width: auto; appearance: none; -webkit-appearance: none;">
+                  <div class="stats-type-wrapper" style="cursor: pointer; margin-top: 2px; width: fit-content;">
+                    <select id="rank-type-select">
                       <option value="coasters">Coasters</option>
                       <option value="parks">Parques</option>
                     </select>
-                    <i class="fa-solid fa-chevron-down text-success opacity-50" style="font-size: 0.7rem;"></i>
+                    <i class="fa-solid fa-chevron-down text-success opacity-50" style="font-size: 0.6rem;"></i>
                   </div>
                 </div>
               </div>

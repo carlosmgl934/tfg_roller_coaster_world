@@ -447,17 +447,35 @@ span.flatpickr-weekday {
 .stats-type-wrapper {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 0.25rem 0.6rem;
+  padding: 0.15rem 0.5rem;
   border-radius: 0;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
+  gap: 0.25rem;
 }
 .stats-type-wrapper:hover {
   border-color: var(--rcw-green);
 }
+#rank-type-select {
+  background: transparent !important;
+  color: var(--rcw-green) !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  cursor: pointer;
+  outline: none !important;
+  appearance: none;
+  -webkit-appearance: none;
+  font-weight: 700;
+}
+#rank-type-select option {
+  background: #161b22;
+  color: #fff;
+}
 .stats-trip-badge {
-  background: rgba(255, 255, 255, 0.05);
+  background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #fff;
   padding: 0.4rem 0.8rem;

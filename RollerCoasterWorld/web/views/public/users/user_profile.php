@@ -327,17 +327,12 @@ $user_id = $_GET['id'] ?? null;
                                 <div class="bg-success bg-opacity-10 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                                     <i class="fa-solid fa-chart-line fs-5 text-success"></i>
                                 </div>
-                                <div>
-                                    <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">Estadísticas de</h5>
-                                    <div class="d-flex align-items-center gap-1 stats-type-wrapper" style="cursor: pointer; margin-top: 2px; width: fit-content;">
-                                        <select id="rank-type-select"
-                                            class="form-select form-select-sm p-0 shadow-none fw-bold border-0 bg-transparent text-success"
-                                            style="cursor: pointer; font-size: 0.95rem; width: auto; appearance: none; -webkit-appearance: none;">
-                                            <option value="coasters">Coasters</option>
-                                            <option value="parks">Parques</option>
-                                        </select>
-                                        <i class="fa-solid fa-chevron-down text-success opacity-50" style="font-size: 0.7rem;"></i>
-                                    </div>
+                                <div class="stats-type-wrapper" style="cursor: pointer; margin-top: 2px; width: fit-content;">
+                                    <select id="rank-type-select">
+                                        <option value="coasters">Coasters</option>
+                                        <option value="parks">Parques</option>
+                                    </select>
+                                    <i class="fa-solid fa-chevron-down text-success opacity-50" style="font-size: 0.6rem;"></i>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center">
