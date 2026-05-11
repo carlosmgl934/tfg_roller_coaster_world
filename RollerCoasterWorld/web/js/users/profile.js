@@ -643,6 +643,12 @@ $(document).ready(function () {
     try {
       const res = await fetch(`${BASE_URL}/api/php/upload.php`, {
         method: "POST",
+        headers: {
+          "X-CSRF-Token":
+            document
+              .querySelector('meta[name="csrf-token"]')
+              ?.getAttribute("content") ?? "",
+        },
         body: formData,
       });
 
