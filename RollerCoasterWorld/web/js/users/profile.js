@@ -2575,15 +2575,6 @@ $(document).ready(function () {
     const prosList = type === "coaster" ? COASTER_PROS : PARK_PROS;
     const contrasList = type === "coaster" ? COASTER_CONTRAS : PARK_CONTRAS;
 
-    if (peditProsChoices) {
-      peditProsChoices.clearChoices();
-      peditProsChoices.setChoices(prosList, "value", "label", true);
-    }
-    if (peditContrasChoices) {
-      peditContrasChoices.clearChoices();
-      peditContrasChoices.setChoices(contrasList, "value", "label", true);
-    }
-
     const rawTags = $(this).attr("data-tags") || "[]";
     let tags = [];
     try {
@@ -2592,22 +2583,24 @@ $(document).ready(function () {
       tags = [];
     }
 
-    if (tags && tags.length > 0) {
-      const activePros = tags.filter((t) => t.type === "pro").map((t) => t.tag);
-      const activeContras = tags
-        .filter((t) => t.type === "con")
-        .map((t) => t.tag);
-      if (peditProsChoices) {
-        peditProsChoices.removeActiveItems();
-        peditProsChoices.setChoiceByValue(activePros);
-      }
-      if (peditContrasChoices) {
-        peditContrasChoices.removeActiveItems();
-        peditContrasChoices.setChoiceByValue(activeContras);
-      }
-    } else {
-      peditProsChoices.removeActiveItems();
-      peditContrasChoices.removeActiveItems();
+    const activePros = tags.filter((t) => t.type === "pro").map((t) => t.tag);
+    const activeContras = tags.filter((t) => t.type === "con").map((t) => t.tag);
+
+    if (peditProsChoices) {
+      peditProsChoices.clearChoices();
+      const mappedPros = prosList.map((p) => ({
+        ...p,
+        selected: activePros.includes(p.value),
+      }));
+      peditProsChoices.setChoices(mappedPros, "value", "label", true);
+    }
+    if (peditContrasChoices) {
+      peditContrasChoices.clearChoices();
+      const mappedContras = contrasList.map((c) => ({
+        ...c,
+        selected: activeContras.includes(c.value),
+      }));
+      peditContrasChoices.setChoices(mappedContras, "value", "label", true);
     }
 
     profileEditModal.show();
