@@ -918,52 +918,50 @@ $(document).ready(function () {
             : "";
 
         container.append(`
-          <div class="${colClass} mb-3">
-            <div class="top-card d-flex flex-column flex-md-row text-decoration-none position-relative overflow-hidden" 
+          <div class="${colClass} mb-2">
+            <div class="top-card d-flex flex-column flex-md-row position-relative overflow-hidden" 
                style="background: #161c22; border: 1px solid #232a31; border-radius: 4px; transition: all 0.2s;">
               
               <!-- Imagen y Ranking -->
-              <div class="rank-img-container position-relative d-flex" style="flex-shrink: 0; width: 100px; min-height: 90px;">
+              <div class="rank-img-container position-relative" style="flex: 0 0 110px; min-height: 90px; align-self: stretch;">
                   <img src="${item.imagen_url.startsWith("/") ? BASE_URL + item.imagen_url : item.imagen_url}" 
                        alt="${item.coaster_name}" 
-                       style="width: 100%; height: 100%; object-fit: cover; border-radius: 0;">
-                  <span class="rank-badge" style="position: absolute; top: 0; left: 0; font-size: 0.8rem; font-weight: 800; padding: 4px 10px; background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 8px rgba(16,185,129,0.3); border-bottom-right-radius: 4px;">#${item.rank_position}</span>
+                       style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+                  <span class="rank-badge" style="position: absolute; top: 0; left: 0; font-size: 0.8rem; font-weight: 800; padding: 4px 10px; background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 8px rgba(16,185,129,0.3); border-bottom-right-radius: 4px; z-index: 2;">#${item.rank_position}</span>
               </div>
 
               <!-- Contenido -->
-              <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center">
+              <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center min-w-0 py-2">
                 <div class="d-flex justify-content-between align-items-start mb-1">
-                  <div class="pe-3">
-                    <a href="${detailUrl}" class="fw-bold text-white text-decoration-none d-block hover-green" style="font-family: var(--rcw-font-title); font-size: 1.1rem; line-height: 1.2;">
+                  <div class="pe-3 min-w-0 flex-grow-1">
+                    <a href="${detailUrl}" class="fw-bold text-white text-decoration-none d-block text-truncate hover-green" style="font-family: var(--rcw-font-title); font-size: 1.1rem; line-height: 1.2;">
                       ${item.coaster_name}
                     </a>
-                    <div class="text-secondary d-flex align-items-center gap-2 mt-1" style="font-size: 0.8rem; opacity: 0.8;">
-                      <i class="fa-solid fa-location-dot text-success opacity-75"></i>
-                      <span>${item.park_name} Â· ${item.country_name || ""}</span>
+                    <div class="text-secondary d-flex align-items-center gap-2 mt-1 text-truncate" style="font-size: 0.8rem; opacity: 0.8;">
+                      <i class="fa-solid fa-location-dot text-success opacity-75 flex-shrink-0"></i>
+                      <span class="text-truncate">${item.park_name} Â· ${item.country_name || ""}</span>
                     </div>
                   </div>
-                  ${starsHtml}
+                  <div class="flex-shrink-0">
+                    ${starsHtml}
+                  </div>
                 </div>
 
                 <!-- Stats Expandibles -->
-                <div class="stats-expandable mt-2 d-flex gap-3 flex-wrap ${shouldCollapse ? "d-none" : ""}" style="font-size: 0.85rem;">
+                <div class="stats-expandable mt-2 gap-3 flex-wrap align-items-center d-none d-md-flex" style="font-size: 0.85rem;">
                   ${getStatBadges(item, sort)}
                 </div>
 
-                ${
-                  hasToggle
-                    ? `
-                <button class="btn btn-sm btn-toggle-stats text-secondary p-0 mt-2 d-flex align-items-center gap-1" style="font-size: 0.75rem; background:transparent; border:none; opacity: 0.7;">
-                   <i class="fa-solid fa-${shouldCollapse ? "plus" : "minus"}-circle"></i>
-                   <span>${shouldCollapse ? "Ver detalles" : "Contraer"}</span>
-                </button>`
-                    : ""
-                }
+                <!-- Toggle Button (Mobile only) -->
+                <button class="btn btn-sm btn-toggle-stats text-secondary p-0 mt-1 d-flex d-md-none align-items-center gap-1 w-100 text-start" style="font-size: 0.75rem; background:transparent; border:none; opacity: 0.7;">
+                   <i class="fa-solid fa-chevron-down"></i>
+                   <span>Ver detalles</span>
+                </button>
               </div>
 
               <!-- Acceso rÃ¡pido -->
-              <a href="${detailUrl}" class="d-none d-md-flex align-items-center px-3 hover-bg-white-5" style="transition: all 0.2s;">
-                 <i class="fa-solid fa-chevron-right fs-5 text-success opacity-75"></i>
+              <a href="${detailUrl}" class="d-none d-md-flex align-items-center px-3 text-decoration-none hover-bg-white-5" style="transition: all 0.2s;">
+                 <i class="fa-solid fa-chevron-right fs-5 text-secondary opacity-50"></i>
               </a>
             </div>
           </div>`);
@@ -1040,52 +1038,50 @@ $(document).ready(function () {
             : "";
 
         container.append(`
-          <div class="${colClass} mb-3">
-            <div class="top-card d-flex flex-column flex-md-row text-decoration-none position-relative overflow-hidden" 
+          <div class="${colClass} mb-2">
+            <div class="top-card d-flex flex-column flex-md-row position-relative overflow-hidden" 
                style="background: #161c22; border: 1px solid #232a31; border-radius: 4px; transition: all 0.2s;">
               
               <!-- Imagen y Ranking -->
-              <div class="rank-img-container position-relative d-flex" style="flex-shrink: 0; width: 100px; min-height: 90px;">
+              <div class="rank-img-container position-relative" style="flex: 0 0 110px; min-height: 90px; align-self: stretch;">
                   <img src="${item.imagen_url.startsWith("/") ? BASE_URL + item.imagen_url : item.imagen_url}" 
                        alt="${item.park_name}" 
-                       style="width: 100%; height: 100%; object-fit: cover; border-radius: 0;">
-                  <span class="rank-badge" style="position: absolute; top: 0; left: 0; font-size: 0.8rem; font-weight: 800; padding: 4px 10px; background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 8px rgba(16,185,129,0.3); border-bottom-right-radius: 4px;">#${item.rank_position}</span>
+                       style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+                  <span class="rank-badge" style="position: absolute; top: 0; left: 0; font-size: 0.8rem; font-weight: 800; padding: 4px 10px; background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 8px rgba(16,185,129,0.3); border-bottom-right-radius: 4px; z-index: 2;">#${item.rank_position}</span>
               </div>
 
               <!-- Contenido -->
-              <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center">
+              <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center min-w-0 py-2">
                 <div class="d-flex justify-content-between align-items-start mb-1">
-                  <div class="pe-3">
-                    <a href="${detailUrl}" class="fw-bold text-white text-decoration-none d-block hover-green" style="font-family: var(--rcw-font-title); font-size: 1.1rem; line-height: 1.2;">
+                  <div class="pe-3 min-w-0 flex-grow-1">
+                    <a href="${detailUrl}" class="fw-bold text-white text-decoration-none d-block text-truncate hover-green" style="font-family: var(--rcw-font-title); font-size: 1.1rem; line-height: 1.2;">
                       ${item.park_name}
                     </a>
-                    <div class="text-secondary d-flex align-items-center gap-2 mt-1" style="font-size: 0.8rem; opacity: 0.8;">
-                      <i class="fa-solid fa-location-dot text-success opacity-75"></i>
-                      <span>${item.country_name || ""}</span>
+                    <div class="text-secondary d-flex align-items-center gap-2 mt-1 text-truncate" style="font-size: 0.8rem; opacity: 0.8;">
+                      <i class="fa-solid fa-location-dot text-success opacity-75 flex-shrink-0"></i>
+                      <span class="text-truncate">${item.country_name || ""}</span>
                     </div>
                   </div>
-                  ${starsHtml}
+                  <div class="flex-shrink-0">
+                    ${starsHtml}
+                  </div>
                 </div>
 
                 <!-- Stats Expandibles -->
-                <div class="stats-expandable mt-2 d-flex gap-3 flex-wrap ${shouldCollapse ? "d-none" : ""}" style="font-size: 0.85rem;">
+                <div class="stats-expandable mt-2 gap-3 flex-wrap align-items-center d-none d-md-flex" style="font-size: 0.85rem;">
                   ${item.operating_coasters ? `<span class="text-info d-flex align-items-center gap-1 fw-semibold"><i class="fa-solid fa-ticket"></i>${item.operating_coasters} coasters</span>` : ""}
                 </div>
 
-                ${
-                  hasToggle
-                    ? `
-                <button class="btn btn-sm btn-toggle-stats text-secondary p-0 mt-2 d-flex align-items-center gap-1" style="font-size: 0.75rem; background:transparent; border:none; opacity: 0.7;">
-                   <i class="fa-solid fa-${shouldCollapse ? "plus" : "minus"}-circle"></i>
-                   <span>${shouldCollapse ? "Ver detalles" : "Contraer"}</span>
-                </button>`
-                    : ""
-                }
+                <!-- Toggle Button (Mobile only) -->
+                <button class="btn btn-sm btn-toggle-stats text-secondary p-0 mt-1 d-flex d-md-none align-items-center gap-1 w-100 text-start" style="font-size: 0.75rem; background:transparent; border:none; opacity: 0.7;">
+                   <i class="fa-solid fa-chevron-down"></i>
+                   <span>Ver detalles</span>
+                </button>
               </div>
 
               <!-- Acceso rÃ¡pido -->
-              <a href="${detailUrl}" class="d-none d-md-flex align-items-center px-3 hover-bg-white-5" style="transition: all 0.2s;">
-                 <i class="fa-solid fa-chevron-right fs-5 text-success opacity-75"></i>
+              <a href="${detailUrl}" class="d-none d-md-flex align-items-center px-3 text-decoration-none hover-bg-white-5" style="transition: all 0.2s;">
+                 <i class="fa-solid fa-chevron-right fs-5 text-secondary opacity-50"></i>
               </a>
             </div>
           </div>`);
@@ -3413,3 +3409,25 @@ $(document).ready(function () {
     fetchRanking();
   }
 });
+
+
+// Animación de estadísticas en versión móvil
+$(document).on('click', '.btn-toggle-stats', function(e) {
+  e.preventDefault();
+  const btn = $(this);
+  const target = btn.closest('.top-card').find('.stats-expandable');
+  if (target.hasClass('d-none')) {
+    target.removeClass('d-none d-md-flex').css('display', 'none').slideDown(250, function() {
+      $(this).css('display', 'flex');
+    });
+    btn.find('i').removeClass('fa-chevron-down').addClass('fa-chevron-up');
+    btn.find('span').text('Contraer');
+  } else {
+    target.slideUp(250, function() {
+      $(this).addClass('d-none d-md-flex').css('display', '');
+    });
+    btn.find('i').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+    btn.find('span').text('Ver detalles');
+  }
+});
+
