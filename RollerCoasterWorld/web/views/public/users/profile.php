@@ -814,21 +814,26 @@ $user_uid = $_SESSION['firebase_uid'];
           <!-- Contenedor Vista Estadísticas -->
           <div id="trips-view-stats" class="d-none">
             <!-- Estadísticas de Viajes (Unificadas) -->
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-              <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
-                <i class="fa-solid fa-chart-line fs-5 text-success"></i>
-                Estadísticas de
-                <select id="rank-type-select"
-                  class="form-select form-select-sm ms-1 d-inline-block w-auto shadow-none fw-bold border-0 bg-transparent"
-                  style="color: var(--rcw-text-primary); cursor: pointer;">
-                  <option value="coasters">Coasters</option>
-                  <option value="parks">Parques</option>
-                </select>
-                <small class="text-muted fw-normal ms-1" style="font-size: 0.7rem; font-family: 'Outfit', sans-serif;">(x = veces montada / visitas)</small>
-              </h5>
-              <span class="badge bg-dark px-3 py-2" style="border:1px solid var(--rcw-border)">
-                <i class="fa-solid fa-suitcase me-1 text-success"></i> <span id="rank-trip-count">0 viajes</span>
-              </span>
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+              <div class="d-flex align-items-center gap-3">
+                <div class="bg-success bg-opacity-10 p-2 rounded-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                  <i class="fa-solid fa-chart-line fs-5 text-success"></i>
+                </div>
+                <div>
+                  <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">Estadísticas de</h5>
+                  <select id="rank-type-select"
+                    class="form-select form-select-sm p-0 shadow-none fw-bold border-0 bg-transparent text-success"
+                    style="cursor: pointer; font-size: 0.95rem; width: auto; margin-top: -2px;">
+                    <option value="coasters">Coasters</option>
+                    <option value="parks">Parques</option>
+                  </select>
+                </div>
+              </div>
+              <div class="d-flex align-items-center">
+                <span class="badge bg-dark px-3 py-2 rounded-pill shadow-sm" style="border:1px solid var(--rcw-border); font-size: 0.85rem;">
+                  <i class="fa-solid fa-suitcase me-1 text-success"></i> <span id="rank-trip-count">0 viajes</span>
+                </span>
+              </div>
             </div>
             <div class="d-flex overflow-x-auto gap-1 pb-1 mb-3" id="rank-filter-btns" style="scrollbar-width: none;">
               <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary flex-shrink-0"
