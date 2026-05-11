@@ -8,7 +8,7 @@ if ($id === 0) {
     exit;
 }
 
-$page_css = ['web/css/coasters.css', 'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css'];
+$page_css = ['web/css/coasters.css', 'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css', 'https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css'];
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 ?>
@@ -358,6 +358,47 @@ require_once __DIR__ . '/../../partials/header.php';
           <label class="form-label text-muted small fw-semibold">Reseña (opcional)</label>
           <textarea class="form-control bg-dark text-white border-secondary rounded-0" id="edit-review-text" rows="4" placeholder="Escribe tu opinión..."></textarea>
         </div>
+        <!-- Pros -->
+        <div class="mb-3">
+            <label class="form-label text-muted small fw-semibold"><i class="fa-solid fa-plus-circle text-success me-1"></i> Ventajas</label>
+            <select id="edit-pros-select" multiple>
+                <option value="airtime">Airtime</option>
+                <option value="arnes">Arnés</option>
+                <option value="capacidad">Capacidad</option>
+                <option value="comodidad">Comodidad</option>
+                <option value="duracion">Duración</option>
+                <option value="hangtime">Hangtime</option>
+                <option value="intensidad">Intensidad</option>
+                <option value="inversiones">Inversiones</option>
+                <option value="launch">Launch</option>
+                <option value="caidas">Caídas</option>
+                <option value="suavidad">Suavidad</option>
+                <option value="recorrido">Layout</option>
+                <option value="tematizacion">Tematización</option>
+                <option value="velocidad">Velocidad</option>
+            </select>
+        </div>
+        <!-- Contras -->
+        <div class="mb-3">
+            <label class="form-label text-muted small fw-semibold"><i class="fa-solid fa-minus-circle text-danger me-1"></i> Contras</label>
+            <select id="edit-contras-select" multiple>
+                <option value="airtime">Airtime</option>
+                <option value="arnes">Arnés</option>
+                <option value="capacidad">Capacidad</option>
+                <option value="comodidad">Comodidad</option>
+                <option value="mantenimiento">Mantenimiento</option>
+                <option value="duracion_corta">Corta duración</option>
+                <option value="intensidad">Intensidad</option>
+                <option value="inversiones">Inversiones</option>
+                <option value="launch">Launch</option>
+                <option value="recorrido">Layout</option>
+                <option value="vibracion">Vibración</option>
+                <option value="dolorosa">Dolorosa</option>
+                <option value="decepcionante">Decepcionante</option>
+                <option value="tematizacion">Tematización</option>
+                <option value="velocidad_nula">Poca velocidad</option>
+            </select>
+        </div>
       </div>
       <div class="modal-footer border-secondary">
         <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal">Cancelar</button>
@@ -379,6 +420,7 @@ require_once __DIR__ . '/../../partials/login_modal.php';
   window.CURRENT_USER_ID = <?= isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 'null' ?>;
   window.CURRENT_USERNAME = <?= isset($_SESSION['username']) ? json_encode($_SESSION['username']) : 'null' ?>;
 </script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <script src="<?= Router::asset('web/js/coasters/coasters.js') ?>?v=<?= time() ?>"></script>
 
 <!-- CropperJS para recortar imágenes al subir fotos -->

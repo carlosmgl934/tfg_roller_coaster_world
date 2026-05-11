@@ -7,6 +7,7 @@ $page_css = [
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css',
   'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css',
+  'https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css',
 ];
 require_once __DIR__ . '/../../partials/header.php';
 require_once __DIR__ . '/../../partials/modals/trip_modals.php';
@@ -1186,7 +1187,8 @@ $user_uid = $_SESSION['firebase_uid'];
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="<?= Router::asset('web/js/components/trip_modals.js') ?>"></script>
 <script src="<?= Router::asset('web/js/users/map.js') ?>"></script>
-<script src="<?= Router::asset('web/js/users/profile.js') ?>"></script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<script src="<?= Router::asset('web/js/users/profile.js') ?>?v=<?= time() ?>"></script>
 
 
 

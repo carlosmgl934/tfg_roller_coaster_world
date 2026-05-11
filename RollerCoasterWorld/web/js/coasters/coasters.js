@@ -1101,6 +1101,7 @@ $(document).ready(function () {
                    data-id="${review.id}"
                    data-note="${review.note}"
                    data-text="${encodeURIComponent(review.review || "")}"
+                   data-tags='${JSON.stringify(review.tags || [])}'
                    title="Editar mi reseña"
                    style="text-decoration:none; min-width: 60px;">
                    <i class="fa-solid fa-pen-to-square mb-1 fs-5"></i>
@@ -1143,6 +1144,24 @@ $(document).ready(function () {
       editReviewModal = new bootstrap.Modal(editModalEl);
     }
 
+    let editProsChoices = null;
+    let editContrasChoices = null;
+
+    function initEditChoices() {
+      if (!editProsChoices && document.getElementById("edit-pros-select")) {
+        editProsChoices = new Choices("#edit-pros-select", {
+          removeItemButton: true,
+          placeholderValue: "Selecciona las ventajas...",
+        });
+      }
+      if (!editContrasChoices && document.getElementById("edit-contras-select")) {
+        editContrasChoices = new Choices("#edit-contras-select", {
+          removeItemButton: true,
+          placeholderValue: "Selecciona las contras...",
+        });
+      }
+    }
+
     // Actualizar nota oculta cuando cambia el radio
     $(document).on("change", 'input[name="edit_note"]', function () {
       $("#edit-review-note").val($(this).val());
@@ -1160,6 +1179,24 @@ $(document).ready(function () {
 
       // Marcar el radio correspondiente
       $(`input[name="edit_note"][value="${note}"]`).prop("checked", true);
+
+      // Cargar tags
+      initEditChoices();
+      const rawTags = $(this).attr("data-tags") || "[]";
+      let tags = [];
+      try { tags = JSON.parse(rawTags); } catch(e) { tags = []; }
+
+      if (tags && tags.length > 0) {
+          const pros = tags.filter(t => t.type === 'pro').map(t => t.tag);
+          const contras = tags.filter(t => t.type === 'con').map(t => t.tag);
+          editProsChoices.removeActiveItems();
+          editProsChoices.setChoiceByValue(pros);
+          editContrasChoices.removeActiveItems();
+          editContrasChoices.setChoiceByValue(contras);
+      } else {
+          editProsChoices.removeActiveItems();
+          editContrasChoices.removeActiveItems();
+      }
 
       if (editReviewModal) editReviewModal.show();
     });
@@ -1184,6 +1221,12 @@ $(document).ready(function () {
       fd.append("review_id", reviewId);
       fd.append("note", note);
       fd.append("review", text);
+
+      // Añadir tags
+      const pros = editProsChoices.getValue(true);
+      const contras = editContrasChoices.getValue(true);
+      pros.forEach(p => fd.append('pros[]', p));
+      contras.forEach(c => fd.append('contras[]', c));
 
       try {
         const res = await fetch(

@@ -2187,6 +2187,17 @@ $(document).ready(function () {
 
       const nota = parseFloat(r.note) || 0;
       const notaText = nota % 1 === 0 ? nota.toFixed(0) : nota.toFixed(1);
+      
+      let tagsHtml = "";
+      if (r.tags && r.tags.length > 0) {
+        tagsHtml = '<div class="d-flex flex-wrap gap-1 mt-2 mb-2">';
+        r.tags.forEach((t) => {
+          const cls = t.type === "pro" ? "success" : "danger";
+          tagsHtml += `<span class="badge bg-${cls} text-white rounded-pill px-2 py-0" style="font-weight:600;font-size:0.6rem;opacity:0.8;">${t.tag.replace(/_/g, " ").toUpperCase()}</span>`;
+        });
+        tagsHtml += "</div>";
+      }
+
       const reviewText = r.review
         ? `<p class="mb-0 text-secondary small" style="line-height:1.6;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;">${r.review}</p>`
         : `<p class="mb-0 text-muted small fst-italic">Sin texto de reseña.</p>`;
@@ -2213,6 +2224,7 @@ $(document).ready(function () {
                 </span>
               </div>
               <small class="text-secondary d-block mb-2 text-truncate" style="font-size: 0.75rem;">${r.subtitle || ""}</small>
+              ${tagsHtml}
               ${reviewText}
             </div>
             
@@ -2228,6 +2240,7 @@ $(document).ready(function () {
                 <button class="btn btn-link p-0 text-warning profile-edit-review-btn d-flex align-items-center gap-1"
                         data-id="${r.id}" data-type="${r.type}"
                         data-note="${nota}" data-text="${encodeURIComponent(r.review || "")}"
+                        data-tags='${JSON.stringify(r.tags || [])}'
                         title="Editar reseña" style="text-decoration:none;">
                   <i class="fa-solid fa-pen-to-square"></i>
                   <span class="fw-bold text-uppercase" style="font-size:0.65rem;">Editar</span>
@@ -2346,6 +2359,16 @@ $(document).ready(function () {
               <label class="form-label text-muted small fw-semibold">Reseña (opcional)</label>
               <textarea class="form-control bg-dark text-white border-secondary rounded-0" id="pedit-review-text" rows="4" placeholder="Escribe tu opinión..."></textarea>
             </div>
+            <!-- Pros -->
+            <div class="mb-3">
+                <label class="form-label text-muted small fw-semibold"><i class="fa-solid fa-plus-circle text-success me-1"></i> Ventajas</label>
+                <select id="pedit-pros-select" multiple></select>
+            </div>
+            <!-- Contras -->
+            <div class="mb-3">
+                <label class="form-label text-muted small fw-semibold"><i class="fa-solid fa-minus-circle text-danger me-1"></i> Contras</label>
+                <select id="pedit-contras-select" multiple></select>
+            </div>
           </div>
           <div class="modal-footer border-secondary">
             <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal">Cancelar</button>
@@ -2362,6 +2385,84 @@ $(document).ready(function () {
   profileEditModal = new bootstrap.Modal(
     document.getElementById("profile-edit-review-modal"),
   );
+
+  let peditProsChoices = null;
+  let peditContrasChoices = null;
+
+  function initPeditChoices() {
+    if (!peditProsChoices && document.getElementById("pedit-pros-select")) {
+      peditProsChoices = new Choices("#pedit-pros-select", {
+        removeItemButton: true,
+        placeholderValue: "Selecciona las ventajas...",
+      });
+    }
+    if (!peditContrasChoices && document.getElementById("pedit-contras-select")) {
+      peditContrasChoices = new Choices("#pedit-contras-select", {
+        removeItemButton: true,
+        placeholderValue: "Selecciona las contras...",
+      });
+    }
+  }
+
+  const COASTER_PROS = [
+    { value: 'airtime', label: 'Airtime' },
+    { value: 'arnes', label: 'Arnés' },
+    { value: 'capacidad', label: 'Capacidad' },
+    { value: 'comodidad', label: 'Comodidad' },
+    { value: 'duracion', label: 'Duración' },
+    { value: 'hangtime', label: 'Hangtime' },
+    { value: 'intensidad', label: 'Intensidad' },
+    { value: 'inversiones', label: 'Inversiones' },
+    { value: 'launch', label: 'Launch' },
+    { value: 'caidas', label: 'Caídas' },
+    { value: 'suavidad', label: 'Suavidad' },
+    { value: 'recorrido', label: 'Layout' },
+    { value: 'tematizacion', label: 'Tematización' },
+    { value: 'velocidad', label: 'Velocidad' }
+  ];
+  const COASTER_CONTRAS = [
+    { value: 'airtime', label: 'Airtime' },
+    { value: 'arnes', label: 'Arnés' },
+    { value: 'capacidad', label: 'Capacidad' },
+    { value: 'comodidad', label: 'Comodidad' },
+    { value: 'mantenimiento', label: 'Mantenimiento' },
+    { value: 'duracion_corta', label: 'Corta duración' },
+    { value: 'intensidad', label: 'Intensidad' },
+    { value: 'inversiones', label: 'Inversiones' },
+    { value: 'launch', label: 'Launch' },
+    { value: 'recorrido', label: 'Layout' },
+    { value: 'vibracion', label: 'Vibración' },
+    { value: 'dolorosa', label: 'Dolorosa' },
+    { value: 'decepcionante', label: 'Decepcionante' },
+    { value: 'tematizacion', label: 'Tematización' },
+    { value: 'velocidad_nula', label: 'Poca velocidad' }
+  ];
+  const PARK_PROS = [
+    { value: 'limpieza', label: 'Limpieza' },
+    { value: 'personal', label: 'Personal / atención' },
+    { value: 'comida', label: 'Comida y restaurantes' },
+    { value: 'tematizacion', label: 'Tematización / ambiente' },
+    { value: 'precio', label: 'Relación calidad-precio' },
+    { value: 'colas', label: 'Gestión de colas' },
+    { value: 'atracciones', label: 'Variedad de atracciones' },
+    { value: 'mantenimiento', label: 'Mantenimiento de instalaciones' },
+    { value: 'accesibilidad', label: 'Accesibilidad (discapacitados)' },
+    { value: 'entretenimiento', label: 'Shows y entretenimiento' },
+    { value: 'tiendas', label: 'Tiendas y merchandising' }
+  ];
+  const PARK_CONTRAS = [
+    { value: 'suciedad', label: 'Suciedad' },
+    { value: 'personal', label: 'Mal personal / atención' },
+    { value: 'comida', label: 'Mala comida / precios abusivos' },
+    { value: 'tematizacion', label: 'Poca tematización' },
+    { value: 'precio', label: 'Mala relación calidad-precio' },
+    { value: 'colas', label: 'Largas colas / mala gestión' },
+    { value: 'pocas_atracciones', label: 'Pocas atracciones' },
+    { value: 'mantenimiento', label: 'Mal mantenimiento' },
+    { value: 'accesibilidad', label: 'Poca accesibilidad' },
+    { value: 'entretenimiento', label: 'Falta de entretenimiento' },
+    { value: 'masificacion', label: 'Masificación' }
+  ];
 
   // Actualizar nota oculta cuando cambia el radio (perfil)
   $(document).on("change", 'input[name="pedit_note"]', function () {
@@ -2380,6 +2481,33 @@ $(document).ready(function () {
     $("#pedit-review-text").val(text);
     // Marcar el radio correspondiente
     $(`input[name="pedit_note"][value="${note}"]`).prop("checked", true);
+
+    // Cargar tags
+    initPeditChoices();
+    const prosList = type === 'coaster' ? COASTER_PROS : PARK_PROS;
+    const contrasList = type === 'coaster' ? COASTER_CONTRAS : PARK_CONTRAS;
+
+    peditProsChoices.clearChoices();
+    peditProsChoices.setChoices(prosList, 'value', 'label', true);
+    peditContrasChoices.clearChoices();
+    peditContrasChoices.setChoices(contrasList, 'value', 'label', true);
+
+    const rawTags = $(this).attr("data-tags") || "[]";
+    let tags = [];
+    try { tags = JSON.parse(rawTags); } catch(e) { tags = []; }
+
+    if (tags && tags.length > 0) {
+        const activePros = tags.filter(t => t.type === 'pro').map(t => t.tag);
+        const activeContras = tags.filter(t => t.type === 'con').map(t => t.tag);
+        peditProsChoices.removeActiveItems();
+        peditProsChoices.setChoiceByValue(activePros);
+        peditContrasChoices.removeActiveItems();
+        peditContrasChoices.setChoiceByValue(activeContras);
+    } else {
+        peditProsChoices.removeActiveItems();
+        peditContrasChoices.removeActiveItems();
+    }
+
     profileEditModal.show();
   });
 
@@ -2401,6 +2529,12 @@ $(document).ready(function () {
     fd.append("review_id", reviewId);
     fd.append("note", note);
     fd.append("review", text);
+
+    // Añadir tags
+    const pros = peditProsChoices.getValue(true);
+    const contras = peditContrasChoices.getValue(true);
+    pros.forEach(p => fd.append('pros[]', p));
+    contras.forEach(c => fd.append('contras[]', c));
     const endpoint =
       type === "coaster"
         ? `${BASE_URL}/api/php/coasters.php?action=update_review`
@@ -2421,6 +2555,11 @@ $(document).ready(function () {
         if (idx !== -1) {
           reviewsData[idx].note = note;
           reviewsData[idx].review = text;
+          // Actualizar tags localmente
+          reviewsData[idx].tags = [
+              ...pros.map(p => ({ type: 'pro', tag: p })),
+              ...contras.map(c => ({ type: 'con', tag: c }))
+          ];
         }
         renderReviews();
       } else {

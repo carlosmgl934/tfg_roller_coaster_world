@@ -6,7 +6,7 @@ if ($id === 0) {
     Router::redirect('park_search');
 }
 
-$page_css = ['web/css/coasters.css', 'web/css/parks.css'];
+$page_css = ['web/css/coasters.css', 'web/css/parks.css', 'https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css'];
 require_once __DIR__ . '/../../partials/header.php';
 ?>
 
@@ -271,6 +271,40 @@ require_once __DIR__ . '/../../partials/header.php';
           <label class="form-label text-muted small fw-semibold">Reseña (opcional)</label>
           <textarea class="form-control bg-dark text-white border-secondary rounded-0" id="edit-review-text" rows="4" placeholder="Escribe tu opinión..."></textarea>
         </div>
+        <!-- Pros -->
+        <div class="mb-3">
+            <label class="form-label text-muted small fw-semibold"><i class="fa-solid fa-plus-circle text-success me-1"></i> Ventajas</label>
+            <select id="edit-pros-select" multiple>
+                <option value="limpieza">Limpieza</option>
+                <option value="personal">Personal / atención</option>
+                <option value="comida">Comida y restaurantes</option>
+                <option value="tematizacion">Tematización / ambiente</option>
+                <option value="precio">Relación calidad-precio</option>
+                <option value="colas">Gestión de colas</option>
+                <option value="atracciones">Variedad de atracciones</option>
+                <option value="mantenimiento">Mantenimiento de instalaciones</option>
+                <option value="accesibilidad">Accesibilidad (discapacitados)</option>
+                <option value="entretenimiento">Shows y entretenimiento</option>
+                <option value="tiendas">Tiendas y merchandising</option>
+            </select>
+        </div>
+        <!-- Contras -->
+        <div class="mb-3">
+            <label class="form-label text-muted small fw-semibold"><i class="fa-solid fa-minus-circle text-danger me-1"></i> Contras</label>
+            <select id="edit-contras-select" multiple>
+                <option value="suciedad">Suciedad</option>
+                <option value="personal">Mal personal / atención</option>
+                <option value="comida">Mala comida / precios abusivos</option>
+                <option value="tematizacion">Poca tematización</option>
+                <option value="precio">Mala relación calidad-precio</option>
+                <option value="colas">Largas colas / mala gestión</option>
+                <option value="pocas_atracciones">Pocas atracciones</option>
+                <option value="mantenimiento">Mal mantenimiento</option>
+                <option value="accesibilidad">Poca accesibilidad</option>
+                <option value="entretenimiento">Falta de entretenimiento</option>
+                <option value="masificacion">Masificación</option>
+            </select>
+        </div>
       </div>
       <div class="modal-footer border-secondary">
         <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal">Cancelar</button>
@@ -294,4 +328,5 @@ require_once __DIR__ . '/../../partials/login_modal.php';
   window.CURRENT_USER_ID = <?= isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 'null' ?>;
   window.CURRENT_USERNAME = <?= isset($_SESSION['username']) ? json_encode($_SESSION['username']) : 'null' ?>;
 </script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <script src="<?= Router::asset('web/js/parks/parks.js') ?>?v=<?= time() ?>"></script>

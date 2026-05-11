@@ -756,7 +756,7 @@ $(document).ready(function () {
   async function loadTrips(targetId) {
     const container = $("#trips-grid");
     container.html(
-      '<div class="text-center py-4 text-muted small"><div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>Cargando viajes...</div>',
+      '<div class="trips-empty-notice"><div class="spinner-border text-success mb-3" role="status"></div><br>Cargando viajes...</div>',
     );
     try {
       const res = await fetch(

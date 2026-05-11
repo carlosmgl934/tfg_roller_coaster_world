@@ -201,6 +201,16 @@ $(document).ready(function () {
       ? review.imagen_url
       : `${BASE_URL}/web/img/rc_placeholder.webp`;
 
+    let tagsHtml = "";
+    if (review.tags && review.tags.length > 0) {
+      tagsHtml = '<div class="d-flex flex-wrap gap-2 mt-2 mb-2">';
+      review.tags.forEach((t) => {
+        const cls = t.type === "pro" ? "success" : "danger";
+        tagsHtml += `<span class="badge bg-${cls} text-white rounded-pill px-3 py-1" style="font-weight:600;font-size:0.75rem;">${t.tag.replace(/_/g, " ").toUpperCase()}</span>`;
+      });
+      tagsHtml += "</div>";
+    }
+
     const reviewText = review.review
       ? `"${review.review}"`
       : '<span class="fst-italic text-secondary">El usuario dejó una puntuación sin reseña escrita.</span>';
@@ -247,6 +257,7 @@ $(document).ready(function () {
         </div>
         
         <!-- Texto de la reseña -->
+        ${tagsHtml}
         <div class="mt-3 p-3 bg-dark bg-opacity-25 rounded border-start border-3 border-success">
             <p class="mb-0 text-white-50" style="line-height: 1.7; font-size: 0.95rem;">
               ${reviewText}
