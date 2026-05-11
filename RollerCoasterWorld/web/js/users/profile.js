@@ -1,8 +1,8 @@
-// profile.js — Lógica del perfil, amigos y top personal
+﻿// profile.js â LÃ³gica del perfil, amigos y top personal
 // TODO: editar bio/avatar, gestionar solicitudes de amistad, top personal
 
 $(document).ready(function () {
-  // ── Inicializar Flatpickr para Fecha de Nacimiento ───────────────────────
+  // ââ Inicializar Flatpickr para Fecha de Nacimiento âââââââââââââââââââââââ
   const birthPicker = flatpickr("#config-user-birthdate", {
     dateFormat: "Y-m-d",
     altInput: true,
@@ -73,7 +73,7 @@ $(document).ready(function () {
       });
     });
 
-  // ── Auto-relleno de país usando Nominatim (OpenStreetMap) ──────────────────
+  // ââ Auto-relleno de paÃ­s usando Nominatim (OpenStreetMap) ââââââââââââââââââ
   const cityInput = document.getElementById("config-user-city");
   const countryInput = document.getElementById("config-user-country");
   const loadingEl = document.getElementById("city-loading");
@@ -96,7 +96,7 @@ $(document).ready(function () {
           countryInput.value = data[0].address.country;
         }
       } catch (e) {
-        console.warn("No se pudo obtener el país automáticamente:", e);
+        console.warn("No se pudo obtener el paÃ­s automÃ¡ticamente:", e);
       } finally {
         if (loadingEl) loadingEl.classList.add("d-none");
       }
@@ -105,7 +105,7 @@ $(document).ready(function () {
     cityInput.addEventListener("blur", fetchCountry);
   }
 
-  // ── Delegación de eventos para expandir tarjetas de Top (Coasters/Parques) ──
+  // ââ DelegaciÃ³n de eventos para expandir tarjetas de Top (Coasters/Parques) ââ
   $(document).on("click", ".btn-toggle-stats", function (e) {
     e.preventDefault();
     e.stopPropagation();
@@ -129,7 +129,7 @@ $(document).ready(function () {
     }
   });
 
-  // ── Cargar datos del usuario ───────────────────────────────────────────────
+  // ââ Cargar datos del usuario âââââââââââââââââââââââââââââââââââââââââââââââ
   const btnGuardar = document.getElementById("guardar-config-btn");
 
   // Capitalizar primera letra del username y del nombre completo al perder el foco
@@ -187,7 +187,7 @@ $(document).ready(function () {
     const formData = new FormData();
     formData.append("fullName", fullName);
     formData.append("username", username);
-    // El email no se envía: está deshabilitado y el backend lo obtiene de la sesión
+    // El email no se envÃ­a: estÃ¡ deshabilitado y el backend lo obtiene de la sesiÃ³n
     formData.append("birthday", birthday);
     formData.append("gender", gender);
     formData.append("city", city);
@@ -220,7 +220,7 @@ $(document).ready(function () {
           setTimeout(() => msgEl2.classList.add("d-none"), 3000);
         }
 
-        // ── Actualizar header en tiempo real ──────────────────────────────────
+        // ââ Actualizar header en tiempo real ââââââââââââââââââââââââââââââââââ
         const savedUsername = username || fullName;
         if (savedUsername) {
           // Actualizar nombre mostrado en el navbar
@@ -238,7 +238,7 @@ $(document).ready(function () {
             const span = headerAvatar.querySelector("span");
             if (span) span.textContent = initials;
           }
-          // Actualizar también el nombre en el dropdown header
+          // Actualizar tambiÃ©n el nombre en el dropdown header
           const headerDropName = document.getElementById(
             "header-dropdown-name",
           );
@@ -247,7 +247,7 @@ $(document).ready(function () {
               savedUsername.charAt(0).toUpperCase() + savedUsername.slice(1);
           }
         }
-        // ─────────────────────────────────────────────────────────────────────
+        // âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
         cargarDatos();
       } else {
@@ -265,7 +265,7 @@ $(document).ready(function () {
       const msgEl3 = document.getElementById("msg-guardar-config");
       if (msgEl3) {
         msgEl3.innerHTML =
-          '<i class="fa-solid fa-circle-xmark me-2"></i>Error de conexión';
+          '<i class="fa-solid fa-circle-xmark me-2"></i>Error de conexiÃ³n';
         msgEl3.className = "text-danger mb-0 me-4 fw-bold";
         msgEl3.classList.remove("d-none");
         setTimeout(() => msgEl3.classList.add("d-none"), 4000);
@@ -276,7 +276,7 @@ $(document).ready(function () {
     }
   });
 
-  // ── Autocomplete de Home Park ──────────────────────────────────────────────
+  // ââ Autocomplete de Home Park ââââââââââââââââââââââââââââââââââââââââââââââ
   function cargarParques() {
     const input = document.getElementById("home-park-user");
     const dropdown = document.getElementById("home-park-dropdown");
@@ -377,7 +377,7 @@ $(document).ready(function () {
         document.getElementById("config-user-country").value =
           data.user.country || "";
         document.getElementById("top-coaster-user").value =
-          data.stats && data.stats.top_coaster !== "—"
+          data.stats && data.stats.top_coaster !== "â"
             ? data.stats.top_coaster
             : data.user.favorite_coaster || "";
         document.getElementById("home-park-user").value =
@@ -388,16 +388,16 @@ $(document).ready(function () {
           let imgSrc = data.user.profile_image;
           // Si es URL absoluta, usarla tal cual
           if (imgSrc.startsWith("http://") || imgSrc.startsWith("https://")) {
-            // OK — usar directamente
+            // OK â usar directamente
           } else if (imgSrc.startsWith("/")) {
-            // Ruta local de otro XAMPP → no existe en esta máquina → ignorar
+            // Ruta local de otro XAMPP â no existe en esta mÃ¡quina â ignorar
             if (imgSrc.includes("/web/img/uploads/")) {
               imgSrc = null; // No mostrar imagen rota
             } else {
               imgSrc = window.BASE_URL + imgSrc;
             }
           } else {
-            // Solo nombre de archivo → construir URL Supabase
+            // Solo nombre de archivo â construir URL Supabase
             imgSrc =
               "https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/" +
               imgSrc;
@@ -418,7 +418,7 @@ $(document).ready(function () {
         }
 
         // Helper: capitaliza primera letra de un string, o devuelve fallback
-        const cap = (s, fallback = "—") =>
+        const cap = (s, fallback = "â") =>
           s ? s.charAt(0).toUpperCase() + s.slice(1) : fallback;
 
         // Actualizar tarjeta de perfil visual
@@ -428,23 +428,23 @@ $(document).ready(function () {
         document.getElementById("username").textContent = cap(
           data.user.username,
         );
-        document.getElementById("email").textContent = data.user.email || "—";
+        document.getElementById("email").textContent = data.user.email || "â";
         document.getElementById("profile-display-name").textContent = cap(
           data.user.username,
           "Usuario",
         );
 
-        let birthDateFormatted = "—";
+        let birthDateFormatted = "â";
         if (data.user.birthdate) {
           const d = new Date(data.user.birthdate);
           birthDateFormatted = d.toLocaleDateString("es-ES");
         }
         document.getElementById("birth-date").textContent = birthDateFormatted;
 
-        document.getElementById("gender").textContent = data.user.gender || "—";
+        document.getElementById("gender").textContent = data.user.gender || "â";
 
-        // Ubicación: ciudad, país, o ambos, de forma null-safe
-        let locationText = "—";
+        // UbicaciÃ³n: ciudad, paÃ­s, o ambos, de forma null-safe
+        let locationText = "â";
         if (data.user.city && data.user.country) {
           locationText = cap(data.user.city) + ", " + cap(data.user.country);
         } else if (data.user.city) {
@@ -455,21 +455,21 @@ $(document).ready(function () {
         document.getElementById("location").textContent = locationText;
 
         document.getElementById("favorite-coaster").textContent =
-          data.stats && data.stats.top_coaster !== "—"
+          data.stats && data.stats.top_coaster !== "â"
             ? data.stats.top_coaster
-            : data.user.favorite_coaster || "—";
+            : data.user.favorite_coaster || "â";
 
         const elFavPark = document.getElementById("favorite-park");
         if (elFavPark)
           elFavPark.textContent =
-            data.stats && data.stats.top_park !== "—"
+            data.stats && data.stats.top_park !== "â"
               ? data.stats.top_park
-              : "—";
+              : "â";
 
         document.getElementById("home-park").textContent =
-          data.user.home_park || "—";
+          data.user.home_park || "â";
 
-        // Rellenar estadísticas automáticas
+        // Rellenar estadÃ­sticas automÃ¡ticas
         if (data.stats) {
           const elCstrCount = document.getElementById("coasters-count");
           if (elCstrCount) elCstrCount.textContent = data.stats.coasters_count;
@@ -531,12 +531,12 @@ $(document).ready(function () {
       const file = e.target.files[0];
       if (!file) return;
 
-      // Comprimir imagen antes de subir (max 400×400, calidad 85%)
+      // Comprimir imagen antes de subir (max 400Ã400, calidad 85%)
       const compressedBlob = await comprimirImagen(file, 400, 400, 0.85);
 
       if (!compressedBlob) {
         showAvatarError(
-          "No se pudo procesar la imagen. El formato podría no estar soportado o la imagen está corrupta.",
+          "No se pudo procesar la imagen. El formato podrÃ­a no estar soportado o la imagen estÃ¡ corrupta.",
         );
         return;
       }
@@ -576,7 +576,7 @@ $(document).ready(function () {
           console.log("Foto de perfil actualizada correctamente");
         } else {
           console.error("Error al actualizar la foto de perfil:", data.error);
-          showAvatarError("No se pudo guardar la foto. Inténtalo de nuevo.");
+          showAvatarError("No se pudo guardar la foto. IntÃ©ntalo de nuevo.");
         }
       } catch (err) {
         console.error("Error subiendo avatar:", err);
@@ -586,7 +586,7 @@ $(document).ready(function () {
           errorMsg.includes("is not of type 'Blob'")
         ) {
           errorMsg =
-            "No se pudo procesar la imagen correctamente. Intenta con un archivo diferente (JPG o PNG válido).";
+            "No se pudo procesar la imagen correctamente. Intenta con un archivo diferente (JPG o PNG vÃ¡lido).";
         }
         showAvatarError(errorMsg);
       }
@@ -613,7 +613,7 @@ $(document).ready(function () {
     new bootstrap.Modal(document.getElementById("avatar-error-modal")).show();
   }
 
-  // Comprime una imagen a un tamaño máximo antes de subirla
+  // Comprime una imagen a un tamaÃ±o mÃ¡ximo antes de subirla
   function comprimirImagen(file, maxW, maxH, quality) {
     return new Promise((resolve) => {
       const img = new Image();
@@ -642,7 +642,7 @@ $(document).ready(function () {
   }
 
   async function subirFoto(blob, originalName) {
-    if (!blob) throw new Error("Archivo inválido o corrupto");
+    if (!blob) throw new Error("Archivo invÃ¡lido o corrupto");
     const formData = new FormData();
     let safeName = (originalName || "avatar").replace(/[^a-zA-Z0-9.-]/g, "_");
     const filename = safeName.replace(/\.[^.]+$/, "") + ".jpg";
@@ -667,7 +667,7 @@ $(document).ready(function () {
       try {
         data = JSON.parse(rawText);
       } catch (parseErr) {
-        throw new Error("El servidor no devolvió una respuesta JSON válida.");
+        throw new Error("El servidor no devolviÃ³ una respuesta JSON vÃ¡lida.");
       }
 
       if (!data.success) {
@@ -683,18 +683,18 @@ $(document).ready(function () {
   cargarParques();
   cargarDatos();
 
-  // ══════════════════════════════════════════════════════════════════
-  //  MIS TOPS  —  Preview · Vista Completa · Edición
-  // ══════════════════════════════════════════════════════════════════
+  // ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+  //  MIS TOPS  â  Preview Â· Vista Completa Â· EdiciÃ³n
+  // ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
   // Datos cacheados para no repetir fetch cada vez que se cambia de modo
   let topsData = { coasters: [], parks: [] };
 
-  // Tipo de vista actual por pestaña ('list' | 'grid')
+  // Tipo de vista actual por pestaÃ±a ('list' | 'grid')
   let coastersViewType = "list";
   let parksViewType = "list";
 
-  // ── Plantillas HTML ──────────────────────────────────────────────
+  // ââ Plantillas HTML ââââââââââââââââââââââââââââââââââââââââââââââ
 
   function emptyState(msg) {
     return `<div class="text-center text-muted py-5">
@@ -706,7 +706,7 @@ $(document).ready(function () {
   function renderCoastersPreview(data) {
     const el = $("#top-coasters-preview-list").empty();
     if (!data.length) {
-      el.html(emptyState("Todavía no tienes montañas rusas en tu top."));
+      el.html(emptyState("TodavÃ­a no tienes montaÃ±as rusas en tu top."));
       return;
     }
     data.slice(0, 10).forEach((item, i) => {
@@ -715,14 +715,14 @@ $(document).ready(function () {
           <span class="tops-preview-rank">#${i + 1}</span>
           <div class="flex-grow-1">
             <div class="fw-bold text-white" style="line-height: 1.2; margin-bottom: 2px;">${item.coaster_name}</div>
-            <small class="text-secondary" style="line-height: 1.1; display: block;">${item.park_name} · ${item.country_name || ""}</small>
+            <small class="text-secondary" style="line-height: 1.1; display: block;">${item.park_name} Â· ${item.country_name || ""}</small>
           </div>
           <i class="fa-solid fa-chevron-right text-muted small ms-2"></i>
         </a>`);
     });
     if (data.length > 10) {
       el.append(
-        `<div class="text-center text-muted small py-2">+${data.length - 10} más en el top completo</div>`,
+        `<div class="text-center text-muted small py-2">+${data.length - 10} mÃ¡s en el top completo</div>`,
       );
     }
   }
@@ -730,7 +730,7 @@ $(document).ready(function () {
   function renderParksPreview(data) {
     const el = $("#top-parks-preview-list").empty();
     if (!data.length) {
-      el.html(emptyState("Todavía no tienes parques en tu top."));
+      el.html(emptyState("TodavÃ­a no tienes parques en tu top."));
       return;
     }
     data.slice(0, 10).forEach((item, i) => {
@@ -746,7 +746,7 @@ $(document).ready(function () {
     });
     if (data.length > 10) {
       el.append(
-        `<div class="text-center text-muted small py-2">+${data.length - 10} más en el top completo</div>`,
+        `<div class="text-center text-muted small py-2">+${data.length - 10} mÃ¡s en el top completo</div>`,
       );
     }
   }
@@ -818,22 +818,22 @@ $(document).ready(function () {
 
     const container = $("#top-coasters-full-container").empty();
 
-    // Update counter pill — singular / plural
+    // Update counter pill â singular / plural
     const count = data.length;
     $("#coasters-full-count").text(count);
     $("#coasters-full-label").text(count === 1 ? "coaster" : "coasters");
 
     if (!data.length) {
-      container.html(emptyState("Ningún elemento coincide con los filtros."));
+      container.html(emptyState("NingÃºn elemento coincide con los filtros."));
       return;
     }
 
     const colClass = isGrid ? "col-6 col-md-4" : "col-12";
 
-    // Definir qué badges mostrar según el criterio de sort
+    // Definir quÃ© badges mostrar segÃºn el criterio de sort
     function getStatBadges(item, sortKey) {
       const mfr = item.manufacter
-        ? `<span class="text-secondary d-flex align-items-center gap-1" title="${item.manufacter}"><i class="fa-solid fa-industry"></i><span class="text-truncate d-inline-block" style="max-width: 100px;">${item.manufacter}</span></span>`
+        ? `<span class="text-secondary d-flex align-items-center gap-1" title="${item.manufacter}"><i class="fa-solid fa-industry"></i><span>${item.manufacter}</span></span>`
         : "";
 
       if (sortKey === "height") {
@@ -939,7 +939,7 @@ $(document).ready(function () {
                     </a>
                     <div class="text-secondary d-flex align-items-center gap-2 mt-1 text-truncate" style="font-size: 0.8rem; opacity: 0.8;">
                       <i class="fa-solid fa-location-dot text-success opacity-75 flex-shrink-0"></i>
-                      <span class="text-truncate">${item.park_name} · ${item.country_name || ""}</span>
+                      <span class="text-truncate">${item.park_name} Â· ${item.country_name || ""}</span>
                     </div>
                   </div>
                   <div class="flex-shrink-0">
@@ -959,7 +959,7 @@ $(document).ready(function () {
                 </button>
               </div>
 
-              <!-- Acceso rápido -->
+              <!-- Acceso rÃ¡pido -->
               <a href="${detailUrl}" class="d-none d-md-flex align-items-center px-3 text-decoration-none hover-bg-white-5" style="transition: all 0.2s;">
                  <i class="fa-solid fa-chevron-right fs-5 text-secondary opacity-50"></i>
               </a>
@@ -996,7 +996,7 @@ $(document).ready(function () {
     $("#parks-full-count").text(data.length);
 
     if (!data.length) {
-      container.html(emptyState("Ningún elemento coincide con los filtros."));
+      container.html(emptyState("NingÃºn elemento coincide con los filtros."));
       return;
     }
 
@@ -1079,7 +1079,7 @@ $(document).ready(function () {
                 </button>
               </div>
 
-              <!-- Acceso rápido -->
+              <!-- Acceso rÃ¡pido -->
               <a href="${detailUrl}" class="d-none d-md-flex align-items-center px-3 text-decoration-none hover-bg-white-5" style="transition: all 0.2s;">
                  <i class="fa-solid fa-chevron-right fs-5 text-secondary opacity-50"></i>
               </a>
@@ -1089,11 +1089,11 @@ $(document).ready(function () {
     });
   }
 
-  // Modo edición: lista arrastrable con número de ranking visible
+  // Modo ediciÃ³n: lista arrastrable con nÃºmero de ranking visible
   function renderCoastersEdit() {
     const el = $("#top-coasters-list-edit").empty();
     if (!topsData.coasters.length) {
-      el.html(emptyState("Añade montañas rusas desde el buscador de arriba."));
+      el.html(emptyState("AÃ±ade montaÃ±as rusas desde el buscador de arriba."));
       return;
     }
     topsData.coasters.forEach((item, i) => {
@@ -1169,7 +1169,7 @@ $(document).ready(function () {
   function renderParksEdit() {
     const el = $("#top-parks-list-edit").empty();
     if (!topsData.parks.length) {
-      el.html(emptyState("Añade parques desde el buscador de arriba."));
+      el.html(emptyState("AÃ±ade parques desde el buscador de arriba."));
       return;
     }
     topsData.parks.forEach((item, i) => {
@@ -1242,7 +1242,7 @@ $(document).ready(function () {
     }
   }
 
-  // ── Helpers de filtros (popularlos dinámicamente) ────────────────
+  // ââ Helpers de filtros (popularlos dinÃ¡micamente) ââââââââââââââââ
 
   function populateCoastersFilters(data) {
     const parks = [
@@ -1283,7 +1283,7 @@ $(document).ready(function () {
     countries.forEach((v) => $co.append(`<option value="${v}">${v}</option>`));
   }
 
-  // ── Sidebar: Leyenda de estadísticas de coasters ─────────────────
+  // ââ Sidebar: Leyenda de estadÃ­sticas de coasters âââââââââââââââââ
   function renderTopsStats(coasters) {
     if (!coasters || !coasters.length) {
       $("#tops-legend-countries").html(
@@ -1342,7 +1342,7 @@ $(document).ready(function () {
     });
   }
 
-  // ── Modal Estadísticas Ampliadas ─────────────────────────────────
+  // ââ Modal EstadÃ­sticas Ampliadas âââââââââââââââââââââââââââââââââ
   $("#tops-stats-sidebar").on("click", function () {
     const coasters = topsData.coasters || [];
     const parks = topsData.parks || [];
@@ -1356,7 +1356,7 @@ $(document).ready(function () {
     parks.forEach((p) => p.country_name && allCountries.add(p.country_name));
     $("#modal-stat-total-countries").text(allCountries.size);
 
-    // 2. Coasters por País (Completo)
+    // 2. Coasters por PaÃ­s (Completo)
     const countryCounts = {};
     coasters.forEach((c) => {
       const country = c.country_name || "Desconocido";
@@ -1466,29 +1466,29 @@ $(document).ready(function () {
       }
     });
 
-    $("#max-stat-height").text(maxHeight > 0 ? `${maxHeight} m` : "—");
+    $("#max-stat-height").text(maxHeight > 0 ? `${maxHeight} m` : "â");
     $("#max-stat-height-name")
-      .text(maxHeightCoaster || "—")
+      .text(maxHeightCoaster || "â")
       .attr("title", maxHeightCoaster || "");
 
-    $("#max-stat-speed").text(maxSpeed > 0 ? `${maxSpeed} km/h` : "—");
+    $("#max-stat-speed").text(maxSpeed > 0 ? `${maxSpeed} km/h` : "â");
     $("#max-stat-speed-name")
-      .text(maxSpeedCoaster || "—")
+      .text(maxSpeedCoaster || "â")
       .attr("title", maxSpeedCoaster || "");
 
-    $("#max-stat-length").text(maxLength > 0 ? `${maxLength} m` : "—");
+    $("#max-stat-length").text(maxLength > 0 ? `${maxLength} m` : "â");
     $("#max-stat-length-name")
-      .text(maxLengthCoaster || "—")
+      .text(maxLengthCoaster || "â")
       .attr("title", maxLengthCoaster || "");
 
-    $("#max-stat-inversions").text(maxInvers > 0 ? maxInvers : "—");
+    $("#max-stat-inversions").text(maxInvers > 0 ? maxInvers : "â");
     $("#max-stat-inversions-name")
-      .text(maxInversCoaster || "—")
+      .text(maxInversCoaster || "â")
       .attr("title", maxInversCoaster || "");
 
-    $("#max-stat-year").text(minYear !== Infinity ? minYear : "—");
+    $("#max-stat-year").text(minYear !== Infinity ? minYear : "â");
     $("#max-stat-year-name")
-      .text(minYearCoaster || "—")
+      .text(minYearCoaster || "â")
       .attr("title", minYearCoaster || "");
 
     // Mostrar modal
@@ -1498,7 +1498,7 @@ $(document).ready(function () {
     }
   });
 
-  // ── Helper: cambiar entre modos ──────────────────────────────────
+  // ââ Helper: cambiar entre modos ââââââââââââââââââââââââââââââââââ
 
   function setTopsMode(mode) {
     // Ocultar todo
@@ -1527,7 +1527,7 @@ $(document).ready(function () {
     }
   }
 
-  // ── Carga inicial de datos ───────────────────────────────────────
+  // ââ Carga inicial de datos âââââââââââââââââââââââââââââââââââââââ
 
   cargarTops();
 
@@ -1553,13 +1553,13 @@ $(document).ready(function () {
     }
   }
 
-  // ── Botones de navegación ────────────────────────────────────────
+  // ââ Botones de navegaciÃ³n ââââââââââââââââââââââââââââââââââââââââ
 
   $("#btn-tops-full-view").on("click", () => setTopsMode("full"));
   $("#btn-tops-edit").on("click", () => setTopsMode("edit"));
   $("#btn-tops-back").on("click", () => setTopsMode("preview"));
 
-  // ── Guardar Cambios ──────────────────────────────────────────────
+  // ââ Guardar Cambios ââââââââââââââââââââââââââââââââââââââââââââââ
 
   async function saveCoastersTop() {
     const $btn = $("#btn-save-coasters-top");
@@ -1570,7 +1570,7 @@ $(document).ready(function () {
 
     $btn
       .prop("disabled", true)
-      .html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Guardando…');
+      .html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Guardandoâ¦');
 
     try {
       const res = await fetch(
@@ -1590,7 +1590,7 @@ $(document).ready(function () {
       const data = await res.json();
       if (data.success) {
         await cargarTops(); // recarga datos frescos desde DB
-        await cargarDatos(); // recarga panel de estadísticas automático
+        await cargarDatos(); // recarga panel de estadÃ­sticas automÃ¡tico
         setTopsMode("preview"); // vuelve al preview
       } else {
         alert("Error al guardar: " + (data.error || "desconocido"));
@@ -1614,7 +1614,7 @@ $(document).ready(function () {
 
     $btn
       .prop("disabled", true)
-      .html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Guardando…');
+      .html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Guardandoâ¦');
 
     try {
       const res = await fetch(
@@ -1634,7 +1634,7 @@ $(document).ready(function () {
       const data = await res.json();
       if (data.success) {
         await cargarTops();
-        await cargarDatos(); // recarga panel de estadísticas automático
+        await cargarDatos(); // recarga panel de estadÃ­sticas automÃ¡tico
         setTopsMode("preview");
       } else {
         alert("Error al guardar: " + (data.error || "desconocido"));
@@ -1652,13 +1652,13 @@ $(document).ready(function () {
   $("#btn-save-coasters-top").on("click", saveCoastersTop);
   $("#btn-save-parks-top").on("click", saveParksTop);
 
-  // ── Sort y Filtros (Vista Completa) ──────────────────────────────
+  // ââ Sort y Filtros (Vista Completa) ââââââââââââââââââââââââââââââ
 
   $(
     "#coasters-sort, #coasters-filter-park, #coasters-filter-country, #coasters-filter-manufacter, #coasters-filter-model",
   ).on("change", renderCoastersFull);
 
-  // Botón de dirección (asc/desc) para el sort de coasters
+  // BotÃ³n de direcciÃ³n (asc/desc) para el sort de coasters
   $("#coasters-sort-dir").on("click", function () {
     const currentDir = $(this).attr("data-dir");
     const newDir = currentDir === "desc" ? "asc" : "desc";
@@ -1674,7 +1674,7 @@ $(document).ready(function () {
 
   $("#parks-sort, #parks-filter-country").on("change", renderParksFull);
 
-  // ── Toggle lista / cuadrícula ────────────────────────────────────
+  // ââ Toggle lista / cuadrÃ­cula ââââââââââââââââââââââââââââââââââââ
 
   $("#coasters-view-list").on("click", function () {
     coastersViewType = "list";
@@ -1709,7 +1709,7 @@ $(document).ready(function () {
     renderParksFull();
   });
 
-  // ── Eliminar items en modo edición ───────────────────────────────
+  // ââ Eliminar items en modo ediciÃ³n âââââââââââââââââââââââââââââââ
 
   $(document).on(
     "click",
@@ -1732,7 +1732,7 @@ $(document).ready(function () {
     },
   );
 
-  // ── Mover items en modo edición ───────────────────────────────────
+  // ââ Mover items en modo ediciÃ³n âââââââââââââââââââââââââââââââââââ
 
   function reindexTopsDOM(listId) {
     $(`#${listId} .tops-edit-item`).each(function (i) {
@@ -1797,7 +1797,7 @@ $(document).ready(function () {
       renderCoastersPreview(topsData.coasters);
     },
   );
-  // -- Coasters: mover a posición específica
+  // -- Coasters: mover a posiciÃ³n especÃ­fica
   $(document).on(
     "click",
     "#top-coasters-list-edit .tops-move-pos-btn",
@@ -1838,7 +1838,7 @@ $(document).ready(function () {
     );
     renderParksPreview(topsData.parks);
   });
-  // -- Parks: mover a posición específica
+  // -- Parks: mover a posiciÃ³n especÃ­fica
   $(document).on(
     "click",
     "#top-parks-list-edit .tops-move-pos-btn",
@@ -1856,7 +1856,7 @@ $(document).ready(function () {
     },
   );
 
-  // -- Delegación de mousedown para prevenir selección en escritorio (Capa 1)
+  // -- DelegaciÃ³n de mousedown para prevenir selecciÃ³n en escritorio (Capa 1)
   $(document).on("mousedown", ".drag-handle", function (e) {
     e.preventDefault();
   });
@@ -1867,7 +1867,7 @@ $(document).ready(function () {
       "#section-profile-content, #section-config-content, #section-tops-content, #section-reviews-content, #section-friends-content, #section-trips-content, #section-map-content",
     ).addClass("d-none");
 
-    // Quitar el active de todos los enlaces del menú
+    // Quitar el active de todos los enlaces del menÃº
     $("#sidebar-menu .list-group-item").removeClass("active");
 
     // Mostrar solo el que queremos
@@ -1939,7 +1939,7 @@ $(document).ready(function () {
     showSection("#profile-map");
   });
 
-  // Al cargar la página con hash en la URL
+  // Al cargar la pÃ¡gina con hash en la URL
   const sectionMap = {
     "#tops": "#profile-tops",
     "#config": "#profile-config",
@@ -1954,7 +1954,7 @@ $(document).ready(function () {
   }
 
   // Fix: interceptar clics en enlaces del header que apunten a secciones del perfil.
-  // Funciona aunque el hash ya sea el mismo (el hashchange no se dispararía en ese caso).
+  // Funciona aunque el hash ya sea el mismo (el hashchange no se dispararÃ­a en ese caso).
   $(document).on("click", 'a[href*="profile.php#"]', function (e) {
     const hash = "#" + this.href.split("#")[1];
     if (sectionMap[hash]) {
@@ -1970,7 +1970,7 @@ $(document).ready(function () {
     if (target) showSection(target);
   });
 
-  // === BÚSQUEDA DE MONTAÑAS RUSAS (MIS TOPS) ===
+  // === BÃSQUEDA DE MONTAÃAS RUSAS (MIS TOPS) ===
   let debounceTopCoaster = null;
 
   $("#top-coasters-search").on("input", function () {
@@ -2006,7 +2006,7 @@ $(document).ready(function () {
           dropdown.empty();
           if (data.length === 0) {
             dropdown.append(
-              '<li class="list-group-item text-muted small bg-dark border-secondary">No se encontraron montañas rusas</li>',
+              '<li class="list-group-item text-muted small bg-dark border-secondary">No se encontraron montaÃ±as rusas</li>',
             );
           } else {
             data.forEach(function (coaster) {
@@ -2021,10 +2021,10 @@ $(document).ready(function () {
                 statusText = "Cerrada";
               else if (
                 statusText === "Construction" ||
-                statusText === "En Construcción" ||
-                statusText === "En construcción"
+                statusText === "En ConstrucciÃ³n" ||
+                statusText === "En construcciÃ³n"
               )
-                statusText = "En Construcción";
+                statusText = "En ConstrucciÃ³n";
               else statusText = statusText.toUpperCase();
 
               dropdown.append(
@@ -2034,8 +2034,8 @@ $(document).ready(function () {
                     data-park="${coaster.park_name}">
                   <div class="fw-bold text-truncate" style="font-size:0.95rem;">${coaster.coaster_name}</div>
                   <div class="text-secondary" style="font-size:0.78rem;">${coaster.park_name}
-                    <span class="mx-1 opacity-40">•</span>${statusText}
-                    <span class="mx-1 opacity-40">•</span>${coaster.park_country || ""}
+                    <span class="mx-1 opacity-40">â¢</span>${statusText}
+                    <span class="mx-1 opacity-40">â¢</span>${coaster.park_country || ""}
                   </div>
                 </li>`,
               );
@@ -2057,7 +2057,7 @@ $(document).ready(function () {
     }
   });
 
-  // Navigación por teclado
+  // NavigaciÃ³n por teclado
   $("#top-coasters-search").on("keydown", function (e) {
     const $dropdown = $("#top-coasters-dropdown");
     if ($dropdown.hasClass("d-none")) return;
@@ -2140,7 +2140,7 @@ $(document).ready(function () {
     },
   );
 
-  // === BÚSQUEDA DE PARQUES (MIS TOPS) ===
+  // === BÃSQUEDA DE PARQUES (MIS TOPS) ===
   let debounceTopPark = null;
 
   $("#top-parks-search").on("input", function () {
@@ -2209,7 +2209,7 @@ $(document).ready(function () {
     }
   });
 
-  // Navigación por teclado
+  // NavigaciÃ³n por teclado
   $("#top-parks-search").on("keydown", function (e) {
     const $dropdown = $("#top-parks-dropdown");
     if ($dropdown.hasClass("d-none")) return;
@@ -2292,7 +2292,7 @@ $(document).ready(function () {
     },
   );
 
-  // === RECUPERAR CONTRASEÑA EN PERFIL ===
+  // === RECUPERAR CONTRASEÃA EN PERFIL ===
   const btnForgotProfile = document.getElementById("forgotPasswordProfileBtn");
   if (btnForgotProfile) {
     btnForgotProfile.addEventListener("click", function (e) {
@@ -2304,11 +2304,11 @@ $(document).ready(function () {
       if (!email) {
         if (typeof showAlert === "function")
           showAlert(
-            "No se ha podido obtener tu correo electrónico. Cierra sesión y vuelve a entrar.",
+            "No se ha podido obtener tu correo electrÃ³nico. Cierra sesiÃ³n y vuelve a entrar.",
           );
         else
           alert(
-            "No se ha podido obtener tu correo electrónico. Cierra sesión y vuelve a entrar.",
+            "No se ha podido obtener tu correo electrÃ³nico. Cierra sesiÃ³n y vuelve a entrar.",
           );
         return;
       }
@@ -2318,20 +2318,20 @@ $(document).ready(function () {
         .then(() => {
           if (typeof showAlert === "function") {
             showAlert(
-              "¡Listo! Hemos enviado un enlace a " +
+              "Â¡Listo! Hemos enviado un enlace a " +
                 email +
-                " para que puedas restablecer tu contraseña. Revisa también la carpeta de SPAM.",
+                " para que puedas restablecer tu contraseÃ±a. Revisa tambiÃ©n la carpeta de SPAM.",
             );
           } else {
             alert(
-              "¡Listo! Hemos enviado un enlace a " +
+              "Â¡Listo! Hemos enviado un enlace a " +
                 email +
-                " para restablecer tu contraseña.",
+                " para restablecer tu contraseÃ±a.",
             );
           }
         })
         .catch((error) => {
-          let txt = "Error al restablecer contraseña: ";
+          let txt = "Error al restablecer contraseÃ±a: ";
           if (error.code === "auth/user-not-found")
             txt =
               "No hay ninguna cuenta vinculada con este correo en nuestro proveedor (Google/Firebase).";
@@ -2356,16 +2356,16 @@ $(document).ready(function () {
     }
   });
 
-  // ══════════════════════════════════════════════════════════════════
-  //  MIS RESEÑAS
-  // ══════════════════════════════════════════════════════════════════
+  // ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+  //  MIS RESEÃAS
+  // ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
-  let reviewsData = []; // cache de todas las reseñas
-  let reviewsLoaded = false; // lazy-load: sólo se carga una vez
+  let reviewsData = []; // cache de todas las reseÃ±as
+  let reviewsLoaded = false; // lazy-load: sÃ³lo se carga una vez
   const REVIEWS_PER_PAGE = 6;
   let reviewsPage = 1;
 
-  // ── Helper: genera las estrellas visuales (nota de 0–10 → 0–5 ★) ─
+  // ââ Helper: genera las estrellas visuales (nota de 0â10 â 0â5 â) â
   function starsHtml(note) {
     const n = parseFloat(note) || 0; // la BD guarda 0-5 directamente
     const full = Math.floor(n);
@@ -2381,7 +2381,7 @@ $(document).ready(function () {
     return html;
   }
 
-  // ── Helper: formatea fecha ─────────────────────────────────────────
+  // ââ Helper: formatea fecha âââââââââââââââââââââââââââââââââââââââââ
   function formatReviewDate(dateStr) {
     if (!dateStr) return "";
     const d = new Date(dateStr);
@@ -2392,7 +2392,7 @@ $(document).ready(function () {
     });
   }
 
-  // ── Aplica sort + tipo y devuelve el subarray de la página actual ──
+  // ââ Aplica sort + tipo y devuelve el subarray de la pÃ¡gina actual ââ
   function getFilteredReviews() {
     const sort = $("#reviews-sort").val();
     const type = $("#reviews-type-filter").val();
@@ -2402,7 +2402,7 @@ $(document).ready(function () {
     // Filtro por tipo
     if (type) data = data.filter((r) => r.type === type);
 
-    // Ordenación
+    // OrdenaciÃ³n
     if (sort === "date_desc")
       data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     else if (sort === "date_asc")
@@ -2415,7 +2415,7 @@ $(document).ready(function () {
     return data;
   }
 
-  // ── Render de reseñas ────────────────────────────────────────────
+  // ââ Render de reseÃ±as ââââââââââââââââââââââââââââââââââââââââââââ
   function renderReviews() {
     const filtered = getFilteredReviews();
     const $list = $("#reviews-list").empty();
@@ -2434,12 +2434,12 @@ $(document).ready(function () {
       $list.html(`
         <div class="text-center text-muted py-5">
           <i class="fa-solid fa-ghost fs-1 mb-3 opacity-50 d-block"></i>
-          <p>Todavía no has dejado ninguna reseña.</p>
+          <p>TodavÃ­a no has dejado ninguna reseÃ±a.</p>
         </div>`);
       return;
     }
 
-    // Paginación
+    // PaginaciÃ³n
     const totalPages = Math.ceil(total / REVIEWS_PER_PAGE);
     if (reviewsPage > totalPages) reviewsPage = totalPages;
     const start = (reviewsPage - 1) * REVIEWS_PER_PAGE;
@@ -2480,7 +2480,7 @@ $(document).ready(function () {
 
       const reviewText = r.review
         ? `<p class="mb-0 text-secondary small" style="line-height:1.6;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;">${r.review}</p>`
-        : `<p class="mb-0 text-muted small fst-italic">Sin texto de reseña.</p>`;
+        : `<p class="mb-0 text-muted small fst-italic">Sin texto de reseÃ±a.</p>`;
 
       $list.append(`
         <div class="top-card d-flex flex-row align-items-stretch mb-3" style="min-height:130px;" data-review-id="${r.id}" data-review-type="${r.type}" data-item-id="${r.item_id}">
@@ -2508,7 +2508,7 @@ $(document).ready(function () {
               ${reviewText}
             </div>
             
-            <!-- Footer: Estrellas y Botón -->
+            <!-- Footer: Estrellas y BotÃ³n -->
             <div class="d-flex flex-wrap justify-content-between align-items-center mt-3 pt-2 border-top border-secondary border-opacity-10 gap-2">
               <div class="d-flex align-items-center gap-2">
                 <div class="stars-container d-flex gap-1" style="font-size: 0.75rem;">${starsHtml(r.note)}</div>
@@ -2521,7 +2521,7 @@ $(document).ready(function () {
                         data-id="${r.id}" data-type="${r.type}"
                         data-note="${nota}" data-text="${encodeURIComponent(r.review || "")}"
                         data-tags='${JSON.stringify(r.tags || [])}'
-                        title="Editar reseña" style="text-decoration:none;">
+                        title="Editar reseÃ±a" style="text-decoration:none;">
                   <i class="fa-solid fa-pen-to-square"></i>
                   <span class="fw-bold text-uppercase" style="font-size:0.65rem;">Editar</span>
                 </button>
@@ -2531,7 +2531,7 @@ $(document).ready(function () {
         </div>`);
     });
 
-    // Controles de paginación
+    // Controles de paginaciÃ³n
     if (totalPages > 1) {
       if (reviewsPage > 1) {
         $pag.append(`<button class="btn btn-sm btn-outline-success rounded-0 px-3" id="rev-prev">
@@ -2558,7 +2558,7 @@ $(document).ready(function () {
     }
   }
 
-  // ── Carga inicial (lazy) ──────────────────────────────────────────
+  // ââ Carga inicial (lazy) ââââââââââââââââââââââââââââââââââââââââââ
   async function cargarReviews() {
     if (reviewsLoaded) {
       renderReviews();
@@ -2567,7 +2567,7 @@ $(document).ready(function () {
 
     const $list = $("#reviews-list");
     $list.html(`<div class="text-center text-muted py-5">
-      <i class="fa-solid fa-spinner fa-spin fs-3 mb-3 d-block"></i>Cargando reseñas…
+      <i class="fa-solid fa-spinner fa-spin fs-3 mb-3 d-block"></i>Cargando reseÃ±asâ¦
     </div>`);
     $("#reviews-pagination").empty();
 
@@ -2580,7 +2580,7 @@ $(document).ready(function () {
       reviewsLoaded = true;
       reviewsPage = 1;
 
-      // Enlazar filtros AQUÍ, cuando los datos ya están listos
+      // Enlazar filtros AQUÃ, cuando los datos ya estÃ¡n listos
       $("#reviews-sort, #reviews-type-filter")
         .off("change.reviews")
         .on("change.reviews", function () {
@@ -2590,39 +2590,39 @@ $(document).ready(function () {
 
       renderReviews();
     } catch (e) {
-      console.error("Error cargando reseñas:", e);
+      console.error("Error cargando reseÃ±as:", e);
       $list.html(`<div class="text-center text-danger py-4">
-        <i class="fa-solid fa-circle-exclamation me-2"></i>Error al cargar las reseñas.
+        <i class="fa-solid fa-circle-exclamation me-2"></i>Error al cargar las reseÃ±as.
       </div>`);
     }
   }
 
-  // ── Activar cuando se hace click en el menú de reseñas ───────────
+  // ââ Activar cuando se hace click en el menÃº de reseÃ±as âââââââââââ
   $("#menu-reviews").on("click", cargarReviews);
 
-  // Si la URL ya está en #reviews al cargar la página, cargamos también
+  // Si la URL ya estÃ¡ en #reviews al cargar la pÃ¡gina, cargamos tambiÃ©n
   if (window.location.hash === "#reviews") {
     cargarReviews();
   }
 
-  // ── Modal de edición de reseñas desde el perfil ──────────────────────────
+  // ââ Modal de ediciÃ³n de reseÃ±as desde el perfil ââââââââââââââââââââââââââ
   let profileEditModal = null;
 
-  // Crear el modal de edición dinámicamente si no existe
+  // Crear el modal de ediciÃ³n dinÃ¡micamente si no existe
   if (!document.getElementById("profile-edit-review-modal")) {
     const modalHtml = `
     <div class="modal fade" id="profile-edit-review-modal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-dark border-secondary text-white">
           <div class="modal-header bg-success">
-            <h5 class="modal-title fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i>Editar reseña</h5>
+            <h5 class="modal-title fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i>Editar reseÃ±a</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
             <input type="hidden" id="pedit-review-id">
             <input type="hidden" id="pedit-review-type">
             <div class="mb-3">
-              <label class="form-label text-muted small fw-semibold">Puntuación</label>
+              <label class="form-label text-muted small fw-semibold">PuntuaciÃ³n</label>
               <div class="star-rating pedit-star-rating-container" style="font-size: 2rem;">
                 ${[10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
                   .map((i) => {
@@ -2636,8 +2636,8 @@ $(document).ready(function () {
               <input type="hidden" id="pedit-review-note" value="0">
             </div>
             <div class="mb-3">
-              <label class="form-label text-muted small fw-semibold">Reseña (opcional)</label>
-              <textarea class="form-control bg-dark text-white border-secondary rounded-0" id="pedit-review-text" rows="4" placeholder="Escribe tu opinión..."></textarea>
+              <label class="form-label text-muted small fw-semibold">ReseÃ±a (opcional)</label>
+              <textarea class="form-control bg-dark text-white border-secondary rounded-0" id="pedit-review-text" rows="4" placeholder="Escribe tu opiniÃ³n..."></textarea>
             </div>
             <!-- Pros -->
             <div class="mb-3 wrapper-pros">
@@ -2693,44 +2693,44 @@ $(document).ready(function () {
 
   const COASTER_PROS = [
     { value: "airtime", label: "Airtime" },
-    { value: "arnes", label: "Arnés" },
+    { value: "arnes", label: "ArnÃ©s" },
     { value: "capacidad", label: "Capacidad" },
     { value: "comodidad", label: "Comodidad" },
-    { value: "duracion", label: "Duración" },
+    { value: "duracion", label: "DuraciÃ³n" },
     { value: "hangtime", label: "Hangtime" },
     { value: "intensidad", label: "Intensidad" },
     { value: "inversiones", label: "Inversiones" },
     { value: "launch", label: "Launch" },
-    { value: "caidas", label: "Caídas" },
+    { value: "caidas", label: "CaÃ­das" },
     { value: "suavidad", label: "Suavidad" },
     { value: "recorrido", label: "Layout" },
-    { value: "tematizacion", label: "Tematización" },
+    { value: "tematizacion", label: "TematizaciÃ³n" },
     { value: "velocidad", label: "Velocidad" },
   ];
   const COASTER_CONTRAS = [
     { value: "airtime", label: "Airtime" },
-    { value: "arnes", label: "Arnés" },
+    { value: "arnes", label: "ArnÃ©s" },
     { value: "capacidad", label: "Capacidad" },
     { value: "comodidad", label: "Comodidad" },
     { value: "mantenimiento", label: "Mantenimiento" },
-    { value: "duracion_corta", label: "Corta duración" },
+    { value: "duracion_corta", label: "Corta duraciÃ³n" },
     { value: "intensidad", label: "Intensidad" },
     { value: "inversiones", label: "Inversiones" },
     { value: "launch", label: "Launch" },
     { value: "recorrido", label: "Layout" },
-    { value: "vibracion", label: "Vibración" },
+    { value: "vibracion", label: "VibraciÃ³n" },
     { value: "dolorosa", label: "Dolorosa" },
     { value: "decepcionante", label: "Decepcionante" },
-    { value: "tematizacion", label: "Tematización" },
+    { value: "tematizacion", label: "TematizaciÃ³n" },
     { value: "velocidad_nula", label: "Poca velocidad" },
   ];
   const PARK_PROS = [
     { value: "limpieza", label: "Limpieza" },
-    { value: "personal", label: "Personal / atención" },
+    { value: "personal", label: "Personal / atenciÃ³n" },
     { value: "comida", label: "Comida y restaurantes" },
-    { value: "tematizacion", label: "Tematización / ambiente" },
-    { value: "precio", label: "Relación calidad-precio" },
-    { value: "colas", label: "Gestión de colas" },
+    { value: "tematizacion", label: "TematizaciÃ³n / ambiente" },
+    { value: "precio", label: "RelaciÃ³n calidad-precio" },
+    { value: "colas", label: "GestiÃ³n de colas" },
     { value: "atracciones", label: "Variedad de atracciones" },
     { value: "mantenimiento", label: "Mantenimiento de instalaciones" },
     { value: "accesibilidad", label: "Accesibilidad (discapacitados)" },
@@ -2739,16 +2739,16 @@ $(document).ready(function () {
   ];
   const PARK_CONTRAS = [
     { value: "suciedad", label: "Suciedad" },
-    { value: "personal", label: "Mal personal / atención" },
+    { value: "personal", label: "Mal personal / atenciÃ³n" },
     { value: "comida", label: "Mala comida / precios abusivos" },
-    { value: "tematizacion", label: "Poca tematización" },
-    { value: "precio", label: "Mala relación calidad-precio" },
-    { value: "colas", label: "Largas colas / mala gestión" },
+    { value: "tematizacion", label: "Poca tematizaciÃ³n" },
+    { value: "precio", label: "Mala relaciÃ³n calidad-precio" },
+    { value: "colas", label: "Largas colas / mala gestiÃ³n" },
     { value: "pocas_atracciones", label: "Pocas atracciones" },
     { value: "mantenimiento", label: "Mal mantenimiento" },
     { value: "accesibilidad", label: "Poca accesibilidad" },
     { value: "entretenimiento", label: "Falta de entretenimiento" },
-    { value: "masificacion", label: "Masificación" },
+    { value: "masificacion", label: "MasificaciÃ³n" },
   ];
 
   // Actualizar nota oculta cuando cambia el radio (perfil)
@@ -2756,7 +2756,7 @@ $(document).ready(function () {
     $("#pedit-review-note").val($(this).val());
   });
 
-  // Abrir modal desde tarjeta de reseña del perfil
+  // Abrir modal desde tarjeta de reseÃ±a del perfil
   $(document).on("click", ".profile-edit-review-btn", function () {
     const id = $(this).data("id");
     const type = $(this).data("type"); // 'coaster' | 'park'
@@ -2815,7 +2815,7 @@ $(document).ready(function () {
     const note = parseFloat($("#pedit-review-note").val()) || 0;
     const text = $("#pedit-review-text").val().trim();
     if (!note) {
-      alert("Por favor, selecciona una puntuación.");
+      alert("Por favor, selecciona una puntuaciÃ³n.");
       return;
     }
     btn
@@ -2826,7 +2826,7 @@ $(document).ready(function () {
     fd.append("note", note);
     fd.append("review", text);
 
-    // Añadir tags
+    // AÃ±adir tags
     const pros = peditProsChoices.getValue(true);
     const contras = peditContrasChoices.getValue(true);
     pros.forEach((p) => fd.append("pros[]", p));
@@ -2867,16 +2867,16 @@ $(document).ready(function () {
         alert("Error: " + (data.error || "No se pudo guardar."));
       }
     } catch (e) {
-      alert("Error de conexión.");
+      alert("Error de conexiÃ³n.");
     } finally {
       btn
         .prop("disabled", false)
         .html('<i class="fa-solid fa-floppy-disk me-1"></i>Guardar cambios');
     }
   });
-  // ══════════════════════════════════════════════════════════════════
+  // ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
   //  MIS AMIGOS
-  // ══════════════════════════════════════════════════════════════════
+  // ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
   let friendsData = [];
   let friendsLoaded = false;
@@ -2897,7 +2897,7 @@ $(document).ready(function () {
       $list.html(
         '<div class="text-center text-muted py-5">' +
           '<i class="fa-solid fa-ghost fs-1 mb-3 opacity-50 d-block"></i>' +
-          "<p>Todavía no tienes amigos agregados.</p>" +
+          "<p>TodavÃ­a no tienes amigos agregados.</p>" +
           "</div>",
       );
       return;
@@ -3059,7 +3059,7 @@ $(document).ready(function () {
     cargarAmigos();
   }
 
-  // ─── VIAJES ──────────────────────────────────────────────────
+  // âââ VIAJES ââââââââââââââââââââââââââââââââââââââââââââââââââ
   const esc = (s) =>
     String(s ?? "")
       .replace(/&/g, "&amp;")
@@ -3079,7 +3079,7 @@ $(document).ready(function () {
       const d = j.data || [];
       if (!d.length) {
         container.html(
-          '<div class="text-center py-4 text-muted"><i class="fa-solid fa-suitcase fa-2x mb-2 opacity-50"></i><br>Aún no tienes viajes registrados.</div>',
+          '<div class="text-center py-4 text-muted"><i class="fa-solid fa-suitcase fa-2x mb-2 opacity-50"></i><br>AÃºn no tienes viajes registrados.</div>',
         );
         return;
       }
@@ -3107,7 +3107,7 @@ $(document).ready(function () {
             ? "Pasado"
             : t_status === "active"
               ? "Activo"
-              : "Próximo";
+              : "PrÃ³ximo";
         let imgUrl = window.BASE_URL + "/dummy.jpg";
         if (t.cover_image) {
           imgUrl = t.cover_image.startsWith("http")
@@ -3141,7 +3141,7 @@ $(document).ready(function () {
             </div>
             <div class="card-body p-3 d-flex flex-column justify-content-start">
               <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
-                <span class="badge bg-dark border border-secondary text-light fw-normal"><i class="fa-regular fa-calendar text-success me-1"></i>${startStr} — ${endStr}</span>
+                <span class="badge bg-dark border border-secondary text-light fw-normal"><i class="fa-regular fa-calendar text-success me-1"></i>${startStr} â ${endStr}</span>
                 <div class="small text-truncate" style="color: #a3aed0; font-size: 0.8rem;"><i class="fa-solid fa-map-location-dot me-1"></i>${esc(pNames)}</div>
               </div>
               ${t.description ? `<div class="small text-muted mt-1" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-height: 1.4;">${esc(t.description)}</div>` : ""}
@@ -3159,7 +3159,7 @@ $(document).ready(function () {
     }
   }
 
-  // ─── RANKING ─────────────────────────────────────────────────
+  // âââ RANKING âââââââââââââââââââââââââââââââââââââââââââââââââ
   async function loadRanking() {
     const sType = document.getElementById("rank-type-select");
     const container = document.getElementById("ranking-container");
@@ -3216,7 +3216,7 @@ $(document).ready(function () {
           eDate.min = "";
         }
       } else if (currentPeriod === "custom") {
-        // Si entramos en custom y están vacíos, ponemos el año actual como base
+        // Si entramos en custom y estÃ¡n vacÃ­os, ponemos el aÃ±o actual como base
         if (sDate && !sDate.value) {
           const fmt = (date) =>
             date.getFullYear() +
@@ -3411,23 +3411,25 @@ $(document).ready(function () {
 });
 
 
-// Animaci�n de estad�sticas en versi�n m�vil
+// Animación de estadísticas en versión móvil
 $(document).on('click', '.btn-toggle-stats', function(e) {
   e.preventDefault();
   const btn = $(this);
   const target = btn.closest('.top-card').find('.stats-expandable');
+  
   if (target.hasClass('d-none')) {
-    target.removeClass('d-none d-md-flex').css('display', 'none').slideDown(250, function() {
-      $(this).css('display', 'flex');
+    // Quitamos d-none y seteamos display:none temporalmente para que slideDown anime
+    target.removeClass('d-none').css('display', 'none').slideDown(250, function() {
+      $(this).css('display', 'flex').addClass('d-flex');
     });
     btn.find('i').removeClass('fa-chevron-down').addClass('fa-chevron-up');
     btn.find('span').text('Contraer');
   } else {
+    // Ocultamos con slideUp y luego restauramos la clase d-none original
     target.slideUp(250, function() {
-      $(this).addClass('d-none d-md-flex').css('display', '');
+      $(this).removeClass('d-flex').addClass('d-none').css('display', '');
     });
     btn.find('i').removeClass('fa-chevron-up').addClass('fa-chevron-down');
     btn.find('span').text('Ver detalles');
   }
 });
-
