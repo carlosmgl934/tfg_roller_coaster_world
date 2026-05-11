@@ -1148,6 +1148,9 @@ $(document).ready(function () {
       new Sortable(document.getElementById("top-coasters-list-edit"), {
         handle: ".drag-handle",
         animation: 150,
+        forceFallback: true,
+        fallbackTolerance: 3,
+        touchStartThreshold: 3,
         onEnd: function () {
           const newOrder = [];
           $("#top-coasters-list-edit .tops-edit-item").each(function (i) {
@@ -1212,8 +1215,10 @@ $(document).ready(function () {
       new Sortable(document.getElementById("top-parks-list-edit"), {
         handle: ".drag-handle",
         animation: 150,
+        forceFallback: true,
+        fallbackTolerance: 3,
+        touchStartThreshold: 3,
         onEnd: function () {
-          // Sync DOM order back into topsData so adding new items doesn't reset positions
           const newOrder = [];
           $("#top-parks-list-edit .tops-edit-item").each(function (i) {
             $(this)
@@ -2013,8 +2018,7 @@ $(document).ready(function () {
               dropdown.append(
                 `<li class="list-group-item list-group-item-action bg-dark text-white border-secondary py-2" style="cursor:pointer;" data-id="${coaster.id}">
                   <div class="fw-bold text-truncate" style="font-size:0.95rem;">${coaster.coaster_name}</div>
-                  <div class="text-secondary" style="font-size:0.78rem;">
-                    <i class="fa-solid fa-tree-city me-1 opacity-50"></i>${coaster.park_name}
+                  <div class="text-secondary" style="font-size:0.78rem;">${coaster.park_name}
                     <span class="mx-1 opacity-40">•</span>${statusText}
                     <span class="mx-1 opacity-40">•</span>${coaster.park_country || ""}
                   </div>

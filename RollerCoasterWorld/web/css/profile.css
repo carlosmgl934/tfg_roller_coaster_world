@@ -959,3 +959,13 @@ span.flatpickr-weekday {
   justify-content: center !important;
   min-height: 220px !important;
 }
+
+/* Drag handle: prevenir interferencia con scroll en móvil */
+.drag-handle {
+  touch-action: none;
+  cursor: grab;
+}
+.drag-handle:active {
+  cursor: grabbing;
+}
+
