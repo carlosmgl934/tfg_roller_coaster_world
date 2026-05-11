@@ -310,9 +310,9 @@ $user_id = $_GET['id'] ?? null;
                             <h5 class="fw-bold mb-0">Viajes de este usuario</h5>
                         </div>
                     </div>
-                    <div class="card-body p-4">
-                        <div id="trips-grid" class="trips-grid-scrollable">
-                            <div class="text-center py-4 text-muted small">Cargando viajes...</div>
+                    <div class="card-body p-0 d-flex" style="min-height: 220px;">
+                        <div id="trips-grid" class="trips-grid-scrollable w-100">
+                            <div class="trips-empty-notice"><i class="fa-solid fa-suitcase fa-3x mb-3 opacity-50"></i><br>Cargando viajes...</div>
                         </div>
                     </div>
                 </div>

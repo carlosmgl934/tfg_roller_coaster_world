@@ -315,7 +315,7 @@ $(document).ready(function () {
       container.empty();
       if (!items || items.length === 0) {
         container.html(
-          `<div class="trips-empty-notice text-muted"><i class="fa-solid fa-suitcase fa-3x mb-3 opacity-50"></i><br>Este usuario no tiene viajes registrados.</div>`,
+          `<div class="trips-empty-notice"><i class="fa-solid fa-ghost fa-3x mb-3 opacity-50"></i><br>No hay ranking definido aún.</div>`,
         );
         return;
       }
@@ -340,9 +340,9 @@ $(document).ready(function () {
         else if (rank === 2) { badgeBg = "#C0C0C0"; badgeColor = "#000"; }
         else if (rank === 3) { badgeBg = "#CD7F32"; badgeColor = "#000"; }
 
-        // PARQUE · PAÍS (Asegurando que park_name no esté vacío)
-        const parkName = item.park_name || item.nombre_parque || "";
-        const country = item.park_country || item.country_name || item.nombre_pais || "";
+        // PARQUE · PAÍS — el campo del parque en coasters viene como 'location' de la API
+        const parkName = item.location || "";
+        const country = item.park_country || item.country_name || "";
         const subtitle = isCoaster ? `${parkName} · ${country}` : country;
 
         const html = `

@@ -914,25 +914,34 @@ span.flatpickr-weekday {
 }
 
 /* ── AJUSTES USER PROFILE ESPECÍFICOS ────────────────────────── */
+
+/* Select de tipo en estadísticas: anula el CSS transparent del ID */
+#rank-type-select.rcw-stats-select,
 .rcw-stats-select {
-  padding: 0.3rem 1.8rem 0.3rem 0.6rem !important;
+  padding: 0.3rem 1.6rem 0.3rem 0.6rem !important;
   font-weight: 700 !important;
   font-size: 0.82rem !important;
-  background-color: rgba(22, 27, 34, 0.85) !important;
-  border: 1px solid rgba(0, 200, 83, 0.4) !important;
+  background-color: rgba(13, 17, 23, 0.9) !important;
+  border: 1px solid rgba(0, 200, 83, 0.35) !important;
   color: var(--rcw-green-neon) !important;
-  cursor: pointer;
-  min-width: 120px;
-  border-radius: 4px !important;
+  cursor: pointer !important;
+  min-width: 110px !important;
+  border-radius: 3px !important;
   appearance: none !important;
   -webkit-appearance: none !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2300c853' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%2300c853' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") !important;
   background-repeat: no-repeat !important;
-  background-position: right 0.6rem center !important;
+  background-position: right 0.5rem center !important;
+  box-shadow: none !important;
+}
+
+/* El .stats-type-wrapper ya no necesita mostrar el chevron manual */
+.stats-type-wrapper > i.fa-chevron-down {
+  display: none !important;
 }
 
 .trips-empty-notice {
-  min-height: 250px !important;
+  min-height: 220px !important;
   width: 100% !important;
   display: flex !important;
   flex-direction: column !important;
@@ -940,4 +949,13 @@ span.flatpickr-weekday {
   justify-content: center !important;
   text-align: center !important;
   color: var(--rcw-text-muted) !important;
+  padding: 2rem !important;
+}
+
+/* Cuando el grid sólo tiene el notice, convertirlo en bloque */
+.trips-grid-scrollable:has(> .trips-empty-notice:only-child) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 220px !important;
 }
