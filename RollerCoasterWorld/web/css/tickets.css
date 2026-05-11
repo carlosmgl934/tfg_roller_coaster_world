@@ -144,3 +144,48 @@
 .addon-card.border-success {
   background: rgba(25,135,84,.08) !important;
 }
+/* -- Ajustes Tabla Carrito Móvil -- */
+@media (max-width: 991px) {
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: none !important;
+  }
+  #cart-tbody td {
+    white-space: nowrap !important; /* Evita que las fechas se rompan en 4 líneas */
+    padding-top: 1.1rem !important;
+    padding-bottom: 1.1rem !important;
+  }
+  /* Dar anchos mínimos para que la info respire en el scroll */
+  #cart-tbody td:nth-child(1) { min-width: 240px; } /* Parque */
+  #cart-tbody td:nth-child(2) { min-width: 140px; } /* Tipo */
+  #cart-tbody td:nth-child(3) { min-width: 155px; } /* Fecha */
+  #cart-tbody td:nth-child(4) { min-width: 100px; } /* Uds */
+  #cart-tbody td:nth-child(5) { min-width: 110px; } /* Precio */
+  #cart-tbody td:nth-child(6) { min-width: 110px; } /* Subtotal */
+}
+
+/* -- Etiquetas de Entrada del Carrito -- */
+.badge-entrada-general {
+  background: rgba(25, 135, 84, 0.1) !important;
+  color: #4ade80 !important;
+  border: 1px solid rgba(74, 222, 128, 0.3) !important;
+  font-size: 0.65rem !important;
+  padding: 4px 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  border-radius: 0 !important;
+}
+
+.badge-pase-rapido-cart {
+  background: rgba(245, 158, 11, 0.1) !important;
+  color: #fbbf24 !important;
+  border: 1px solid rgba(251, 191, 36, 0.3) !important;
+  font-size: 0.65rem !important;
+  padding: 4px 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  border-radius: 0 !important;
+}

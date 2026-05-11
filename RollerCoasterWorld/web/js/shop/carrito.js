@@ -159,7 +159,7 @@ async function loadCart() {
           </div>
         </div>
       </td>
-      <td><span class="status-badge ${item.ticket_type === "pase_rapido" ? "badge-confirmado" : "badge-pendiente"}" style="font-size:.65rem;">${carritoType(item.ticket_type)}</span></td>
+      <td><span class="${item.ticket_type === "pase_rapido" ? "badge-pase-rapido-cart" : "badge-entrada-general"}" style="font-size:.65rem;">${carritoType(item.ticket_type)}</span></td>
       <td class="text-muted">${carritoDate(item.visit_date)}</td>
       <td class="text-center">
         <div class="d-flex align-items-center justify-content-center gap-1">
