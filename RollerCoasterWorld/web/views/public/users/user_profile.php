@@ -324,12 +324,12 @@ $user_id = $_GET['id'] ?? null;
                     <div class="card-header pt-3 pb-3 d-flex flex-column gap-3">
                         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-2">
                             <div class="d-flex align-items-center gap-3">
-                                <div class="bg-success bg-opacity-10 p-2 rounded-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <div class="bg-success bg-opacity-10 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                                     <i class="fa-solid fa-chart-line fs-5 text-success"></i>
                                 </div>
                                 <div>
                                     <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">Estadísticas de</h5>
-                                    <div class="d-flex align-items-center gap-1 bg-dark bg-opacity-25 px-2 py-1 rounded-2 border border-secondary border-opacity-25" style="cursor: pointer; margin-top: 2px; width: fit-content;">
+                                    <div class="d-flex align-items-center gap-1 stats-type-wrapper" style="cursor: pointer; margin-top: 2px; width: fit-content;">
                                         <select id="rank-type-select"
                                             class="form-select form-select-sm p-0 shadow-none fw-bold border-0 bg-transparent text-success"
                                             style="cursor: pointer; font-size: 0.95rem; width: auto; appearance: none; -webkit-appearance: none;">

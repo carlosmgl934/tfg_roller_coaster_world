@@ -303,6 +303,15 @@ $(document).ready(function () {
 
       debounceTimer = setTimeout(async () => {
         if (loading) $(loading).removeClass("d-none");
+        btnDir.on("click", function () {
+          const currentDir = $(this).attr("data-dir");
+          const newDir = currentDir === "asc" ? "desc" : "asc";
+          $(this).attr("data-dir", newDir);
+          $(this).html(
+            `<i class="fa-solid fa-caret-${newDir === "asc" ? "up" : "down"}"></i>`,
+          );
+          loadTops();
+        });
 
         try {
           const res = await fetch(
@@ -1498,16 +1507,11 @@ $(document).ready(function () {
     const currentDir = $(this).data("dir");
     const newDir = currentDir === "desc" ? "asc" : "desc";
     $(this).data("dir", newDir);
+    const icon = $(this).find("i");
     if (newDir === "asc") {
-      $(this)
-        .find("i")
-        .removeClass("fa-arrow-down-wide-short")
-        .addClass("fa-arrow-up-wide-short");
+      icon.removeClass().addClass("fa-solid fa-caret-up");
     } else {
-      $(this)
-        .find("i")
-        .removeClass("fa-arrow-up-wide-short")
-        .addClass("fa-arrow-down-wide-short");
+      icon.removeClass().addClass("fa-solid fa-caret-down");
     }
     renderCoastersFull();
   });

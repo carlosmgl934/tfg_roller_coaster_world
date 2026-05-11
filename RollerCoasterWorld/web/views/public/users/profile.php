@@ -526,12 +526,12 @@ $user_uid = $_SESSION['firebase_uid'];
                       <div class="tops-sort-row">
                         <select id="coasters-sort" class="tops-filter-select tops-sort-select">
                           <option value="rank">Mi Ranking</option>
-                          <option value="name">Nombre (A-Z)</option>
+                          <option value="name">A-Z</option>
                           <option value="height">Altura</option>
                           <option value="speed">Velocidad</option>
                           <option value="length">Longitud</option>
                           <option value="inversions">Inversiones</option>
-                          <option value="year">Apertura</option>
+                          <option value="year">Antigüedad</option>
                         </select>
                         <button id="coasters-sort-dir" class="tops-sort-dir-btn" title="Dirección" data-dir="desc">
                           <i class="fa-solid fa-sort"></i>
@@ -815,12 +815,15 @@ $user_uid = $_SESSION['firebase_uid'];
             <!-- Estadísticas de Viajes (Unificadas) -->
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
               <div class="d-flex align-items-center gap-3">
-                <div class="bg-success bg-opacity-10 p-2 rounded-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <div class="bg-success bg-opacity-10 p-2 rounded-2 d-flex align-items-center justify-content-center"
+                  style="width: 40px; height: 40px;">
                   <i class="fa-solid fa-chart-line fs-5 text-success"></i>
                 </div>
                 <div>
                   <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">Estadísticas de</h5>
-                  <div class="d-flex align-items-center gap-1 bg-dark bg-opacity-25 px-2 py-1 rounded-2 border border-secondary border-opacity-25" style="cursor: pointer; margin-top: 2px; width: fit-content;">
+                  <div
+                    class="d-flex align-items-center gap-1 bg-dark bg-opacity-25 px-2 py-1 rounded-2 border border-secondary border-opacity-25"
+                    style="cursor: pointer; margin-top: 2px; width: fit-content;">
                     <select id="rank-type-select"
                       class="form-select form-select-sm p-0 shadow-none fw-bold border-0 bg-transparent text-success"
                       style="cursor: pointer; font-size: 0.95rem; width: auto; appearance: none; -webkit-appearance: none;">
@@ -832,7 +835,8 @@ $user_uid = $_SESSION['firebase_uid'];
                 </div>
               </div>
               <div class="d-flex align-items-center">
-                <span class="badge bg-dark px-3 py-2 rounded-pill shadow-sm" style="border:1px solid var(--rcw-border); font-size: 0.85rem;">
+                <span class="badge bg-dark px-3 py-2 rounded-pill shadow-sm"
+                  style="border:1px solid var(--rcw-border); font-size: 0.85rem;">
                   <i class="fa-solid fa-suitcase me-1 text-success"></i> <span id="rank-trip-count">0 viajes</span>
                 </span>
               </div>
