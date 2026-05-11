@@ -3,45 +3,45 @@
    ============================================================ */
 
 /* ── GOOGLE FONTS ───────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700;800;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700;800;900&display=swap");
 
 /* ── DESIGN TOKENS ──────────────────────────────────────────── */
 :root {
   /* Backgrounds (Dark Slate/Navy neutro) */
-  --rcw-bg:           #0f172a;   /* body base — slate-900 */
-  --rcw-bg-card:      #1e293b;   /* cards — slate-800 */
-  --rcw-bg-card-alt:  #334155;   /* alternada — slate-700 */
-  --rcw-bg-input:     #020617;   /* inputs — slate-950 */
-  --rcw-bg-hover:     #334155;   /* hover state — slate-700 */
+  --rcw-bg: #0f172a; /* body base — slate-900 */
+  --rcw-bg-card: #1e293b; /* cards — slate-800 */
+  --rcw-bg-card-alt: #334155; /* alternada — slate-700 */
+  --rcw-bg-input: #020617; /* inputs — slate-950 */
+  --rcw-bg-hover: #334155; /* hover state — slate-700 */
 
   /* Navbar */
-  --rcw-nav-bg:       #020617;   /* casi negro — slate-950 */
-  --rcw-nav-border:   rgba(255, 255, 255, 0.08);
+  --rcw-nav-bg: #020617; /* casi negro — slate-950 */
+  --rcw-nav-border: rgba(255, 255, 255, 0.08);
 
   /* Greens (Solo para CTAs, glows y highlights) */
-  --rcw-green-neon:   #10b981;   /* acento principal emerald-500 */
-  --rcw-green-bright: #34d399;   /* hover / glow emerald-400 */
-  --rcw-green-dim:    #059669;   /* secundario emerald-600 */
-  --rcw-green-muted:  #047857;   /* borders suaves emerald-700 */
-  --rcw-green-glow:   rgba(16, 185, 129, 0.25);
+  --rcw-green-neon: #10b981; /* acento principal emerald-500 */
+  --rcw-green-bright: #34d399; /* hover / glow emerald-400 */
+  --rcw-green-dim: #059669; /* secundario emerald-600 */
+  --rcw-green-muted: #047857; /* borders suaves emerald-700 */
+  --rcw-green-glow: rgba(16, 185, 129, 0.25);
 
   /* Text (Blanco y gris claro para máxima legibilidad) */
-  --rcw-text-primary:   #ffffff;   /* blanco puro */
-  --rcw-text-secondary: #e2e8f0;   /* slate-200 (muy claro) */
-  --rcw-text-muted:     #cbd5e1;   /* slate-300 (claro) */
+  --rcw-text-primary: #ffffff; /* blanco puro */
+  --rcw-text-secondary: #e2e8f0; /* slate-200 (muy claro) */
+  --rcw-text-muted: #cbd5e1; /* slate-300 (claro) */
 
   /* Borders neutros */
-  --rcw-border:       rgba(255, 255, 255, 0.1);
+  --rcw-border: rgba(255, 255, 255, 0.1);
   --rcw-border-strong: rgba(255, 255, 255, 0.2);
 
   /* Shadows */
-  --rcw-shadow-sm:  0 2px 12px rgba(0, 0, 0, 0.4);
-  --rcw-shadow-md:  0 4px 24px rgba(0, 0, 0, 0.5);
+  --rcw-shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.4);
+  --rcw-shadow-md: 0 4px 24px rgba(0, 0, 0, 0.5);
   --rcw-shadow-glow: 0 0 20px rgba(16, 185, 129, 0.15);
 
   /* Typography */
-  --rcw-font-body:  'Inter', sans-serif;
-  --rcw-font-title: 'Outfit', sans-serif;
+  --rcw-font-body: "Inter", sans-serif;
+  --rcw-font-title: "Outfit", sans-serif;
 
   /* Transitions */
   --rcw-transition: all 0.2s ease;
@@ -58,7 +58,7 @@ body {
   display: flex;
   flex-direction: column;
   background-color: var(--rcw-bg);
-  background-image: url('../img/bg-coaster.svg');
+  background-image: url("../img/bg-coaster.svg");
   background-repeat: no-repeat;
   background-position: center bottom;
   background-size: 100% auto;
@@ -75,7 +75,12 @@ footer {
   flex-shrink: 0;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--rcw-font-title);
   color: var(--rcw-text-primary);
 }
@@ -229,13 +234,21 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Botones primarios/success */
 .btn-success {
-  background: linear-gradient(135deg, var(--rcw-green-neon) 0%, #00952a 100%) !important;
+  background: linear-gradient(
+    135deg,
+    var(--rcw-green-neon) 0%,
+    #00952a 100%
+  ) !important;
   border: none !important;
   color: #000 !important;
   font-weight: 700;
 }
 .btn-success:hover {
-  background: linear-gradient(135deg, var(--rcw-green-bright) 0%, var(--rcw-green-neon) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    var(--rcw-green-bright) 0%,
+    var(--rcw-green-neon) 100%
+  ) !important;
   box-shadow: 0 4px 16px rgba(0, 200, 83, 0.4) !important;
   transform: translateY(-1px);
   color: #000 !important;
@@ -269,17 +282,39 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ── UTILIDADES CUSTOM ─────────────────────────────────────── */
-.text-neon       { color: var(--rcw-green-neon) !important; }
-.text-rcw        { color: var(--rcw-text-secondary) !important; }
-.bg-rcw-card     { background-color: var(--rcw-bg-card) !important; }
-.border-rcw      { border-color: var(--rcw-border) !important; }
-.glow-neon       { box-shadow: var(--rcw-shadow-glow) !important; }
-.font-title      { font-family: var(--rcw-font-title) !important; }
+.text-neon {
+  color: var(--rcw-green-neon) !important;
+}
+.text-rcw {
+  color: var(--rcw-text-secondary) !important;
+}
+.bg-rcw-card {
+  background-color: var(--rcw-bg-card) !important;
+}
+.border-rcw {
+  border-color: var(--rcw-border) !important;
+}
+.glow-neon {
+  box-shadow: var(--rcw-shadow-glow) !important;
+}
+.font-title {
+  font-family: var(--rcw-font-title) !important;
+}
 
 /* ── ANIMACIÓN FADEINDROP ───────────────────────────────────── */
 @keyframes rcwFadeIn {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* --- FLEX UTILITIES --- */
+.min-w-0 {
+  min-width: 0 !important;
 }
 
 /* ── OVERRIDES DE TEXTO — LEGIBILIDAD MÁXIMA ─────────────────
@@ -292,23 +327,47 @@ body *:not(script):not(style) {
 }
 
 /* Bootstrap text utilities */
-.text-muted    { color: #94a3b8 !important; }
-.text-secondary { color: #cbd5e1 !important; }
-.text-body     { color: #f8fafc !important; }
-.text-dark     { color: #e2e8f0 !important; }
-.text-black    { color: #f8fafc !important; }
+.text-muted {
+  color: #94a3b8 !important;
+}
+.text-secondary {
+  color: #cbd5e1 !important;
+}
+.text-body {
+  color: #f8fafc !important;
+}
+.text-dark {
+  color: #e2e8f0 !important;
+}
+.text-black {
+  color: #f8fafc !important;
+}
 
 /* Tags genéricos que se quedan oscuros */
-p, span, small, label, li, td, th, dt, dd, blockquote {
+p,
+span,
+small,
+label,
+li,
+td,
+th,
+dt,
+dd,
+blockquote {
   color: inherit;
 }
 
 /* Elementos que Bootstrap pone grises/negros por defecto */
-.small, small { color: #94a3b8 !important; }
+.small,
+small {
+  color: #94a3b8 !important;
+}
 small.text-muted,
 p.text-muted,
 span.text-muted,
-div.text-muted { color: #94a3b8 !important; }
+div.text-muted {
+  color: #94a3b8 !important;
+}
 
 /* Inputs con clase Bootstrap (dark mode) — solo dentro de cards/forms oscuros.
    NO se aplica a inputs del login/register que tienen fondo blanco. */
@@ -323,16 +382,31 @@ a:not([class]) {
 }
 
 /* Bootstrap card-title, card-text neutros */
-.card-title  { color: #ffffff !important; }
-.card-text   { color: #e2e8f0 !important; }
-.card-subtitle { color: #94a3b8 !important; }
+.card-title {
+  color: #ffffff !important;
+}
+.card-text {
+  color: #e2e8f0 !important;
+}
+.card-subtitle {
+  color: #94a3b8 !important;
+}
 
 /* ── USER SEARCH RESULTS SCROLLBAR ──────────────────────────── */
 #page-user-search-results {
   scrollbar-width: thin;
   scrollbar-color: #198754 var(--rcw-bg);
 }
-#page-user-search-results::-webkit-scrollbar { width: 6px; }
-#page-user-search-results::-webkit-scrollbar-track { background: var(--rcw-bg); }
-#page-user-search-results::-webkit-scrollbar-thumb { background: #198754; border-radius: 4px; }
-#page-user-search-results::-webkit-scrollbar-thumb:hover { background: var(--rcw-green-neon); }
+#page-user-search-results::-webkit-scrollbar {
+  width: 6px;
+}
+#page-user-search-results::-webkit-scrollbar-track {
+  background: var(--rcw-bg);
+}
+#page-user-search-results::-webkit-scrollbar-thumb {
+  background: #198754;
+  border-radius: 4px;
+}
+#page-user-search-results::-webkit-scrollbar-thumb:hover {
+  background: var(--rcw-green-neon);
+}

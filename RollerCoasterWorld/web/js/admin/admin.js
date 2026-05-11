@@ -11,7 +11,6 @@ $(document).ready(function () {
         FOTOS
   ***************************************
   */
-
   async function loadPendingPhotos() {
     const pendingPhotosContainer = document.getElementById(
       "pending-photos-container",
@@ -22,8 +21,11 @@ $(document).ready(function () {
       $("#loading-spinner").show();
       $("#empty-state").addClass("d-none");
       try {
-        const res = await fetch(`${BASE_URL}/api/php/admin/admin_photos.php?action=getPendingPhotos`, { 
-                credentials: "include" },
+        const res = await fetch(
+          `${BASE_URL}/api/php/admin/admin_photos.php?action=getPendingPhotos`,
+          {
+            credentials: "include",
+          },
         );
         const data = await res.json();
         if (data.success) {
@@ -110,8 +112,18 @@ $(document).ready(function () {
     $container.on("click", ".btn-approve", async function () {
       const tarjeta = $(this).closest(".col-12");
       const photoId = $(this).data("id");
-      const res = await fetch(`${BASE_URL}/api/php/admin/admin_photos.php?action=approvePhoto&id=${photoId}`, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST", credentials: "include" },
+      const res = await fetch(
+        `${BASE_URL}/api/php/admin/admin_photos.php?action=approvePhoto&id=${photoId}`,
+        {
+          headers: {
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+          },
+          method: "POST",
+          credentials: "include",
+        },
       );
       const data = await res.json();
       if (data.success) {
@@ -128,14 +140,24 @@ $(document).ready(function () {
     $container.on("click", ".btn-reject", async function () {
       const tarjeta = $(this).closest(".col-12");
       const photoId = $(this).data("id");
-      const res = await fetch(`${BASE_URL}/api/php/admin/admin_photos.php?action=rejectPhoto&id=${photoId}`, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST", credentials: "include" },
+      const res = await fetch(
+        `${BASE_URL}/api/php/admin/admin_photos.php?action=rejectPhoto&id=${photoId}`,
+        {
+          headers: {
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+          },
+          method: "POST",
+          credentials: "include",
+        },
       );
       const data = await res.json();
       if (data.success) {
         tarjeta.fadeOut(300, function () {
           $(this).remove();
-        } );
+        });
         let newCount = Math.max(0, parseInt($("#pending-count").text()) - 1);
         $("#pending-count").text(newCount);
         if (newCount === 0) $("#empty-state").removeClass("d-none");
@@ -149,8 +171,18 @@ $(document).ready(function () {
       btn
         .prop("disabled", true)
         .html('<i class="fa-solid fa-spinner fa-spin"></i>');
-      const res = await fetch(`${BASE_URL}/api/php/admin/admin_photos.php?action=clearCaption&id=${photoId}`, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST", credentials: "include" },
+      const res = await fetch(
+        `${BASE_URL}/api/php/admin/admin_photos.php?action=clearCaption&id=${photoId}`,
+        {
+          headers: {
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+          },
+          method: "POST",
+          credentials: "include",
+        },
       );
       const data = await res.json();
       if (data.success) {
@@ -165,7 +197,7 @@ $(document).ready(function () {
           .prop("disabled", false)
           .html('<i class="fa-solid fa-trash-can"></i>');
       }
-    } );
+    });
 
     // Buscador en tiempo real
     $("#search-pending").on("input", function () {
@@ -233,22 +265,19 @@ $(document).ready(function () {
     coasters.forEach((c) => {
       const isChecked = selectedCoasters.has(c.id.toString()) ? "checked" : "";
       $list.append(`
-        <div class="list-group-item list-group-item-action d-flex align-items-center justify-content-between p-3">
-          <div class="form-check me-3 mb-0 flex-shrink-0">
-            <input class="form-check-input coaster-select-checkbox" type="checkbox" value="${c.id}" ${isChecked} style="transform: scale(1.3); cursor: pointer;">
+        <div class="list-group-item list-group-item-action d-flex align-items-center justify-content-between p-3 gap-2">
+          <div class="form-check me-2 mb-0 flex-shrink-0 d-none d-sm-block">
+            <input class="form-check-input coaster-select-checkbox" type="checkbox" value="${c.id}" ${isChecked} style="transform: scale(1.1); cursor: pointer;">
           </div>
-          <div class="flex-grow-1 text-truncate">
-            <h6 class="mb-0 fw-bold text-success text-truncate">${c.coaster_name}</h6>
-            <small class="text-muted text-truncate d-block">
+          <div class="flex-grow-1 min-w-0">
+            <h6 class="mb-0 fw-bold text-success text-truncate" style="font-size: .95rem;">${c.coaster_name}</h6>
+            <small class="text-muted text-truncate d-block" style="font-size: .75rem;">
               ${c.coaster_manufacter || "Desconocido"} &bull;
-              ${c.park_name || "Desconocido"} &bull;
-              ${c.park_country || "—"} &bull;
-              ${c.opening_year || "—"} &bull;
-              ${c.coaster_status || "—"}
+              ${c.park_name || "Desconocido"}
             </small>
           </div>
-          <div class="d-flex gap-2 ms-3 flex-shrink-0">
-            <a href="#" class="btn btn-sm btn-outline-primary rounded-0" 
+          <div class="d-flex gap-1 gap-sm-2 flex-shrink-0">
+            <a href="#" class="btn btn-sm btn-outline-primary rounded-0 px-2 px-sm-3" 
               data-bs-toggle="modal" data-bs-target="#modal-edit-coaster"
               data-id="${c.id}"
               data-name="${c.coaster_name ? c.coaster_name.replace(/"/g, "&quot;") : ""}"
@@ -264,27 +293,11 @@ $(document).ready(function () {
               data-park-id="${c.park_id ?? ""}"
               data-country="${c.park_country ? c.park_country.replace(/"/g, "&quot;") : ""}"
               data-image="${c.imagen_url || ""}">
-              <i class="fa-solid fa-pen"></i> Editar
+              <i class="fa-solid fa-pen"></i> <span class="d-none d-md-inline">Editar</span>
             </a>
-            <button class="btn btn-sm btn-outline-warning rounded-0 btn-duplicate-coaster"
-              data-name="${c.coaster_name ? c.coaster_name.replace(/"/g, "&quot;") : ""}"
-              data-year="${c.opening_year ?? ""}"
-              data-height="${c.height ?? ""}"
-              data-speed="${c.speed ?? ""}"
-              data-length="${c.coaster_length ?? ""}"
-              data-inversions="${c.inversions ?? ""}"
-              data-status="${c.coaster_status || ""}"
-              data-manufacturer="${c.coaster_manufacter ? c.coaster_manufacter.replace(/"/g, "&quot;") : ""}"
-              data-model="${c.coaster_model ? c.coaster_model.replace(/"/g, "&quot;") : ""}"
-              data-park="${c.park_name ? c.park_name.replace(/"/g, "&quot;") : ""}"
-              data-park-id="${c.park_id ?? ""}"
-              data-country="${c.park_country ? c.park_country.replace(/"/g, "&quot;") : ""}"
-              data-image="${c.imagen_url || ""}">
-              <i class="fa-solid fa-copy"></i> Duplicar
-            </button>
-            <button class="btn btn-sm btn-outline-danger rounded-0 btn-delete-coaster"
+            <button class="btn btn-sm btn-outline-danger rounded-0 btn-delete-coaster px-2 px-sm-3"
               data-id="${c.id}" data-name="${c.coaster_name}">
-              <i class="fa-solid fa-trash"></i> Eliminar
+              <i class="fa-solid fa-trash"></i> <span class="d-none d-md-inline">Eliminar</span>
             </button>
           </div>
         </div>
@@ -610,7 +623,12 @@ $(document).ready(function () {
           {
             method: "POST",
             headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
+              "X-CSRF-Token":
+                document
+                  .querySelector('meta[name="csrf-token"]')
+                  ?.getAttribute("content") ?? "",
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({ coasterIds: Array.from(selectedCoasters) }),
           },
         );
@@ -641,10 +659,17 @@ $(document).ready(function () {
         .prop("disabled", true)
         .html('<i class="fa-solid fa-spinner fa-spin"></i>');
       try {
-        const res = await fetch(`${BASE_URL}/api/php/admin/admin_coasters.php?action=deleteCoaster`, {
+        const res = await fetch(
+          `${BASE_URL}/api/php/admin/admin_coasters.php?action=deleteCoaster`,
+          {
             method: "POST",
             headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
+              "X-CSRF-Token":
+                document
+                  .querySelector('meta[name="csrf-token"]')
+                  ?.getAttribute("content") ?? "",
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({ coasterId: id }),
           },
         );
@@ -1272,7 +1297,10 @@ $(document).ready(function () {
           const uploadRes = await fetch(`${BASE_URL}/api/php/upload.php`, {
             method: "POST",
             headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? ''
+              "X-CSRF-Token":
+                document
+                  .querySelector('meta[name="csrf-token"]')
+                  ?.getAttribute("content") ?? "",
             },
             body: uploadForm,
           });
@@ -1288,8 +1316,15 @@ $(document).ready(function () {
           formData.append("imagenUrl", existingImg);
         }
 
-        const response = await fetch(`${BASE_URL}/api/php/admin/admin_coasters.php?action=addCoaster`, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
+        const response = await fetch(
+          `${BASE_URL}/api/php/admin/admin_coasters.php?action=addCoaster`,
+          {
+            headers: {
+              "X-CSRF-Token":
+                document
+                  .querySelector('meta[name="csrf-token"]')
+                  ?.getAttribute("content") ?? "",
+            },
             method: "POST",
             body: formData,
           },
@@ -1330,7 +1365,7 @@ $(document).ready(function () {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-plus me-2"></i>Añadir coaster';
       }
-    } );
+    });
 
   function showModalError(msg) {
     const container = document.getElementById("add-coaster-messages");
@@ -1794,8 +1829,9 @@ $(document).ready(function () {
           url = `${BASE_URL}/api/php/admin/admin_parks.php?${params}`;
         }
 
-        const res = await fetch(url, { 
-                credentials: "include" });
+        const res = await fetch(url, {
+          credentials: "include",
+        });
         const data = await res.json();
 
         if (data.success) {
@@ -1869,8 +1905,15 @@ $(document).ready(function () {
       try {
         const fd = new FormData();
         fd.append("id", id);
-        const res = await fetch(`${BASE_URL}/api/php/admin/admin_parks.php?action=deletePark`, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
+        const res = await fetch(
+          `${BASE_URL}/api/php/admin/admin_parks.php?action=deletePark`,
+          {
+            headers: {
+              "X-CSRF-Token":
+                document
+                  .querySelector('meta[name="csrf-token"]')
+                  ?.getAttribute("content") ?? "",
+            },
             method: "POST",
             credentials: "include",
             body: fd,
@@ -1911,8 +1954,15 @@ $(document).ready(function () {
       try {
         const fd = new FormData();
         fd.append("id", id);
-        const res = await fetch(`${BASE_URL}/api/php/admin/admin_parks.php?action=duplicatePark`, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
+        const res = await fetch(
+          `${BASE_URL}/api/php/admin/admin_parks.php?action=duplicatePark`,
+          {
+            headers: {
+              "X-CSRF-Token":
+                document
+                  .querySelector('meta[name="csrf-token"]')
+                  ?.getAttribute("content") ?? "",
+            },
             method: "POST",
             credentials: "include",
             body: fd,
@@ -1933,8 +1983,7 @@ $(document).ready(function () {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-copy me-1"></i>Duplicar';
       }
-    } );
-
+    });
   }
 
   // ── Modal añadir parque ───────────────────────────────────────────────────────
@@ -2017,8 +2066,9 @@ $(document).ready(function () {
         '<div class="text-center text-muted py-3"><div class="spinner-border spinner-border-sm text-success"></div> Cargando...</div>';
       try {
         const url = `${BASE_URL}/api/php/admin/admin_parks.php?action=unknownCoasters${q ? "&q=" + encodeURIComponent(q) : ""}`;
-        const res = await fetch(url, { 
-                credentials: "include" });
+        const res = await fetch(url, {
+          credentials: "include",
+        });
         const data = await res.json();
         if (!data.success) throw new Error(data.error);
 
@@ -2204,8 +2254,15 @@ $(document).ready(function () {
             formData.append("image", imageFile);
           }
 
-          const res = await fetch(`${BASE_URL}/api/php/admin/admin_parks.php?action=addPark`, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
+          const res = await fetch(
+            `${BASE_URL}/api/php/admin/admin_parks.php?action=addPark`,
+            {
+              headers: {
+                "X-CSRF-Token":
+                  document
+                    .querySelector('meta[name="csrf-token"]')
+                    ?.getAttribute("content") ?? "",
+              },
               method: "POST",
               credentials: "include",
               body: formData,
@@ -2296,8 +2353,9 @@ $(document).ready(function () {
         '<div class="text-center text-muted py-3"><div class="spinner-border spinner-border-sm text-primary"></div> Cargando...</div>';
       try {
         const url = `${BASE_URL}/api/php/admin/admin_parks.php?action=getParkCoasters&park_id=${parkId}${q ? "&q=" + encodeURIComponent(q) : ""}`;
-        const res = await fetch(url, { 
-                credentials: "include" });
+        const res = await fetch(url, {
+          credentials: "include",
+        });
         const data = await res.json();
         if (!data.success) throw new Error(data.error);
         window.renderEditCoastersList(
@@ -2538,8 +2596,15 @@ $(document).ready(function () {
           fd.append("coasterIds", coasterIds);
           if (imgFile) fd.append("image", imgFile);
 
-          const res = await fetch(`${BASE_URL}/api/php/admin/admin_parks.php?action=editPark`, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
+          const res = await fetch(
+            `${BASE_URL}/api/php/admin/admin_parks.php?action=editPark`,
+            {
+              headers: {
+                "X-CSRF-Token":
+                  document
+                    .querySelector('meta[name="csrf-token"]')
+                    ?.getAttribute("content") ?? "",
+              },
               method: "POST",
               credentials: "include",
               body: fd,
@@ -2551,7 +2616,8 @@ $(document).ready(function () {
             showOk("Parque actualizado correctamente.");
             setTimeout(() => {
               bootstrap.Modal.getInstance(_modalEditPark)?.hide();
-              if (typeof window.loadAdminParks === "function") window.loadAdminParks(parkCurrentPage);
+              if (typeof window.loadAdminParks === "function")
+                window.loadAdminParks(parkCurrentPage);
             }, 1500);
           } else {
             showErr("Error: " + (data.error || "No se pudo guardar."));
@@ -2646,7 +2712,9 @@ $(document).ready(function () {
       // Cargamos datos y abrimos el modal directamente
       (async () => {
         try {
-          const res = await fetch(`${BASE_URL}/api/php/admin/admin_parks.php?action=getPark&id=${parkId}`, { credentials: "include" },
+          const res = await fetch(
+            `${BASE_URL}/api/php/admin/admin_parks.php?action=getPark&id=${parkId}`,
+            { credentials: "include" },
           );
           const data = await res.json();
           if (!data.success) {
@@ -2732,7 +2800,12 @@ $(document).ready(function () {
             method: "POST",
             credentials: "include",
             headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
+              "X-CSRF-Token":
+                document
+                  .querySelector('meta[name="csrf-token"]')
+                  ?.getAttribute("content") ?? "",
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({ coasterId }),
           },
         );
@@ -3092,7 +3165,10 @@ if (_confirmEditCoaster) {
         const uploadRes = await fetch(`${BASE_URL}/api/php/upload.php`, {
           method: "POST",
           headers: {
-              'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? ''
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
           },
           body: uploadForm,
         });
@@ -3104,8 +3180,18 @@ if (_confirmEditCoaster) {
         }
       }
 
-      const response = await fetch(`${BASE_URL}/api/php/admin/admin_coasters.php?action=updateCoaster`, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST", body: formData },
+      const response = await fetch(
+        `${BASE_URL}/api/php/admin/admin_coasters.php?action=updateCoaster`,
+        {
+          headers: {
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+          },
+          method: "POST",
+          body: formData,
+        },
       );
 
       let data = {};
@@ -3148,7 +3234,7 @@ if (_confirmEditCoaster) {
       btn.innerHTML =
         '<i class="fa-solid fa-arrows-rotate me-2"></i>Actualizar Atracción';
     }
-  } );
+  });
 }
 
 /****************************************
@@ -3180,8 +3266,15 @@ window.loadAdminNews = async function (page) {
       featured: featured,
     });
 
-    const res = await fetch(`${BASE_URL}/api/php/admin/admin_news.php?${params}`, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
+    const res = await fetch(
+      `${BASE_URL}/api/php/admin/admin_news.php?${params}`,
+      {
+        headers: {
+          "X-CSRF-Token":
+            document
+              .querySelector('meta[name="csrf-token"]')
+              ?.getAttribute("content") ?? "",
+        },
         credentials: "include",
       },
     );
@@ -3402,8 +3495,15 @@ if ($("#admin-news-list").length) {
     btn.prop("disabled", true).text("Guardando...");
 
     try {
-      const res = await fetch(`${BASE_URL}/api/php/admin/admin_news.php?action=${action}`, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
+      const res = await fetch(
+        `${BASE_URL}/api/php/admin/admin_news.php?action=${action}`,
+        {
+          headers: {
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+          },
           method: "POST",
           body: formData,
         },
@@ -3442,8 +3542,17 @@ if ($("#admin-news-list").length) {
     const btn = $(this);
     const id = btn.attr("data-id");
     try {
-      const res = await fetch(`${BASE_URL}/api/php/admin/admin_news.php?action=deleteNews&id=${id}`, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST" },
+      const res = await fetch(
+        `${BASE_URL}/api/php/admin/admin_news.php?action=deleteNews&id=${id}`,
+        {
+          headers: {
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+          },
+          method: "POST",
+        },
       );
       const data = await res.json();
       if (data.success) {
@@ -3455,32 +3564,32 @@ if ($("#admin-news-list").length) {
     } catch (err) {
       console.error("Error deleting news:", err);
     }
-  } );
-
-function showNewsModalError(msg) {
-  const container = document.getElementById("news-form-messages");
-  const error = document.getElementById("news-form-error");
-  if (!container || !error) return;
-  container.classList.remove("d-none");
-  error.classList.remove("d-none");
-  error.textContent = msg;
-}
-
-function markNewsError(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.add("field-error");
-}
-
-function clearNewsErrors() {
-  document.getElementById("news-form-messages")?.classList.add("d-none");
-  document.getElementById("news-form-error")?.classList.add("d-none");
-  document.querySelectorAll("#modal-news-form .field-error").forEach((el) => {
-    el.classList.remove("field-error");
   });
-}
 
-/* ════════════════════════════════════════════════════════
+  function showNewsModalError(msg) {
+    const container = document.getElementById("news-form-messages");
+    const error = document.getElementById("news-form-error");
+    if (!container || !error) return;
+    container.classList.remove("d-none");
+    error.classList.remove("d-none");
+    error.textContent = msg;
+  }
+
+  function markNewsError(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add("field-error");
+  }
+
+  function clearNewsErrors() {
+    document.getElementById("news-form-messages")?.classList.add("d-none");
+    document.getElementById("news-form-error")?.classList.add("d-none");
+    document.querySelectorAll("#modal-news-form .field-error").forEach((el) => {
+      el.classList.remove("field-error");
+    });
+  }
+
+  /* ════════════════════════════════════════════════════════
      ADMIN PARKS
   ════════════════════════════════════════════════════════ */
   if (document.getElementById("admin-park-list")) {
@@ -3540,8 +3649,13 @@ function clearNewsErrors() {
       if (year) params.set("year", year);
 
       try {
-        const res = await fetch(`${BASE_URL}/api/php/parks.php?${params}`, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
+        const res = await fetch(`${BASE_URL}/api/php/parks.php?${params}`, {
+          headers: {
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+          },
           credentials: "include",
         });
         const data = await res.json();
@@ -3573,28 +3687,22 @@ function clearNewsErrors() {
               "\u20AC</span>"
             : "";
           const html =
-            '<div class="list-group-item list-group-item-action d-flex align-items-center p-3 gap-3">' +
+            '<div class="list-group-item list-group-item-action d-flex align-items-center p-3 gap-2 gap-sm-3">' +
             '<img src="' +
             img +
-            '" onerror="this.src=\'https://placehold.co/80x60/0d1117/444?text=P\'" style="width:80px;height:60px;object-fit:cover;flex-shrink:0;" class="rounded-0">' +
+            '" onerror="this.src=\'https://placehold.co/80x60/0d1117/444?text=P\'" style="width:60px;height:45px;object-fit:cover;flex-shrink:0;" class="rounded-0 d-none d-sm-block">' +
             '<div class="flex-grow-1 min-w-0">' +
-            '<h6 class="mb-0 fw-bold text-success text-truncate">' +
+            '<h6 class="mb-0 fw-bold text-success text-truncate" style="font-size: .95rem;">' +
             esc(p.park_name) +
             "</h6>" +
-            '<small class="text-muted">' +
-            esc(p.park_location || "\u2014") +
-            ", " +
+            '<small class="text-muted text-truncate d-block" style="font-size: .75rem;">' +
             esc(p.park_country || "\u2014") +
             " &bull; " +
             (p.opening_year || "\u2014") +
-            " &bull; " +
-            (p.operating_coasters || 0) +
-            " coasters " +
-            priceBadge +
             "</small>" +
             "</div>" +
-            '<div class="d-flex gap-2 flex-shrink-0">' +
-            '<button class="btn btn-sm btn-outline-primary rounded-0 btn-edit-park" data-id="' +
+            '<div class="d-flex gap-1 gap-sm-2 flex-shrink-0">' +
+            '<button class="btn btn-sm btn-outline-primary rounded-0 px-2 px-sm-3 btn-edit-park" data-id="' +
             p.id +
             '" data-name="' +
             esc(p.park_name) +
@@ -3610,17 +3718,12 @@ function clearNewsErrors() {
             (p.precio_entrada || "") +
             '" data-img="' +
             (p.imagen_url || "") +
-            '"><i class="fa-solid fa-pen"></i> Editar</button>' +
-            '<button class="btn btn-sm btn-outline-warning rounded-0 btn-duplicate-park" data-id="' +
+            '"><i class="fa-solid fa-pen"></i> <span class="d-none d-md-inline">Editar</span></button>' +
+            '<button class="btn btn-sm btn-outline-danger rounded-0 px-2 px-sm-3 btn-delete-park" data-id="' +
             p.id +
             '" data-name="' +
             esc(p.park_name) +
-            '"><i class="fa-solid fa-copy"></i> Duplicar</button>' +
-            '<button class="btn btn-sm btn-outline-danger rounded-0 btn-delete-park" data-id="' +
-            p.id +
-            '" data-name="' +
-            esc(p.park_name) +
-            '"><i class="fa-solid fa-trash"></i> Eliminar</button>' +
+            '"><i class="fa-solid fa-trash"></i> <span class="d-none d-md-inline">Eliminar</span></button>' +
             "</div></div>";
           $list.append(html);
         });
@@ -3865,8 +3968,13 @@ function clearNewsErrors() {
       if (imageFile) fd.append("image", imageFile);
 
       try {
-        const res = await fetch(`${parksApi}`, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
+        const res = await fetch(`${parksApi}`, {
+          headers: {
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+          },
           method: "POST",
           body: fd,
           credentials: "include",
@@ -4012,12 +4120,17 @@ function clearNewsErrors() {
         .html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Guardando...');
 
       try {
-        const res = await fetch(`${parksApi}`, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
+        const res = await fetch(`${parksApi}`, {
+          headers: {
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+          },
           method: "POST",
           body: fd,
           credentials: "include",
-        } );
+        });
         const data = await res.json();
         document
           .getElementById("edit-park-messages")
@@ -4069,12 +4182,17 @@ function clearNewsErrors() {
         const fd = new FormData();
         fd.append("action", "deletePark");
         fd.append("id", id);
-        const res = await fetch(`${parksApi}`, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
+        const res = await fetch(`${parksApi}`, {
+          headers: {
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+          },
           method: "POST",
           body: fd,
           credentials: "include",
-        } );
+        });
         const data = await res.json();
         if (data.success) {
           bootstrap.Modal.getInstance(
@@ -4113,12 +4231,17 @@ function clearNewsErrors() {
         const fd = new FormData();
         fd.append("action", "duplicatePark");
         fd.append("id", id);
-        const res = await fetch(`${parksApi}`, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
+        const res = await fetch(`${parksApi}`, {
+          headers: {
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+          },
           method: "POST",
           body: fd,
           credentials: "include",
-        } );
+        });
         const data = await res.json();
         if (data.success) {
           bootstrap.Modal.getInstance(

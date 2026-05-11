@@ -898,8 +898,8 @@
 .timeline-legend {
   display: flex;
   gap: 1rem;
-  margin-bottom: 1.5rem;
-  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.75rem;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -1383,7 +1383,6 @@
     font-size: 0.75rem !important;
   }
 }
-
 /* ── UPCOMING TRIPS & NOTES ENHANCEMENTS ─────────────────────── */
 #upcoming-trips-grid {
   scroll-behavior: smooth;

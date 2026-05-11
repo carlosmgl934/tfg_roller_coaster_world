@@ -445,19 +445,18 @@ $(document).ready(function () {
         const extraAttr = window.IS_LOGGED_IN
           ? ""
           : `data-bs-toggle="modal" data-bs-target="#loginModal" onclick="event.preventDefault();"`;
-
         return `
         <a href="${href}" ${extraAttr} class="forum-card-item d-flex flex-column h-100">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0 text-white fw-bold d-flex align-items-center gap-2">
-              <span class="forum-icon-bg"><i class="fa-regular fa-comments"></i></span>
-              ${forum.title}
+          <div class="d-flex justify-content-between align-items-start mb-3 gap-3">
+            <h5 class="mb-0 text-white fw-bold d-flex align-items-center gap-2 min-w-0" style="flex: 1;">
+              <span class="forum-icon-bg flex-shrink-0"><i class="fa-regular fa-comments"></i></span>
+              <span class="text-truncate">${forum.title}</span>
             </h5>
-            <span class="forum-privacy-badge ${forum.privacy === "private" ? "private" : "public"}">
+            <span class="forum-privacy-badge flex-shrink-0 ${forum.privacy === "private" ? "private" : "public"}">
               <i class="fa-solid ${privacyIcon} me-1"></i>${privacyLabel}
             </span>
           </div>
-          <p class="mb-3 text-white-50 text-truncate" style="max-width: 90%; font-size: 0.95rem;">
+          <p class="mb-3 text-white-50 text-truncate" style="width: 100%; font-size: 0.95rem;">
             ${forum.forum_subject}
           </p>
           <div class="mt-auto pt-3 border-top border-secondary border-opacity-10 d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">

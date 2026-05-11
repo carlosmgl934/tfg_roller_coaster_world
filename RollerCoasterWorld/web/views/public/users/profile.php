@@ -824,6 +824,7 @@ $user_uid = $_SESSION['firebase_uid'];
                   <option value="coasters">Coasters</option>
                   <option value="parks">Parques</option>
                 </select>
+                <small class="text-muted fw-normal ms-1" style="font-size: 0.7rem; font-family: 'Outfit', sans-serif;">(x = veces montada / visitas)</small>
               </h5>
               <span class="badge bg-dark px-3 py-2" style="border:1px solid var(--rcw-border)">
                 <i class="fa-solid fa-suitcase me-1 text-success"></i> <span id="rank-trip-count">0 viajes</span>

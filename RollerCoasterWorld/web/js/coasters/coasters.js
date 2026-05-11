@@ -411,11 +411,16 @@ $(document).ready(function () {
       const pagination = document.querySelector(".pagination");
       pagination.innerHTML = "";
       const pageBtn = document.createElement("div");
-      pageBtn.classList.add("page-buttons");
+      pageBtn.classList.add(
+        "page-buttons",
+        "d-flex",
+        "flex-nowrap",
+        "justify-content-center",
+        "gap-1",
+      );
       const totalPages = Math.ceil(total / 15);
-
       const prevBtn = document.createElement("button");
-      prevBtn.className = "btn btn-outline-success mx-1";
+      prevBtn.className = "btn btn-outline-success";
       prevBtn.textContent = "«";
       if (page === 1) {
         prevBtn.disabled = true;
@@ -427,7 +432,7 @@ $(document).ready(function () {
       pageBtn.appendChild(prevBtn);
 
       const btnFirst = document.createElement("button");
-      btnFirst.className = "btn btn-success mx-1";
+      btnFirst.className = "btn btn-success";
       btnFirst.textContent = "1";
       btnFirst.addEventListener("click", function () {
         window.scrollTo({ top: 10, behavior: "smooth" });
@@ -436,7 +441,7 @@ $(document).ready(function () {
       pageBtn.appendChild(btnFirst);
 
       const btnDots = document.createElement("button");
-      btnDots.className = "btn border-0 text-secondary mx-1";
+      btnDots.className = "btn border-0 text-secondary";
       btnDots.textContent = "...";
       btnDots.disabled = true;
       pageBtn.appendChild(btnDots);
@@ -447,7 +452,7 @@ $(document).ready(function () {
 
       for (let i = start; i <= end; i++) {
         const pageButton = document.createElement("button");
-        pageButton.className = "btn btn-light text-success border mx-1";
+        pageButton.className = "btn btn-light text-success border";
         pageButton.textContent = i;
         if (i === page) {
           pageButton.classList.remove("btn-light", "text-success", "border");
@@ -461,13 +466,13 @@ $(document).ready(function () {
       }
 
       const btnDots2 = document.createElement("button");
-      btnDots2.className = "btn border-0 text-secondary mx-1";
+      btnDots2.className = "btn border-0 text-secondary";
       btnDots2.textContent = "...";
       btnDots2.disabled = true;
       pageBtn.appendChild(btnDots2);
 
       const btnLast = document.createElement("button");
-      btnLast.className = "btn btn-success mx-1";
+      btnLast.className = "btn btn-success";
       btnLast.textContent = `${totalPages}`;
       btnLast.addEventListener("click", function () {
         window.scrollTo({ top: 10, behavior: "smooth" });
@@ -476,7 +481,7 @@ $(document).ready(function () {
       pageBtn.appendChild(btnLast);
 
       const nextBtn = document.createElement("button");
-      nextBtn.className = "btn btn-outline-success mx-1";
+      nextBtn.className = "btn btn-outline-success";
       nextBtn.textContent = "»";
       if (page === totalPages) {
         nextBtn.disabled = true;

@@ -629,10 +629,10 @@
               </div>`;
 
         if (d.rides?.length) {
-          h += `<h6 class="fw-bold text-warning mb-3 d-flex align-items-center gap-2" style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:.5rem; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.1em;">
+          h += `<h6 class="fw-bold text-warning mb-2 d-flex align-items-center gap-2" style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:.5rem; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.1em;">
             <i class="fa-solid fa-list-check"></i>
             Agenda de hoy (${d.rides.length})</h6>
-            <div class="ride-timeline custom-scrollbar" style="max-height: 400px; overflow-y: auto; padding-right: 8px; overscroll-behavior: contain;">`;
+            <div class="ride-timeline custom-scrollbar" style="max-height: 450px; overflow-y: auto; padding-right: 8px; overscroll-behavior: contain;">`;
 
           let lastTime = null;
           let lastParkId = null;
@@ -668,7 +668,6 @@
               }
             }
             if (tDate) lastTime = tDate;
-
             const ft = r.first_time === true || r.first_time === "true";
             h +=
               parkSeparatorStr +

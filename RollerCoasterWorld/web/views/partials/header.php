@@ -1,8 +1,6 @@
 <?php
-// Inicia sesión (si no está ya iniciada)
-if (session_status() === PHP_SESSION_NONE) {
-  session_start();
-}
+// Gestión de sesión centralizada
+require_once __DIR__ . '/../../../api/php/utils/SessionManager.php';
 
 // ── Cabeceras de seguridad HTTP ───────────────────────────────────────────────
 if (!headers_sent()) {
@@ -10,6 +8,7 @@ if (!headers_sent()) {
   header("X-Frame-Options: SAMEORIGIN");
   header("Referrer-Policy: strict-origin-when-cross-origin");
   header("Permissions-Policy: geolocation=(), camera=(), microphone=()");
+  header("Cross-Origin-Opener-Policy: same-origin-allow-popups");
   header(
     "Content-Security-Policy: " .
     "default-src 'self'; " .
@@ -18,20 +17,15 @@ if (!headers_sent()) {
     "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; " .
     "img-src 'self' data: blob: https: https://*.openstreetmap.org https://*.supabase.co; " .
     "connect-src 'self' https://*.supabase.co https://*.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://nominatim.openstreetmap.org https://firebaseapp.com https://www.gstatic.com https://unpkg.com https://cdn.jsdelivr.net; " .
-    "frame-src https://js.stripe.com; " .
+    "frame-src https://js.stripe.com https://tfg-roller-coaster-world-auth.firebaseapp.com https://accounts.google.com; " .
     "frame-ancestors 'none';"
   );
-}
-
-// ── Asegurar token CSRF para el frontend ────────────────────────────────────
-if (empty($_SESSION['csrf_token'])) {
-  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // Asegurar que tenemos el user_id de la BD si hay sesión de Firebase
 if (isset($_SESSION['firebase_uid']) && !isset($_SESSION['user_id'])) {
   try {
-    require_once __DIR__ . '/../../api/database/db_conexion.php';
+    require_once __DIR__ . '/../../../api/database/db_conexion.php';
     $db_h = new DBConexion();
     $stmt_h = $db_h->prepare("SELECT id, user_rol, username, profile_image FROM users WHERE firebase_uid = :uid LIMIT 1");
     $stmt_h->execute([':uid' => $_SESSION['firebase_uid']]);
@@ -111,7 +105,6 @@ if ($is_logged) {
       $user_initials .= strtoupper(substr($parts[1], 0, 1));
   }
 }
-
 // Comprobar si la página actual es pública o privada
 $current_script = $_SERVER['SCRIPT_NAME'];
 $is_public = false;

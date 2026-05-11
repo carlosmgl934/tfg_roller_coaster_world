@@ -632,3 +632,23 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
 .photos-expandable-grid.expanded::after {
     opacity: 0;
 }
+/* --- PAGINACIÓN (Unir en una sola línea) --- */
+.page-buttons {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 4px !important;
+  width: 100%;
+}
+.page-buttons .btn {
+  padding: 6px 10px !important;
+  font-size: 0.85rem !important;
+  margin: 0 !important; /* Quitamos mx-1 para usar gap */
+}
+@media (max-width: 576px) {
+  .page-buttons .btn {
+    padding: 4px 8px !important;
+    font-size: 0.75rem !important;
+  }
+}

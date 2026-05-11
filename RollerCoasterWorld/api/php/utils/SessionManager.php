@@ -6,7 +6,7 @@ session_set_cookie_params([
     'domain' => '', // Dominio actual
     'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off', // Solo HTTPS si está disponible
     'httponly' => true,  // No accesible desde JavaScript (protección XSS)
-    'samesite' => 'Strict' // Protección CSRF básica a nivel de cookie
+    'samesite' => 'Lax' // Protección CSRF básica a nivel de cookie
 ]);
 
 session_start();

@@ -103,11 +103,39 @@ $(document).ready(function () {
     }
 
     cityInput.addEventListener("blur", fetchCountry);
-    cityInput.addEventListener("change", fetchCountry);
   }
 
-  // ── Cargar datos del usuario ───────────────────────────────────────────────
+  // ── Delegación de eventos para expandir tarjetas de Top (Coasters/Parques) ──
+  $(document).on("click", ".btn-toggle-stats", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
 
+    const $btn = $(this);
+    const $card = $btn.closest(".top-card");
+    const $imgContainer = $card.find(".rank-img-container");
+    const $img = $imgContainer.find("img, div[style*='background']");
+    const $stats = $card.find(".stats-expandable");
+
+    const isExpanded = !$stats.hasClass("d-none");
+
+    if (isExpanded) {
+      // Contraer
+      $stats.addClass("d-none");
+      $card.css("height", "85px");
+      $imgContainer.css({ width: "85px", height: "85px" });
+      $img.css("height", "85px");
+      $btn.html('<i class="fa-solid fa-plus"></i>');
+    } else {
+      // Expandir
+      $stats.removeClass("d-none");
+      $card.css("height", "115px");
+      $imgContainer.css({ width: "115px", height: "115px" });
+      $img.css("height", "115px");
+      $btn.html('<i class="fa-solid fa-minus"></i>');
+    }
+  });
+
+  // ── Cargar datos del usuario ───────────────────────────────────────────────
   const btnGuardar = document.getElementById("guardar-config-btn");
 
   // Capitalizar primera letra del username y del nombre completo al perder el foco
@@ -178,12 +206,17 @@ $(document).ready(function () {
         `${BASE_URL}/api/php/profile_config.php?action=save_profile`,
         {
           method: "POST",
+          headers: {
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+          },
           body: formData,
         },
       );
       const data = await res.json();
       const msgEl2 = document.getElementById("msg-guardar-config");
-
       if (data.success) {
         if (msgEl2) {
           msgEl2.classList.remove("d-none");
@@ -608,47 +641,26 @@ $(document).ready(function () {
     formData.append("bucket", "avatars");
 
     try {
-      console.log("SUPER DEBUG: Iniciando fetch a upload.php", [
-        ...formData.entries(),
-      ]);
       const res = await fetch(`${BASE_URL}/api/php/upload.php`, {
         method: "POST",
         body: formData,
       });
 
       const rawText = await res.text();
-      console.log(
-        "SUPER DEBUG: Respuesta raw del servidor (status " + res.status + "):",
-        rawText,
-      );
 
       let data;
       try {
         data = JSON.parse(rawText);
       } catch (parseErr) {
-        alert(
-          "SUPER DEBUG [JSON PARSE ERROR]\nStatus: " +
-            res.status +
-            "\nRespuesta cruda del servidor:\n" +
-            rawText.substring(0, 500) +
-            "...\nRevisa la consola y Network Tab.",
-        );
         throw new Error("El servidor no devolvió una respuesta JSON válida.");
       }
 
       if (!data.success) {
-        alert(
-          "SUPER DEBUG [SERVER ERROR]\n" + (data.error || "Error desconocido"),
-        );
         throw new Error(data.error || "Error al subir la foto");
       }
 
       return data.url;
     } catch (e) {
-      console.error("SUPER DEBUG: Promesa / Red falló:", e);
-      // No mostramos alert aquí de error de red normal a menos que el usuario lo pida, el throw lo pilla el front.
-      // Pero como es un super debug:
-      alert("SUPER DEBUG [FETCH CATCH]\n" + e.message);
       throw e;
     }
   }
@@ -869,19 +881,22 @@ $(document).ready(function () {
             </a>
           </div>`);
       } else {
+        const isRankSort = sort === "rank_position";
         container.append(`
           <div class="${colClass}">
-            <a href="${detailUrl}" class="top-card d-flex align-items-stretch text-decoration-none shadow-sm mb-2" style="height:110px;">
-              <div style="width:110px; flex-shrink:0; position:relative;">
-                ${img.replace("height:150px", "height:110px").replace("height:120px", "height:110px")}
+            <a href="${detailUrl}" class="top-card d-flex align-items-stretch text-decoration-none shadow-sm mb-2" 
+               style="height:${isRankSort ? "85px" : "110px"}; transition: height 0.2s ease-out; overflow: hidden;">
+              <div class="rank-img-container" style="width:${isRankSort ? "85px" : "110px"}; height:${isRankSort ? "85px" : "110px"}; flex-shrink:0; position:relative; transition: all 0.2s ease-out;">
+                ${img.replace(/height:\d+px/g, isRankSort ? "height:85px" : "height:110px")}
                 <span class="rank-badge" style="font-size: 0.65rem; padding: 2px 6px;">#${item.rank_position}</span>
               </div>
-              <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center" style="width: 0; min-width: 0;">
-                <div class="mb-1 pe-2">
+              <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center position-relative" style="width: 0; min-width: 0;">
+                ${isRankSort ? `<button class="btn btn-sm btn-toggle-stats text-secondary p-0 position-absolute" style="top:8px; right:12px; z-index:10; width:24px; height:24px; background: rgba(255,255,255,0.05); border-radius:50%;" title="Ver más detalles"><i class="fa-solid fa-plus"></i></button>` : ""}
+                <div class="mb-1 pe-4">
                   <div class="fw-bold text-white text-truncate" style="font-family: var(--rcw-font-title); font-size: 0.95rem; width: 100%;">${item.coaster_name}</div>
                   <small class="text-muted text-truncate d-block" style="font-size: 0.72rem; width: 100%;">${item.park_name} · ${item.country_name || ""}</small>
                 </div>
-                <div class="d-flex gap-2 flex-wrap mt-1">
+                <div class="stats-expandable ${isRankSort ? "d-none" : ""} d-flex gap-2 flex-wrap mt-1">
                   ${getStatBadges(item, sort)}
                 </div>
               </div>
@@ -943,20 +958,23 @@ $(document).ready(function () {
             </a>
           </div>`);
       } else {
+        const isRankSort = sort === "rank_position";
         const detailUrl = `${BASE_URL}/web/views/public/parks/parks.php?id=${item.park_id}`;
         container.append(`
           <div class="${colClass}">
-            <a href="${detailUrl}" class="top-card d-flex align-items-stretch text-decoration-none shadow-sm mb-2" style="height:110px;">
-              <div style="width:110px; flex-shrink:0; position:relative;">
-                ${img.replace("height:150px", "height:110px").replace("height:120px", "height:110px")}
+            <a href="${detailUrl}" class="top-card d-flex align-items-stretch text-decoration-none shadow-sm mb-2" 
+               style="height:${isRankSort ? "85px" : "110px"}; transition: height 0.2s ease-out; overflow: hidden;">
+              <div class="rank-img-container" style="width:${isRankSort ? "85px" : "110px"}; height:${isRankSort ? "85px" : "110px"}; flex-shrink:0; position:relative; transition: all 0.2s ease-out;">
+                ${img.replace(/height:\d+px/g, isRankSort ? "height:85px" : "height:110px")}
                 <span class="rank-badge" style="font-size: 0.65rem; padding: 2px 6px;">#${item.rank_position}</span>
               </div>
-              <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center" style="width: 0; min-width: 0;">
-                <div class="mb-1 pe-2">
+              <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center position-relative" style="width: 0; min-width: 0;">
+                ${isRankSort ? `<button class="btn btn-sm btn-toggle-stats text-secondary p-0 position-absolute" style="top:8px; right:12px; z-index:10; width:24px; height:24px; background: rgba(255,255,255,0.05); border-radius:50%;" title="Ver más detalles"><i class="fa-solid fa-plus"></i></button>` : ""}
+                <div class="mb-1 pe-4">
                   <div class="fw-bold text-white text-truncate" style="font-family: var(--rcw-font-title); font-size: 0.95rem; width: 100%;">${item.park_name}</div>
                   <small class="text-muted text-truncate d-block" style="font-size: 0.72rem; width: 100%;">${item.country_name || ""}</small>
                 </div>
-                <div class="d-flex gap-2 flex-wrap mt-1">
+                <div class="stats-expandable ${isRankSort ? "d-none" : ""} d-flex gap-2 flex-wrap mt-1">
                   ${item.operating_coasters ? `<small class="text-info d-flex align-items-center gap-1"><i class="fa-solid fa-ticket"></i>${item.operating_coasters} coasters</small>` : ""}
                   ${item.stars ? `<small class="text-warning d-flex align-items-center gap-1"><i class="fa-solid fa-star"></i>${parseFloat(item.stars).toFixed(1)}</small>` : ""}
                 </div>
@@ -2813,9 +2831,9 @@ $(document).ready(function () {
         const pct = (count / max) * 100;
 
         html += `
-          <div class="list-group-item bg-transparent border-bottom border-secondary border-opacity-25 px-4 py-3">
+          <div class="list-group-item bg-transparent border-bottom border-secondary border-opacity-25 px-2 py-3">
             <div class="d-flex align-items-center gap-3">
-              <div class="fw-bold text-success fs-5" style="min-width:30px;">#${idx + 1}</div>
+              <div class="fw-bold text-success fs-5" style="min-width:40px;">#${idx + 1}</div>
               <img src="${img}" onerror="this.src='${window.BASE_URL}/web/img/dummy.jpg'" style="width: 48px; height: 48px; object-fit: cover; border-radius: 4px; border: 1px solid var(--rcw-border);">
               <div class="flex-grow-1 min-w-0">
                 <div class="d-flex justify-content-between align-items-end mb-1 gap-2">
@@ -2823,8 +2841,8 @@ $(document).ready(function () {
                     <h6 class="fw-bold text-white mb-0 text-truncate" title="${title}">${title}</h6>
                     <small class="text-muted text-truncate d-block" title="${sub}">${sub}</small>
                   </div>
-                  <div class="fw-bold text-success fs-6 fs-md-5 flex-shrink-0 text-end" style="min-width: 60px;">
-                    ${count} <span class="d-block d-sm-inline text-muted fw-normal" style="font-family: 'Outfit', sans-serif; letter-spacing: 0.5px; font-size: 0.7em;">${isC ? (count === 1 ? "vez montada" : "veces montada") : count === 1 ? "visita" : "visitas"}</span>
+                  <div class="fw-bold text-success fs-5 flex-shrink-0 text-end" style="min-width: 40px;">
+                    x${count}
                   </div>
                 </div>
                 <div class="progress rounded-pill bg-dark mt-2" style="height: 6px;">
@@ -2869,6 +2887,7 @@ $(document).ready(function () {
           }
         });
       }
+
       if (currentPeriod === "year")
         baseDate.setFullYear(baseDate.getFullYear() + dir);
       else if (currentPeriod === "month")

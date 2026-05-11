@@ -958,9 +958,9 @@ $(document).ready(function () {
         const pct = (count / max) * 100;
 
         html += `
-          <div class="list-group-item bg-transparent border-bottom border-secondary border-opacity-25 px-4 py-3">
+          <div class="list-group-item bg-transparent border-bottom border-secondary border-opacity-25 px-2 py-3">
             <div class="d-flex align-items-center gap-3">
-              <div class="fw-bold text-success fs-5" style="min-width:30px;">#${idx + 1}</div>
+              <div class="fw-bold text-success fs-5" style="min-width:40px;">#${idx + 1}</div>
               <img src="${img}" onerror="this.src='${window.BASE_URL}/web/img/dummy.jpg'" style="width: 48px; height: 48px; object-fit: cover; border-radius: 4px; border: 1px solid var(--rcw-border);">
               <div class="flex-grow-1 min-w-0">
                 <div class="d-flex justify-content-between align-items-end mb-1 gap-2">
@@ -968,8 +968,8 @@ $(document).ready(function () {
                     <h6 class="fw-bold text-white mb-0 text-truncate" title="${title}">${title}</h6>
                     <small class="text-muted text-truncate d-block" title="${sub}">${sub}</small>
                   </div>
-                  <div class="fw-bold text-success fs-6 fs-md-5 flex-shrink-0 text-end" style="min-width: 60px;">
-                    ${count} <span class="d-block d-sm-inline text-muted fw-normal" style="font-family: 'Outfit', sans-serif; letter-spacing: 0.5px; font-size: 0.7em;">${isC ? (count === 1 ? "vez montada" : "veces montada") : count === 1 ? "visita" : "visitas"}</span>
+                  <div class="fw-bold text-success fs-5 flex-shrink-0 text-end" style="min-width: 40px;">
+                    x${count}
                   </div>
                 </div>
                 <div class="progress rounded-pill bg-dark mt-2" style="height: 6px;">
@@ -1013,6 +1013,7 @@ $(document).ready(function () {
           }
         });
       }
+
       if (currentPeriod === "year")
         baseDate.setFullYear(baseDate.getFullYear() + dir);
       else if (currentPeriod === "month")

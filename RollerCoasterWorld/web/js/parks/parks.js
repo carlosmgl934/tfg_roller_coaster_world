@@ -205,10 +205,14 @@ $(document).ready(function () {
       if (totalPages <= 1) {
         return;
       }
-
       const pageBtn = document.createElement("div");
-      pageBtn.classList.add("page-buttons");
-
+      pageBtn.classList.add(
+        "page-buttons",
+        "d-flex",
+        "flex-nowrap",
+        "justify-content-center",
+        "gap-1",
+      );
       const prevBtn = document.createElement("button");
       prevBtn.className = "btn btn-outline-success mx-1";
       prevBtn.textContent = "«";
@@ -221,9 +225,9 @@ $(document).ready(function () {
 
       const btnFirst = document.createElement("button");
       if (currentPage === 1) {
-        btnFirst.className = "btn btn-success mx-1 text-white";
+        btnFirst.className = "btn btn-success text-white";
       } else {
-        btnFirst.className = "btn btn-light text-success border mx-1";
+        btnFirst.className = "btn btn-light text-success border";
       }
       btnFirst.textContent = "1";
       btnFirst.addEventListener("click", function () {
@@ -233,7 +237,7 @@ $(document).ready(function () {
       pageBtn.appendChild(btnFirst);
 
       const btnDots = document.createElement("button");
-      btnDots.className = "btn border-0 text-secondary mx-1";
+      btnDots.className = "btn border-0 text-secondary";
       btnDots.textContent = "...";
       btnDots.disabled = true;
       pageBtn.appendChild(btnDots);
@@ -244,7 +248,7 @@ $(document).ready(function () {
 
       for (let i = start; i <= end; i++) {
         const pageButton = document.createElement("button");
-        pageButton.className = "btn btn-light text-success border mx-1";
+        pageButton.className = "btn btn-light text-success border";
         pageButton.textContent = i;
         if (i === currentPage) {
           pageButton.classList.remove("btn-light", "text-success", "border");
@@ -258,16 +262,16 @@ $(document).ready(function () {
       }
 
       const btnDots2 = document.createElement("button");
-      btnDots2.className = "btn border-0 text-secondary mx-1";
+      btnDots2.className = "btn border-0 text-secondary";
       btnDots2.textContent = "...";
       btnDots2.disabled = true;
       pageBtn.appendChild(btnDots2);
 
       const btnLast = document.createElement("button");
       if (currentPage === totalPages) {
-        btnLast.className = "btn btn-success mx-1 text-white";
+        btnLast.className = "btn btn-success text-white";
       } else {
-        btnLast.className = "btn btn-light text-success border mx-1";
+        btnLast.className = "btn btn-light text-success border";
       }
       btnLast.textContent = `${totalPages}`;
       btnLast.addEventListener("click", function () {
@@ -277,7 +281,7 @@ $(document).ready(function () {
       pageBtn.appendChild(btnLast);
 
       const nextBtn = document.createElement("button");
-      nextBtn.className = "btn btn-outline-success mx-1";
+      nextBtn.className = "btn btn-outline-success";
       nextBtn.textContent = "»";
       if (currentPage === totalPages) nextBtn.disabled = true;
       nextBtn.addEventListener("click", function () {
@@ -815,14 +819,17 @@ $(document).ready(function () {
               style="width:40px;height:40px;object-fit:cover;border-radius:50%;border:2px solid var(--rcw-green-dim,#198754);flex-shrink:0;background:#2d333b;"
               onerror="this.src='${defaultAvatarUrl}';this.onerror=null;">`;
 
-            const isOwn = (window.CURRENT_USER_ID && parseInt(review.user_id) === window.CURRENT_USER_ID) || 
-                          (window.CURRENT_USERNAME && review.username === window.CURRENT_USERNAME);
+            const isOwn =
+              (window.CURRENT_USER_ID &&
+                parseInt(review.user_id) === window.CURRENT_USER_ID) ||
+              (window.CURRENT_USERNAME &&
+                review.username === window.CURRENT_USERNAME);
 
             const editBtn = isOwn
               ? `<button class="btn btn-link p-0 text-warning edit-review-btn d-flex flex-column align-items-center lh-1"
                    data-id="${review.id}"
                    data-note="${review.note}"
-                   data-text="${encodeURIComponent(review.review || '')}"
+                   data-text="${encodeURIComponent(review.review || "")}"
                    title="Editar mi reseña"
                    style="text-decoration:none; min-width: 60px;">
                    <i class="fa-solid fa-pen-to-square mb-1 fs-5"></i>
@@ -831,7 +838,7 @@ $(document).ready(function () {
               : "";
 
             container.append(`
-              <div class="border-bottom pb-4 mb-4 animate__animated animate__fadeIn${isOwn ? ' own-review' : ''}">
+              <div class="border-bottom pb-4 mb-4 animate__animated animate__fadeIn${isOwn ? " own-review" : ""}">
                 <div class="d-flex align-items-start gap-3 mb-2">
                   ${avatarHtml}
                   <div class="flex-grow-1 min-w-0">
@@ -846,10 +853,14 @@ $(document).ready(function () {
                   </div>
                 </div>
                 ${tagsHtml}
-                ${review.review ? `
+                ${
+                  review.review
+                    ? `
                 <div class="mt-3 p-3 bg-dark bg-opacity-25 rounded border-start border-3 border-success border-opacity-50">
                   <p class="mb-0 text-white-50" style="font-size:0.92rem; line-height:1.7;">${review.review}</p>
-                </div>` : ""}
+                </div>`
+                    : ""
+                }
               </div>
             `);
           });
@@ -882,7 +893,7 @@ $(document).ready(function () {
     });
 
     $(document).on("click", ".edit-review-btn", function () {
-      const id   = $(this).data("id");
+      const id = $(this).data("id");
       const note = parseFloat($(this).data("note")) || 0;
       const text = decodeURIComponent($(this).data("text") || "");
       $("#edit-review-id").val(id);
@@ -894,19 +905,35 @@ $(document).ready(function () {
     });
 
     $(document).on("click", "#save-edit-review-btn", async function () {
-      const btn      = $(this);
+      const btn = $(this);
       const reviewId = $("#edit-review-id").val();
-      const note     = parseFloat($("#edit-review-note").val()) || 0;
-      const text     = $("#edit-review-text").val().trim();
-      if (!note) { alert("Por favor, selecciona una puntuación."); return; }
-      btn.prop("disabled", true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i>Guardando...');
+      const note = parseFloat($("#edit-review-note").val()) || 0;
+      const text = $("#edit-review-text").val().trim();
+      if (!note) {
+        alert("Por favor, selecciona una puntuación.");
+        return;
+      }
+      btn
+        .prop("disabled", true)
+        .html('<i class="fa-solid fa-spinner fa-spin me-1"></i>Guardando...');
       const fd = new FormData();
       fd.append("review_id", reviewId);
       fd.append("note", note);
       fd.append("review", text);
       try {
-        const res  = await fetch(`${window.BASE_URL}/api/php/parks.php?action=update_review`, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST", body: fd } );
+        const res = await fetch(
+          `${window.BASE_URL}/api/php/parks.php?action=update_review`,
+          {
+            headers: {
+              "X-CSRF-Token":
+                document
+                  .querySelector('meta[name="csrf-token"]')
+                  ?.getAttribute("content") ?? "",
+            },
+            method: "POST",
+            body: fd,
+          },
+        );
         const data = await res.json();
         if (data.success) {
           if (editReviewModalPark) editReviewModalPark.hide();
@@ -917,7 +944,9 @@ $(document).ready(function () {
       } catch (e) {
         alert("Error de conexión.");
       } finally {
-        btn.prop("disabled", false).html('<i class="fa-solid fa-floppy-disk me-1"></i>Guardar cambios');
+        btn
+          .prop("disabled", false)
+          .html('<i class="fa-solid fa-floppy-disk me-1"></i>Guardar cambios');
       }
     });
 
@@ -931,7 +960,6 @@ $(document).ready(function () {
       });
     }
   }
-
 
   // --- LÓGICA PARA EL FORMULARIO DE RESEÑAS DE PARQUES ---
   if (document.getElementById("review-form")) {
@@ -978,11 +1006,16 @@ $(document).ready(function () {
         submitBtn.innerHTML =
           'Publicando... <i class="fa-solid fa-spinner fa-spin ms-2"></i>';
 
-        fetch(window.BASE_URL + "/api/php/parks.php?action=save_review", { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
+        fetch(window.BASE_URL + "/api/php/parks.php?action=save_review", {
+          headers: {
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+          },
           method: "POST",
           body: formData,
-        } )
+        })
           .then((res) => res.json())
           .then((data) => {
             if (data.success) {
