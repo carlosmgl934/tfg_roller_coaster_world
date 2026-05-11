@@ -919,59 +919,46 @@ $(document).ready(function () {
 
         container.append(`
           <div class="${colClass} mb-3">
-            <div class="top-card d-flex flex-column flex-md-row text-decoration-none shadow-sm position-relative" 
-               style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; transition: all 0.3s ease;">
+            <div class="top-card d-flex flex-column flex-md-row text-decoration-none position-relative overflow-hidden" 
+               style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(4px);">
               
               <!-- Imagen y Ranking -->
-              <div class="rank-img-container p-2 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.2); border-radius: 8px 0 0 8px; min-width: 110px;">
+              <div class="rank-img-container p-3 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.15); min-width: 130px;">
                 <div class="position-relative">
                   <img src="${item.imagen_url.startsWith("/") ? BASE_URL + item.imagen_url : item.imagen_url}" 
                        alt="${item.coaster_name}" 
-                       class="rounded" 
-                       style="width: 90px; height: 90px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1);">
-                  <span class="rank-badge" style="position: absolute; top: -5px; left: -5px; font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">#${item.rank_position}</span>
+                       class="rounded-3 shadow" 
+                       style="width: 100px; height: 100px; object-fit: cover; border: 2px solid rgba(255,255,255,0.05);">
+                  <span class="rank-badge" style="position: absolute; top: -8px; left: -8px; font-size: 0.8rem; font-weight: 800; padding: 4px 10px; border-radius: 6px; background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 12px rgba(16,185,129,0.4); border: 1px solid rgba(255,255,255,0.1);">#${item.rank_position}</span>
                 </div>
               </div>
 
               <!-- Contenido -->
-              <div class="p-3 flex-grow-1 d-flex flex-column justify-content-center">
-                <div class="d-flex justify-content-between align-items-start mb-1">
+              <div class="p-4 flex-grow-1 d-flex flex-column justify-content-center">
+                <div class="d-flex justify-content-between align-items-start mb-2">
                   <div class="pe-3">
-                    <a href="${detailUrl}" class="fw-bold text-white text-decoration-none d-block hover-green" style="font-family: var(--rcw-font-title); font-size: 1.1rem; line-height: 1.2;">
+                    <a href="${detailUrl}" class="fw-bold text-white text-decoration-none d-block hover-green" style="font-family: var(--rcw-font-title); font-size: 1.25rem; line-height: 1.2; letter-spacing: -0.01em;">
                       ${item.coaster_name}
                     </a>
-                    <small class="text-muted d-block mt-1" style="font-size: 0.75rem; opacity: 0.8;">
-                      <i class="fa-solid fa-location-dot me-1"></i>${item.park_name} · ${item.country_name || ""}
-                    </small>
+                    <div class="text-secondary d-flex align-items-center gap-2 mt-2" style="font-size: 0.85rem; opacity: 0.7;">
+                      <i class="fa-solid fa-location-dot text-success opacity-75"></i>
+                      <span>${item.park_name} · ${item.country_name || ""}</span>
+                    </div>
                   </div>
                   ${starsHtml}
                 </div>
 
-                <!-- Stats Expandibles -->
-                <div class="stats-expandable mt-2 d-flex gap-2 flex-wrap ${shouldCollapse ? "d-none" : ""}">
-                  ${getStatBadges(item, sort)
-                    .replace(
-                      /<small/g,
-                      '<small class="badge bg-dark border border-secondary text-secondary fw-normal px-2 py-1"',
-                    )
-                    .replace(/fa-industry/g, "fa-industry me-1")
-                    .replace(/fa-bolt/g, "fa-bolt me-1")}
+                <!-- Stats Secundarias -->
+                <div class="d-flex gap-3 mt-3 flex-wrap opacity-60">
+                   ${item.manufacter ? `<small class="d-flex align-items-center gap-1" style="font-size:0.75rem;"><i class="fa-solid fa-industry"></i> ${item.manufacter}</small>` : ""}
+                   ${item.height ? `<small class="d-flex align-items-center gap-1" style="font-size:0.75rem;"><i class="fa-solid fa-ruler-vertical"></i> ${item.height}m</small>` : ""}
+                   ${item.speed ? `<small class="d-flex align-items-center gap-1" style="font-size:0.75rem;"><i class="fa-solid fa-bolt"></i> ${item.speed}km/h</small>` : ""}
                 </div>
-
-                ${
-                  hasToggle
-                    ? `
-                <button class="btn btn-sm btn-toggle-stats text-muted p-0 mt-2 d-flex align-items-center gap-1" style="font-size: 0.7rem; background:transparent; border:none;">
-                   <i class="fa-solid fa-${shouldCollapse ? "plus" : "minus"}-circle"></i>
-                   <span>${shouldCollapse ? "Ver detalles" : "Contraer"}</span>
-                </button>`
-                    : ""
-                }
               </div>
 
-              <!-- Acceso rápido -->
-              <a href="${detailUrl}" class="d-none d-md-flex align-items-center px-3 border-start border-secondary border-opacity-10 opacity-25 hover-opacity-100" style="transition: opacity 0.2s;">
-                 <i class="fa-solid fa-chevron-right fs-5 text-white"></i>
+              <!-- Acceso rÃ¡pido premium -->
+              <a href="${detailUrl}" class="d-none d-md-flex align-items-center px-4 border-start border-white border-opacity-5 hover-bg-white-5" style="transition: all 0.2s; background: rgba(255,255,255,0.01);">
+                 <i class="fa-solid fa-arrow-right fs-5 text-success opacity-50"></i>
               </a>
             </div>
           </div>`);
@@ -1013,27 +1000,25 @@ $(document).ready(function () {
     const colClass = isGrid ? "col-6 col-md-4" : "col-12";
 
     data.forEach((item) => {
-      const img = item.imagen_url
-        ? `<img src="${item.imagen_url.startsWith("/") ? BASE_URL + item.imagen_url : item.imagen_url}" alt="${item.park_name}" loading="lazy">`
-        : `<div style="height:150px;background:#0d1117;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-image text-secondary fs-3"></i></div>`;
+      const detailUrl = `${BASE_URL}/web/views/public/parks/parks.php?id=${item.park_id}`;
 
       if (isGrid) {
-        const detailUrl = `${BASE_URL}/web/views/public/parks/parks.php?id=${item.park_id}`;
+        const img = item.imagen_url
+          ? `<img src="${item.imagen_url.startsWith("/") ? BASE_URL + item.imagen_url : item.imagen_url}" alt="${item.park_name}" loading="lazy">`
+          : `<div style="height:150px;background:#0d1117;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-image text-secondary fs-3"></i></div>`;
+
         container.append(`
           <div class="${colClass}">
-            <a href="${detailUrl}" class="top-card position-relative d-block text-decoration-none">
+            <a href="${detailUrl}" class="top-card position-relative d-block text-decoration-none shadow-sm">
               ${img}
               <span class="rank-badge">#${item.rank_position}</span>
               <div class="p-2">
-                <div class="fw-bold text-white small text-truncate">${item.park_name}</div>
-                <div class="text-secondary" style="font-size:.75rem;">${item.country_name || ""}</div>
+                <div class="fw-bold text-white small text-truncate" style="font-family: var(--rcw-font-title);">${item.park_name}</div>
+                <div class="text-secondary text-truncate" style="font-size:.7rem;">${item.country_name || ""}</div>
               </div>
             </a>
           </div>`);
       } else {
-        const isRankSort = sort === "rank_position";
-        const detailUrl = `${BASE_URL}/web/views/public/parks/parks.php?id=${item.park_id}`;
-
         // Estrellas
         const starsVal = parseFloat(item.stars) || 0;
         const starsHtml =
@@ -1046,53 +1031,44 @@ $(document).ready(function () {
 
         container.append(`
           <div class="${colClass} mb-3">
-            <div class="top-card d-flex flex-column flex-md-row text-decoration-none shadow-sm position-relative" 
-               style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; transition: all 0.3s ease;">
+            <div class="top-card d-flex flex-column flex-md-row text-decoration-none position-relative overflow-hidden" 
+               style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(4px);">
               
               <!-- Imagen y Ranking -->
-              <div class="rank-img-container p-2 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.2); border-radius: 8px 0 0 8px; min-width: 110px;">
+              <div class="rank-img-container p-3 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.15); min-width: 130px;">
                 <div class="position-relative">
-                   <img src="${item.imagen_url.startsWith("/") ? BASE_URL + item.imagen_url : item.imagen_url}" 
+                  <img src="${item.imagen_url.startsWith("/") ? BASE_URL + item.imagen_url : item.imagen_url}" 
                        alt="${item.park_name}" 
-                       class="rounded" 
-                       style="width: 90px; height: 90px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1);">
-                  <span class="rank-badge" style="position: absolute; top: -5px; left: -5px; font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">#${item.rank_position}</span>
+                       class="rounded-3 shadow" 
+                       style="width: 100px; height: 100px; object-fit: cover; border: 2px solid rgba(255,255,255,0.05);">
+                  <span class="rank-badge" style="position: absolute; top: -8px; left: -8px; font-size: 0.8rem; font-weight: 800; padding: 4px 10px; border-radius: 6px; background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 12px rgba(16,185,129,0.4); border: 1px solid rgba(255,255,255,0.1);">#${item.rank_position}</span>
                 </div>
               </div>
 
               <!-- Contenido -->
-              <div class="p-3 flex-grow-1 d-flex flex-column justify-content-center">
-                <div class="d-flex justify-content-between align-items-start mb-1">
+              <div class="p-4 flex-grow-1 d-flex flex-column justify-content-center">
+                <div class="d-flex justify-content-between align-items-start mb-2">
                   <div class="pe-3">
-                    <a href="${detailUrl}" class="fw-bold text-white text-decoration-none d-block hover-green" style="font-family: var(--rcw-font-title); font-size: 1.1rem; line-height: 1.2;">
+                    <a href="${detailUrl}" class="fw-bold text-white text-decoration-none d-block hover-green" style="font-family: var(--rcw-font-title); font-size: 1.25rem; line-height: 1.2; letter-spacing: -0.01em;">
                       ${item.park_name}
                     </a>
-                    <small class="text-muted d-block mt-1" style="font-size: 0.75rem; opacity: 0.8;">
-                      <i class="fa-solid fa-location-dot me-1"></i>${item.country_name || ""}
-                    </small>
+                    <div class="text-secondary d-flex align-items-center gap-2 mt-2" style="font-size: 0.85rem; opacity: 0.7;">
+                      <i class="fa-solid fa-location-dot text-success opacity-75"></i>
+                      <span>${item.country_name || ""}</span>
+                    </div>
                   </div>
                   ${starsHtml}
                 </div>
 
-                <!-- Stats Expandibles -->
-                <div class="stats-expandable mt-2 d-flex gap-2 flex-wrap ${isRankSort ? "d-none" : ""}">
-                  ${item.operating_coasters ? `<small class="badge bg-dark border border-secondary text-info fw-normal px-2 py-1"><i class="fa-solid fa-ticket me-1"></i>${item.operating_coasters} coasters</small>` : ""}
+                <!-- Stats Secundarias -->
+                <div class="d-flex gap-3 mt-3 flex-wrap opacity-60">
+                   ${item.operating_coasters ? `<small class="d-flex align-items-center gap-1" style="font-size:0.75rem;"><i class="fa-solid fa-ticket"></i> ${item.operating_coasters} coasters</small>` : ""}
                 </div>
-
-                ${
-                  isRankSort
-                    ? `
-                <button class="btn btn-sm btn-toggle-stats text-muted p-0 mt-2 d-flex align-items-center gap-1" style="font-size: 0.7rem; background:transparent; border:none;">
-                   <i class="fa-solid fa-plus-circle"></i>
-                   <span>Ver detalles</span>
-                </button>`
-                    : ""
-                }
               </div>
 
-              <!-- Acceso rápido -->
-              <a href="${detailUrl}" class="d-none d-md-flex align-items-center px-3 border-start border-secondary border-opacity-10 opacity-25 hover-opacity-100" style="transition: opacity 0.2s;">
-                 <i class="fa-solid fa-chevron-right fs-5 text-white"></i>
+              <!-- Acceso rÃ¡pido premium -->
+              <a href="${detailUrl}" class="d-none d-md-flex align-items-center px-4 border-start border-white border-opacity-5 hover-bg-white-5" style="transition: all 0.2s; background: rgba(255,255,255,0.01);">
+                 <i class="fa-solid fa-arrow-right fs-5 text-success opacity-50"></i>
               </a>
             </div>
           </div>`);
@@ -1109,9 +1085,11 @@ $(document).ready(function () {
     }
     topsData.coasters.forEach((item, i) => {
       const imgUrl = item.imagen_url
-        ? (item.imagen_url.startsWith("/") ? BASE_URL + item.imagen_url : item.imagen_url)
+        ? item.imagen_url.startsWith("/")
+          ? BASE_URL + item.imagen_url
+          : item.imagen_url
         : "";
-      const imgHtml = imgUrl 
+      const imgHtml = imgUrl
         ? `<img src="${imgUrl}" class="tops-edit-thumb" alt="">`
         : `<div class="tops-edit-thumb-placeholder"><i class="fa-solid fa-image"></i></div>`;
 
@@ -1122,7 +1100,7 @@ $(document).ready(function () {
           ${imgHtml}
           <div class="tops-edit-info">
             <div class="tops-edit-name">${item.coaster_name}</div>
-            <div class="tops-edit-sub">${item.manufacter || 'Fabricante'} · ${item.park_name}</div>
+            <div class="tops-edit-sub">${item.manufacter || "Fabricante"} · ${item.park_name}</div>
           </div>
           <div class="tops-edit-actions">
             <div class="dropdown">
@@ -1193,9 +1171,11 @@ $(document).ready(function () {
     }
     topsData.parks.forEach((item, i) => {
       const imgUrl = item.imagen_url
-        ? (item.imagen_url.startsWith("/") ? BASE_URL + item.imagen_url : item.imagen_url)
+        ? item.imagen_url.startsWith("/")
+          ? BASE_URL + item.imagen_url
+          : item.imagen_url
         : "";
-      const imgHtml = imgUrl 
+      const imgHtml = imgUrl
         ? `<img src="${imgUrl}" class="tops-edit-thumb" alt="">`
         : `<div class="tops-edit-thumb-placeholder"><i class="fa-solid fa-image"></i></div>`;
 
