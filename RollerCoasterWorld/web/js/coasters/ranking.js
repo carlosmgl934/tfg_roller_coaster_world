@@ -83,7 +83,7 @@ $(document).ready(function () {
             <span class="fw-black" style="font-size:1.3rem; color:${podiumColor};">#${position}</span>
           </div>
           <div class="flex-shrink-0">
-            <img src="${validImgUrl || 'https://www.hussrides.com/fileadmin/_processed_/5/e/csm_giant-frisbee-cedarpoint-01_0697df513a.jpg'}" 
+            <img src="${validImgUrl || "https://www.hussrides.com/fileadmin/_processed_/5/e/csm_giant-frisbee-cedarpoint-01_0697df513a.jpg"}" 
                  alt="${coaster.coaster_name}" 
                  class="rounded shadow-sm" 
                  referrerpolicy="no-referrer" 
@@ -100,12 +100,16 @@ $(document).ready(function () {
 
         <!-- Estrellas -->
         <div class="flex-shrink-0 d-flex align-items-center justify-content-center justify-content-md-end gap-3 mt-2 mt-md-0" style="min-width: 90px;">
-          ${starsVal > 0 ? `
+          ${
+            starsVal > 0
+              ? `
             <div class="d-flex align-items-center gap-1 bg-dark bg-opacity-25 px-2 py-1 rounded">
               <span class="fw-bold text-warning" style="font-size:1.1rem;">${starsVal.toFixed(2)}</span>
               <i class="fa-solid fa-star text-warning" style="font-size:0.85rem;"></i>
             </div>
-          ` : ""}
+          `
+              : ""
+          }
           <i class="fa-solid fa-chevron-right text-muted opacity-25 d-none d-md-block ms-1"></i>
         </div>
       `;

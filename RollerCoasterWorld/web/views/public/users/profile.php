@@ -1187,7 +1187,7 @@ $user_uid = $_SESSION['firebase_uid'];
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="<?= Router::asset('web/js/components/trip_modals.js') ?>"></script>
 <script src="<?= Router::asset('web/js/users/map.js') ?>"></script>
-<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js@10.2.0/public/assets/scripts/choices.min.js"></script>
 <script src="<?= Router::asset('web/js/users/profile.js') ?>?v=<?= time() ?>"></script>
 
 

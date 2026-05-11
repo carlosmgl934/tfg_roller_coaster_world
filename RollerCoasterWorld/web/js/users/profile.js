@@ -2575,10 +2575,14 @@ $(document).ready(function () {
     const prosList = type === "coaster" ? COASTER_PROS : PARK_PROS;
     const contrasList = type === "coaster" ? COASTER_CONTRAS : PARK_CONTRAS;
 
-    peditProsChoices.clearChoices();
-    peditProsChoices.setChoices(prosList, "value", "label", true);
-    peditContrasChoices.clearChoices();
-    peditContrasChoices.setChoices(contrasList, "value", "label", true);
+    if (peditProsChoices) {
+      peditProsChoices.clearChoices();
+      peditProsChoices.setChoices(prosList, "value", "label", true);
+    }
+    if (peditContrasChoices) {
+      peditContrasChoices.clearChoices();
+      peditContrasChoices.setChoices(contrasList, "value", "label", true);
+    }
 
     const rawTags = $(this).attr("data-tags") || "[]";
     let tags = [];
@@ -2593,10 +2597,14 @@ $(document).ready(function () {
       const activeContras = tags
         .filter((t) => t.type === "con")
         .map((t) => t.tag);
-      peditProsChoices.removeActiveItems();
-      peditProsChoices.setChoiceByValue(activePros);
-      peditContrasChoices.removeActiveItems();
-      peditContrasChoices.setChoiceByValue(activeContras);
+      if (peditProsChoices) {
+        peditProsChoices.removeActiveItems();
+        peditProsChoices.setChoiceByValue(activePros);
+      }
+      if (peditContrasChoices) {
+        peditContrasChoices.removeActiveItems();
+        peditContrasChoices.setChoiceByValue(activeContras);
+      }
     } else {
       peditProsChoices.removeActiveItems();
       peditContrasChoices.removeActiveItems();
