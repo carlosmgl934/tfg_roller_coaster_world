@@ -307,8 +307,15 @@ function getBaseUrl(): string
     $proto = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host  = $_SERVER['HTTP_HOST'] ?? 'localhost';
     $script = $_SERVER['SCRIPT_NAME'] ?? '';
-    // Obtener la base hasta /RollerCoasterWorld
-    $base = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $script) ?? '';
+    
+    // Si el script contiene /RollerCoasterWorld/, estamos en local (XAMPP)
+    if (str_contains($script, '/RollerCoasterWorld/')) {
+        $base = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $script) ?? '';
+    } else {
+        // En producción, si el dominio ya apunta a la raíz del proyecto
+        $base = '';
+    }
+    
     return $proto . '://' . $host . $base;
 }
 
