@@ -1108,15 +1108,23 @@ $(document).ready(function () {
       return;
     }
     topsData.coasters.forEach((item, i) => {
+      const imgUrl = item.imagen_url
+        ? (item.imagen_url.startsWith("/") ? BASE_URL + item.imagen_url : item.imagen_url)
+        : "";
+      const imgHtml = imgUrl 
+        ? `<img src="${imgUrl}" class="tops-edit-thumb" alt="">`
+        : `<div class="tops-edit-thumb-placeholder"><i class="fa-solid fa-image"></i></div>`;
+
       el.append(`
         <div class="tops-edit-item" data-id="${item.coaster_id}">
-          <i class="fa-solid fa-grip-lines drag-handle fs-5"></i>
-          <span class="tops-rank-badge">#${i + 1}</span>
-          <div class="flex-grow-1 min-w-0 pe-3">
-            <div class="fw-bold text-white text-truncate">${item.coaster_name}</div>
-            <small class="text-secondary d-block text-truncate">${item.park_name}</small>
+          <i class="fa-solid fa-grip-lines drag-handle"></i>
+          <div class="tops-edit-rank">${i + 1}</div>
+          ${imgHtml}
+          <div class="tops-edit-info">
+            <div class="tops-edit-name">${item.coaster_name}</div>
+            <div class="tops-edit-sub">${item.manufacter || 'Fabricante'} · ${item.park_name}</div>
           </div>
-          <div class="d-flex gap-1">
+          <div class="tops-edit-actions">
             <div class="dropdown">
               <button class="btn btn-sm btn-outline-secondary border-0 square-box dropdown-toggle dropdown-toggle-split"
                 data-bs-toggle="dropdown" aria-expanded="false" title="Mover a...">
@@ -1184,15 +1192,23 @@ $(document).ready(function () {
       return;
     }
     topsData.parks.forEach((item, i) => {
+      const imgUrl = item.imagen_url
+        ? (item.imagen_url.startsWith("/") ? BASE_URL + item.imagen_url : item.imagen_url)
+        : "";
+      const imgHtml = imgUrl 
+        ? `<img src="${imgUrl}" class="tops-edit-thumb" alt="">`
+        : `<div class="tops-edit-thumb-placeholder"><i class="fa-solid fa-image"></i></div>`;
+
       el.append(`
         <div class="tops-edit-item" data-id="${item.park_id}">
-          <i class="fa-solid fa-grip-lines drag-handle fs-5"></i>
-          <span class="tops-rank-badge">#${i + 1}</span>
-          <div class="flex-grow-1">
-            <span class="fw-bold text-white">${item.park_name}</span>
-            <small class="text-secondary ms-2">${item.country_name || ""}</small>
+          <i class="fa-solid fa-grip-lines drag-handle"></i>
+          <div class="tops-edit-rank">${i + 1}</div>
+          ${imgHtml}
+          <div class="tops-edit-info">
+            <div class="tops-edit-name">${item.park_name}</div>
+            <div class="tops-edit-sub">${item.country_name || "PaÃ­s"}</div>
           </div>
-          <div class="d-flex gap-1">
+          <div class="tops-edit-actions">
             <div class="dropdown">
               <button class="btn btn-sm btn-outline-secondary border-0 square-box dropdown-toggle dropdown-toggle-split"
                 data-bs-toggle="dropdown" aria-expanded="false" title="Mover a...">
