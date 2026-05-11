@@ -341,8 +341,8 @@ $user_id = $_GET['id'] ?? null;
                                 </div>
                             </div>
                             <div class="d-flex align-items-center">
-                                <span class="badge bg-dark px-3 py-2 rounded-pill shadow-sm" style="border:1px solid var(--rcw-border); font-size: 0.85rem;">
-                                    <i class="fa-solid fa-suitcase me-1 text-success"></i> <span id="rank-trip-count">0 viajes</span>
+                                <span class="stats-trip-badge shadow-sm">
+                                    <i class="fa-solid fa-suitcase text-success"></i> <span id="rank-trip-count">0 viajes</span>
                                 </span>
                             </div>
                         </div>
