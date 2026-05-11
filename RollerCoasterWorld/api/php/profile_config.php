@@ -559,7 +559,9 @@ function getMyReviews()
                    cr.note,
                    cr.review,
                    cr.created_at,
-                   c.imagen_url
+                   c.imagen_url,
+                   (SELECT json_agg(json_build_object('tag', rt.tag, 'type', rt.type))
+                        FROM review_tags rt WHERE rt.review_id = cr.id) AS tags
             FROM coaster_ratings cr
             JOIN coasters c ON cr.coaster_id = c.id
             JOIN parks    p ON c.park_id = p.id
@@ -575,7 +577,9 @@ function getMyReviews()
                    pr.note,
                    pr.review,
                    pr.created_at,
-                   p.imagen_url
+                   p.imagen_url,
+                   (SELECT json_agg(json_build_object('tag', pt.tag, 'type', pt.type))
+                        FROM park_review_tags pt WHERE pt.review_id = pr.id) AS tags
             FROM park_ratings pr
             JOIN parks p ON pr.park_id = p.id
             WHERE pr.user_id = :uid AND pr.is_hidden = FALSE
@@ -585,6 +589,13 @@ function getMyReviews()
         $stmt->bindValue(':uid', $user_id, PDO::PARAM_INT);
         $stmt->execute();
         $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Decodificar los tags de JSON string a array
+        foreach ($reviews as &$r) {
+            $r['tags'] = $r['tags'] ? json_decode($r['tags'], true) : [];
+        }
+        unset($r);
+
         Response::success(['reviews' => $reviews]);
     } catch (PDOException $e) {
         error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);

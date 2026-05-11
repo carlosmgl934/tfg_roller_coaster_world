@@ -1190,7 +1190,3 @@ $user_uid = $_SESSION['firebase_uid'];
 <script src="<?= Router::asset('web/js/users/map.js') ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <script src="<?= Router::asset('web/js/users/profile.js') ?>?v=<?= time() ?>"></script>
-
-
-
-
