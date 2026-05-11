@@ -1180,6 +1180,7 @@ $user_uid = $_SESSION['firebase_uid'];
 
 
 
+<?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
@@ -1187,11 +1188,9 @@ $user_uid = $_SESSION['firebase_uid'];
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="<?= Router::asset('web/js/components/trip_modals.js') ?>"></script>
 <script src="<?= Router::asset('web/js/users/map.js') ?>"></script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <script src="<?= Router::asset('web/js/users/profile.js') ?>?v=<?= time() ?>"></script>
 
 
 
-
-<?php
-require_once __DIR__ . '/../../partials/footer.php';
-?>
+
