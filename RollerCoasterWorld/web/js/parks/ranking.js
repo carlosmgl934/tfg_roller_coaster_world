@@ -73,30 +73,33 @@ $(document).ready(function () {
       card.classList.add("list-group-item", "list-group-item-action", "d-flex", "flex-column", "flex-md-row", "align-items-center", "p-3", "gap-3");
 
       card.innerHTML = `
-        <div class="d-flex align-items-center w-100 w-md-auto">
-          <div class="flex-shrink-0 text-center me-3" style="width:30px;">
-            <span class="fw-black" style="font-size:1.15rem; color:${podiumColor};">#${position}</span>
+        <div class="d-flex align-items-center flex-shrink-0" style="min-width: 140px;">
+          <div class="text-center me-3" style="width:35px;">
+            <span class="fw-black" style="font-size:1.2rem; color:${podiumColor};">#${position}</span>
           </div>
           <div class="flex-shrink-0">
-            ${validImgUrl 
-              ? `<img src="${validImgUrl}" alt="${park.park_name}" class="rounded shadow-sm" referrerpolicy="no-referrer" style="width:80px; height:80px; object-fit:cover;">`
-              : `<img src="https://www.hussrides.com/fileadmin/_processed_/5/e/csm_giant-frisbee-cedarpoint-01_0697df513a.jpg" alt="Sin imagen" class="rounded shadow-sm" style="width:80px; height:80px; object-fit:cover;">`
-            }
+            <img src="${validImgUrl || 'https://www.hussrides.com/fileadmin/_processed_/5/e/csm_giant-frisbee-cedarpoint-01_0697df513a.jpg'}" 
+                 alt="${park.park_name}" 
+                 class="rounded shadow-sm" 
+                 referrerpolicy="no-referrer" 
+                 style="width:80px; height:80px; object-fit:cover; border: 1px solid rgba(255,255,255,0.1);">
           </div>
         </div>
-        <div class="flex-grow-1 text-center text-md-start w-100">
-          <h5 class="mb-1 fw-bold text-white" style="font-family: var(--rcw-font-title); font-size: 1.15rem;">${park.park_name}</h5>
-          <p class="mb-1 text-muted small"><i class="fa-solid fa-map-pin me-1 opacity-50"></i>${park.park_location}</p>
-          ${infoLine ? `<small class="text-secondary opacity-75">${infoLine}</small>` : ""}
+
+        <div class="flex-grow-1 px-3 min-w-0 text-start">
+          <h5 class="mb-1 fw-bold text-white text-truncate" style="font-family: var(--rcw-font-title); font-size: 1.15rem; letter-spacing: -0.01em;">${park.park_name}</h5>
+          <p class="mb-1 text-muted small text-truncate"><i class="fa-solid fa-map-pin me-1 opacity-50"></i>${park.park_location}</p>
+          ${infoLine ? `<small class="text-secondary opacity-75 d-block text-truncate">${infoLine}</small>` : ""}
         </div>
-        <div class="flex-shrink-0 d-flex align-items-center justify-content-between justify-content-md-end w-100 w-md-auto gap-4">
+
+        <div class="flex-shrink-0 d-flex align-items-center justify-content-end gap-4" style="min-width: 100px;">
           ${starsVal > 0 ? `
             <div class="d-flex align-items-center gap-1">
-              <span class="fw-bold text-warning" style="font-size:1.1rem;">${starsVal.toFixed(2)}</span>
-              <i class="fa-solid fa-star text-warning" style="font-size:0.9rem;"></i>
+              <span class="fw-bold text-warning" style="font-size:1.15rem;">${starsVal.toFixed(2)}</span>
+              <i class="fa-solid fa-star text-warning" style="font-size:0.95rem;"></i>
             </div>
           ` : ""}
-          <i class="fa-solid fa-chevron-right text-muted opacity-25 d-none d-md-block"></i>
+          <i class="fa-solid fa-chevron-right text-muted opacity-25 d-none d-md-block ms-2"></i>
         </div>
       `;
       parkList.appendChild(card);
