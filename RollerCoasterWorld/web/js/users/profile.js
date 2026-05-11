@@ -833,50 +833,50 @@ $(document).ready(function () {
     // Definir qué badges mostrar según el criterio de sort
     function getStatBadges(item, sortKey) {
       const mfr = item.manufacter
-        ? `<small class="text-secondary d-flex align-items-center gap-1" title="${item.manufacter}"><i class="fa-solid fa-industry"></i><span class="text-truncate d-inline-block" style="max-width: 100px;">${item.manufacter}</span></small>`
+        ? `<span class="text-secondary d-flex align-items-center gap-1" title="${item.manufacter}"><i class="fa-solid fa-industry"></i><span class="text-truncate d-inline-block" style="max-width: 100px;">${item.manufacter}</span></span>`
         : "";
 
       if (sortKey === "height") {
         return (
           (item.height
-            ? `<small class="text-info d-flex align-items-center gap-1"><i class="fa-solid fa-ruler-vertical"></i>${item.height} m</small>`
+            ? `<span class="text-info d-flex align-items-center gap-1 fw-semibold"><i class="fa-solid fa-ruler-vertical"></i>${item.height} m</span>`
             : "") + mfr
         );
       }
       if (sortKey === "speed") {
         return (
           (item.speed
-            ? `<small class="text-warning d-flex align-items-center gap-1"><i class="fa-solid fa-bolt"></i>${item.speed} km/h</small>`
+            ? `<span class="text-warning d-flex align-items-center gap-1 fw-semibold"><i class="fa-solid fa-bolt"></i>${item.speed} km/h</span>`
             : "") + mfr
         );
       }
       if (sortKey === "length") {
         return (
           (item.coaster_length
-            ? `<small class="text-info d-flex align-items-center gap-1"><i class="fa-solid fa-ruler-horizontal"></i>${item.coaster_length} m</small>`
+            ? `<span class="text-info d-flex align-items-center gap-1 fw-semibold"><i class="fa-solid fa-ruler-horizontal"></i>${item.coaster_length} m</span>`
             : "") + mfr
         );
       }
       if (sortKey === "inversions") {
         return (
           (item.inversions != null
-            ? `<small class="text-warning d-flex align-items-center gap-1"><i class="fa-solid fa-infinity"></i>${item.inversions} inv.</small>`
+            ? `<span class="text-warning d-flex align-items-center gap-1 fw-semibold"><i class="fa-solid fa-infinity"></i>${item.inversions} inv.</span>`
             : "") + mfr
         );
       }
       if (sortKey === "year") {
         return (
           (item.opening_year
-            ? `<small class="text-secondary d-flex align-items-center gap-1"><i class="fa-regular fa-calendar"></i>${item.opening_year}</small>`
+            ? `<span class="text-secondary d-flex align-items-center gap-1 fw-semibold"><i class="fa-regular fa-calendar"></i>${item.opening_year}</span>`
             : "") + mfr
         );
       }
       return (
         (item.height
-          ? `<small class="text-info d-flex align-items-center gap-1"><i class="fa-solid fa-ruler-vertical"></i>${item.height}m</small>`
+          ? `<span class="text-info d-flex align-items-center gap-1 fw-semibold"><i class="fa-solid fa-ruler-vertical"></i>${item.height}m</span>`
           : "") +
         (item.speed
-          ? `<small class="text-warning d-flex align-items-center gap-1"><i class="fa-solid fa-bolt"></i>${item.speed}km/h</small>`
+          ? `<span class="text-warning d-flex align-items-center gap-1 fw-semibold"><i class="fa-solid fa-bolt"></i>${item.speed}km/h</span>`
           : "") +
         mfr
       );
@@ -920,24 +920,24 @@ $(document).ready(function () {
         container.append(`
           <div class="${colClass} mb-3">
             <div class="top-card d-flex flex-column flex-md-row text-decoration-none position-relative overflow-hidden" 
-               style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(4px);">
+               style="background: #161c22; border: 1px solid #232a31; border-radius: 4px; transition: all 0.2s;">
               
               <!-- Imagen y Ranking -->
-              <div class="rank-img-container position-relative d-flex" style="flex-shrink: 0; min-width: 130px; min-height: 130px;">
+              <div class="rank-img-container position-relative d-flex" style="flex-shrink: 0; width: 100px; min-height: 90px;">
                   <img src="${item.imagen_url.startsWith("/") ? BASE_URL + item.imagen_url : item.imagen_url}" 
                        alt="${item.coaster_name}" 
                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 0;">
-                  <span class="rank-badge" style="position: absolute; top: 0; left: 0; font-size: 0.8rem; font-weight: 800; padding: 4px 10px; background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 12px rgba(16,185,129,0.4); border-bottom-right-radius: 6px;">#${item.rank_position}</span>
+                  <span class="rank-badge" style="position: absolute; top: 0; left: 0; font-size: 0.8rem; font-weight: 800; padding: 4px 10px; background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 8px rgba(16,185,129,0.3); border-bottom-right-radius: 4px;">#${item.rank_position}</span>
               </div>
 
               <!-- Contenido -->
-              <div class="p-3 flex-grow-1 d-flex flex-column justify-content-center">
-                <div class="d-flex justify-content-between align-items-start mb-2">
+              <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center">
+                <div class="d-flex justify-content-between align-items-start mb-1">
                   <div class="pe-3">
-                    <a href="${detailUrl}" class="fw-bold text-white text-decoration-none d-block hover-green" style="font-family: var(--rcw-font-title); font-size: 1.25rem; line-height: 1.2; letter-spacing: -0.01em;">
+                    <a href="${detailUrl}" class="fw-bold text-white text-decoration-none d-block hover-green" style="font-family: var(--rcw-font-title); font-size: 1.1rem; line-height: 1.2;">
                       ${item.coaster_name}
                     </a>
-                    <div class="text-secondary d-flex align-items-center gap-2 mt-2" style="font-size: 0.85rem; opacity: 0.7;">
+                    <div class="text-secondary d-flex align-items-center gap-2 mt-1" style="font-size: 0.8rem; opacity: 0.8;">
                       <i class="fa-solid fa-location-dot text-success opacity-75"></i>
                       <span>${item.park_name} · ${item.country_name || ""}</span>
                     </div>
@@ -946,20 +946,14 @@ $(document).ready(function () {
                 </div>
 
                 <!-- Stats Expandibles -->
-                <div class="stats-expandable mt-2 d-flex gap-2 flex-wrap ${shouldCollapse ? "d-none" : ""}">
-                  ${getStatBadges(item, sort)
-                    .replace(
-                      /<small/g,
-                      '<small class="badge bg-dark border border-secondary text-secondary fw-normal px-2 py-1"',
-                    )
-                    .replace(/fa-industry/g, "fa-industry me-1")
-                    .replace(/fa-bolt/g, "fa-bolt me-1")}
+                <div class="stats-expandable mt-2 d-flex gap-3 flex-wrap ${shouldCollapse ? "d-none" : ""}" style="font-size: 0.85rem;">
+                  ${getStatBadges(item, sort)}
                 </div>
 
                 ${
                   hasToggle
                     ? `
-                <button class="btn btn-sm btn-toggle-stats text-muted p-0 mt-2 d-flex align-items-center gap-1" style="font-size: 0.7rem; background:transparent; border:none;">
+                <button class="btn btn-sm btn-toggle-stats text-secondary p-0 mt-2 d-flex align-items-center gap-1" style="font-size: 0.75rem; background:transparent; border:none; opacity: 0.7;">
                    <i class="fa-solid fa-${shouldCollapse ? "plus" : "minus"}-circle"></i>
                    <span>${shouldCollapse ? "Ver detalles" : "Contraer"}</span>
                 </button>`
@@ -967,9 +961,9 @@ $(document).ready(function () {
                 }
               </div>
 
-              <!-- Acceso rápido premium -->
-              <a href="${detailUrl}" class="d-none d-md-flex align-items-center px-4 border-start border-white border-opacity-5 hover-bg-white-5" style="transition: all 0.2s; background: rgba(255,255,255,0.01);">
-                 <i class="fa-solid fa-arrow-right fs-5 text-success opacity-50"></i>
+              <!-- Acceso rápido -->
+              <a href="${detailUrl}" class="d-none d-md-flex align-items-center px-3 hover-bg-white-5" style="transition: all 0.2s;">
+                 <i class="fa-solid fa-chevron-right fs-5 text-success opacity-75"></i>
               </a>
             </div>
           </div>`);
@@ -1048,24 +1042,24 @@ $(document).ready(function () {
         container.append(`
           <div class="${colClass} mb-3">
             <div class="top-card d-flex flex-column flex-md-row text-decoration-none position-relative overflow-hidden" 
-               style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(4px);">
+               style="background: #161c22; border: 1px solid #232a31; border-radius: 4px; transition: all 0.2s;">
               
               <!-- Imagen y Ranking -->
-              <div class="rank-img-container position-relative d-flex" style="flex-shrink: 0; min-width: 130px; min-height: 130px;">
+              <div class="rank-img-container position-relative d-flex" style="flex-shrink: 0; width: 100px; min-height: 90px;">
                   <img src="${item.imagen_url.startsWith("/") ? BASE_URL + item.imagen_url : item.imagen_url}" 
                        alt="${item.park_name}" 
                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 0;">
-                  <span class="rank-badge" style="position: absolute; top: 0; left: 0; font-size: 0.8rem; font-weight: 800; padding: 4px 10px; background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 12px rgba(16,185,129,0.4); border-bottom-right-radius: 6px;">#${item.rank_position}</span>
+                  <span class="rank-badge" style="position: absolute; top: 0; left: 0; font-size: 0.8rem; font-weight: 800; padding: 4px 10px; background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 8px rgba(16,185,129,0.3); border-bottom-right-radius: 4px;">#${item.rank_position}</span>
               </div>
 
               <!-- Contenido -->
-              <div class="p-3 flex-grow-1 d-flex flex-column justify-content-center">
-                <div class="d-flex justify-content-between align-items-start mb-2">
+              <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center">
+                <div class="d-flex justify-content-between align-items-start mb-1">
                   <div class="pe-3">
-                    <a href="${detailUrl}" class="fw-bold text-white text-decoration-none d-block hover-green" style="font-family: var(--rcw-font-title); font-size: 1.25rem; line-height: 1.2; letter-spacing: -0.01em;">
+                    <a href="${detailUrl}" class="fw-bold text-white text-decoration-none d-block hover-green" style="font-family: var(--rcw-font-title); font-size: 1.1rem; line-height: 1.2;">
                       ${item.park_name}
                     </a>
-                    <div class="text-secondary d-flex align-items-center gap-2 mt-2" style="font-size: 0.85rem; opacity: 0.7;">
+                    <div class="text-secondary d-flex align-items-center gap-2 mt-1" style="font-size: 0.8rem; opacity: 0.8;">
                       <i class="fa-solid fa-location-dot text-success opacity-75"></i>
                       <span>${item.country_name || ""}</span>
                     </div>
@@ -1074,14 +1068,14 @@ $(document).ready(function () {
                 </div>
 
                 <!-- Stats Expandibles -->
-                <div class="stats-expandable mt-2 d-flex gap-2 flex-wrap ${shouldCollapse ? "d-none" : ""}">
-                  ${item.operating_coasters ? `<small class="badge bg-dark border border-secondary text-info fw-normal px-2 py-1"><i class="fa-solid fa-ticket me-1"></i>${item.operating_coasters} coasters</small>` : ""}
+                <div class="stats-expandable mt-2 d-flex gap-3 flex-wrap ${shouldCollapse ? "d-none" : ""}" style="font-size: 0.85rem;">
+                  ${item.operating_coasters ? `<span class="text-info d-flex align-items-center gap-1 fw-semibold"><i class="fa-solid fa-ticket"></i>${item.operating_coasters} coasters</span>` : ""}
                 </div>
 
                 ${
                   hasToggle
                     ? `
-                <button class="btn btn-sm btn-toggle-stats text-muted p-0 mt-2 d-flex align-items-center gap-1" style="font-size: 0.7rem; background:transparent; border:none;">
+                <button class="btn btn-sm btn-toggle-stats text-secondary p-0 mt-2 d-flex align-items-center gap-1" style="font-size: 0.75rem; background:transparent; border:none; opacity: 0.7;">
                    <i class="fa-solid fa-${shouldCollapse ? "plus" : "minus"}-circle"></i>
                    <span>${shouldCollapse ? "Ver detalles" : "Contraer"}</span>
                 </button>`
@@ -1089,9 +1083,9 @@ $(document).ready(function () {
                 }
               </div>
 
-              <!-- Acceso rápido premium -->
-              <a href="${detailUrl}" class="d-none d-md-flex align-items-center px-4 border-start border-white border-opacity-5 hover-bg-white-5" style="transition: all 0.2s; background: rgba(255,255,255,0.01);">
-                 <i class="fa-solid fa-arrow-right fs-5 text-success opacity-50"></i>
+              <!-- Acceso rápido -->
+              <a href="${detailUrl}" class="d-none d-md-flex align-items-center px-3 hover-bg-white-5" style="transition: all 0.2s;">
+                 <i class="fa-solid fa-chevron-right fs-5 text-success opacity-75"></i>
               </a>
             </div>
           </div>`);
