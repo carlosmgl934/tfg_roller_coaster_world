@@ -760,7 +760,7 @@ $(document).ready(function () {
   // Vista completa: tarjetas ricas con sort + filtros
   function renderCoastersFull() {
     const sort = $("#coasters-sort").val();
-    const sortDir = $("#coasters-sort-dir").data("dir") || "desc";
+    const sortDir = $("#coasters-sort-dir").attr("data-dir") || "desc";
     const fPark = $("#coasters-filter-park").val();
     const fCountry = $("#coasters-filter-country").val();
     const fMfr = $("#coasters-filter-manufacter").val();
@@ -1504,9 +1504,9 @@ $(document).ready(function () {
 
   // Botón de dirección (asc/desc) para el sort de coasters
   $("#coasters-sort-dir").on("click", function () {
-    const currentDir = $(this).data("dir");
+    const currentDir = $(this).attr("data-dir");
     const newDir = currentDir === "desc" ? "asc" : "desc";
-    $(this).data("dir", newDir);
+    $(this).attr("data-dir", newDir);
     const icon = $(this).find("i");
     if (newDir === "asc") {
       icon.removeClass().addClass("fa-solid fa-caret-up");
