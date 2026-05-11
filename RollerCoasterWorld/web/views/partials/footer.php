@@ -99,6 +99,7 @@
 </footer>
 <!-- Bootstrap Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <!-- Global Trip Modals -->
 <?php require_once __DIR__ . '/modals/trip_modals.php'; ?>
 <script src="<?= Router::asset('web/js/components/trip_modals.js') ?>?v=<?= time() ?>"></script>

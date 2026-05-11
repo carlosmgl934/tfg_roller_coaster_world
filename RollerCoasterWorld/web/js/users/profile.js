@@ -2584,7 +2584,9 @@ $(document).ready(function () {
     }
 
     const activePros = tags.filter((t) => t.type === "pro").map((t) => t.tag);
-    const activeContras = tags.filter((t) => t.type === "con").map((t) => t.tag);
+    const activeContras = tags
+      .filter((t) => t.type === "con")
+      .map((t) => t.tag);
 
     if (peditProsChoices) {
       peditProsChoices.clearChoices();

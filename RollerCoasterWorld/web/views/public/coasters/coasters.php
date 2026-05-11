@@ -419,7 +419,6 @@ require_once __DIR__ . '/../../partials/login_modal.php';
   window.CURRENT_USER_ID = <?= isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 'null' ?>;
   window.CURRENT_USERNAME = <?= isset($_SESSION['username']) ? json_encode($_SESSION['username']) : 'null' ?>;
 </script>
-<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <script src="<?= Router::asset('web/js/coasters/coasters.js') ?>?v=<?= time() ?>"></script>
 
 <!-- CropperJS para recortar imágenes al subir fotos -->
