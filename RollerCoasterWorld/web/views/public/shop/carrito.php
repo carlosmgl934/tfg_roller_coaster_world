@@ -1,7 +1,8 @@
 <?php
 $page_css = ['web/css/coasters.css', 'web/css/tickets.css'];
 require_once __DIR__ . '/../../partials/header.php';
-if (!$is_logged) Router::redirect('login');
+if (!$is_logged)
+  Router::redirect('login');
 ?>
 
 <main class="container-fluid px-lg-5 my-5">
@@ -51,9 +52,11 @@ if (!$is_logged) Router::redirect('login');
                   </tr>
                 </thead>
                 <tbody id="cart-tbody">
-                  <tr><td colspan="7" class="text-center py-4 text-muted">
-                    <div class="spinner-border spinner-border-sm text-success me-2"></div>Cargando...
-                  </td></tr>
+                  <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">
+                      <div class="spinner-border spinner-border-sm text-success me-2"></div>Cargando...
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -93,11 +96,13 @@ if (!$is_logged) Router::redirect('login');
             <!-- Formulario Cupón -->
             <div class="mb-3">
               <div class="input-group input-group-sm">
-                <input type="text" id="coupon-input" class="form-control rounded-0 border-secondary bg-dark text-white" placeholder="Código de descuento">
+                <input type="text" id="coupon-input" class="form-control rounded-0 border-secondary bg-dark text-white"
+                  placeholder="Código de descuento">
                 <button class="btn btn-outline-success rounded-0" id="btn-apply-coupon">Aplicar</button>
               </div>
               <div id="coupon-feedback" class="small mt-2 d-none"></div>
-              <button class="btn btn-link text-danger btn-sm p-0 text-decoration-none mt-1 d-none" id="btn-remove-coupon">
+              <button class="btn btn-link text-danger btn-sm p-0 text-decoration-none mt-1 d-none"
+                id="btn-remove-coupon">
                 <i class="fa-solid fa-trash-can me-1"></i>Quitar cupón
               </button>
             </div>
@@ -106,14 +111,16 @@ if (!$is_logged) Router::redirect('login');
               <span>Total</span>
               <span class="text-success" id="summary-total">0.00 €</span>
             </div>
-            <a href="<?= Router::url('checkout') ?>" class="btn btn-success w-100 fw-bold rounded-0 shadow-sm py-2" id="btn-checkout">
+            <a href="<?= Router::url('checkout') ?>" class="btn btn-success w-100 fw-bold rounded-0 shadow-sm py-2"
+              id="btn-checkout">
               <i class="fa-solid fa-lock me-2"></i>Proceder al pago
             </a>
           </div>
-          <div class="card-footer rounded-0 border-warning" style="background:rgba(255,193,7,.08);border-color:rgba(255,193,7,.3)!important;">
+          <div class="card-footer rounded-0 border-warning"
+            style="background:rgba(255,193,7,.08);border-color:rgba(255,193,7,.3)!important;">
             <small class="text-warning">
               <i class="fa-solid fa-clock me-1"></i>
-              Pago con tarjeta disponible próximamente. El pedido quedará pendiente de confirmación.
+              Pago con tarjeta disponible próximamente - el pago es falso. El pedido se enviará por correo electrónico.
             </small>
           </div>
         </div>
@@ -137,7 +144,8 @@ if (!$is_logged) Router::redirect('login');
       </div>
       <div class="modal-footer rounded-0">
         <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-danger fw-bold rounded-0 px-4" id="btn-confirm-clear-cart">Sí, vaciar</button>
+        <button type="button" class="btn btn-danger fw-bold rounded-0 px-4" id="btn-confirm-clear-cart">Sí,
+          vaciar</button>
       </div>
     </div>
   </div>
@@ -145,8 +153,8 @@ if (!$is_logged) Router::redirect('login');
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 <script>
-window.TICKETS_API  = '<?= Router::getBaseUrl() ?>/api/php/tickets.php';
-window.CHECKOUT_URL = '<?= Router::url('checkout') ?>';
+  window.TICKETS_API = '<?= Router::getBaseUrl() ?>/api/php/tickets.php';
+  window.CHECKOUT_URL = '<?= Router::url('checkout') ?>';
 </script>
 <script src="<?= Router::asset('web/js/shop/tickets.js') ?>?v=<?= time() ?>"></script>
 <script src="<?= Router::asset('web/js/shop/carrito.js') ?>?v=<?= time() ?>"></script>

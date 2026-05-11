@@ -4,7 +4,7 @@
 const CARRITO_API = window.TICKETS_API || window.BASE_URL + "/api/php/tickets.php";
 const carritoFmt  = (v) => parseFloat(v).toFixed(2) + " \u20AC";
 const carritoDate = (d) => d ? new Date(d + "T00:00:00").toLocaleDateString("es-ES", { day: "2-digit", month: "long", year: "numeric" }) : "?";
-const carritoType = (t) => t === "pase_rapido" ? "Pase R\u00e1pido" : "Entrada General";
+const carritoType = (t) => t === "pase_rapido" ? "Pase&nbsp;R\u00e1pido" : "Entrada&nbsp;General";
 
 async function carritoApiPost(url, data) {
   const fd = new FormData();

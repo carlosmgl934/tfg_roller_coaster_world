@@ -4,11 +4,14 @@
 
 /* ── Catálogo: card de parque ─────────────────────────────── */
 .park-ticket-card {
-  transition: transform .2s, box-shadow .2s, border-color .2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
 }
 .park-ticket-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(0,0,0,.25) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25) !important;
 }
 .park-ticket-card .card-img-wrap {
   position: relative;
@@ -17,17 +20,22 @@
   background: #111;
 }
 .park-ticket-card .card-img-wrap img {
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  transition: transform .4s ease;
+  transition: transform 0.4s ease;
 }
-.park-ticket-card:hover .card-img-wrap img { transform: scale(1.05); }
+.park-ticket-card:hover .card-img-wrap img {
+  transform: scale(1.05);
+}
 
 .park-ticket-card .price-badge {
   position: absolute;
-  top: 10px; right: 10px;
-  font-size: .78rem; font-weight: 800;
-  letter-spacing: .03em;
+  top: 10px;
+  right: 10px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
 }
 
 /* ── Modal: toggle tipo entrada ───────────────────────────── */
@@ -50,64 +58,116 @@
   grid-template-columns: 160px 1fr auto;
   overflow: hidden;
   background: #141b25;
-  border: 1px solid rgba(255,255,255,.07);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   border-left: 4px solid #198754;
   border-radius: 6px;
-  margin-bottom: .75rem;
-  transition: box-shadow .2s, transform .2s;
+  margin-bottom: 0.75rem;
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
 }
 .ticket-card:hover {
-  box-shadow: 0 6px 28px rgba(25, 135, 84, .18) !important;
+  box-shadow: 0 6px 28px rgba(25, 135, 84, 0.18) !important;
   transform: translateY(-1px);
 }
 
 .ticket-card .tc-img {
-  width: 160px; height: 130px;
-  object-fit: cover; display: block;
+  width: 160px;
+  height: 130px;
+  object-fit: cover;
+  display: block;
 }
 .ticket-card .tc-img-placeholder {
-  width: 160px; height: 130px;
-  display: flex; align-items: center; justify-content: center;
+  width: 160px;
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: #0a1a10;
   color: #198754;
 }
 .ticket-card .tc-body {
   padding: 1rem 1.25rem;
-  display: flex; flex-direction: column; justify-content: space-between;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 .ticket-card .tc-side {
   padding: 1rem;
-  border-left: 2px dashed rgba(255,255,255,.1);
+  border-left: 2px dashed rgba(255, 255, 255, 0.1);
   background: #0f1520;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: space-between;
-  min-width: 130px; gap: .75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 130px;
+  gap: 0.75rem;
 }
-.ticket-card .tc-code { font-size: .62rem; font-family: monospace; word-break: break-all; text-align: center; }
+.ticket-card .tc-code {
+  font-size: 0.62rem;
+  font-family: monospace;
+  word-break: break-all;
+  text-align: center;
+}
 
 /* ── Status badges ────────────────────────────────────────── */
-.badge-pendiente  { background: rgba(255,193,7,.18); color: #ffc107; border: 1px solid rgba(255,193,7,.35); font-size:.7rem; padding:3px 9px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
-.badge-confirmado { background: rgba(25,135,84,.2);  color: #198754; border: 1px solid rgba(25,135,84,.35); font-size:.7rem; padding:3px 9px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
-.badge-cancelado  { background: rgba(220,53,69,.15); color: #dc3545; border: 1px solid rgba(220,53,69,.35); font-size:.7rem; padding:3px 9px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+.badge-pendiente {
+  background: rgba(255, 193, 7, 0.18);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  font-size: 0.7rem;
+  padding: 3px 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.badge-confirmado {
+  background: rgba(25, 135, 84, 0.2);
+  color: #198754;
+  border: 1px solid rgba(25, 135, 84, 0.35);
+  font-size: 0.7rem;
+  padding: 3px 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.badge-cancelado {
+  background: rgba(220, 53, 69, 0.15);
+  color: #dc3545;
+  border: 1px solid rgba(220, 53, 69, 0.35);
+  font-size: 0.7rem;
+  padding: 3px 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
 
 /* ── Responsive tickets ───────────────────────────────────── */
 @media (max-width: 768px) {
-  .ticket-card { grid-template-columns: 1fr; }
+  .ticket-card {
+    grid-template-columns: 1fr;
+  }
   .ticket-card .tc-img,
-  .ticket-card .tc-img-placeholder { width: 100%; height: 140px; }
+  .ticket-card .tc-img-placeholder {
+    width: 100%;
+    height: 140px;
+  }
   .ticket-card .tc-side {
     border-left: none;
-    border-top: 2px dashed rgba(25, 135, 84, .35);
-    flex-direction: row; min-width: auto;
+    border-top: 2px dashed rgba(25, 135, 84, 0.35);
+    flex-direction: row;
+    min-width: auto;
   }
 }
 
 /* -- Wizard de compra (2 pasos) ----------------------------- */
 .step-tab {
-  color: rgba(255,255,255,.4);
+  color: rgba(255, 255, 255, 0.4);
   font-weight: 600;
   border-bottom: 3px solid transparent;
-  transition: color .2s, border-color .2s;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
 }
 .step-tab.active {
   color: #fff;
@@ -120,10 +180,10 @@
   width: 1.4rem;
   height: 1.4rem;
   border-radius: 50%;
-  background: rgba(255,255,255,.12);
-  font-size: .7rem;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 0.7rem;
   font-weight: 800;
-  transition: background .2s;
+  transition: background 0.2s;
 }
 .step-tab.active .step-num {
   background: #198754;
@@ -134,7 +194,10 @@
 .addon-card {
   background: #141b25;
   border-width: 2px !important;
-  transition: border-color .2s, background .2s, transform .15s;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    transform 0.15s;
   user-select: none;
 }
 .addon-card:hover {
@@ -142,27 +205,33 @@
   transform: translateY(-1px);
 }
 .addon-card.border-success {
-  background: rgba(25,135,84,.08) !important;
+  background: rgba(25, 135, 84, 0.08) !important;
 }
-/* -- Ajustes Tabla Carrito Móvil -- */
+/* -- Ajustes Tabla Carrito Móvil (Fuerza Bruta) -- */
 @media (max-width: 991px) {
   .table-responsive {
-    overflow-x: auto;
+    overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
+    display: block !important;
+    width: 100% !important;
     border: none !important;
   }
-  #cart-tbody td {
-    white-space: nowrap !important; /* Evita que las fechas se rompan en 4 líneas */
-    padding-top: 1.1rem !important;
-    padding-bottom: 1.1rem !important;
+  .table-responsive table {
+    min-width: 1000px !important; /* Tabla extra ancha para que nada se amontone */
+    width: 100% !important;
+    table-layout: auto !important;
   }
-  /* Dar anchos mínimos para que la info respire en el scroll */
-  #cart-tbody td:nth-child(1) { min-width: 240px; } /* Parque */
-  #cart-tbody td:nth-child(2) { min-width: 140px; } /* Tipo */
-  #cart-tbody td:nth-child(3) { min-width: 155px; } /* Fecha */
-  #cart-tbody td:nth-child(4) { min-width: 100px; } /* Uds */
-  #cart-tbody td:nth-child(5) { min-width: 110px; } /* Precio */
-  #cart-tbody td:nth-child(6) { min-width: 110px; } /* Subtotal */
+  #cart-tbody td, 
+  .table thead th {
+    white-space: nowrap !important; /* Prohibido romper líneas en celdas y cabeceras */
+    vertical-align: middle !important;
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+  /* Forzar que los precios y el símbolo € no se separen jamás */
+  .text-success.fw-bold, .text-muted {
+    white-space: nowrap !important;
+  }
 }
 
 /* -- Etiquetas de Entrada del Carrito -- */
