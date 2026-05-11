@@ -329,11 +329,21 @@ $(document).ready(function () {
         const link = isCoaster
           ? `${BASE_URL}/web/views/public/coasters/coasters.php?id=${item.id}`
           : `${BASE_URL}/web/views/public/parks/parks.php?id=${item.id}`;
+        
         const rank = parseInt(item.rank_position) || index + 1;
         const title = isCoaster ? item.coaster_name : item.park_name;
-        const subtitle = isCoaster 
-          ? `${item.park_name || ""} · ${item.park_country || item.country_name || ""}`
-          : (item.park_country || item.country_name || "");
+        
+        // Determinar color del badge según el puesto
+        let badgeBg = "#000";
+        let badgeColor = "#fff";
+        if (rank === 1) { badgeBg = "#FFD700"; badgeColor = "#000"; }
+        else if (rank === 2) { badgeBg = "#C0C0C0"; badgeColor = "#000"; }
+        else if (rank === 3) { badgeBg = "#CD7F32"; badgeColor = "#000"; }
+
+        // Asegurar que sacamos el parque si es coaster
+        const parkName = item.park_name || item.subtitle || "";
+        const country = item.park_country || item.country_name || "";
+        const subtitle = isCoaster ? `${parkName} · ${country}` : country;
 
         const html = `
           <div class="mb-2">
@@ -341,7 +351,7 @@ $(document).ready(function () {
                style="height:90px; overflow: hidden; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 0;">
               <div class="rank-img-container" style="width:90px; height:90px; flex-shrink:0; position:relative;">
                 <img src="${imgUrl}" alt="${title}" class="w-100 h-100 object-fit-cover" onerror="this.src='${fallbackImage}'">
-                <div style="position:absolute; top:0; left:0; background:var(--rcw-green); color:white; font-size: 0.85rem; padding: 4px 8px; font-weight:900; font-family:var(--rcw-font-title);">#${rank}</div>
+                <div style="position:absolute; top:0; left:0; background:${badgeBg}; color:${badgeColor}; font-size: 0.9rem; padding: 4px 10px; font-weight:900; font-family:var(--rcw-font-title); border-bottom-right-radius: 4px;">#${rank}</div>
               </div>
               <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center" style="width: 0; min-width: 0;">
                 <div class="pe-2">
@@ -756,7 +766,7 @@ $(document).ready(function () {
       const d = j.data || [];
       if (!d.length) {
         container.html(
-          '<div class="text-center py-4 text-muted"><i class="fa-solid fa-suitcase fa-2x mb-2 opacity-50"></i><br>Este usuario no tiene viajes registrados.</div>',
+          '<div class="trips-empty-notice text-muted"><i class="fa-solid fa-suitcase fa-3x mb-3 opacity-50"></i><br>Este usuario no tiene viajes registrados.</div>',
         );
         return;
       }

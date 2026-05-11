@@ -912,3 +912,29 @@ span.flatpickr-weekday {
   width: 100vw !important;
   border-radius: 0 !important;
 }
+
+/* ── AJUSTES USER PROFILE ESPECÍFICOS ────────────────────────── */
+.rcw-stats-select {
+  padding: 0.7rem 1rem !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  background-color: var(--rcw-bg-card-alt) !important;
+  border: 1px solid var(--rcw-border) !important;
+  color: var(--rcw-text-primary) !important;
+  cursor: pointer;
+  min-width: 160px;
+}
+.rcw-stats-select:focus {
+  border-color: var(--rcw-green-neon) !important;
+  box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.2) !important;
+}
+
+.trips-empty-notice {
+  padding: 5rem 1rem !important;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
