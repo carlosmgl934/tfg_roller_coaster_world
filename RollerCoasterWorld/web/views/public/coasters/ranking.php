@@ -1,5 +1,4 @@
 <?php
-$page_css = ['web/css/ranking.css'];
 require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 ?>
