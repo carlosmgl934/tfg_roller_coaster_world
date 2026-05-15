@@ -52,7 +52,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const options = { method, credentials: "include", headers: {} };
     if (method !== "GET") {
-      options.headers["X-CSRF-Token"] = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ?? "";
+      options.headers["X-CSRF-Token"] =
+        document
+          .querySelector('meta[name="csrf-token"]')
+          ?.getAttribute("content") ?? "";
     }
     if (body) {
       options.headers["Content-Type"] = "application/json";
@@ -216,8 +219,17 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("msg-detail-body").textContent = m.user_message;
 
     const badge = document.getElementById("msg-detail-badge");
-    badge.className = `badge ${r.bg} rounded-pill fs-6`;
-    badge.textContent = r.label;
+    const badgeMobile = document.getElementById("msg-detail-badge-mobile");
+    const badgeClasses = `badge ${r.bg} rounded-pill`;
+
+    if (badge) {
+      badge.className = `${badgeClasses} d-none d-md-inline-block fs-6`;
+      badge.textContent = r.label;
+    }
+    if (badgeMobile) {
+      badgeMobile.className = `${badgeClasses} d-md-none`;
+      badgeMobile.textContent = r.label;
+    }
 
     const replyAlert = document.getElementById("msg-reply-alert");
     if (m.wants_reply) {

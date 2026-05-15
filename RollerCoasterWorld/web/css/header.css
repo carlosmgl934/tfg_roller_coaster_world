@@ -86,7 +86,9 @@
   background-color: var(--rcw-bg-card) !important;
   border: 1px solid var(--rcw-border) !important;
   border-radius: 0 !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.05) !important;
   min-width: 240px;
   padding: 0;
   animation: rcwFadeIn 0.18s ease;
@@ -242,8 +244,10 @@
   transition: all 0.15s ease !important;
   white-space: nowrap;
   letter-spacing: 0.01em;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05) !important;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   cursor: pointer;
 }
 .rcw-btn-agenda:hover {
@@ -251,13 +255,17 @@
   border-color: #2563eb !important;
   border-bottom: 3px solid #1d4ed8 !important;
   color: #ffffff !important;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1) !important;
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
   transform: translateY(-1px);
 }
 .rcw-btn-agenda:active {
   background: linear-gradient(180deg, #0f1520 0%, #0b0f19 100%) !important;
   border-bottom: 1px solid #1e3a8a !important;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.6), inset 0 2px 4px rgba(0,0,0,0.3) !important;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.6),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
   transform: translateY(2px);
 }
 .rcw-btn-agenda i {
@@ -274,23 +282,29 @@
   border-radius: 6px !important;
   font-weight: 700 !important;
   font-size: 0.88rem !important;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05) !important;
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
   transition: all 0.15s ease !important;
   padding: 0.45rem 1rem !important;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 .rcw-nav-admin:hover {
   background: linear-gradient(180deg, #28384e 0%, #172133 100%) !important;
   border-color: #2563eb !important;
   border-bottom: 3px solid #1d4ed8 !important;
   color: #ffffff !important;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1) !important;
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
   transform: translateY(-1px);
 }
 .rcw-nav-admin:active {
   background: linear-gradient(180deg, #0f1520 0%, #0b0f19 100%) !important;
   border-bottom: 1px solid #1e3a8a !important;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.6), inset 0 2px 4px rgba(0,0,0,0.3) !important;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.6),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
   transform: translateY(2px);
 }
 .rcw-nav-admin i {
@@ -374,8 +388,13 @@
     left: 10px;
     right: 10px;
     z-index: 1050;
-    max-height: calc(100vh - 90px);
+    max-height: calc(100dvh - 75px); /* Mejorado para móviles modernos */
     overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  body.navbar-open {
+    overflow: hidden !important;
   }
   .custom-navbar .dropdown-menu {
     background-color: transparent !important;

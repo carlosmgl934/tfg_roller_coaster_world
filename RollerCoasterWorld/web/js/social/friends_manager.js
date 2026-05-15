@@ -33,7 +33,11 @@ $(document).ready(function () {
         allFriends = payload.data.friends || [];
         const forumInvites = payload.data.forum_invitations || [];
         const tripInvites = payload.data.trip_invitations || [];
-        renderReceived(payload.data.received_requests, forumInvites, tripInvites);
+        renderReceived(
+          payload.data.received_requests,
+          forumInvites,
+          tripInvites,
+        );
         renderSent(payload.data.sent_requests);
         filterAndRenderFriends();
       } else {
@@ -59,7 +63,7 @@ $(document).ready(function () {
     fallbackColor = "198754",
     fallbackText = "fff",
   ) {
-    const fallbackInitials = BASE_URL + '/web/img/avatars/default_avatar.svg';
+    const fallbackInitials = BASE_URL + "/web/img/avatars/default_avatar.svg";
 
     if (!profileImage) return fallbackInitials;
 
@@ -121,13 +125,18 @@ $(document).ready(function () {
     requestsList.empty();
     forumInvites = forumInvites || [];
     tripInvites = tripInvites || [];
-    const totalCount = requests.length + forumInvites.length + tripInvites.length;
+    const totalCount =
+      requests.length + forumInvites.length + tripInvites.length;
     requestsCount.text(totalCount);
 
     if (totalCount > 0) {
-      requestsCount.removeClass("badge-profile-gray").addClass("badge-profile-danger");
+      requestsCount
+        .removeClass("badge-profile-gray")
+        .addClass("badge-profile-danger");
     } else {
-      requestsCount.removeClass("badge-profile-danger").addClass("badge-profile-gray");
+      requestsCount
+        .removeClass("badge-profile-danger")
+        .addClass("badge-profile-gray");
     }
 
     if (totalCount === 0) {
@@ -141,7 +150,12 @@ $(document).ready(function () {
 
     // ── Solicitudes de amistad ──────────────────────────────────
     requests.forEach((req) => {
-      const avatarSrc = getAvatarUrl(req.profile_image, req.username, "ffc107", "000");
+      const avatarSrc = getAvatarUrl(
+        req.profile_image,
+        req.username,
+        "ffc107",
+        "000",
+      );
       html += `
         <div class="list-group-item bg-transparent py-3 px-4 border-bottom border-secondary border-opacity-25"
              style="border-left: 3px solid var(--rcw-green-neon) !important;">
@@ -171,22 +185,28 @@ $(document).ready(function () {
 
     // ── Invitaciones de colaboración de foro ─────────────────────
     forumInvites.forEach((inv) => {
-      const avatarSrc = getAvatarUrl(inv.sender_image, inv.sender_username, "6d28d9", "fff");
+      const avatarSrc = getAvatarUrl(
+        inv.sender_image,
+        inv.sender_username,
+        "6d28d9",
+        "fff",
+      );
 
       // Compact short title for badge preview (max 40 chars)
-      const shortTitle = inv.forum_title && inv.forum_title.length > 40
-        ? inv.forum_title.substring(0, 40) + '…'
-        : (inv.forum_title || '—');
+      const shortTitle =
+        inv.forum_title && inv.forum_title.length > 40
+          ? inv.forum_title.substring(0, 40) + "…"
+          : inv.forum_title || "—";
 
       // Data JSON encoded for modal
       const dataInv = JSON.stringify({
         invite_id: inv.invite_id,
         sender_username: inv.sender_username,
         forum_title: inv.forum_title,
-        forum_description: inv.forum_description || '',
+        forum_description: inv.forum_description || "",
         member_count: inv.member_count || null,
-        created_at: inv.created_at || null
-      }).replace(/'/g, '&apos;');
+        created_at: inv.created_at || null,
+      }).replace(/'/g, "&apos;");
 
       html += `
         <div class="list-group-item bg-transparent py-3 px-4 border-bottom border-secondary border-opacity-25 rcw-forum-invite-info-btn"
@@ -225,7 +245,12 @@ $(document).ready(function () {
 
     // ── Invitaciones de viajes ──────────────────────────────────
     tripInvites.forEach((inv) => {
-      const avatarSrc = getAvatarUrl(inv.inviter_image, inv.inviter_username, "10b981", "fff");
+      const avatarSrc = getAvatarUrl(
+        inv.inviter_image,
+        inv.inviter_username,
+        "10b981",
+        "fff",
+      );
       html += `
         <div class="list-group-item bg-transparent py-3 px-4 border-bottom border-secondary border-opacity-25"
              style="border-left: 3px solid #10b981 !important;">
@@ -285,82 +310,88 @@ $(document).ready(function () {
       if (friend.city || friend.country) {
         let loc = [friend.city, friend.country].filter(Boolean).join(", ");
         details.push(
-          `<i class="fa-solid fa-location-dot text-success me-1"></i>${loc}`,
+          `<div class="d-flex align-items-center gap-1"><i class="fa-solid fa-location-dot text-success opacity-75" style="width:14px;"></i><span class="text-truncate">${loc}</span></div>`,
         );
       }
       if (friend.joined_at) {
         const date = new Date(friend.joined_at);
-        const mes = new Intl.DateTimeFormat("es-ES", { month: "long" }).format(
+        const mes = new Intl.DateTimeFormat("es-ES", { month: "short" }).format(
           date,
         );
         const anio = date.getFullYear();
         details.push(
-          `<i class="fa-regular fa-calendar text-info me-1"></i>Miembro desde ${mes} de ${anio}`,
+          `<div class="d-flex align-items-center gap-1"><i class="fa-regular fa-calendar text-info opacity-75" style="width:14px;"></i><span>Miembro desde ${mes} ${anio}</span></div>`,
         );
       }
       if (friend.since) {
         const dateSince = new Date(friend.since);
-        const mesSince = new Intl.DateTimeFormat("es-ES", { month: "long" }).format(
-          dateSince,
-        );
+        const mesSince = new Intl.DateTimeFormat("es-ES", {
+          month: "short",
+        }).format(dateSince);
         const anioSince = dateSince.getFullYear();
         details.push(
-          `<i class="fa-solid fa-handshake text-success opacity-75 me-1"></i>Amigos desde ${mesSince} de ${anioSince}`,
+          `<div class="d-flex align-items-center gap-1"><i class="fa-solid fa-handshake text-success opacity-75" style="width:14px;"></i><span>Amigos desde ${mesSince} ${anioSince}</span></div>`,
         );
       }
-      details.push(
-        `<span class="text-warning fw-bold">${friend.credits || 0}</span> credits`,
-      );
-
-      let detailsHtml =
-        details.length > 0
-          ? `<div class="d-flex flex-wrap gap-2 align-items-center">${details.join('<span class="d-none d-sm-inline opacity-25">•</span>')}</div>`
-          : '<i class="fa-solid fa-user text-muted me-1"></i>Miembro RCW';
 
       html += `
-        <div class="col-12">
-          <div class="rcw-friend-row d-flex align-items-center gap-3 px-3 px-md-4 py-3"
-               style="background-color: #1a222e; border-bottom: 1px solid var(--rcw-border); transition: background 0.2s;"
-               onmouseover="this.style.background='#222b38'"
-               onmouseout="this.style.background='#1a222e'">
-
+        <div class="col-12 col-xl-6 p-2">
+          <div class="rcw-friend-card h-100 d-flex flex-column flex-sm-row align-items-center gap-3 p-3"
+               style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; transition: all 0.3s; position: relative;"
+               onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(16,185,129,0.3)';"
+               onmouseout="this.style.background='rgba(255,255,255,0.02)'; this.style.borderColor='rgba(255,255,255,0.06)';">
+            
             <!-- Avatar -->
-            <div class="flex-shrink-0">
-              <img src="${avatarSrc}"
-                alt="${friend.username}"
+            <div class="flex-shrink-0 position-relative">
+              <img src="${avatarSrc}" alt="${friend.username}"
                 class="rounded-circle shadow-sm border border-success border-opacity-25 object-fit-cover"
-                style="width: 52px; height: 52px;"
+                style="width: 64px; height: 64px;"
                 onerror="this.onerror=null; this.src=window.BASE_URL+'/web/img/avatars/default_avatar.svg'">
+              <div class="position-absolute bottom-0 end-0 bg-success border border-dark rounded-circle" 
+                   style="width: 14px; height: 14px; border-width: 2px !important;" title="Conectado"></div>
             </div>
 
             <!-- Info -->
-            <div class="flex-grow-1 min-w-0 py-1">
-              <div class="d-flex align-items-baseline flex-wrap gap-2 mb-0">
+            <div class="flex-grow-1 min-w-0 text-center text-sm-start">
+              <div class="d-flex align-items-center justify-content-center justify-content-sm-start gap-2 mb-1 flex-wrap">
                 <a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${friend.id}"
                    class="text-white text-decoration-none fw-bold"
-                   style="font-size: 1rem; font-family: var(--rcw-font-title);">
+                   style="font-size: 1.1rem; font-family: var(--rcw-font-title); letter-spacing: -0.01em;">
                   ${friend.username}
                 </a>
-                <small class="text-success fw-bold d-flex align-items-center gap-1" style="font-size: 0.65rem;">
-                   <i class="fa-solid fa-circle-check"></i> AMIGO
-                </small>
-                <small class="text-muted font-monospace ms-1" style="font-size: 0.7rem;">Nº ${String(friend.id).padStart(6, "0")}</small>
+                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 py-1 px-2" style="font-size: 0.6rem; letter-spacing: 0.05em;">AMIGO</span>
+                <small class="text-muted opacity-50 font-monospace" style="font-size: 0.7rem;">#${String(friend.id).padStart(6, "0")}</small>
               </div>
-              <div class="text-muted mt-1" style="font-size: 0.75rem;">
-                ${detailsHtml}
+
+              <div class="row g-2 mt-1">
+                <div class="col-12 col-sm-12 text-muted" style="font-size: 0.78rem; line-height: 1.5;">
+                  ${details.join("")}
+                </div>
+              </div>
+              
+              <div class="mt-2 d-flex align-items-center justify-content-center justify-content-sm-start gap-3">
+                 <div class="d-flex align-items-center gap-1">
+                   <i class="fa-solid fa-ticket text-warning" style="font-size: 0.8rem;"></i>
+                   <span class="fw-bold text-white" style="font-size: 0.9rem;">${friend.credits || 0}</span>
+                   <small class="text-muted small">credits</small>
+                 </div>
               </div>
             </div>
 
-            <!-- Btn Eliminar -->
-            <div class="flex-shrink-0 ms-auto rcw-trigger-remove"
-                 data-id="${friend.id}" data-name="${friend.username}"
-                 title="Eliminar amigo"
-                 style="cursor:pointer; z-index:10;">
-              <button class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center"
-                      style="width:36px; height:36px; border-width: 2px;"
-                      tabindex="-1">
-                <i class="fa-solid fa-user-xmark" style="pointer-events: none;"></i>
-              </button>
+            <!-- Acciones -->
+            <div class="d-flex flex-row flex-sm-column gap-2 ms-sm-auto mt-3 mt-sm-0">
+               <a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${friend.id}" 
+                  class="btn btn-dark btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                  style="width: 38px; height: 38px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);"
+                  title="Ver perfil">
+                 <i class="fa-solid fa-eye" style="font-size: 0.9rem;"></i>
+               </a>
+               <button class="btn btn-outline-danger btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm rcw-trigger-remove"
+                       style="width: 38px; height: 38px;"
+                       data-id="${friend.id}" data-name="${friend.username}"
+                       title="Eliminar amigo">
+                 <i class="fa-solid fa-user-xmark" style="font-size: 0.9rem; pointer-events: none;"></i>
+               </button>
             </div>
 
           </div>
@@ -409,21 +440,32 @@ $(document).ready(function () {
     e.preventDefault();
     e.stopPropagation();
 
-    const btn       = $(this);
-    const action    = btn.data("action");     // 'accept' | 'decline'
-    const inviteId  = btn.data("invite-id");
-    const endpoint  = action === "accept" ? "accept_forum_invite" : "decline_forum_invite";
+    const btn = $(this);
+    const action = btn.data("action"); // 'accept' | 'decline'
+    const inviteId = btn.data("invite-id");
+    const endpoint =
+      action === "accept" ? "accept_forum_invite" : "decline_forum_invite";
 
     const originalHtml = btn.html();
-    btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span>');
+    btn
+      .prop("disabled", true)
+      .html('<span class="spinner-border spinner-border-sm"></span>');
 
     try {
-      const res  = await fetch(`${BASE_URL}/api/php/users.php?action=${endpoint}`, {
-        method: "POST",
-        headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
-        body:    JSON.stringify({ invite_id: inviteId }),
-      });
+      const res = await fetch(
+        `${BASE_URL}/api/php/users.php?action=${endpoint}`,
+        {
+          method: "POST",
+          headers: {
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ invite_id: inviteId }),
+        },
+      );
       const data = await res.json();
       if (data.success) {
         fetchFriendsData();
@@ -447,14 +489,20 @@ $(document).ready(function () {
 
     // Get data from the card div (might be on this or an ancestor)
     const card = $(this).closest("[data-inv]");
-    const rawData = card.length ? card.attr("data-inv") : $(this).attr("data-inv");
+    const rawData = card.length
+      ? card.attr("data-inv")
+      : $(this).attr("data-inv");
 
     let inv;
-    try { inv = JSON.parse(rawData); } catch(err) { return; }
+    try {
+      inv = JSON.parse(rawData);
+    } catch (err) {
+      return;
+    }
 
     // Populate modal fields
     $("#forumInviteModalSender").text("Invitación de " + inv.sender_username);
-    $("#forumInviteModalTitle").text(inv.forum_title || '—');
+    $("#forumInviteModalTitle").text(inv.forum_title || "—");
 
     const descWrap = $("#forumInviteModalDescWrap");
     if (inv.forum_description && inv.forum_description.trim()) {
@@ -464,42 +512,63 @@ $(document).ready(function () {
       descWrap.hide();
     }
 
-    $("#forumInviteModalMembers").text(inv.member_count != null ? inv.member_count : '—');
+    $("#forumInviteModalMembers").text(
+      inv.member_count != null ? inv.member_count : "—",
+    );
     if (inv.created_at) {
       const d = new Date(inv.created_at);
-      $("#forumInviteModalCreated").text(d.toLocaleDateString('es-ES', {year:'numeric', month:'short', day:'numeric'}));
+      $("#forumInviteModalCreated").text(
+        d.toLocaleDateString("es-ES", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        }),
+      );
     } else {
-      $("#forumInviteModalCreated").text('—');
+      $("#forumInviteModalCreated").text("—");
     }
 
     // Store invite_id on modal action buttons
-    $("#forumInviteModalAcceptBtn").data('invite-id', inv.invite_id);
-    $("#forumInviteModalDeclineBtn").data('invite-id', inv.invite_id);
+    $("#forumInviteModalAcceptBtn").data("invite-id", inv.invite_id);
+    $("#forumInviteModalDeclineBtn").data("invite-id", inv.invite_id);
 
-    new bootstrap.Modal(document.getElementById('forumInviteInfoModal')).show();
+    new bootstrap.Modal(document.getElementById("forumInviteInfoModal")).show();
   });
 
   // ── Botones de acción del modal de foro ──────────────────────
   $(document).on("click", ".rcw-forum-invite-modal-action", async function (e) {
     e.preventDefault();
-    const btn      = $(this);
-    const action   = btn.data("action");   // 'accept' | 'decline'
+    const btn = $(this);
+    const action = btn.data("action"); // 'accept' | 'decline'
     const inviteId = btn.data("invite-id");
-    const endpoint = action === "accept" ? "accept_forum_invite" : "decline_forum_invite";
+    const endpoint =
+      action === "accept" ? "accept_forum_invite" : "decline_forum_invite";
 
     const originalHtml = btn.html();
-    btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span>');
+    btn
+      .prop("disabled", true)
+      .html('<span class="spinner-border spinner-border-sm"></span>');
 
     try {
-      const res  = await fetch(`${BASE_URL}/api/php/users.php?action=${endpoint}`, {
-        method: "POST",
-        headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
-        body:    JSON.stringify({ invite_id: inviteId }),
-      });
+      const res = await fetch(
+        `${BASE_URL}/api/php/users.php?action=${endpoint}`,
+        {
+          method: "POST",
+          headers: {
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ invite_id: inviteId }),
+        },
+      );
       const data = await res.json();
       if (data.success) {
-        bootstrap.Modal.getInstance(document.getElementById('forumInviteInfoModal')).hide();
+        bootstrap.Modal.getInstance(
+          document.getElementById("forumInviteInfoModal"),
+        ).hide();
         fetchFriendsData();
       } else {
         alert("Error: " + (data.error || "Acción fallida"));
@@ -531,10 +600,17 @@ $(document).ready(function () {
       endpoint = "reject_remove_friend";
 
     try {
-      const res = await fetch(`${BASE_URL}/api/php/users.php?action=${endpoint}`, {
+      const res = await fetch(
+        `${BASE_URL}/api/php/users.php?action=${endpoint}`,
+        {
           method: "POST",
           headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({ target_id: targetId }),
         },
       );
@@ -575,10 +651,17 @@ $(document).ready(function () {
       .html('<span class="spinner-border spinner-border-sm"></span>');
 
     try {
-      const res = await fetch(`${BASE_URL}/api/php/users.php?action=reject_remove_friend`, {
+      const res = await fetch(
+        `${BASE_URL}/api/php/users.php?action=reject_remove_friend`,
+        {
           method: "POST",
           headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({ target_id: targetId }),
         },
       );
@@ -602,21 +685,31 @@ $(document).ready(function () {
     e.preventDefault();
     e.stopPropagation();
 
-    const btn      = $(this);
-    const action   = btn.data("action");
+    const btn = $(this);
+    const action = btn.data("action");
     const inviteId = btn.data("invite-id");
-    const accept   = action === "accept";
+    const accept = action === "accept";
 
     const originalHtml = btn.html();
-    btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span>');
+    btn
+      .prop("disabled", true)
+      .html('<span class="spinner-border spinner-border-sm"></span>');
 
     try {
-      const res = await fetch(`${BASE_URL}/api/php/trips.php?action=respond_invite`, {
-        method: "POST",
-        headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
-        body:    JSON.stringify({ invite_id: inviteId, accept: accept }),
-      });
+      const res = await fetch(
+        `${BASE_URL}/api/php/trips.php?action=respond_invite`,
+        {
+          method: "POST",
+          headers: {
+            "X-CSRF-Token":
+              document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content") ?? "",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ invite_id: inviteId, accept: accept }),
+        },
+      );
       const data = await res.json();
       if (data.success) {
         fetchFriendsData();

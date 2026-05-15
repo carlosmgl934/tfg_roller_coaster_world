@@ -761,8 +761,15 @@ $(document).ready(function () {
   // ─── VIAJES ──────────────────────────────────────────────────
   async function loadTrips(targetId) {
     const container = $("#trips-grid");
+    const esc = (s) =>
+      String(s ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     container.html(
-      '<div class="trips-empty-notice"><div class="spinner-border text-success mb-3" role="status"></div><br>Cargando viajes...</div>',
+      '<div class="d-flex align-items-center justify-content-center py-4 text-muted small"><div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>Cargando viajes...</div>',
     );
     try {
       const res = await fetch(
@@ -772,7 +779,7 @@ $(document).ready(function () {
       const d = j.data || [];
       if (!d.length) {
         container.html(
-          '<div class="trips-empty-notice text-muted"><i class="fa-solid fa-suitcase fa-3x mb-3 opacity-50"></i><br>Este usuario no tiene viajes registrados.</div>',
+          '<div class="text-center py-4 text-muted"><i class="fa-solid fa-suitcase fa-2x mb-2 opacity-50"></i><br>Este usuario no tiene viajes registrados.</div>',
         );
         return;
       }
@@ -781,10 +788,8 @@ $(document).ready(function () {
         const start = new Date(t.start_date);
         start.setHours(0, 0, 0, 0);
         const end = new Date(t.end_date);
-        end.setHours(23, 59, 59, 999);
-        const mon = start.toLocaleString("es-ES", { month: "short" });
-        const y = start.getFullYear();
-        const diff = Math.ceil((end - start) / 86400000);
+        end.setHours(0, 0, 0, 0);
+        const diff = Math.max(1, Math.round((end - start) / 86400000) + 1);
 
         const today = new Date();
         let t_status = "upcoming";
@@ -803,7 +808,8 @@ $(document).ready(function () {
             : t_status === "active"
               ? "Activo"
               : "Próximo";
-        let imgUrl = window.BASE_URL + "/dummy.jpg";
+        let imgUrl =
+          "https://st3.depositphotos.com/3436901/14792/i/450/depositphotos_147926787-stock-photo-plane-flying-over-blue-sky.jpg";
         if (t.cover_image) {
           imgUrl = t.cover_image.startsWith("http")
             ? t.cover_image
@@ -821,25 +827,27 @@ $(document).ready(function () {
         });
 
         html += `
-          <div class="trip-card shadow-sm h-100 rounded-1" onclick="openTrip(${t.id})" style="background: #111;">
-            <div style="height: 140px; position: relative; overflow: hidden;">
-               ${t.cover_image ? `<img src="${imgUrl}" referrerpolicy="no-referrer" onerror="this.style.opacity='0'" class="w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease, opacity 0.3s ease;">` : ""}
-               <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(13,17,23,0.9));"></div>
-               <div class="position-absolute bottom-0 start-0 w-100 p-3 text-white">
+          <div class="col-12">
+          <div class="card shadow-sm h-100 border-0" style="background:#111; border-radius: 0; cursor:pointer; transition:transform 0.2s, box-shadow 0.2s;" onclick="openTrip(${t.id})" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--bs-shadow-sm)'">
+            <div style="height: 130px; position: relative; overflow: hidden; border-radius: 0;">
+               <img src="${imgUrl}" referrerpolicy="no-referrer" onerror="this.src='https://st3.depositphotos.com/3436901/14792/i/450/depositphotos_147926787-stock-photo-plane-flying-over-blue-sky.jpg'" class="w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease, opacity 0.3s ease; z-index: 0; position:absolute;">
+               <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to bottom, transparent 10%, rgba(10,12,16,0.95)); z-index: 1;"></div>
+               <div class="position-absolute bottom-0 start-0 w-100 p-3 pb-2 text-white" style="z-index: 2;">
                  <div class="d-flex align-items-center gap-2 mb-1">
                     <span class="badge ${statusClass}" style="font-size:0.6rem; letter-spacing:0.05em;">${statusText}</span>
                     <span class="small opacity-75" style="font-size:0.75rem;"><i class="fa-regular fa-clock me-1"></i>${diff} d</span>
                  </div>
-                 <h5 class="fw-bold mb-0 text-truncate" style="font-family: var(--rcw-font-title); font-size:1.1rem;">${t.title}</h5>
+                 <h5 class="fw-bold mb-1 text-truncate" style="font-family: var(--rcw-font-title); font-size:1.15rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">${esc(t.title)}</h5>
                </div>
             </div>
-            <div class="card-body p-3">
-              <div class="d-flex align-items-center gap-2 mb-2 text-muted small" style="font-size: 0.8rem; font-weight:600;">
-                <i class="fa-solid fa-calendar-day text-success"></i> ${startStr} — ${endStr}
+            <div class="card-body p-3 d-flex flex-column justify-content-start">
+              <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                <span class="badge bg-dark border border-secondary text-light fw-normal"><i class="fa-regular fa-calendar text-success me-1"></i>${startStr} — ${endStr}</span>
+                <div class="small text-truncate" style="color: #a3aed0; font-size: 0.8rem;"><i class="fa-solid fa-map-location-dot me-1"></i>${esc(pNames)}</div>
               </div>
-              <div class="small text-muted mb-2 text-truncate" style="font-size:0.75rem;"><i class="fa-solid fa-map-pin me-1 opacity-50"></i>${pNames}</div>
-              ${t.description ? `<div class="small text-white-50" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font-size:0.8rem; line-height:1.4;">${t.description}</div>` : ""}
+              ${t.description ? `<div class="small text-muted mt-1" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-height: 1.4;">${esc(t.description)}</div>` : ""}
             </div>
+          </div>
           </div>
         `;
       });
@@ -863,17 +871,125 @@ $(document).ready(function () {
     const navLabel = document.getElementById("rank-nav-label");
     let currentPeriod = "year";
     let baseDate = new Date();
-    let customStart = "";
-    let customEnd = "";
     let cachedData = null;
+
+    // Inicializar Flatpickr para el ranking
+    const flatpickrConfig = {
+      locale: "es",
+      dateFormat: "Y-m-d",
+      altInput: true,
+      altFormat: "d/m/Y",
+      theme: "dark",
+      disableMobile: true,
+      monthSelectorType: "dropdown",
+      minDate: "1850-01-01",
+      maxDate: "2100-12-31",
+      onReady: function (selectedDates, dateStr, fp) {
+        fp.calendarContainer.classList.add("rcw-flatpickr");
+        const yearInput = fp.calendarContainer.querySelector(".cur-year");
+        if (yearInput) {
+          const yearSelect = document.createElement("select");
+          yearSelect.className =
+            "flatpickr-monthDropdown-months cur-year-select";
+          for (let y = 2100; y >= 1850; y--) {
+            const opt = document.createElement("option");
+            opt.value = y;
+            opt.textContent = y;
+            yearSelect.appendChild(opt);
+          }
+          yearSelect.value = fp.currentYear;
+          yearSelect.addEventListener("change", (e) => {
+            fp.changeYear(parseInt(e.target.value));
+          });
+          fp.set("onYearChange", () => {
+            yearSelect.value = fp.currentYear;
+          });
+          yearInput.parentNode.replaceChild(yearSelect, yearInput);
+        }
+      },
+    };
+
+    if (sDate) {
+      flatpickr(sDate, {
+        ...flatpickrConfig,
+        onChange: (selectedDates, dateStr) => {
+          if (!dateStr) return; // limpieza programática — ignorar
+          if (eDate && eDate._flatpickr) {
+            eDate._flatpickr.set("minDate", dateStr);
+          }
+          if (currentPeriod !== "custom") switchToCustom();
+          const sv = document.getElementById("rank-start-date")?.value;
+          const ev = document.getElementById("rank-end-date")?.value;
+          if (sv && ev && sv <= ev) fetchRanking();
+        },
+      });
+    }
+
+    if (eDate) {
+      flatpickr(eDate, {
+        ...flatpickrConfig,
+        onChange: (selectedDates, dateStr) => {
+          if (!dateStr) return; // limpieza programática — ignorar
+          if (currentPeriod !== "custom") switchToCustom();
+          const sv = document.getElementById("rank-start-date")?.value;
+          const ev = document.getElementById("rank-end-date")?.value;
+          if (sv && ev && sv <= ev) fetchRanking();
+        },
+      });
+    }
 
     function updateLabel() {
       const navContainer = document.getElementById("rank-nav-container");
-      if (currentPeriod === "all" || currentPeriod === "custom") {
+      const datesContainer = document.getElementById("rank-dates-container");
+
+      if (currentPeriod === "all") {
         if (navContainer) navContainer.classList.add("d-none");
-        navLabel.textContent = "Siempre";
+        if (datesContainer) datesContainer.classList.add("d-none");
+        if (sDate) {
+          if (sDate._flatpickr) sDate._flatpickr.clear();
+          else sDate.value = "";
+        }
+        if (eDate) {
+          if (eDate._flatpickr) {
+            eDate._flatpickr.clear();
+            eDate._flatpickr.set("minDate", null);
+          } else {
+            eDate.value = "";
+            eDate.min = "";
+          }
+        }
+      } else if (currentPeriod === "custom") {
+        if (navContainer) navContainer.classList.add("d-none");
+        if (datesContainer) datesContainer.classList.remove("d-none");
+        // Pre-fill with current year if empty
+        const isEmpty =
+          sDate &&
+          (sDate._flatpickr
+            ? sDate._flatpickr.selectedDates.length === 0
+            : !sDate.value);
+        if (isEmpty) {
+          const fmt = (d) =>
+            d.getFullYear() +
+            "-" +
+            String(d.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(d.getDate()).padStart(2, "0");
+          const s = fmt(new Date(baseDate.getFullYear(), 0, 1));
+          const e = fmt(new Date(baseDate.getFullYear(), 11, 31));
+          if (sDate._flatpickr) sDate._flatpickr.setDate(s, false);
+          else if (sDate) sDate.value = s;
+          if (eDate._flatpickr) {
+            eDate._flatpickr.set("minDate", s);
+            eDate._flatpickr.setDate(e, false);
+          } else if (eDate) {
+            eDate.value = e;
+            eDate.min = s;
+          }
+        }
       } else {
+        // week / month / year
         if (navContainer) navContainer.classList.remove("d-none");
+        if (datesContainer) datesContainer.classList.remove("d-none");
         if (currentPeriod === "year")
           navLabel.textContent = baseDate.getFullYear();
         else if (currentPeriod === "month") {
@@ -892,41 +1008,19 @@ $(document).ready(function () {
               month: "short",
             });
         }
-      }
-
-      if (currentPeriod !== "custom" && currentPeriod !== "all") {
         const d = getDates();
         if (sDate) {
-          sDate.value = d.start || "";
-          if (eDate) eDate.min = d.start || "";
+          if (sDate._flatpickr) sDate._flatpickr.setDate(d.start || "", false);
+          else sDate.value = d.start || "";
+          if (eDate) {
+            if (eDate._flatpickr)
+              eDate._flatpickr.set("minDate", d.start || "");
+            else eDate.min = d.start || "";
+          }
         }
-        if (eDate) eDate.value = d.end || "";
-      } else if (currentPeriod === "all") {
-        if (sDate) sDate.value = "";
         if (eDate) {
-          eDate.value = "";
-          eDate.min = "";
-        }
-      } else if (currentPeriod === "custom") {
-        // Si entramos en custom y están vacíos, ponemos el año actual como base
-        if (sDate && !sDate.value) {
-          const d = getDates(); // Como currentPeriod ya es custom, esto fallaría si no lo manejamos antes
-          // Forzamos un periodo temporal para sacar fechas base
-          const tempPeriod = "year";
-          const fmt = (date) =>
-            date.getFullYear() +
-            "-" +
-            String(date.getMonth() + 1).padStart(2, "0") +
-            "-" +
-            String(date.getDate()).padStart(2, "0");
-          const start = fmt(new Date(baseDate.getFullYear(), 0, 1));
-          const end = fmt(new Date(baseDate.getFullYear(), 11, 31));
-
-          sDate.value = start;
-          eDate.value = end;
-          eDate.min = start;
-          customStart = start;
-          customEnd = end;
+          if (eDate._flatpickr) eDate._flatpickr.setDate(d.end || "", false);
+          else eDate.value = d.end || "";
         }
       }
     }
@@ -955,8 +1049,10 @@ $(document).ready(function () {
         start = fmt(new Date(baseDate.getFullYear(), 0, 1));
         end = fmt(new Date(baseDate.getFullYear(), 11, 31));
       } else if (currentPeriod === "custom") {
-        start = customStart;
-        end = customEnd;
+        const sd = document.getElementById("rank-start-date");
+        const ed = document.getElementById("rank-end-date");
+        start = sd ? sd.value : "";
+        end = ed ? ed.value : "";
       }
       return { start, end };
     }
@@ -1079,25 +1175,21 @@ $(document).ready(function () {
     if (prevBtn) prevBtn.addEventListener("click", () => handleArrowClick(-1));
     if (nextBtn) nextBtn.addEventListener("click", () => handleArrowClick(1));
 
-    sDate.addEventListener("change", (e) => {
-      customStart = e.target.value;
-      if (eDate) {
-        eDate.min = customStart;
-        if (eDate.value && eDate.value < customStart) {
-          eDate.value = customStart;
-          customEnd = customStart;
+    function switchToCustom() {
+      currentPeriod = "custom";
+      pBtns.forEach((btn) => {
+        btn.classList.remove("btn-outline-success", "active");
+        btn.classList.add("btn-outline-secondary");
+        if (btn.dataset.period === "custom") {
+          btn.classList.remove("btn-outline-secondary");
+          btn.classList.add("btn-outline-success", "active");
         }
-      }
-      if (currentPeriod === "custom") fetchRanking();
-    });
-    eDate.addEventListener("change", (e) => {
-      customEnd = e.target.value;
-      if (sDate && customEnd && customEnd < sDate.value) {
-        eDate.value = sDate.value;
-        customEnd = sDate.value;
-      }
-      if (currentPeriod === "custom") fetchRanking();
-    });
+      });
+      const datesContainer = document.getElementById("rank-dates-container");
+      if (datesContainer) datesContainer.classList.remove("d-none");
+      const navContainer = document.getElementById("rank-nav-container");
+      if (navContainer) navContainer.classList.add("d-none");
+    }
 
     updateLabel();
     fetchRanking();

@@ -327,6 +327,7 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
   background-color: var(--rcw-bg-card-alt) !important;
   border-color: var(--rcw-border) !important;
   color: var(--rcw-text-primary) !important;
+  max-height: 450px !important;
 }
 .choices__list--dropdown .choices__item,
 .choices__list[aria-expanded] .choices__item {
@@ -665,14 +666,14 @@ input[type="range"].form-range::-webkit-slider-runnable-track {
 
 /* --- Photos Expandable Grid --- */
 .photos-expandable-grid {
-  max-height: 520px; /* Móvil: ~2 filas (col-6) */
+  max-height: 580px;
   overflow: hidden;
   position: relative;
   transition: max-height 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 @media (min-width: 992px) {
   .photos-expandable-grid {
-    max-height: 290px; /* PC: ~1 fila (col-lg-2) */
+    max-height: 350px;
   }
 }
 .photos-expandable-grid.expanded {

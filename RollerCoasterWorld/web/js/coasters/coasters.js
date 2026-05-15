@@ -794,6 +794,20 @@ $(document).ready(function () {
 
           data.photos.forEach((photo, index) => {
             const userKey = window.CURRENT_USER_ID || "guest";
+
+            if (window.CURRENT_USER_ID) {
+              if (photo.user_has_liked) {
+                localStorage.setItem(
+                  "liked_photo_" + userKey + "_" + photo.id,
+                  "true",
+                );
+              } else {
+                localStorage.removeItem(
+                  "liked_photo_" + userKey + "_" + photo.id,
+                );
+              }
+            }
+
             const hasLiked =
               localStorage.getItem(
                 "liked_photo_" + userKey + "_" + photo.id,
@@ -819,7 +833,7 @@ $(document).ready(function () {
                            <button class="btn grid-like-btn d-flex align-items-center gap-1 px-2 py-1" 
                                    data-id="${photo.id}" 
                                    style="background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; font-size: 0.75rem; color: #fff; line-height: 1;">
-                               <i class="${heartClass} fa-heart ${photo.user_has_liked ? "text-danger" : ""}"></i>
+                               <i class="${heartClass} fa-heart"></i>
                                <span class="grid-likes-count fw-bold">${photo.likes || 0}</span>
                            </button>
                        </div>
@@ -1640,21 +1654,38 @@ $(document).ready(function () {
     const text = `Mira esta montaña rusa en RollerCoaster World: ${title}`;
     const url = window.location.href;
 
+    const fallbackCopy = async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+        if (window.rcwToast) {
+          window.rcwToast("Enlace copiado al portapapeles", "success");
+        } else if (window.showModalNotification) {
+          window.showModalNotification(
+            "Enlace copiado al portapapeles",
+            "success",
+          );
+        } else {
+          alert("Enlace copiado al portapapeles");
+        }
+      } catch (err) {
+        console.error("Error copying to clipboard:", err);
+      }
+    };
+
     if (navigator.share) {
       try {
         await navigator.share({ title, text, url });
       } catch (err) {
-        if (err.name !== "AbortError") console.error("Error sharing:", err);
+        if (err.name === "InvalidStateError") {
+          // Si hay un share colgado, usamos el fallback
+          await fallbackCopy();
+        } else if (err.name !== "AbortError") {
+          console.error("Error sharing:", err);
+          await fallbackCopy();
+        }
       }
     } else {
-      try {
-        await navigator.clipboard.writeText(url);
-        if (window.rcwToast)
-          window.rcwToast("Enlace copiado al portapapeles", "success");
-        else alert("Enlace copiado al portapapeles");
-      } catch (err) {
-        console.error("Error copying:", err);
-      }
+      await fallbackCopy();
     }
   });
 });

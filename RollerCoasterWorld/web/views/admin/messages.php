@@ -71,8 +71,7 @@ if (!$is_logged || !$is_admin) {
                 <div class="flex-grow-1 position-relative">
                     <input type="text" id="admin-msg-search"
                         class="form-control shadow-sm pe-5 border-success rounded-0"
-                        placeholder="Buscar por usuario, email o asunto..."
-                        style="border-width: 2px;">
+                        placeholder="Buscar por usuario, email o asunto..." style="border-width: 2px;">
                     <i class="fa-solid fa-magnifying-glass text-muted position-absolute"
                         style="right: 14px; top: 50%; transform: translateY(-50%); cursor: default;"></i>
                 </div>
@@ -80,7 +79,7 @@ if (!$is_logged || !$is_admin) {
 
             <!-- Contador -->
             <p class="text-muted fw-semibold mb-2 small" id="admin-msg-count"></p>
-            
+
             <div class="list-group shadow-sm rounded-0" id="admin-msg-list">
                 <div class="list-group-item text-center text-muted py-5" id="admin-msg-loading">
                     <i class="fa-solid fa-circle-notch fa-spin fa-2x mb-2 d-block text-success"></i>
@@ -108,41 +107,56 @@ if (!$is_logged || !$is_admin) {
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
 
-            <div class="modal-body p-4 text-light">
-                <div class="d-flex justify-content-between align-items-start mb-4 border-bottom pb-3 border-secondary">
-                    <div>
-                        <h4 class="fw-bold mb-1" id="msg-detail-subject">Asunto</h4>
-                        <div class="d-flex align-items-center gap-3 text-muted small">
-                            <span id="msg-detail-user"><i class="fa-solid fa-user me-1"></i>Usuario</span>
-                            <span id="msg-detail-email"><i class="fa-solid fa-envelope me-1"></i>Email</span>
-                            <span id="msg-detail-date"><i class="fa-solid fa-calendar me-1"></i>Fecha</span>
+            <div class="modal-body p-3 p-md-4 text-light">
+                <div
+                    class="d-flex flex-column flex-md-row justify-content-between align-items-start mb-4 border-bottom pb-3 border-secondary gap-3">
+                    <div class="w-100">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h4 class="fw-bold mb-0 flex-grow-1 fs-5 fs-md-4" id="msg-detail-subject">Asunto</h4>
+                            <span class="badge rounded-pill d-md-none" id="msg-detail-badge-mobile">Motivo</span>
+                        </div>
+                        <div class="d-flex flex-wrap align-items-center gap-x-3 gap-y-2 text-muted small mt-2 mt-md-0">
+                            <span id="msg-detail-user" class="me-2"><i
+                                    class="fa-solid fa-user me-1 text-success opacity-75"></i>Usuario</span>
+                            <span id="msg-detail-email" class="me-2"><i
+                                    class="fa-solid fa-envelope me-1 text-success opacity-75"></i>Email</span>
+                            <span id="msg-detail-date"><i
+                                    class="fa-solid fa-calendar me-1 text-success opacity-75"></i>Fecha</span>
                         </div>
                     </div>
-                    <span class="badge rounded-pill" id="msg-detail-badge">Motivo</span>
+                    <span class="badge rounded-pill d-none d-md-inline-block" id="msg-detail-badge">Motivo</span>
                 </div>
 
                 <div class="mb-4">
-                    <label class="text-uppercase text-muted small fw-bold mb-2">Mensaje:</label>
-                    <div class="p-3 rounded" style="background:#0d1117; border: 1px solid #30363d; white-space: pre-wrap; font-size: 1rem;" id="msg-detail-body">
+                    <label class="text-uppercase text-muted small fw-bold mb-2 tracking-wider">Mensaje:</label>
+                    <div class="p-3 rounded shadow-inner"
+                        style="background:#0d1117; border: 1px solid #30363d; white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6;"
+                        id="msg-detail-body">
                         Cuerpo del mensaje...
                     </div>
                 </div>
 
-                <div id="msg-reply-alert" class="alert alert-warning border-0 rounded-0 d-none">
+                <div id="msg-reply-alert" class="alert alert-warning border-0 rounded-1 d-none small">
                     <i class="fa-solid fa-reply me-2"></i>El usuario ha solicitado una respuesta a su correo.
                 </div>
             </div>
 
-            <div class="modal-footer border-0 px-4 pb-4 pt-0" style="background:#161b22;">
-                <button type="button" class="btn btn-outline-secondary rounded-0 me-auto" data-bs-dismiss="modal">Cerrar</button>
-                
-                <button type="button" class="btn btn-outline-success rounded-0 fw-bold" id="btn-toggle-read">
+            <div class="modal-footer border-0 px-3 px-md-4 pb-4 pt-0 d-flex flex-wrap justify-content-center justify-content-md-end gap-2"
+                style="background:#161b22;">
+                <button type="button"
+                    class="btn btn-outline-secondary rounded-0 me-md-auto w-100 w-md-auto order-last order-md-first"
+                    data-bs-dismiss="modal">Cerrar</button>
+
+                <button type="button" class="btn btn-outline-success rounded-0 fw-bold flex-grow-1 flex-md-grow-0"
+                    id="btn-toggle-read">
                     <i class="fa-solid fa-envelope-open me-2"></i>Marcar Leído
                 </button>
-                <button type="button" class="btn btn-success rounded-0 fw-bold" id="btn-reply-msg">
-                    <i class="fa-solid fa-paper-plane me-2"></i>Responder Email
+                <button type="button" class="btn btn-success rounded-0 fw-bold flex-grow-1 flex-md-grow-0"
+                    id="btn-reply-msg">
+                    <i class="fa-solid fa-paper-plane me-2"></i>Responder
                 </button>
-                <button type="button" class="btn btn-danger rounded-0 fw-bold ms-2" id="btn-delete-msg-prompt">
+                <button type="button" class="btn btn-danger rounded-0 fw-bold w-100 w-md-auto"
+                    id="btn-delete-msg-prompt">
                     <i class="fa-solid fa-trash me-2"></i>Eliminar
                 </button>
             </div>
@@ -161,10 +175,12 @@ if (!$is_logged || !$is_admin) {
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p class="mb-0 text-dark">¿Estás seguro de que quieres eliminar este mensaje permanentemente? Esta acción no se puede deshacer.</p>
+                <p class="mb-0 text-dark">¿Estás seguro de que quieres eliminar este mensaje permanentemente? Esta
+                    acción no se puede deshacer.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-outline-secondary rounded-0"
+                    data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-danger rounded-0 fw-bold" id="confirm-delete-msg">
                     <i class="fa-solid fa-trash me-1"></i>Eliminar
                 </button>

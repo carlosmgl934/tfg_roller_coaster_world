@@ -14,18 +14,23 @@ const ADMIN_ORDERS_API =
 const PDF_BASE =
   window.PDF_BASE || window.BASE_URL + "/api/php/generate_ticket_pdf.php";
 
-/* ------------------------------------------------------------------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------------------
    UTILIDADES
-   ------------------------------------------------------------------------------------------------------------------------------------------------ */
-const fmt = (v) => parseFloat(v).toFixed(2) + " \u20AC";
-const date = (d) =>
-  d
-    ? new Date(d + "T00:00:00").toLocaleDateString("es-ES", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      })
-    : "?";
+   ---------------------------------------------------------------------------------------------------------- */
+const fmt = (v) =>
+  v != null && !isNaN(parseFloat(v)) ? parseFloat(v).toFixed(2) + " €" : "—";
+const date = (d) => {
+  if (!d)
+    return '<span class="text-muted" style="font-size:.72rem;font-style:italic;">Sin fecha</span>';
+  const parsed = new Date(d + "T00:00:00");
+  if (isNaN(parsed))
+    return '<span class="text-muted" style="font-size:.72rem;font-style:italic;">Sin fecha</span>';
+  return parsed.toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+};
 const typeLabel = (t) =>
   t === "pase_rapido" ? "Pase Rápido" : "Entrada General";
 const statusBadge = (s) => {
@@ -45,12 +50,17 @@ const statusBadge = (s) => {
 async function apiPost(url, data) {
   const fd = new FormData();
   Object.entries(data).forEach(([k, v]) => fd.append(k, v));
-  const r = await fetch(url, { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' },
+  const r = await fetch(url, {
+    headers: {
+      "X-CSRF-Token":
+        document
+          .querySelector('meta[name="csrf-token"]')
+          ?.getAttribute("content") ?? "",
+    },
     method: "POST",
     body: fd,
     credentials: "include",
-  } );
+  });
   return r.json();
 }
 async function apiGet(url) {
@@ -71,10 +81,10 @@ let qty = 1;
 
 // Precios de complementos (por persona excepto parking que es fijo)
 const ADDON_CONFIG = {
-  pase_rapido: { pct: 0.50, perPerson: true  },
-  photopass:   { pct: 0.30, perPerson: true  },
-  buffet:      { pct: 0.20, perPerson: true  },
-  parking:     { pct: null, perPerson: false }, // precio fijo determinista
+  pase_rapido: { pct: 0.5, perPerson: true },
+  photopass: { pct: 0.3, perPerson: true },
+  buffet: { pct: 0.2, perPerson: true },
+  parking: { pct: null, perPerson: false }, // precio fijo determinista
 };
 
 function parkingPrice(parkId) {
@@ -105,15 +115,25 @@ async function initTicketsCatalog() {
 
   // ── Paso 1: cantidad ──────────────────────────────────────────
   document.getElementById("qty-minus")?.addEventListener("click", () => {
-    if (qty > 1) { qty--; updateStep1(); }
+    if (qty > 1) {
+      qty--;
+      updateStep1();
+    }
   });
   document.getElementById("qty-plus")?.addEventListener("click", () => {
-    if (qty < 10) { qty++; updateStep1(); }
+    if (qty < 10) {
+      qty++;
+      updateStep1();
+    }
   });
 
   // ── Navegación wizard ─────────────────────────────────────────
-  document.getElementById("btn-next-step")?.addEventListener("click", goToStep2);
-  document.getElementById("btn-prev-step")?.addEventListener("click", goToStep1);
+  document
+    .getElementById("btn-next-step")
+    ?.addEventListener("click", goToStep2);
+  document
+    .getElementById("btn-prev-step")
+    ?.addEventListener("click", goToStep1);
 
   // ── Paso 2: add-ons ───────────────────────────────────────────
   document.querySelectorAll(".addon-check").forEach((cb) => {
@@ -188,11 +208,16 @@ function openBuyModal(parkId) {
   // Reset checkboxes
   document.querySelectorAll(".addon-check").forEach((cb) => {
     cb.checked = false;
-    cb.closest(".addon-card")?.classList.replace("border-success", "border-secondary");
+    cb.closest(".addon-card")?.classList.replace(
+      "border-success",
+      "border-secondary",
+    );
   });
 
-  document.getElementById("modal-park-name").textContent = currentPark.park_name;
-  document.getElementById("modal-park-country").textContent = currentPark.park_country;
+  document.getElementById("modal-park-name").textContent =
+    currentPark.park_name;
+  document.getElementById("modal-park-country").textContent =
+    currentPark.park_country;
 
   const fpInput = document.getElementById("modal-visit-date");
   if (fpInput._flatpickr) fpInput._flatpickr.destroy();
@@ -229,13 +254,19 @@ function goToStep2() {
   const parking = parkingPrice(currentPark.id);
 
   // Rellenar precios de add-ons
-  document.getElementById("price-pase").textContent    = fmtAddon(base * qty * 0.50);
-  document.getElementById("price-photo").textContent   = fmtAddon(base * qty * 0.30);
-  document.getElementById("price-buffet").textContent  = fmtAddon(base * qty * 0.20);
+  document.getElementById("price-pase").textContent = fmtAddon(
+    base * qty * 0.5,
+  );
+  document.getElementById("price-photo").textContent = fmtAddon(
+    base * qty * 0.3,
+  );
+  document.getElementById("price-buffet").textContent = fmtAddon(
+    base * qty * 0.2,
+  );
   document.getElementById("price-parking").textContent = fmtAddon(parking);
 
   // Resumen
-  document.getElementById("s-qty").textContent  = qty;
+  document.getElementById("s-qty").textContent = qty;
   document.getElementById("s-base").textContent = fmtAddon(base * qty);
 
   updateStep2Total();
@@ -251,55 +282,62 @@ function goToStep2() {
 function updateStep1() {
   if (!currentPark) return;
   const base = parseFloat(currentPark.precio_entrada);
-  document.getElementById("qty-display").textContent     = qty;
+  document.getElementById("qty-display").textContent = qty;
   document.getElementById("step1-qty-label").textContent = `× ${qty}`;
-  document.getElementById("step1-total").textContent     = fmtAddon(base * qty);
+  document.getElementById("step1-total").textContent = fmtAddon(base * qty);
 }
 
 function updateStep2Total() {
   if (!currentPark) return;
-  const base    = parseFloat(currentPark.precio_entrada);
+  const base = parseFloat(currentPark.precio_entrada);
   const parking = parkingPrice(currentPark.id);
 
-  const pase    = document.getElementById("addon-pase").checked;
-  const photo   = document.getElementById("addon-photo").checked;
-  const buffet  = document.getElementById("addon-buffet").checked;
-  const park    = document.getElementById("addon-parking").checked;
+  const pase = document.getElementById("addon-pase").checked;
+  const photo = document.getElementById("addon-photo").checked;
+  const buffet = document.getElementById("addon-buffet").checked;
+  const park = document.getElementById("addon-parking").checked;
 
   let total = base * qty;
-  if (pase)   total += base * qty * 0.50;
-  if (photo)  total += base * qty * 0.30;
-  if (buffet) total += base * qty * 0.20;
-  if (park)   total += parking;
+  if (pase) total += base * qty * 0.5;
+  if (photo) total += base * qty * 0.3;
+  if (buffet) total += base * qty * 0.2;
+  if (park) total += parking;
 
   // Mostrar/ocultar filas del resumen
   document.querySelector(".addon-row-pase").classList.toggle("d-none", !pase);
   document.querySelector(".addon-row-photo").classList.toggle("d-none", !photo);
-  document.querySelector(".addon-row-buffet").classList.toggle("d-none", !buffet);
-  document.querySelector(".addon-row-parking").classList.toggle("d-none", !park);
+  document
+    .querySelector(".addon-row-buffet")
+    .classList.toggle("d-none", !buffet);
+  document
+    .querySelector(".addon-row-parking")
+    .classList.toggle("d-none", !park);
 
-  document.getElementById("s-pase").textContent    = fmtAddon(base * qty * 0.50);
-  document.getElementById("s-photo").textContent   = fmtAddon(base * qty * 0.30);
-  document.getElementById("s-buffet").textContent  = fmtAddon(base * qty * 0.20);
+  document.getElementById("s-pase").textContent = fmtAddon(base * qty * 0.5);
+  document.getElementById("s-photo").textContent = fmtAddon(base * qty * 0.3);
+  document.getElementById("s-buffet").textContent = fmtAddon(base * qty * 0.2);
   document.getElementById("s-parking").textContent = fmtAddon(parking);
   document.getElementById("modal-total").textContent = fmtAddon(total);
 }
 
 async function addToCart() {
   const visitDate = document.getElementById("modal-visit-date").value;
-  if (!visitDate) { showToast("Selecciona una fecha de visita", "error"); return; }
+  if (!visitDate) {
+    showToast("Selecciona una fecha de visita", "error");
+    return;
+  }
 
-  const base    = parseFloat(currentPark.precio_entrada);
+  const base = parseFloat(currentPark.precio_entrada);
   const parking = parkingPrice(currentPark.id);
-  const pase    = document.getElementById("addon-pase").checked;
-  const photo   = document.getElementById("addon-photo").checked;
-  const buffet  = document.getElementById("addon-buffet").checked;
-  const park    = document.getElementById("addon-parking").checked;
+  const pase = document.getElementById("addon-pase").checked;
+  const photo = document.getElementById("addon-photo").checked;
+  const buffet = document.getElementById("addon-buffet").checked;
+  const park = document.getElementById("addon-parking").checked;
 
   let unitPrice = base;
-  if (pase)   unitPrice += base * 0.50;
-  if (photo)  unitPrice += base * 0.30;
-  if (buffet) unitPrice += base * 0.20;
+  if (pase) unitPrice += base * 0.5;
+  if (photo) unitPrice += base * 0.3;
+  if (buffet) unitPrice += base * 0.2;
   // Parking se añade como importe fijo, no por persona
   const parkingTotal = park ? parking : 0;
 
@@ -307,21 +345,22 @@ async function addToCart() {
 
   const btn = document.getElementById("btn-add-cart");
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Añadiendo...';
+  btn.innerHTML =
+    '<span class="spinner-border spinner-border-sm me-2"></span>Añadiendo...';
 
   const res = await apiPost(TICKETS_API + "?action=add_to_cart", {
-    park_id:          currentPark.id,
-    park_name:        currentPark.park_name,
-    park_img:         currentPark.imagen_url || "",
-    ticket_type:      "entrada",
-    quantity:         qty,
-    unit_price:       +unitPrice.toFixed(2),
-    visit_date:       visitDate,
-    addon_pase_rapido: pase   ? 1 : 0,
-    addon_photopass:   photo  ? 1 : 0,
-    addon_buffet:      buffet ? 1 : 0,
-    addon_parking:     park   ? 1 : 0,
-    parking_price:     parkingTotal,
+    park_id: currentPark.id,
+    park_name: currentPark.park_name,
+    park_img: currentPark.imagen_url || "",
+    ticket_type: "entrada",
+    quantity: qty,
+    unit_price: +unitPrice.toFixed(2),
+    visit_date: visitDate,
+    addon_pase_rapido: pase ? 1 : 0,
+    addon_photopass: photo ? 1 : 0,
+    addon_buffet: buffet ? 1 : 0,
+    addon_parking: park ? 1 : 0,
+    parking_price: parkingTotal,
   });
 
   btn.disabled = false;
@@ -330,8 +369,14 @@ async function addToCart() {
   if (res.success) {
     bootstrap.Modal.getInstance(document.getElementById("buy-modal")).hide();
     window.updateCartBadge?.();
-    const addons = [pase && "Pase Rápido", photo && "PhotoPass", buffet && "Buffet", park && "Parking"]
-      .filter(Boolean).join(", ");
+    const addons = [
+      pase && "Pase Rápido",
+      photo && "PhotoPass",
+      buffet && "Buffet",
+      park && "Parking",
+    ]
+      .filter(Boolean)
+      .join(", ");
     showToast(`${qty} entrada(s) añadida(s)${addons ? ` + ${addons}` : ""}`);
   } else {
     showToast(res.error || "Error al añadir", "error");
@@ -391,7 +436,9 @@ async function initCheckout() {
   document.getElementById("checkout-grand-total").textContent = fmt(total);
 
   // Botón principal -> redirige a Stripe directamente
-  document.getElementById("btn-pay-stripe")?.addEventListener("click", goToStripe);
+  document
+    .getElementById("btn-pay-stripe")
+    ?.addEventListener("click", goToStripe);
 
   // Manejar retorno de Stripe (payment=success|cancel)
   const returnStatus = window.STRIPE_RETURN_STATUS || "";
@@ -409,11 +456,14 @@ async function initCheckout() {
 
 /** Redirige al usuario a la pasarela de Stripe */
 async function goToStripe() {
-  const name  = document.getElementById("checkout-name")?.value.trim();
+  const name = document.getElementById("checkout-name")?.value.trim();
   const email = document.getElementById("checkout-email")?.value.trim();
 
   if (!name || !email) {
-    showToast("Indica el nombre del titular y el email donde recibirás las entradas", "error");
+    showToast(
+      "Indica el nombre del titular y el email donde recibirás las entradas",
+      "error",
+    );
     if (!name) document.getElementById("checkout-name")?.focus();
     else document.getElementById("checkout-email")?.focus();
     return;
@@ -425,24 +475,33 @@ async function goToStripe() {
 
   const btn = document.getElementById("btn-pay-stripe");
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a Stripe...';
+  btn.innerHTML =
+    '<span class="spinner-border spinner-border-sm me-2"></span>Redirigiendo a Stripe...';
 
-  const stripeApi = window.STRIPE_API || window.BASE_URL + "/api/php/stripe_checkout.php";
-  const res = await apiPost(stripeApi + "?action=create_session", { name, email });
+  const stripeApi =
+    window.STRIPE_API || window.BASE_URL + "/api/php/stripe_checkout.php";
+  const res = await apiPost(stripeApi + "?action=create_session", {
+    name,
+    email,
+  });
 
   if (res.success && res.url) {
     window.location.href = res.url;
   } else {
     btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-credit-card me-2"></i>Pagar con Stripe';
+    btn.innerHTML =
+      '<i class="fa-solid fa-credit-card me-2"></i>Pagar con Stripe';
     showToast(res.error || "Error al iniciar el pago", "error");
   }
 }
 
 /** Verifica el pago tras volver de Stripe y crea los pedidos */
 async function verifyStripeSession(sessionId) {
-  const stripeApi = window.STRIPE_API || window.BASE_URL + "/api/php/stripe_checkout.php";
-  const res = await apiPost(stripeApi + "?action=verify_session", { session_id: sessionId });
+  const stripeApi =
+    window.STRIPE_API || window.BASE_URL + "/api/php/stripe_checkout.php";
+  const res = await apiPost(stripeApi + "?action=verify_session", {
+    session_id: sessionId,
+  });
 
   document.getElementById("checkout-verifying")?.classList.add("d-none");
 
@@ -450,12 +509,18 @@ async function verifyStripeSession(sessionId) {
     const ids = res.order_ids || [];
     document.getElementById("checkout-success")?.classList.remove("d-none");
     document.getElementById("success-order-ref").textContent = ids
-      .map((id) => `#RCW-${new Date().getFullYear()}-${String(id).padStart(6, "0")}`)
+      .map(
+        (id) =>
+          `#RCW-${new Date().getFullYear()}-${String(id).padStart(6, "0")}`,
+      )
       .join(", ");
     window.updateCartBadge?.();
   } else {
     document.getElementById("checkout-form-wrap")?.classList.remove("d-none");
-    showToast(res.error || "No se pudo verificar el pago. Contacta con soporte.", "error");
+    showToast(
+      res.error || "No se pudo verificar el pago. Contacta con soporte.",
+      "error",
+    );
   }
 }
 
@@ -469,7 +534,10 @@ async function initOrders() {
 
   // Notificación de reembolsos procesados
   if (res.unnotified_refunds && res.unnotified_refunds.length > 0) {
-    const total = res.unnotified_refunds.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+    const total = res.unnotified_refunds.reduce(
+      (a, b) => parseFloat(a) + parseFloat(b),
+      0,
+    );
     const msgEl = document.getElementById("refund-notice-msg");
     const modalEl = document.getElementById("refundNoticeModal");
     if (msgEl && modalEl) {
@@ -534,7 +602,8 @@ async function initOrders() {
       // Clonar para limpiar eventos previos, y SIEMPRE resetear estado
       const newConfirmBtn = confirmBtn.cloneNode(true);
       newConfirmBtn.disabled = false;
-      newConfirmBtn.innerHTML = '<i class="fa-solid fa-rotate-left me-1"></i>Confirmar Solicitud';
+      newConfirmBtn.innerHTML =
+        '<i class="fa-solid fa-rotate-left me-1"></i>Confirmar Solicitud';
       confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
 
       newConfirmBtn.addEventListener("click", async () => {
@@ -564,7 +633,6 @@ async function initOrders() {
       modal.show();
     });
   });
-
 }
 
 function renderTicket(o) {
@@ -682,30 +750,46 @@ async function loadAdminOrders() {
   empty.classList.add("d-none");
 
   tbody.innerHTML = orders
-    .map(
-      (o) => `
+    .map((o) => {
+      const addons = o.addon_label
+        ? `<div class="text-success small" style="font-size:.65rem; line-height:1.2;">+ ${o.addon_label}</div>`
+        : "";
+      return `
     <tr style="border-bottom:1px solid rgba(255,255,255,.05);">
       <td class="px-3 text-muted" style="font-size:.75rem;">#${o.id}</td>
       <td><div class="fw-semibold text-white" style="font-size:.82rem;">${o.username}</div><div class="text-muted" style="font-size:.7rem;">${o.email}</div></td>
-      <td class="fw-semibold text-white" style="font-size:.82rem;">${o.park_name}</td>
+      <td><div class="fw-semibold text-white" style="font-size:.82rem;">${o.park_name}</div>${addons}</td>
       <td><span class="status-badge ${o.ticket_type === "pase_rapido" ? "badge-confirmado" : "badge-pendiente"}" style="font-size:.65rem;">${typeLabel(o.ticket_type)}</span></td>
       <td class="text-muted" style="font-size:.82rem;">${date(o.visit_date)}</td>
-      <td class="text-center text-muted">${o.quantity}</td>
+      <td class="text-center text-muted">${o.quantity}${o.unit_price != null ? `<small class="d-block" style="font-size:.6rem;">${fmt(o.unit_price)}/ud</small>` : ""}</td>
       <td class="text-end fw-bold text-success">${fmt(o.price)}</td>
       <td>${statusBadge(o.status)}</td>
       <td class="text-muted" style="font-size:.75rem;">${new Date(o.created_at).toLocaleDateString("es-ES")}</td>
       <td class="text-center">
         <div class="d-flex gap-1 justify-content-center">
-          ${(o.status === "confirmado" || o.status === "solicitada_cancelacion") ? `
+          ${
+            o.status === "confirmado" || o.status === "solicitada_cancelacion"
+              ? `
             <button class="btn btn-outline-danger btn-sm rounded-0 btn-cancel-order" data-id="${o.id}" title="Cancelar" style="font-size:.72rem;padding:3px 8px;">
               <i class="fa-solid fa-xmark"></i>
             </button>
-          ` : '<span class="text-muted" style="font-size:.72rem;">-</span>'}
+          `
+              : o.status === "pendiente"
+                ? `
+            <button class="btn btn-outline-success btn-sm rounded-0 btn-confirm-order" data-id="${o.id}" title="Confirmar" style="font-size:.72rem;padding:3px 8px;">
+              <i class="fa-solid fa-check"></i>
+            </button>
+            <button class="btn btn-outline-danger btn-sm rounded-0 btn-cancel-order" data-id="${o.id}" title="Cancelar" style="font-size:.72rem;padding:3px 8px;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          `
+                : '<span class="text-muted" style="font-size:.72rem;">-</span>'
+          }
         </div>
       </td>
     </tr>
-  `,
-    )
+  `;
+    })
     .join("");
 
   // Helper: actualiza la fila en el sitio sin recargar la tabla

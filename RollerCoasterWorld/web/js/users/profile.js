@@ -2,21 +2,52 @@
 // TODO: editar bio/avatar, gestionar solicitudes de amistad, top personal
 
 $(document).ready(function () {
-  // Inicializar Flatpickr para Fecha de Nacimiento
   const birthPicker = flatpickr("#config-user-birthdate", {
     dateFormat: "Y-m-d",
     altInput: true,
     altFormat: "d/m/Y",
     locale: "es",
-    maxDate: "today",
-    disableMobile: "true",
-    onReady: function (selectedDates, dateStr, instance) {
-      if (instance.altInput) {
-        instance.altInput.id = "config-user-birthdate-alt";
+    minDate: "1850-01-01",
+    maxDate: "2100-12-31",
+    disableMobile: true,
+    monthSelectorType: "dropdown",
+    static: true, // Evita saltos al renderizar el select
+    onReady: function (selectedDates, dateStr, fp) {
+      // Añadir clase personalizada para CSS
+      fp.calendarContainer.classList.add("rcw-flatpickr");
+
+      if (fp.altInput) {
+        fp.altInput.id = "config-user-birthdate-alt";
         const label = document.querySelector(
           'label[for="config-user-birthdate"]',
         );
         if (label) label.setAttribute("for", "config-user-birthdate-alt");
+      }
+
+      // Reemplazar input de año por un select
+      const yearInput = fp.calendarContainer.querySelector(".cur-year");
+      if (yearInput) {
+        const yearSelect = document.createElement("select");
+        yearSelect.className = "flatpickr-monthDropdown-months cur-year-select";
+
+        for (let y = 2100; y >= 1850; y--) {
+          const opt = document.createElement("option");
+          opt.value = y;
+          opt.textContent = y;
+          yearSelect.appendChild(opt);
+        }
+
+        yearSelect.value = fp.currentYear;
+        yearSelect.addEventListener("change", (e) => {
+          fp.changeYear(parseInt(e.target.value));
+        });
+
+        // Sincronizar si el año cambia por otros medios (flechas, etc - aunque el select lo reemplaza)
+        fp.set("onYearChange", () => {
+          yearSelect.value = fp.currentYear;
+        });
+
+        yearInput.parentNode.replaceChild(yearSelect, yearInput);
       }
     },
   });
@@ -271,16 +302,6 @@ $(document).ready(function () {
 
       debounceTimer = setTimeout(async () => {
         if (loading) $(loading).removeClass("d-none");
-        btnDir.on("click", function () {
-          const currentDir = $(this).attr("data-dir");
-          const newDir = currentDir === "asc" ? "desc" : "asc";
-          $(this).attr("data-dir", newDir);
-          $(this).html(
-            `<i class="fa-solid fa-caret-${newDir === "asc" ? "up" : "down"}"></i>`,
-          );
-          loadTops();
-        });
-
         try {
           const res = await fetch(
             `${BASE_URL}/api/php/profile_config.php?action=search&search=${encodeURIComponent(search)}`,
@@ -1345,10 +1366,10 @@ $(document).ready(function () {
       $modalCountries.append(`
         <div class="px-4 py-3 d-flex align-items-center" style="border-bottom: 1px solid rgba(255,255,255,0.06); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
           <div class="flex-shrink-0 d-flex align-items-center justify-content-center fw-bold me-3" style="width:28px;height:28px;background:rgba(16,185,129,0.1);color:#10b981;font-size:0.75rem;">${idx + 1}</div>
-          <div class="flex-grow-1 pe-3">
-            <div class="d-flex justify-content-between align-items-end mb-2">
-              <span class="fw-bold text-white small text-truncate" title="${name}">${name}</span>
-              <span class="fw-bold text-success" style="font-size:0.85rem;">${count}</span>
+          <div class="flex-grow-1 pe-3" style="min-width:0;">
+            <div class="d-flex align-items-end mb-2 gap-2" style="min-width:0;">
+              <span class="fw-bold text-white small text-truncate flex-grow-1" style="min-width:0;" title="${name}">${name}</span>
+              <span class="fw-bold text-success flex-shrink-0 text-end" style="font-size:0.85rem; min-width:30px;">${count}</span>
             </div>
             <div style="height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;">
               <div style="height:100%;width:${pct}%;background:linear-gradient(90deg, #059669, #10b981);border-radius:2px;box-shadow:0 0 5px rgba(16,185,129,0.5);"></div>
@@ -1377,10 +1398,10 @@ $(document).ready(function () {
       $modalMfrs.append(`
         <div class="px-4 py-3 d-flex align-items-center" style="border-bottom: 1px solid rgba(255,255,255,0.06); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
           <div class="flex-shrink-0 d-flex align-items-center justify-content-center fw-bold me-3" style="width:28px;height:28px;background:rgba(16,185,129,0.1);color:#10b981;font-size:0.75rem;">${idx + 1}</div>
-          <div class="flex-grow-1 pe-3">
-            <div class="d-flex justify-content-between align-items-end mb-2">
-              <span class="fw-bold text-white small text-truncate" title="${name}">${name}</span>
-              <span class="fw-bold text-success" style="font-size:0.85rem;">${count}</span>
+          <div class="flex-grow-1 pe-3" style="min-width:0;">
+            <div class="d-flex align-items-end mb-2 gap-2" style="min-width:0;">
+              <span class="fw-bold text-white small text-truncate flex-grow-1" style="min-width:0;" title="${name}">${name}</span>
+              <span class="fw-bold text-success flex-shrink-0 text-end" style="font-size:0.85rem; min-width:30px;">${count}</span>
             </div>
             <div style="height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;">
               <div style="height:100%;width:${pct}%;background:linear-gradient(90deg, #059669, #10b981);border-radius:2px;box-shadow:0 0 5px rgba(16,185,129,0.5);"></div>
@@ -1834,7 +1855,7 @@ $(document).ready(function () {
   function showSection(sectionId) {
     // Ocultar todas las secciones principales
     $(
-      "#section-profile-content, #section-config-content, #section-tops-content, #section-reviews-content, #section-friends-content, #section-trips-content, #section-map-content",
+      "#section-profile-content, #section-config-content, #section-tops-content, #section-reviews-content, #section-friends-content, #section-trips-content, #section-map-content, #section-photos-content",
     ).addClass("d-none");
 
     // Quitar el active de todos los enlaces del menú
@@ -1862,6 +1883,10 @@ $(document).ready(function () {
     } else if (sectionId === "#profile-map") {
       $("#section-map-content").removeClass("d-none");
       $("#menu-map").addClass("active");
+    } else if (sectionId === "#profile-photos") {
+      $("#section-photos-content").removeClass("d-none");
+      $("#menu-photos").addClass("active");
+      loadPhotos();
     }
   }
 
@@ -1899,8 +1924,14 @@ $(document).ready(function () {
     e.preventDefault();
     history.replaceState(null, null, "#trips");
     showSection("#profile-trips");
-    loadTrips();
-    loadRanking();
+    if (typeof loadTrips === "function") loadTrips();
+    if (typeof loadRanking === "function") loadRanking();
+  });
+
+  $("#menu-photos").on("click", function (e) {
+    e.preventDefault();
+    history.replaceState(null, null, "#photos");
+    showSection("#profile-photos");
   });
 
   $("#menu-map").on("click", function (e) {
@@ -2674,6 +2705,7 @@ $(document).ready(function () {
     { value: "recorrido", label: "Layout" },
     { value: "tematizacion", label: "Tematización" },
     { value: "velocidad", label: "Velocidad" },
+    { value: "buen_ritmo", label: "Buen ritmo" },
   ];
   const COASTER_CONTRAS = [
     { value: "airtime", label: "Airtime" },
@@ -2691,6 +2723,7 @@ $(document).ready(function () {
     { value: "decepcionante", label: "Decepcionante" },
     { value: "tematizacion", label: "Tematización" },
     { value: "velocidad_nula", label: "Poca velocidad" },
+    { value: "pierde_ritmo", label: "Pierde ritmo" },
   ];
   const PARK_PROS = [
     { value: "limpieza", label: "Limpieza" },
@@ -2756,6 +2789,8 @@ $(document).ready(function () {
       .map((t) => t.tag);
 
     if (peditProsChoices) {
+      peditProsChoices.removeActiveItems();
+      peditProsChoices.removeHighlightedItems();
       peditProsChoices.clearChoices();
       const mappedPros = prosList.map((p) => ({
         ...p,
@@ -2764,6 +2799,8 @@ $(document).ready(function () {
       peditProsChoices.setChoices(mappedPros, "value", "label", true);
     }
     if (peditContrasChoices) {
+      peditContrasChoices.removeActiveItems();
+      peditContrasChoices.removeHighlightedItems();
       peditContrasChoices.clearChoices();
       const mappedContras = contrasList.map((c) => ({
         ...c,
@@ -3054,8 +3091,8 @@ $(document).ready(function () {
         const start = new Date(t.start_date);
         start.setHours(0, 0, 0, 0);
         const end = new Date(t.end_date);
-        end.setHours(23, 59, 59, 999);
-        const diff = Math.ceil((end - start) / 86400000);
+        end.setHours(0, 0, 0, 0);
+        const diff = Math.max(1, Math.round((end - start) / 86400000) + 1);
 
         const today = new Date();
         let t_status = "upcoming";
@@ -3074,7 +3111,8 @@ $(document).ready(function () {
             : t_status === "active"
               ? "Activo"
               : "Próximo";
-        let imgUrl = window.BASE_URL + "/dummy.jpg";
+        let imgUrl =
+          "https://st3.depositphotos.com/3436901/14792/i/450/depositphotos_147926787-stock-photo-plane-flying-over-blue-sky.jpg";
         if (t.cover_image) {
           imgUrl = t.cover_image.startsWith("http")
             ? t.cover_image
@@ -3095,7 +3133,7 @@ $(document).ready(function () {
           <div class="col-12">
           <div class="card shadow-sm h-100 border-0" style="background:#111; border-radius: 0; cursor:pointer; transition:transform 0.2s, box-shadow 0.2s;" onclick="openTrip(${t.id})" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--bs-shadow-sm)'">
             <div style="height: 130px; position: relative; overflow: hidden; border-radius: 0;">
-               ${t.cover_image ? `<img src="${imgUrl}" referrerpolicy="no-referrer" onerror="this.style.opacity='0'" class="w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease, opacity 0.3s ease; z-index: 0; position:absolute;">` : ""}
+               <img src="${imgUrl}" referrerpolicy="no-referrer" onerror="this.src='https://st3.depositphotos.com/3436901/14792/i/450/depositphotos_147926787-stock-photo-plane-flying-over-blue-sky.jpg'" class="w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease, opacity 0.3s ease; z-index: 0; position:absolute;">
                <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to bottom, transparent 10%, rgba(10,12,16,0.95)); z-index: 1;"></div>
                <div class="position-absolute bottom-0 start-0 w-100 p-3 pb-2 text-white" style="z-index: 2;">
                  <div class="d-flex align-items-center gap-2 mb-1">
@@ -3137,17 +3175,103 @@ $(document).ready(function () {
     const navLabel = document.getElementById("rank-nav-label");
     let currentPeriod = "year";
     let baseDate = new Date();
-    let customStart = "";
-    let customEnd = "";
     let cachedData = null;
+
+    // Inicializar Flatpickr para el ranking si no está inicializado
+    const rankingFpConfig = {
+      locale: "es",
+      dateFormat: "Y-m-d",
+      altInput: true,
+      altFormat: "d/m/Y",
+      theme: "dark",
+      disableMobile: true,
+      monthSelectorType: "dropdown",
+      minDate: "1850-01-01",
+      maxDate: "2100-12-31",
+      onReady: function (selectedDates, dateStr, fp) {
+        fp.calendarContainer.classList.add("rcw-flatpickr");
+        const yearInput = fp.calendarContainer.querySelector(".cur-year");
+        if (yearInput) {
+          const yearSelect = document.createElement("select");
+          yearSelect.className =
+            "flatpickr-monthDropdown-months cur-year-select";
+          for (let y = 2100; y >= 1850; y--) {
+            const opt = document.createElement("option");
+            opt.value = y;
+            opt.textContent = y;
+            yearSelect.appendChild(opt);
+          }
+          yearSelect.value = fp.currentYear;
+          yearSelect.addEventListener("change", (e) => {
+            fp.changeYear(parseInt(e.target.value));
+          });
+          fp.set("onYearChange", () => {
+            yearSelect.value = fp.currentYear;
+          });
+          yearInput.parentNode.replaceChild(yearSelect, yearInput);
+        }
+      },
+    };
+
+    if (sDate && !sDate._flatpickr) {
+      flatpickr(sDate, rankingFpConfig);
+    }
+    if (eDate && !eDate._flatpickr) {
+      flatpickr(eDate, rankingFpConfig);
+    }
 
     function updateLabel() {
       const navContainer = document.getElementById("rank-nav-container");
-      if (currentPeriod === "all" || currentPeriod === "custom") {
+      const datesContainer = document.getElementById("rank-dates-container");
+
+      if (currentPeriod === "all") {
         if (navContainer) navContainer.classList.add("d-none");
-        navLabel.textContent = "Siempre";
+        if (datesContainer) datesContainer.classList.add("d-none");
+        if (sDate) {
+          if (sDate._flatpickr) sDate._flatpickr.clear();
+          else sDate.value = "";
+        }
+        if (eDate) {
+          if (eDate._flatpickr) {
+            eDate._flatpickr.clear();
+            eDate._flatpickr.set("minDate", null);
+          } else {
+            eDate.value = "";
+            eDate.min = "";
+          }
+        }
+      } else if (currentPeriod === "custom") {
+        if (navContainer) navContainer.classList.add("d-none");
+        if (datesContainer) datesContainer.classList.remove("d-none");
+        // Pre-fill with current year if empty
+        const isEmpty =
+          sDate &&
+          (sDate._flatpickr
+            ? sDate._flatpickr.selectedDates.length === 0
+            : !sDate.value);
+        if (isEmpty) {
+          const fmt = (d) =>
+            d.getFullYear() +
+            "-" +
+            String(d.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(d.getDate()).padStart(2, "0");
+          const s = fmt(new Date(baseDate.getFullYear(), 0, 1));
+          const e = fmt(new Date(baseDate.getFullYear(), 11, 31));
+          if (sDate._flatpickr) sDate._flatpickr.setDate(s, false);
+          else if (sDate) sDate.value = s;
+          if (eDate._flatpickr) {
+            eDate._flatpickr.set("minDate", s);
+            eDate._flatpickr.setDate(e, false);
+          } else if (eDate) {
+            eDate.value = e;
+            eDate.min = s;
+          }
+        }
       } else {
+        // week / month / year
         if (navContainer) navContainer.classList.remove("d-none");
+        if (datesContainer) datesContainer.classList.remove("d-none");
         if (currentPeriod === "year")
           navLabel.textContent = baseDate.getFullYear();
         else if (currentPeriod === "month") {
@@ -3166,38 +3290,19 @@ $(document).ready(function () {
               month: "short",
             });
         }
-      }
-
-      if (currentPeriod !== "custom" && currentPeriod !== "all") {
         const d = getDates();
         if (sDate) {
-          sDate.value = d.start || "";
-          if (eDate) eDate.min = d.start || "";
+          if (sDate._flatpickr) sDate._flatpickr.setDate(d.start || "", false);
+          else sDate.value = d.start || "";
+          if (eDate) {
+            if (eDate._flatpickr)
+              eDate._flatpickr.set("minDate", d.start || "");
+            else eDate.min = d.start || "";
+          }
         }
-        if (eDate) eDate.value = d.end || "";
-      } else if (currentPeriod === "all") {
-        if (sDate) sDate.value = "";
         if (eDate) {
-          eDate.value = "";
-          eDate.min = "";
-        }
-      } else if (currentPeriod === "custom") {
-        // Si entramos en custom y están vacíos, ponemos el año actual como base
-        if (sDate && !sDate.value) {
-          const fmt = (date) =>
-            date.getFullYear() +
-            "-" +
-            String(date.getMonth() + 1).padStart(2, "0") +
-            "-" +
-            String(date.getDate()).padStart(2, "0");
-          const start = fmt(new Date(baseDate.getFullYear(), 0, 1));
-          const end = fmt(new Date(baseDate.getFullYear(), 11, 31));
-
-          sDate.value = start;
-          eDate.value = end;
-          eDate.min = start;
-          customStart = start;
-          customEnd = end;
+          if (eDate._flatpickr) eDate._flatpickr.setDate(d.end || "", false);
+          else eDate.value = d.end || "";
         }
       }
     }
@@ -3226,8 +3331,10 @@ $(document).ready(function () {
         start = fmt(new Date(baseDate.getFullYear(), 0, 1));
         end = fmt(new Date(baseDate.getFullYear(), 11, 31));
       } else if (currentPeriod === "custom") {
-        start = customStart;
-        end = customEnd;
+        const sd = document.getElementById("rank-start-date");
+        const ed = document.getElementById("rank-end-date");
+        start = sd ? sd.value : "";
+        end = ed ? ed.value : "";
       }
       return { start, end };
     }
@@ -3277,14 +3384,16 @@ $(document).ready(function () {
         const title = isC ? item.coaster_name : item.park_name;
         const sub = isC ? item.park_name : item.park_location;
         const count = parseInt(isC ? item.times_ridden : item.times_visited);
-        const img = item.imagen_url || window.BASE_URL + "/web/img/dummy.jpg";
+        const defaultImg =
+          "https://st3.depositphotos.com/3436901/14792/i/450/depositphotos_147926787-stock-photo-plane-flying-over-blue-sky.jpg";
+        const img = item.imagen_url || defaultImg;
         const pct = (count / max) * 100;
 
         html += `
           <div class="list-group-item bg-transparent border-bottom border-secondary border-opacity-25 px-2 py-3">
             <div class="d-flex align-items-center gap-3">
               <div class="fw-bold text-success fs-5" style="min-width:40px;">#${idx + 1}</div>
-              <img src="${img}" onerror="this.src='${window.BASE_URL}/web/img/dummy.jpg'" style="width: 48px; height: 48px; object-fit: cover; border-radius: 4px; border: 1px solid var(--rcw-border);">
+              <img src="${img}" onerror="this.src='${defaultImg}'" style="width: 48px; height: 48px; object-fit: cover; border-radius: 4px; border: 1px solid var(--rcw-border);">
               <div class="flex-grow-1 min-w-0">
                 <div class="d-flex justify-content-between align-items-end mb-1 gap-2">
                   <div class="flex-grow-1 min-w-0">
@@ -3351,28 +3460,205 @@ $(document).ready(function () {
     if (prevBtn) prevBtn.addEventListener("click", () => handleArrowClick(-1));
     if (nextBtn) nextBtn.addEventListener("click", () => handleArrowClick(1));
 
-    sDate.addEventListener("change", (e) => {
-      customStart = e.target.value;
-      if (eDate) {
-        eDate.min = customStart;
-        if (eDate.value && eDate.value < customStart) {
-          eDate.value = customStart;
-          customEnd = customStart;
+    // Cambia visualmente el bot\u00f3n activo a "personalizado" y actualiza el estado
+    function switchToCustom() {
+      currentPeriod = "custom";
+      pBtns.forEach((btn) => {
+        btn.classList.remove("btn-outline-success", "active");
+        btn.classList.add("btn-outline-secondary");
+        if (btn.dataset.period === "custom") {
+          btn.classList.remove("btn-outline-secondary");
+          btn.classList.add("btn-outline-success", "active");
         }
-      }
-      if (currentPeriod === "custom") fetchRanking();
-    });
-    eDate.addEventListener("change", (e) => {
-      customEnd = e.target.value;
-      if (sDate && customEnd && customEnd < sDate.value) {
-        eDate.value = sDate.value;
-        customEnd = sDate.value;
-      }
-      if (currentPeriod === "custom") fetchRanking();
-    });
+      });
+      const datesContainer = document.getElementById("rank-dates-container");
+      if (datesContainer) datesContainer.classList.remove("d-none");
+      const navContainer = document.getElementById("rank-nav-container");
+      if (navContainer) navContainer.classList.add("d-none");
+    }
+
+    // Flatpickr en profile.php/user_profile.php (iniciado por trips.js initFlatpickr o localmente)
+    // Nos subscribimos via el evento onChange de Flatpickr
+    if (sDate && sDate._flatpickr) {
+      const onStartChange = (val) => {
+        if (!val) return; // limpieza programática — no cambiar periodo
+        if (eDate && eDate._flatpickr) {
+          eDate._flatpickr.set("minDate", val);
+        }
+        if (currentPeriod !== "custom") switchToCustom();
+        const sv = document.getElementById("rank-start-date")?.value;
+        const ev = document.getElementById("rank-end-date")?.value;
+        if (sv && ev && sv <= ev) fetchRanking();
+      };
+      sDate._flatpickr.config.onChange.push((_, dateStr) =>
+        onStartChange(dateStr),
+      );
+    }
+
+    if (eDate && eDate._flatpickr) {
+      const onEndChange = (val) => {
+        if (!val) return; // limpieza programática — no cambiar periodo
+        if (currentPeriod !== "custom") switchToCustom();
+        const sv = document.getElementById("rank-start-date")?.value;
+        const ev = document.getElementById("rank-end-date")?.value;
+        if (sv && ev && sv <= ev) fetchRanking();
+      };
+      eDate._flatpickr.config.onChange.push((_, dateStr) =>
+        onEndChange(dateStr),
+      );
+    }
 
     updateLabel();
     fetchRanking();
+  }
+
+  if (window.location.hash === "#photos") {
+    setTimeout(() => showSection("#profile-photos"), 200);
+  }
+
+  // ── GESTIÓN DE FOTOS (MIS FOTOS) ──────────────────────────────────────────
+
+  function resolveAvatarUrl(profileImage, username) {
+    if (profileImage && profileImage.trim() !== "") {
+      const src = profileImage.startsWith("/")
+        ? BASE_URL + profileImage
+        : profileImage;
+      return { type: "image", src: src };
+    }
+    const initial = username ? username.charAt(0).toUpperCase() : "?";
+    return { type: "initial", initial: initial };
+  }
+
+  async function loadPhotos() {
+    const container = $("#photos-grid-container");
+    container.html(
+      '<div class="col-12 text-center py-5"><i class="fa-solid fa-spinner fa-spin fs-1 opacity-25"></i></div>',
+    );
+
+    try {
+      const res = await fetch(
+        `${BASE_URL}/api/php/profile_config.php?action=get_my_photos`,
+      );
+      const json = await res.json();
+      if (json.success) {
+        renderPhotos(json.photos);
+      } else {
+        container.html(
+          `<div class="col-12 text-center py-5 text-muted">${json.error || "Error cargando fotos."}</div>`,
+        );
+      }
+    } catch (e) {
+      console.error(e);
+      container.html(
+        '<div class="col-12 text-center py-5 text-muted">Error de conexión.</div>',
+      );
+    }
+  }
+
+  function renderPhotos(photos) {
+    const container = $("#photos-grid-container");
+    container.empty();
+
+    if (!photos || photos.length === 0) {
+      container.html(
+        '<div class="col-12 text-center py-5 text-muted"><i class="fa-solid fa-camera-viewfinder fs-1 mb-3 opacity-50"></i><br>Todavía no tienes fotos aprobadas. Sube fotos desde las páginas de montañas rusas.</div>',
+      );
+      return;
+    }
+
+    photos.forEach((photo, index) => {
+      const url = photo.photo_url.startsWith("/")
+        ? BASE_URL + photo.photo_url
+        : photo.photo_url;
+      const caption =
+        photo.caption || `${photo.coaster_name} en ${photo.park_name}`;
+      const username = photo.username || "Tú";
+      const profileImage = photo.profile_image || "";
+      const avatarObj = resolveAvatarUrl(profileImage, username);
+      const avatarSrc = avatarObj.type === "image" ? avatarObj.src : null;
+
+      const html = `
+        <div class="col-6 col-md-4 col-xl-3">
+            <div class="position-relative ratio ratio-1x1 overflow-hidden shadow-sm group-hover-zoom photo-square-container"
+                 style="cursor: pointer;"
+                 data-index="${index}"
+                 data-url="${url}"
+                 data-username="${username}"
+                 data-avatar="${avatarSrc ? avatarSrc : ""}"
+                 data-caption="${caption}">
+                <img src="${url}" class="object-fit-cover w-100 h-100" style="transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" alt="Foto">
+                <div class="position-absolute bottom-0 start-0 w-100 p-2" style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); pointer-events:none;">
+                    <p class="text-white small mb-0 fw-bold text-truncate w-100" style="font-size: 0.75rem;">${caption}</p>
+                </div>
+            </div>
+        </div>
+      `;
+      container.append(html);
+    });
+
+    let currentPhotoIndex = 0;
+    const igModal = new bootstrap.Modal(
+      document.getElementById("ig-lightbox-modal"),
+    );
+
+    function updateModalContent(index) {
+      const allPhotosList = $(".photo-square-container");
+      if (index < 0 || index >= allPhotosList.length) return;
+      currentPhotoIndex = index;
+      const el = $(allPhotosList[index]);
+
+      const url = el.data("url");
+      const username = el.data("username");
+      const avatar = el.data("avatar");
+      const caption = el.data("caption");
+
+      $("#ig-modal-img").attr("src", url);
+      if (avatar) {
+        $("#ig-modal-avatar").attr("src", avatar).removeClass("d-none");
+        $("#ig-modal-avatar-fallback").addClass("d-none");
+      } else {
+        $("#ig-modal-avatar").addClass("d-none");
+        $("#ig-modal-avatar-fallback").removeClass("d-none");
+      }
+      $("#ig-modal-username").text(username);
+
+      if (caption) {
+        $("#ig-modal-caption-user").text(username);
+        $("#ig-modal-caption").html(
+          `<span class="text-muted opacity-50 mx-1">&bull;</span> ${caption}`,
+        );
+      } else {
+        $("#ig-modal-caption-user").text("");
+        $("#ig-modal-caption").text("");
+      }
+
+      // Mostrar/ocultar flechas si es la primera o ultima
+      $("#ig-modal-prev").toggle(index > 0);
+      $("#ig-modal-next").toggle(index < allPhotosList.length - 1);
+    }
+
+    $(".photo-square-container")
+      .off("click")
+      .on("click", function () {
+        const idx = $(this).data("index");
+        updateModalContent(idx);
+        igModal.show();
+      });
+
+    $("#ig-modal-prev")
+      .off("click")
+      .on("click", () => updateModalContent(currentPhotoIndex - 1));
+    $("#ig-modal-next")
+      .off("click")
+      .on("click", () => updateModalContent(currentPhotoIndex + 1));
+
+    $(document)
+      .off("keydown.igmodal")
+      .on("keydown.igmodal", function (e) {
+        if (!$("#ig-lightbox-modal").hasClass("show")) return;
+        if (e.key === "ArrowLeft") updateModalContent(currentPhotoIndex - 1);
+        if (e.key === "ArrowRight") updateModalContent(currentPhotoIndex + 1);
+      });
   }
 });
 
@@ -3383,17 +3669,16 @@ $(document).on("click", ".btn-toggle-stats", function (e) {
   const target = btn.closest(".top-card").find(".stats-expandable");
 
   if (target.hasClass("d-none")) {
-    // Quitamos d-none y seteamos display:none temporalmente para que slideDown anime
     target
       .removeClass("d-none")
-      .css("display", "none")
+      .addClass("d-flex")
+      .hide()
       .slideDown(250, function () {
-        $(this).css("display", "flex").addClass("d-flex");
+        $(this).css("display", ""); // Clean up inline style
       });
     btn.find("i").removeClass("fa-chevron-down").addClass("fa-chevron-up");
     btn.find("span").text("Contraer");
   } else {
-    // Ocultamos con slideUp y luego restauramos la clase d-none original
     target.slideUp(250, function () {
       $(this).removeClass("d-flex").addClass("d-none").css("display", "");
     });

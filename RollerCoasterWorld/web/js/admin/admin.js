@@ -295,6 +295,23 @@ $(document).ready(function () {
               data-image="${c.imagen_url || ""}">
               <i class="fa-solid fa-pen"></i> <span class="d-none d-md-inline">Editar</span>
             </a>
+            <button class="btn btn-sm btn-outline-info rounded-0 px-2 px-sm-3 btn-duplicate-coaster"
+              data-id="${c.id}"
+              data-name="${c.coaster_name ? c.coaster_name.replace(/"/g, "&quot;") : ""}"
+              data-year="${c.opening_year ?? ""}"
+              data-height="${c.height ?? ""}"
+              data-speed="${c.speed ?? ""}"
+              data-length="${c.coaster_length ?? ""}"
+              data-inversions="${c.inversions ?? ""}"
+              data-status="${c.coaster_status || ""}"
+              data-manufacturer="${c.coaster_manufacter ? c.coaster_manufacter.replace(/"/g, "&quot;") : ""}"
+              data-model="${c.coaster_model ? c.coaster_model.replace(/"/g, "&quot;") : ""}"
+              data-park="${c.park_name ? c.park_name.replace(/"/g, "&quot;") : ""}"
+              data-park-id="${c.park_id ?? ""}"
+              data-country="${c.park_country ? c.park_country.replace(/"/g, "&quot;") : ""}"
+              data-image="${c.imagen_url || ""}" title="Duplicar esta coaster">
+              <i class="fa-solid fa-copy"></i>
+            </button>
             <button class="btn btn-sm btn-outline-danger rounded-0 btn-delete-coaster px-2 px-sm-3"
               data-id="${c.id}" data-name="${c.coaster_name}">
               <i class="fa-solid fa-trash"></i> <span class="d-none d-md-inline">Eliminar</span>
@@ -1720,11 +1737,6 @@ $(document).ready(function () {
                 data-name="${(p.park_name || "").replace(/"/g, "&quot;")}">
                 <i class="fa-solid fa-pen"></i> Editar
               </button>
-              <button class="btn btn-sm btn-outline-warning rounded-0 btn-duplicate-park"
-                data-id="${p.id}"
-                data-name="${(p.park_name || "").replace(/"/g, "&quot;")}">
-                <i class="fa-solid fa-copy"></i> Duplicar
-              </button>
               <button class="btn btn-sm btn-outline-danger rounded-0 btn-delete-park"
                 data-id="${p.id}"
                 data-name="${(p.park_name || "").replace(/"/g, "&quot;")}">
@@ -1933,55 +1945,6 @@ $(document).ready(function () {
       } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-trash me-1"></i>Eliminar';
-      }
-    });
-
-    // ── Modal duplicar ─────────────────────────────────────────
-    $(document).on("click", ".btn-duplicate-park", function () {
-      $("#duplicate-park-name").text($(this).data("name"));
-      $("#confirm-duplicate-park").data("id", $(this).data("id"));
-      new bootstrap.Modal(
-        document.getElementById("modal-duplicate-park"),
-      ).show();
-    });
-
-    $(document).on("click", "#confirm-duplicate-park", async function () {
-      const id = $(this).data("id");
-      const btn = this;
-      btn.disabled = true;
-      btn.innerHTML =
-        '<i class="fa-solid fa-spinner fa-spin me-1"></i>Duplicando...';
-      try {
-        const fd = new FormData();
-        fd.append("id", id);
-        const res = await fetch(
-          `${BASE_URL}/api/php/admin/admin_parks.php?action=duplicatePark`,
-          {
-            headers: {
-              "X-CSRF-Token":
-                document
-                  .querySelector('meta[name="csrf-token"]')
-                  ?.getAttribute("content") ?? "",
-            },
-            method: "POST",
-            credentials: "include",
-            body: fd,
-          },
-        );
-        const data = await res.json();
-        if (data.success) {
-          bootstrap.Modal.getInstance(
-            document.getElementById("modal-duplicate-park"),
-          )?.hide();
-          loadParks(parkCurrentPage);
-        } else {
-          alert("Error: " + (data.error || "No se pudo duplicar."));
-        }
-      } catch (e) {
-        console.error(e);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-copy me-1"></i>Duplicar';
       }
     });
   }
@@ -4208,55 +4171,6 @@ if ($("#admin-news-list").length) {
       btn
         .prop("disabled", false)
         .html('<i class="fa-solid fa-trash me-1"></i>Eliminar');
-    });
-
-    // ── Duplicar parque ──────────────────────────────────
-    $(document).on("click", ".btn-duplicate-park", function () {
-      const id = $(this).data("id"),
-        name = $(this).data("name");
-      $("#duplicate-park-name").text(name);
-      $("#confirm-duplicate-park").attr("data-id", id);
-      new bootstrap.Modal(
-        document.getElementById("modal-duplicate-park"),
-      ).show();
-    });
-
-    $("#confirm-duplicate-park").on("click", async function () {
-      const btn = $(this);
-      const id = btn.attr("data-id");
-      btn
-        .prop("disabled", true)
-        .html('<i class="fa-solid fa-spinner fa-spin"></i>');
-      try {
-        const fd = new FormData();
-        fd.append("action", "duplicatePark");
-        fd.append("id", id);
-        const res = await fetch(`${parksApi}`, {
-          headers: {
-            "X-CSRF-Token":
-              document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute("content") ?? "",
-          },
-          method: "POST",
-          body: fd,
-          credentials: "include",
-        });
-        const data = await res.json();
-        if (data.success) {
-          bootstrap.Modal.getInstance(
-            document.getElementById("modal-duplicate-park"),
-          ).hide();
-          window.loadAdminParks(1);
-        } else {
-          alert(data.error || "Error al duplicar");
-        }
-      } catch (err) {
-        alert("Error de conexión");
-      }
-      btn
-        .prop("disabled", false)
-        .html('<i class="fa-solid fa-copy me-1"></i>Duplicar');
     });
 
     // ── Restaurar estado si viene de btn-new-park ────────

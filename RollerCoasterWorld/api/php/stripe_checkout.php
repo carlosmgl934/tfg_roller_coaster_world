@@ -33,7 +33,8 @@ if (!file_exists($envFile)) {
 $env = [];
 if (file_exists($envFile)) {
     foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
-        if (str_starts_with(trim($line), '#') || !str_contains($line, '=')) continue;
+        if (str_starts_with(trim($line), '#') || !str_contains($line, '='))
+            continue;
         [$k, $v] = explode('=', $line, 2);
         $env[trim($k)] = trim($v);
     }
@@ -49,10 +50,10 @@ if (empty($stripeSecret)) {
 // ── Router simple ─────────────────────────────────────────────────────────────
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
-match($action) {
+match ($action) {
     'create_session' => createCheckoutSession($env),
     'verify_session' => verifySession(),
-    default          => Response::error('Acción no válida', 400),
+    default => Response::error('Acción no válida', 400),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -81,7 +82,7 @@ function createCheckoutSession(array $env): void
         Response::error('El carrito está vacío', 400);
     }
 
-    $buyerName  = trim($_POST['name']  ?? '');
+    $buyerName = trim($_POST['name'] ?? '');
     $buyerEmail = trim($_POST['email'] ?? '');
 
     if (!$buyerName || !$buyerEmail) {
@@ -92,59 +93,60 @@ function createCheckoutSession(array $env): void
     }
 
     // Aplicar cupón si existe
-    $coupon          = $_SESSION['rcw_coupon'] ?? null;
+    $coupon = $_SESSION['rcw_coupon'] ?? null;
     $discountPercent = $coupon ? ($coupon['percent'] / 100) : 0;
 
     // Construir line_items para Stripe (precio en céntimos)
     $lineItems = [];
     foreach ($cart as $item) {
-        $unitPrice   = (float)$item['unit_price'];
-        $finalUnit   = round($unitPrice * (1 - $discountPercent), 2);
-        $amountCents = (int)round($finalUnit * 100);
+        $unitPrice = (float) $item['unit_price'];
+        $finalUnit = round($unitPrice * (1 - $discountPercent), 2);
+        $amountCents = (int) round($finalUnit * 100);
 
-        $label  = $item['park_name'];
+        $label = $item['park_name'];
         $label .= ' — ' . ($item['ticket_type'] === 'pase_rapido' ? 'Pase Rápido' : 'Entrada General');
         $label .= ' (' . $item['visit_date'] . ')';
 
         $lineItems[] = [
             'price_data' => [
-                'currency'     => 'eur',
-                'unit_amount'  => $amountCents,
+                'currency' => 'eur',
+                'unit_amount' => $amountCents,
                 'product_data' => ['name' => $label],
             ],
-            'quantity' => (int)$item['quantity'],
+            'quantity' => (int) $item['quantity'],
         ];
     }
 
     // Serializar datos del comprador en metadata de la session
     $meta = [
-        'buyer_name'  => $buyerName,
+        'buyer_name' => $buyerName,
         'buyer_email' => $buyerEmail,
-        'user_id'     => (string)getUserId(),
+        'user_id' => (string) getUserId(),
     ];
 
     // URL base del proyecto
     $baseUrl = getBaseUrl();
     $successUrl = $baseUrl . '/web/views/public/shop/checkout.php?payment=success&session_id={CHECKOUT_SESSION_ID}';
-    $cancelUrl  = $baseUrl . '/web/views/public/shop/checkout.php?payment=cancel';
+    $cancelUrl = $baseUrl . '/web/views/public/shop/checkout.php?payment=cancel';
 
     try {
         $session = \Stripe\Checkout\Session::create([
             'payment_method_types' => ['card'],
-            'mode'                 => 'payment',
-            'line_items'           => $lineItems,
-            'customer_email'       => $buyerEmail,
-            'metadata'             => $meta,
-            'success_url'          => $successUrl,
-            'cancel_url'           => $cancelUrl,
+            'mode' => 'payment',
+            'line_items' => $lineItems,
+            'customer_email' => $buyerEmail,
+            'metadata' => $meta,
+            'success_url' => $successUrl,
+            'cancel_url' => $cancelUrl,
         ]);
 
         Response::success([
-            'url'        => $session->url,
+            'url' => $session->url,
             'session_id' => $session->id,
         ]);
     } catch (\Stripe\Exception\ApiErrorException $e) {
-        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
+        error_log($e->getMessage());
+        Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -166,7 +168,8 @@ function verifySession(): void
     try {
         $session = \Stripe\Checkout\Session::retrieve($sessionId);
     } catch (\Stripe\Exception\ApiErrorException $e) {
-        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
+        error_log($e->getMessage());
+        Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 
     if ($session->payment_status !== 'paid') {
@@ -177,12 +180,12 @@ function verifySession(): void
     if (isset($_SESSION['rcw_stripe_processed'][$sessionId])) {
         Response::success([
             'already_processed' => true,
-            'order_ids'         => $_SESSION['rcw_stripe_processed'][$sessionId],
+            'order_ids' => $_SESSION['rcw_stripe_processed'][$sessionId],
         ]);
     }
 
     // Recuperar metadatos
-    $buyerName  = $session->metadata->buyer_name  ?? '';
+    $buyerName = $session->metadata->buyer_name ?? '';
     $buyerEmail = $session->metadata->buyer_email ?? $session->customer_email ?? '';
 
     // Crear pedido en BD (misma lógica que tickets.php::createOrder)
@@ -198,7 +201,7 @@ function verifySession(): void
         Response::error('El carrito ya fue procesado', 409);
     }
 
-    $coupon          = $_SESSION['rcw_coupon'] ?? null;
+    $coupon = $_SESSION['rcw_coupon'] ?? null;
     $discountPercent = $coupon ? ($coupon['percent'] / 100) : 0;
 
     try {
@@ -220,33 +223,37 @@ function verifySession(): void
 
         $createdOrders = [];
         foreach ($cart as $item) {
-            $itemDiscount = round((float)$item['total'] * $discountPercent, 2);
-            $finalPrice   = round((float)$item['total'] - $itemDiscount, 2);
+            $itemDiscount = round((float) $item['total'] * $discountPercent, 2);
+            $finalPrice = round((float) $item['total'] - $itemDiscount, 2);
 
             // Build addon label
             $addonParts = [];
-            if (!empty($item['addon_pase_rapido'])) $addonParts[] = 'Pase Rápido';
-            if (!empty($item['addon_photopass']))   $addonParts[] = 'PhotoPass';
-            if (!empty($item['addon_buffet']))      $addonParts[] = 'Buffet';
-            if (!empty($item['addon_parking']))     $addonParts[] = 'Parking';
+            if (!empty($item['addon_pase_rapido']))
+                $addonParts[] = 'Pase Rápido';
+            if (!empty($item['addon_photopass']))
+                $addonParts[] = 'PhotoPass';
+            if (!empty($item['addon_buffet']))
+                $addonParts[] = 'Buffet';
+            if (!empty($item['addon_parking']))
+                $addonParts[] = 'Parking';
 
             $stmt->execute([
-                ':user_id'           => $userId,
-                ':park_id'           => $item['park_id'],
-                ':ticket_type'       => $item['ticket_type'],
-                ':visit_date'        => $item['visit_date'],
-                ':quantity'          => $item['quantity'],
-                ':unit_price'        => $item['unit_price'],
-                ':price'             => $finalPrice,
-                ':buyer_name'        => $buyerName,
-                ':buyer_email'       => $buyerEmail,
+                ':user_id' => $userId,
+                ':park_id' => $item['park_id'],
+                ':ticket_type' => $item['ticket_type'],
+                ':visit_date' => $item['visit_date'],
+                ':quantity' => $item['quantity'],
+                ':unit_price' => $item['unit_price'],
+                ':price' => $finalPrice,
+                ':buyer_name' => $buyerName,
+                ':buyer_email' => $buyerEmail,
                 ':stripe_session_id' => $sessionId,
                 ':addon_pase_rapido' => !empty($item['addon_pase_rapido']) ? 1 : 0,
-                ':addon_photopass'   => !empty($item['addon_photopass']) ? 1 : 0,
-                ':addon_buffet'      => !empty($item['addon_buffet']) ? 1 : 0,
-                ':addon_parking'     => !empty($item['addon_parking']) ? 1 : 0,
-                ':parking_price'     => (float)($item['parking_price'] ?? 0),
-                ':addon_label'       => implode(', ', $addonParts),
+                ':addon_photopass' => !empty($item['addon_photopass']) ? 1 : 0,
+                ':addon_buffet' => !empty($item['addon_buffet']) ? 1 : 0,
+                ':addon_parking' => !empty($item['addon_parking']) ? 1 : 0,
+                ':parking_price' => (float) ($item['parking_price'] ?? 0),
+                ':addon_label' => implode(', ', $addonParts),
             ]);
             $createdOrders[] = $stmt->fetchColumn();
         }
@@ -274,12 +281,14 @@ function verifySession(): void
 
         Response::success([
             'order_ids' => $createdOrders,
-            'message'   => '¡Pago confirmado! Tus entradas están listas.',
+            'message' => '¡Pago confirmado! Tus entradas están listas.',
         ]);
 
     } catch (\Exception $e) {
-        if ($db->inTransaction()) $db->rollBack();
-        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
+        if ($db->inTransaction())
+            $db->rollBack();
+        error_log($e->getMessage());
+        Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -287,16 +296,17 @@ function verifySession(): void
 
 function getUserId(): ?int
 {
-    if (isset($_SESSION['user_id'])) return (int)$_SESSION['user_id'];
+    if (isset($_SESSION['user_id']))
+        return (int) $_SESSION['user_id'];
 
     if (isset($_SESSION['firebase_uid'])) {
-        $db   = new DBConexion();
+        $db = new DBConexion();
         $stmt = $db->prepare("SELECT id FROM users WHERE firebase_uid = :uid LIMIT 1");
         $stmt->execute([':uid' => $_SESSION['firebase_uid']]);
         $row = $stmt->fetch(\PDO::FETCH_ASSOC);
         if ($row) {
-            $_SESSION['user_id'] = (int)$row['id'];
-            return (int)$row['id'];
+            $_SESSION['user_id'] = (int) $row['id'];
+            return (int) $row['id'];
         }
     }
     return null;
@@ -305,9 +315,9 @@ function getUserId(): ?int
 function getBaseUrl(): string
 {
     $proto = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-    $host  = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
     $script = $_SERVER['SCRIPT_NAME'] ?? '';
-    
+
     // Si el script contiene /RollerCoasterWorld/, estamos en local (XAMPP)
     if (str_contains($script, '/RollerCoasterWorld/')) {
         $base = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $script) ?? '';
@@ -315,7 +325,7 @@ function getBaseUrl(): string
         // En producción, si el dominio ya apunta a la raíz del proyecto
         $base = '';
     }
-    
+
     return $proto . '://' . $host . $base;
 }
 
@@ -333,7 +343,8 @@ function sendTicketsByEmailStripe(string $email, string $name, array $orderIds, 
         $env = [];
         if (file_exists($envFile)) {
             foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
-                if (str_starts_with(trim($line), '#') || !str_contains($line, '=')) continue;
+                if (str_starts_with(trim($line), '#') || !str_contains($line, '='))
+                    continue;
                 [$k, $v] = explode('=', $line, 2);
                 $env[trim($k)] = trim($v);
             }
@@ -349,7 +360,8 @@ function sendTicketsByEmailStripe(string $email, string $name, array $orderIds, 
         if (!file_exists($autoload)) {
             $autoload = __DIR__ . '/../../../vendor/autoload.php';
         }
-        if (!file_exists($autoload)) return;
+        if (!file_exists($autoload))
+            return;
         require_once $autoload;
 
         // Cargar buildTicketHtml desde el helper compartido (evita ejecutar el router de tickets.php)
@@ -365,11 +377,13 @@ function sendTicketsByEmailStripe(string $email, string $name, array $orderIds, 
             ");
             $stmt->execute([':id' => $orderId, ':uid' => $userId]);
             $order = $stmt->fetch(\PDO::FETCH_ASSOC);
-            if (!$order) continue;
+            if (!$order)
+                continue;
 
             // Usar el template compartido (QR + márgenes + páginas por persona)
             $html = buildTicketHtml($order, (int) $orderId);
-            if (empty($html)) continue;
+            if (empty($html))
+                continue;
 
             $options = new \Dompdf\Options();
             $options->set('isHtml5ParserEnabled', true);
@@ -379,30 +393,31 @@ function sendTicketsByEmailStripe(string $email, string $name, array $orderIds, 
             $dompdf->setPaper('A4', 'portrait');
             $dompdf->render();
             $pdfs[] = [
-                'content'  => $dompdf->output(),
+                'content' => $dompdf->output(),
                 'filename' => 'entrada_RCW_' . $orderId . '_' . date('Ymd') . '.pdf',
             ];
         }
 
-        if (empty($pdfs)) return;
+        if (empty($pdfs))
+            return;
 
         $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
         $mail->isSMTP();
-        $mail->Host       = $env['MAIL_HOST'] ?? 'smtp.gmail.com';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = $env['MAIL_USER'] ?? '';
-        $mail->Password   = $env['MAIL_PASS'] ?? '';
+        $mail->Host = $env['MAIL_HOST'] ?? 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = $env['MAIL_USER'] ?? '';
+        $mail->Password = $env['MAIL_PASS'] ?? '';
         $mail->SMTPSecure = strtolower($env['MAIL_SECURE'] ?? 'tls') === 'ssl'
             ? \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS
             : \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port    = (int)($env['MAIL_PORT'] ?? 587);
+        $mail->Port = (int) ($env['MAIL_PORT'] ?? 587);
         $mail->CharSet = 'UTF-8';
 
         $mail->setFrom($env['MAIL_FROM'] ?? 'noreply@rollercoasterworld.com', $env['MAIL_FROM_NAME'] ?? 'RollerCoasterWorld');
         $mail->addAddress($email, $name);
         $mail->isHTML(true);
 
-        $n  = count($pdfs);
+        $n = count($pdfs);
         $pl = $n > 1 ? 's' : '';
         $mail->Subject = 'Tus entradas RollerCoasterWorld — Pago confirmado';
         $mail->Body = <<<MAIL

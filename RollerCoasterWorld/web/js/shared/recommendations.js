@@ -11,52 +11,54 @@
  */
 
 (function () {
-    'use strict';
+  "use strict";
 
-    const API = window.BASE_URL + '/api/php/recommendations.php';
+  const API = window.BASE_URL + "/api/php/recommendations.php";
 
-    // ── Estado global del módulo ──────────────────────────────────────────────
-    let currentRec     = null;   // Recomendación actualmente en el modal
-    let currentQty     = 1;      // Cantidad de entradas
-    let currentOrderId = null;   // ID del pedido creado
-    let modalEl        = null;   // Instancia Bootstrap del modal
+  // ── Estado global del módulo ──────────────────────────────────────────────
+  let currentRec = null; // Recomendación actualmente en el modal
+  let currentQty = 1; // Cantidad de entradas
+  let currentOrderId = null; // ID del pedido creado
+  let modalEl = null; // Instancia Bootstrap del modal
 
-    // ── Bootstrap init ────────────────────────────────────────────────────────
-    // Activo en cualquier página que tenga #recs-grid (dashboard Y generador de viajes)
-    document.addEventListener('DOMContentLoaded', () => {
-        const grid = document.getElementById('recs-grid');
-        if (!grid) return;
+  // ── Bootstrap init ────────────────────────────────────────────────────────
+  // Activo en cualquier página que tenga #recs-grid (dashboard Y generador de viajes)
+  document.addEventListener("DOMContentLoaded", () => {
+    const grid = document.getElementById("recs-grid");
+    if (!grid) return;
 
-        loadRecommendations();
-        bindRefreshBtn();
-    });
+    loadRecommendations();
+    bindRefreshBtn();
+  });
 
-    // ═════════════════════════════════════════════════════════════════════════
-    // 1. CARGA Y RENDERIZADO
-    // ═════════════════════════════════════════════════════════════════════════
-    async function loadRecommendations(forceRefresh = false) {
-        showSkeletons();
-        try {
-            const url    = API + (forceRefresh ? '?action=refresh' : '?action=get');
-            const resp   = await fetch(url, { credentials: 'same-origin' });
-            const json   = await resp.json();
+  // ═════════════════════════════════════════════════════════════════════════
+  // 1. CARGA Y RENDERIZADO
+  // ═════════════════════════════════════════════════════════════════════════
+  async function loadRecommendations(forceRefresh = false) {
+    showSkeletons();
+    try {
+      const url = API + (forceRefresh ? "?action=refresh" : "?action=get");
+      const resp = await fetch(url, { credentials: "same-origin" });
+      const json = await resp.json();
 
-            if (!json.success || !Array.isArray(json.data)) {
-                showError('No pudimos generar recomendaciones en este momento.');
-                return;
-            }
-            renderCards(json.data);
-        } catch (e) {
-            console.error('[Recommendations]', e);
-            showError('Error de conexión al cargar recomendaciones.');
-        }
+      if (!json.success || !Array.isArray(json.data)) {
+        showError("No pudimos generar recomendaciones en este momento.");
+        return;
+      }
+      renderCards(json.data);
+    } catch (e) {
+      console.error("[Recommendations]", e);
+      showError("Error de conexión al cargar recomendaciones.");
     }
+  }
 
-    // ── Skeleton mientras carga ───────────────────────────────────────────────
-    function showSkeletons() {
-        const grid = document.getElementById('recs-grid');
-        if (!grid) return;
-        grid.innerHTML = [1, 2, 3].map(() => `
+  // ── Skeleton mientras carga ───────────────────────────────────────────────
+  function showSkeletons() {
+    const grid = document.getElementById("recs-grid");
+    if (!grid) return;
+    grid.innerHTML = [1, 2, 3]
+      .map(
+        () => `
             <div class="rcw-rec-skeleton">
                 <div class="sk-img"></div>
                 <div class="sk-body">
@@ -66,51 +68,54 @@
                     <div class="sk-line w-80"></div>
                 </div>
             </div>
-        `).join('');
-    }
+        `,
+      )
+      .join("");
+  }
 
-    function showError(msg) {
-        const grid = document.getElementById('recs-grid');
-        if (!grid) return;
-        grid.innerHTML = `
+  function showError(msg) {
+    const grid = document.getElementById("recs-grid");
+    if (!grid) return;
+    grid.innerHTML = `
             <div class="col-span-3" style="grid-column:1/-1;text-align:center;padding:2rem;color:#94a3b8;">
                 <i class="fa-solid fa-triangle-exclamation mb-2 d-block" style="font-size:2rem;color:#f59e0b;"></i>
                 ${msg}
             </div>`;
-    }
+  }
 
-    // ── Renderizar cards ──────────────────────────────────────────────────────
-    function renderCards(recs) {
-        const grid = document.getElementById('recs-grid');
-        if (!grid) return;
+  // ── Renderizar cards ──────────────────────────────────────────────────────
+  function renderCards(recs) {
+    const grid = document.getElementById("recs-grid");
+    if (!grid) return;
 
-        grid.innerHTML = recs.map((rec, i) => buildCard(rec, i)).join('');
+    grid.innerHTML = recs.map((rec, i) => buildCard(rec, i)).join("");
 
-        // Bind click en cada card
-        grid.querySelectorAll('.rcw-rec-card').forEach((card) => {
-            card.addEventListener('click', () => {
-                const idx = parseInt(card.dataset.idx, 10);
-                openCheckout(recs[idx]);
-            });
-        });
-    }
+    // Bind click en cada card
+    grid.querySelectorAll(".rcw-rec-card").forEach((card) => {
+      card.addEventListener("click", () => {
+        const idx = parseInt(card.dataset.idx, 10);
+        openCheckout(recs[idx]);
+      });
+    });
+  }
 
-    // ── Construye HTML de un card ─────────────────────────────────────────────
-    function buildCard(rec, idx) {
-        const stars = renderStars(parseFloat(rec.hotel_stars || 3), 5);
-        const typeLabel = rec.rec_type === 'wildcard' ? 'Descubrimiento' : 'Recomendado';
-        const affinityPct = Math.round((parseFloat(rec.affinity_score) || 0) * 100);
-        const priceText = rec.price_estimate
-            ? parseFloat(rec.price_estimate).toFixed(0) + '€/pers.'
-            : 'Precio a consultar';
-        const imgHtml = rec.park_image_url
-            ? `<img class="rcw-rec-img" src="${escHtml(rec.park_image_url)}"
+  // ── Construye HTML de un card ─────────────────────────────────────────────
+  function buildCard(rec, idx) {
+    const stars = renderStars(parseFloat(rec.hotel_stars || 3), 5);
+    const typeLabel =
+      rec.rec_type === "wildcard" ? "Descubrimiento" : "Recomendado";
+    const affinityPct = Math.round((parseFloat(rec.affinity_score) || 0) * 100);
+    const priceText = rec.price_estimate
+      ? parseFloat(rec.price_estimate).toFixed(0) + "€/pers."
+      : "Precio a consultar";
+    const imgHtml = rec.park_image_url
+      ? `<img class="rcw-rec-img" src="${escHtml(rec.park_image_url)}"
                     alt="${escHtml(rec.park_name)}"
                     onerror="this.outerHTML='<div class=\\'rcw-rec-img-placeholder\\'><i class=\\'fa-solid fa-tree-city\\'></i></div>'">`
-            : `<div class="rcw-rec-img-placeholder"><i class="fa-solid fa-tree-city"></i></div>`;
-        const hotelStarsHtml = renderStars(rec.hotel_stars, 5, true);
+      : `<div class="rcw-rec-img-placeholder"><i class="fa-solid fa-tree-city"></i></div>`;
+    const hotelStarsHtml = renderStars(rec.hotel_stars, 5, true);
 
-        return `
+    return `
         <div class="rcw-rec-card" data-idx="${idx}" role="button" tabindex="0"
              aria-label="Ver recomendación: ${escHtml(rec.park_name)}">
 
@@ -126,7 +131,7 @@
                 <div class="rcw-rec-park-name">${escHtml(rec.park_name)}</div>
                 <div class="rcw-rec-country">
                     <i class="fa-solid fa-location-dot" style="color:var(--rcw-green-neon);"></i>
-                    ${escHtml(rec.park_country || '—')}
+                    ${escHtml(rec.park_country || "—")}
                 </div>
 
                 <!-- Razón IA -->
@@ -135,7 +140,7 @@
                 <!-- Detalles hotel + precio -->
                 <div class="rcw-rec-details">
                     <div class="rcw-rec-detail-row">
-                        <span><i class="fa-solid fa-hotel me-1"></i>${escHtml(rec.hotel_name || 'Hotel sugerido')}</span>
+                        <span><i class="fa-solid fa-hotel me-1"></i>${escHtml(rec.hotel_name || "Hotel sugerido")}</span>
                         <span class="rcw-rec-stars">${hotelStarsHtml}</span>
                     </div>
                     <div class="rcw-rec-detail-row">
@@ -157,30 +162,32 @@
                 </button>
             </div>
         </div>`;
+  }
+
+  // ═════════════════════════════════════════════════════════════════════════
+  // 2. MODAL CHECKOUT
+  // ═════════════════════════════════════════════════════════════════════════
+  function openCheckout(rec) {
+    currentRec = rec;
+    currentQty = 1;
+    currentOrderId = null;
+
+    ensureModal();
+    populateCheckout(rec);
+
+    if (!modalEl) {
+      modalEl = new bootstrap.Modal(
+        document.getElementById("rec-checkout-modal"),
+      );
     }
+    modalEl.show();
+  }
 
-    // ═════════════════════════════════════════════════════════════════════════
-    // 2. MODAL CHECKOUT
-    // ═════════════════════════════════════════════════════════════════════════
-    function openCheckout(rec) {
-        currentRec     = rec;
-        currentQty     = 1;
-        currentOrderId = null;
+  function ensureModal() {
+    if (document.getElementById("rec-checkout-modal")) return;
 
-        ensureModal();
-        populateCheckout(rec);
-
-        if (!modalEl) {
-            modalEl = new bootstrap.Modal(document.getElementById('rec-checkout-modal'));
-        }
-        modalEl.show();
-    }
-
-    function ensureModal() {
-        if (document.getElementById('rec-checkout-modal')) return;
-
-        const div = document.createElement('div');
-        div.innerHTML = `
+    const div = document.createElement("div");
+    div.innerHTML = `
         <div class="modal fade" id="rec-checkout-modal" tabindex="-1" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -204,28 +211,28 @@
             </div>
           </div>
         </div>`;
-        document.body.appendChild(div.firstElementChild);
-    }
+    document.body.appendChild(div.firstElementChild);
+  }
 
-    function populateCheckout(rec) {
-        const body   = document.getElementById('checkout-modal-body');
-        const footer = document.getElementById('checkout-modal-footer');
-        const title  = document.getElementById('checkout-modal-title');
-        if (!body || !footer) return;
+  function populateCheckout(rec) {
+    const body = document.getElementById("checkout-modal-body");
+    const footer = document.getElementById("checkout-modal-footer");
+    const title = document.getElementById("checkout-modal-title");
+    if (!body || !footer) return;
 
-        title.textContent = `Reservar: ${rec.park_name}`;
+    title.textContent = `Reservar: ${rec.park_name}`;
 
-        const hotelStarsHtml = renderStars(rec.hotel_stars, 5, true);
-        const unitPrice = parseFloat(rec.price_estimate || 50);
-        const hotelNight = parseFloat(rec.hotel_price_night || 80);
-        const totalDays  = parseInt(rec.duration_days, 10) || 2;
+    const hotelStarsHtml = renderStars(rec.hotel_stars, 5, true);
+    const unitPrice = parseFloat(rec.price_estimate || 50);
+    const hotelNight = parseFloat(rec.hotel_price_night || 80);
+    const totalDays = parseInt(rec.duration_days, 10) || 2;
 
-        // Fecha de inicio por defecto: 14 días desde hoy
-        const defaultStart = new Date();
-        defaultStart.setDate(defaultStart.getDate() + 14);
-        const startStr = defaultStart.toISOString().split('T')[0];
+    // Fecha de inicio por defecto: 14 días desde hoy
+    const defaultStart = new Date();
+    defaultStart.setDate(defaultStart.getDate() + 14);
+    const startStr = defaultStart.toISOString().split("T")[0];
 
-        body.innerHTML = `
+    body.innerHTML = `
         <!-- Razón IA -->
         <div class="rcw-rec-reason mb-3">${escHtml(rec.reason)}</div>
 
@@ -237,7 +244,7 @@
             </div>
             <div class="checkout-detail-row">
                 <span><i class="fa-solid fa-location-dot me-2 text-success"></i>País</span>
-                <span>${escHtml(rec.park_country || '—')}</span>
+                <span>${escHtml(rec.park_country || "—")}</span>
             </div>
             <div class="checkout-detail-row">
                 <span><i class="fa-solid fa-ticket me-2 text-success"></i>Precio entrada / pers.</span>
@@ -290,110 +297,135 @@
             Precio estimado = entradas × personas. El hotel se gestiona aparte con el proveedor.
         </p>`;
 
-        footer.innerHTML = `
+    footer.innerHTML = `
         <button type="button" class="btn btn-outline-secondary rounded-0 px-4"
                 data-bs-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-success rounded-0 fw-bold px-5" id="checkout-confirm-btn">
             <i class="fa-solid fa-credit-card me-2"></i>Confirmar y pagar (simulado)
         </button>`;
 
-        // Bind controles
-        bindQtyControls(unitPrice);
-        document.getElementById('checkout-confirm-btn')
-            .addEventListener('click', handleCheckoutConfirm);
+    // Bind controles
+    bindQtyControls(unitPrice);
+    document
+      .getElementById("checkout-confirm-btn")
+      .addEventListener("click", handleCheckoutConfirm);
+  }
+
+  function bindQtyControls(unitPrice) {
+    const display = document.getElementById("qty-display");
+    const total = document.getElementById("checkout-total-display");
+
+    const update = () => {
+      display.textContent = currentQty;
+      total.textContent = (unitPrice * currentQty).toFixed(2) + "€";
+    };
+
+    document.getElementById("qty-minus").addEventListener("click", () => {
+      if (currentQty > 1) {
+        currentQty--;
+        update();
+      }
+    });
+    document.getElementById("qty-plus").addEventListener("click", () => {
+      if (currentQty < 20) {
+        currentQty++;
+        update();
+      }
+    });
+  }
+
+  // ═════════════════════════════════════════════════════════════════════════
+  // 3. CONFIRM → BOOK → SCHEDULE
+  // ═════════════════════════════════════════════════════════════════════════
+  async function handleCheckoutConfirm() {
+    const btn = document.getElementById("checkout-confirm-btn");
+    if (!btn || !currentRec) return;
+
+    btn.disabled = true;
+    btn.innerHTML =
+      '<span class="spinner-border spinner-border-sm me-2"></span>Procesando…';
+
+    try {
+      // Paso A: Crear / actualizar pedido
+      const bookResp = await fetch(API + "?action=book", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "X-CSRF-Token":
+            document
+              .querySelector('meta[name="csrf-token"]')
+              ?.getAttribute("content") ?? "",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          park_id: currentRec.park_id,
+          quantity: currentQty,
+        }),
+      });
+      const bookJson = await bookResp.json();
+      if (!bookJson.success)
+        throw new Error(bookJson.error || "Error al reservar");
+
+      currentOrderId = bookJson.data.order_id;
+      const startDate =
+        document.getElementById("checkout-start-date")?.value || "";
+
+      // Paso B: Confirmar pago y generar agenda
+      const confirmResp = await fetch(API + "?action=confirm", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "X-CSRF-Token":
+            document
+              .querySelector('meta[name="csrf-token"]')
+              ?.getAttribute("content") ?? "",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          order_id: currentOrderId,
+          park_id: currentRec.park_id,
+          duration_days: currentRec.duration_days,
+          start_date: startDate,
+        }),
+      });
+      const confirmJson = await confirmResp.json();
+      if (!confirmJson.success)
+        throw new Error(confirmJson.error || "Error al confirmar");
+
+      showPaymentSuccess(confirmJson.data);
+    } catch (err) {
+      console.error("[Checkout]", err);
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-credit-card me-2"></i>Reintentar';
+      showToast("Error: " + err.message, "danger");
     }
+  }
 
-    function bindQtyControls(unitPrice) {
-        const display = document.getElementById('qty-display');
-        const total   = document.getElementById('checkout-total-display');
+  // ── Pantalla de éxito dentro del modal ────────────────────────────────────
+  function showPaymentSuccess(data) {
+    const body = document.getElementById("checkout-modal-body");
+    const footer = document.getElementById("checkout-modal-footer");
+    const title = document.getElementById("checkout-modal-title");
+    if (!body) return;
 
-        const update = () => {
-            display.textContent = currentQty;
-            total.textContent   = (unitPrice * currentQty).toFixed(2) + '€';
-        };
+    title.textContent = "¡Reserva Confirmada!";
 
-        document.getElementById('qty-minus').addEventListener('click', () => {
-            if (currentQty > 1) { currentQty--; update(); }
-        });
-        document.getElementById('qty-plus').addEventListener('click', () => {
-            if (currentQty < 20) { currentQty++; update(); }
-        });
-    }
-
-    // ═════════════════════════════════════════════════════════════════════════
-    // 3. CONFIRM → BOOK → SCHEDULE
-    // ═════════════════════════════════════════════════════════════════════════
-    async function handleCheckoutConfirm() {
-        const btn = document.getElementById('checkout-confirm-btn');
-        if (!btn || !currentRec) return;
-
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Procesando…';
-
-        try {
-            // Paso A: Crear / actualizar pedido
-            const bookResp = await fetch(API + '?action=book', {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers:     {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', 'Content-Type': 'application/json' },
-                body:        JSON.stringify({
-                    park_id:  currentRec.park_id,
-                    quantity: currentQty,
-                }),
-            });
-            const bookJson = await bookResp.json();
-            if (!bookJson.success) throw new Error(bookJson.error || 'Error al reservar');
-
-            currentOrderId = bookJson.data.order_id;
-            const startDate = document.getElementById('checkout-start-date')?.value || '';
-
-            // Paso B: Confirmar pago y generar agenda
-            const confirmResp = await fetch(API + '?action=confirm', {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers:     {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', 'Content-Type': 'application/json' },
-                body:        JSON.stringify({
-                    order_id:     currentOrderId,
-                    park_id:      currentRec.park_id,
-                    duration_days: currentRec.duration_days,
-                    start_date:   startDate,
-                }),
-            });
-            const confirmJson = await confirmResp.json();
-            if (!confirmJson.success) throw new Error(confirmJson.error || 'Error al confirmar');
-
-            showPaymentSuccess(confirmJson.data);
-        } catch (err) {
-            console.error('[Checkout]', err);
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-credit-card me-2"></i>Reintentar';
-            showToast('Error: ' + err.message, 'danger');
-        }
-    }
-
-    // ── Pantalla de éxito dentro del modal ────────────────────────────────────
-    function showPaymentSuccess(data) {
-        const body   = document.getElementById('checkout-modal-body');
-        const footer = document.getElementById('checkout-modal-footer');
-        const title  = document.getElementById('checkout-modal-title');
-        if (!body) return;
-
-        title.textContent = '¡Reserva Confirmada!';
-
-        const itineraryHtml = (data.itinerary || []).map(day => `
+    const itineraryHtml = (data.itinerary || [])
+      .map(
+        (day) => `
             <div class="rcw-itinerary-day">
                 <h6>${escHtml(day.day)} — ${escHtml(day.title)}</h6>
-                <ul>${(day.items || []).map(it => `<li>${escHtml(it)}</li>`).join('')}</ul>
-            </div>`).join('');
+                <ul>${(day.items || []).map((it) => `<li>${escHtml(it)}</li>`).join("")}</ul>
+            </div>`,
+      )
+      .join("");
 
-        body.innerHTML = `
+    body.innerHTML = `
         <div class="rcw-payment-success">
             <div class="success-icon"><i class="fa-solid fa-check"></i></div>
-            <h5 class="fw-bold text-white mb-1">${escHtml(data.trip_title || 'Viaje reservado')}</h5>
+            <h5 class="fw-bold text-white mb-1">${escHtml(data.trip_title || "Viaje reservado")}</h5>
             <p class="text-muted small mb-3">
-                ${escHtml(data.start_date || '')} → ${escHtml(data.end_date || '')}
+                ${escHtml(data.start_date || "")} → ${escHtml(data.end_date || "")}
             </p>
             <div class="alert alert-success rounded-2 text-start mb-3" role="alert">
                 <i class="fa-solid fa-calendar-check me-2"></i>
@@ -408,77 +440,77 @@
             ${itineraryHtml}
         </div>`;
 
-        footer.innerHTML = `
+    footer.innerHTML = `
         <a href="${window.BASE_URL}/web/views/public/trips/trips.php"
            class="btn btn-success rounded-0 fw-bold px-5">
             <i class="fa-solid fa-calendar-days me-2"></i>Ver mi Agenda
         </a>
         <button type="button" class="btn btn-outline-secondary rounded-0 px-4"
                 data-bs-dismiss="modal">Cerrar</button>`;
-    }
+  }
 
-    // ═════════════════════════════════════════════════════════════════════════
-    // 4. REFRESH BUTTON
-    // ═════════════════════════════════════════════════════════════════════════
-    function bindRefreshBtn() {
-        const btn = document.getElementById('recs-refresh-btn');
-        if (!btn) return;
-        btn.addEventListener('click', async () => {
-            btn.classList.add('spinning');
-            btn.disabled = true;
-            await loadRecommendations(true);
-            btn.classList.remove('spinning');
-            btn.disabled = false;
-        });
-    }
+  // ═════════════════════════════════════════════════════════════════════════
+  // 4. REFRESH BUTTON
+  // ═════════════════════════════════════════════════════════════════════════
+  function bindRefreshBtn() {
+    const btn = document.getElementById("recs-refresh-btn");
+    if (!btn) return;
+    btn.addEventListener("click", async () => {
+      btn.classList.add("spinning");
+      btn.disabled = true;
+      await loadRecommendations(true);
+      btn.classList.remove("spinning");
+      btn.disabled = false;
+    });
+  }
 
-    // ═════════════════════════════════════════════════════════════════════════
-    // HELPERS
-    // ═════════════════════════════════════════════════════════════════════════
-    function renderStars(val, max = 5, small = false) {
-        const filled = Math.round(parseFloat(val) || 0);
-        const cls = small ? 'fa-xs' : '';
-        let h = '';
-        for (let i = 1; i <= max; i++) {
-            h += `<i class="fa-${i <= filled ? 'solid' : 'regular'} fa-star ${cls}"
+  // ═════════════════════════════════════════════════════════════════════════
+  // HELPERS
+  // ═════════════════════════════════════════════════════════════════════════
+  function renderStars(val, max = 5, small = false) {
+    const filled = Math.round(parseFloat(val) || 0);
+    const cls = small ? "fa-xs" : "";
+    let h = "";
+    for (let i = 1; i <= max; i++) {
+      h += `<i class="fa-${i <= filled ? "solid" : "regular"} fa-star ${cls}"
                      style="color:#fbbf24;"></i>`;
-        }
-        return h;
     }
+    return h;
+  }
 
-    function escHtml(str) {
-        return String(str ?? '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-    }
+  function escHtml(str) {
+    return String(str ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
 
-    function showToast(msg, type = 'success') {
-        const container = document.getElementById('toast-container') || createToastContainer();
-        const id = 'toast-' + Date.now();
-        const el = document.createElement('div');
-        el.id = id;
-        el.className = `toast align-items-center text-bg-${type} border-0 show`;
-        el.setAttribute('role', 'alert');
-        el.innerHTML = `
+  function showToast(msg, type = "success") {
+    const container =
+      document.getElementById("toast-container") || createToastContainer();
+    const id = "toast-" + Date.now();
+    const el = document.createElement("div");
+    el.id = id;
+    el.className = `toast align-items-center text-bg-${type} border-0 show`;
+    el.setAttribute("role", "alert");
+    el.innerHTML = `
             <div class="d-flex">
                 <div class="toast-body">${escHtml(msg)}</div>
                 <button type="button" class="btn-close btn-close-white me-2 m-auto"
                         data-bs-dismiss="toast"></button>
             </div>`;
-        container.appendChild(el);
-        setTimeout(() => el.remove(), 4000);
-    }
+    container.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
 
-    function createToastContainer() {
-        const c = document.createElement('div');
-        c.id = 'toast-container';
-        c.className = 'toast-container position-fixed bottom-0 end-0 p-3';
-        c.style.zIndex = '9999';
-        document.body.appendChild(c);
-        return c;
-    }
-
+  function createToastContainer() {
+    const c = document.createElement("div");
+    c.id = "toast-container";
+    c.className = "toast-container position-fixed bottom-0 end-0 p-3";
+    c.style.zIndex = "9999";
+    document.body.appendChild(c);
+    return c;
+  }
 })();

@@ -57,6 +57,8 @@ function listAllOrders() {
         $stmt = $db->prepare("
             SELECT p.id, p.ticket_type, p.visit_date, p.quantity, p.unit_price, p.price,
                    p.status, p.created_at,
+                   p.addon_pase_rapido, p.addon_photopass, p.addon_buffet, p.addon_parking,
+                   p.addon_label, p.parking_price,
                    u.username, u.email,
                    pk.park_name, pk.park_country, pk.id AS park_id
             FROM pedidos p

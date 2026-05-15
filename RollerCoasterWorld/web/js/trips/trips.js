@@ -76,7 +76,32 @@
     altInput: true,
     altFormat: "d/m/Y",
     theme: "dark",
-    disableMobile: "true",
+    disableMobile: true,
+    monthSelectorType: "dropdown",
+    minDate: "1850-01-01",
+    maxDate: "2100-12-31",
+    onReady: function (selectedDates, dateStr, fp) {
+      fp.calendarContainer.classList.add("rcw-flatpickr");
+      const yearInput = fp.calendarContainer.querySelector(".cur-year");
+      if (yearInput) {
+        const yearSelect = document.createElement("select");
+        yearSelect.className = "flatpickr-monthDropdown-months cur-year-select";
+        for (let y = 2100; y >= 1850; y--) {
+          const opt = document.createElement("option");
+          opt.value = y;
+          opt.textContent = y;
+          yearSelect.appendChild(opt);
+        }
+        yearSelect.value = fp.currentYear;
+        yearSelect.addEventListener("change", (e) => {
+          fp.changeYear(parseInt(e.target.value));
+        });
+        fp.set("onYearChange", () => {
+          yearSelect.value = fp.currentYear;
+        });
+        yearInput.parentNode.replaceChild(yearSelect, yearInput);
+      }
+    },
   };
 
   const initFlatpickr = () => {
@@ -112,12 +137,52 @@
 
     // Calendarios de estadísticas — sólo notifican al módulo de ranking,
     // que gestiona el estado interno (currentPeriod, customStart/End…)
+    const statsConfig = {
+      locale: "es",
+      dateFormat: "Y-m-d",
+      altInput: true,
+      altFormat: "d/m/Y",
+      theme: "dark",
+      disableMobile: true,
+      monthSelectorType: "dropdown",
+      minDate: "1850-01-01",
+      maxDate: "2100-12-31",
+      onReady: function (selectedDates, dateStr, fp) {
+        fp.calendarContainer.classList.add("rcw-flatpickr");
+        const yearInput = fp.calendarContainer.querySelector(".cur-year");
+        if (yearInput) {
+          const yearSelect = document.createElement("select");
+          yearSelect.className =
+            "flatpickr-monthDropdown-months cur-year-select";
+          for (let y = 2100; y >= 1850; y--) {
+            const opt = document.createElement("option");
+            opt.value = y;
+            opt.textContent = y;
+            yearSelect.appendChild(opt);
+          }
+          yearSelect.value = fp.currentYear;
+          yearSelect.addEventListener("change", (e) => {
+            fp.changeYear(parseInt(e.target.value));
+          });
+          fp.set("onYearChange", () => {
+            yearSelect.value = fp.currentYear;
+          });
+          const parent = yearInput.parentNode;
+          const arrowUp = parent.querySelector(".arrowUp");
+          const arrowDown = parent.querySelector(".arrowDown");
+          if (arrowUp) arrowUp.style.display = "none";
+          if (arrowDown) arrowDown.style.display = "none";
+          parent.replaceChild(yearSelect, yearInput);
+        }
+      },
+    };
+
     const rankStartEl = document.getElementById("rank-start-date");
     const rankEndEl = document.getElementById("rank-end-date");
 
     if (rankStartEl) {
       flatpickr(rankStartEl, {
-        ...flatpickrConfig,
+        ...statsConfig,
         onChange: function (selectedDates, dateStr) {
           if (rankEndEl && rankEndEl._flatpickr) {
             rankEndEl._flatpickr.set("minDate", dateStr);
@@ -131,7 +196,7 @@
 
     if (rankEndEl) {
       flatpickr(rankEndEl, {
-        ...flatpickrConfig,
+        ...statsConfig,
         onChange: function (selectedDates, dateStr) {
           if (window.rankingOnDateChange) {
             window.rankingOnDateChange("end", dateStr);
@@ -218,7 +283,6 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     refreshAll();
-    document.getElementById("ct-submit-btn").onclick = submitCreate;
     document.getElementById("ct-start").onchange = generateDays;
     document.getElementById("ct-end").onchange = generateDays;
     setupAC(
@@ -577,10 +641,10 @@
     });
   }
 
-  window.currentEditTripId = null;
-
   window.openCreateTripModal = () => {
-    window.currentEditTripId = null;
+    const err = document.getElementById("ct-error");
+    if (err) err.classList.add("d-none");
+    document.getElementById("ct-trip-id").value = "";
     document.getElementById("ct-title").value = "";
     document.getElementById("ct-desc").value = "";
     if (document.getElementById("ct-start")._flatpickr) {
@@ -605,147 +669,6 @@
     if (window.renderCountryTags) window.renderCountryTags();
     gm("create-trip-modal").show();
   };
-
-  window.openEditTrip = async (id) => {
-    gm("trip-detail-modal").hide();
-
-    const j = await api("detail&trip_id=" + id);
-    if (!j.success) {
-      toast("Error al cargar el viaje para edición", "error");
-      return;
-    }
-    const t = j.data;
-
-    document.getElementById("ct-title").value = t.title || "";
-    document.getElementById("ct-desc").value = t.description || "";
-
-    // Actualizar Flatpickr si existe
-    if (document.getElementById("ct-start")._flatpickr) {
-      document.getElementById("ct-start")._flatpickr.setDate(t.start_date);
-    } else {
-      document.getElementById("ct-start").value = t.start_date || "";
-    }
-
-    if (document.getElementById("ct-end")._flatpickr) {
-      document.getElementById("ct-end")._flatpickr.setDate(t.end_date);
-    } else {
-      document.getElementById("ct-end").value = t.end_date || "";
-    }
-
-    const manualCountries = t.parks_visited
-      ? t.parks_visited
-          .split(",")
-          .map((c) => c.trim())
-          .filter((c) => c)
-      : [];
-
-    const allRaw = [...(t.countries || []), ...manualCountries];
-    const uniqueMap = new Map();
-    allRaw.forEach((c) => {
-      const key = c
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase();
-      if (!uniqueMap.has(key)) uniqueMap.set(key, c); // Guarda la primera variante que encuentre (idealmente la de t.countries que suele venir de la BD con acentos correctos)
-    });
-    const allCountries = Array.from(uniqueMap.values());
-
-    document.getElementById("ct-countries").value = allCountries.join(", ");
-
-    if (window.renderCountryTags) window.renderCountryTags();
-
-    document
-      .getElementById("create-trip-modal")
-      .querySelector(".modal-title").innerHTML =
-      '<i class="fa-solid fa-pen me-2"></i>Editar Viaje';
-    document.getElementById("ct-submit-btn").innerHTML =
-      '<i class="fa-solid fa-save me-1"></i>Guardar Cambios';
-
-    window.currentEditTripId = id;
-
-    // We don't repopulate days complex config for edits currently to avoid duplicates,
-    // we just hide it and show it's already configured.
-    document.getElementById("ct-days-container").classList.add("d-none");
-
-    setTimeout(() => gm("create-trip-modal").show(), 300);
-  };
-
-  async function submitCreate() {
-    const title = document.getElementById("ct-title").value.trim(),
-      desc = document.getElementById("ct-desc").value.trim();
-    const start = document.getElementById("ct-start").value,
-      end = document.getElementById("ct-end").value;
-    const err = document.getElementById("ct-error");
-    if (!title || !start || !end) {
-      err.textContent = "Completa los campos obligatorios";
-      err.classList.remove("d-none");
-      return;
-    }
-    if (new Date(end) < new Date(start)) {
-      err.textContent = "La fecha fin debe ser posterior";
-      err.classList.remove("d-none");
-      return;
-    }
-    const countries = document.getElementById("ct-countries").value.trim();
-
-    try {
-      const btn = document.getElementById("ct-submit-btn");
-      const oldHtml = btn.innerHTML;
-      btn.innerHTML = '<div class="spinner-border spinner-border-sm"></div>';
-      btn.disabled = true;
-
-      let j;
-      if (window.currentEditTripId) {
-        j = await api("update", {
-          trip_id: window.currentEditTripId,
-          title,
-          description: desc,
-          start_date: start,
-          end_date: end,
-          parks_visited: countries, // Usamos este campo internamente
-        });
-      } else {
-        const parks = [];
-        document.querySelectorAll(".ct-park-id-input").forEach((h) => {
-          if (h.value)
-            parks.push({
-              park_id: +h.value,
-              visit_date: h.dataset.date,
-              visit_order: +h.dataset.order,
-            });
-        });
-        j = await api("create", {
-          title,
-          description: desc,
-          start_date: start,
-          end_date: end,
-          countries,
-          parks,
-        });
-      }
-
-      btn.innerHTML = oldHtml;
-      btn.disabled = false;
-
-      if (j.success) {
-        gm("create-trip-modal").hide();
-        loadTrips();
-        loadCalendar();
-        toast(
-          window.currentEditTripId
-            ? "Viaje actualizado"
-            : "Viaje creado correctamente",
-        );
-        if (window.currentEditTripId) openTrip(window.currentEditTripId);
-      } else {
-        err.textContent = j.error || "Error";
-        err.classList.remove("d-none");
-      }
-    } catch (e) {
-      err.textContent = "Error de red";
-      err.classList.remove("d-none");
-    }
-  }
 
   // ── COUNTRY TAGS LOGIC ──────────────────────────────────────
   document.addEventListener("DOMContentLoaded", () => {
@@ -1000,10 +923,10 @@
         const start = new Date(t.start_date);
         start.setHours(0, 0, 0, 0);
         const end = new Date(t.end_date);
-        end.setHours(23, 59, 59, 999);
+        end.setHours(0, 0, 0, 0);
         const mon = start.toLocaleString("es-ES", { month: "short" });
         const y = start.getFullYear();
-        const diff = Math.ceil((end - start) / 86400000) + 1;
+        const diff = Math.max(1, Math.round((end - start) / 86400000) + 1);
         const today = new Date();
         let t_status = "upcoming";
         if (today > end) t_status = "past";
@@ -1042,7 +965,7 @@
         html += `
           <div class="card shadow-sm h-100 border-0" style="background:var(--rcw-bg-card-alt); border-radius: 12px; cursor:pointer; transition:transform 0.2s, box-shadow 0.2s;" onclick="openTrip(${t.id})" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--bs-shadow-sm)'">
             <div style="height: 130px; position: relative; overflow: hidden; border-top-left-radius: 12px; border-top-right-radius: 12px;">
-               <img src="${imgUrl}" onerror="this.onerror=null; this.src='${window.RCW_BASE_URL}/dummy.jpg';" class="position-absolute top-0 start-0 w-100 h-100" style="object-fit: cover; z-index: 0;">
+               <img src="${imgUrl}" onerror="this.onerror=null; this.src='https://st3.depositphotos.com/3436901/14792/i/450/depositphotos_147926787-stock-photo-plane-flying-over-blue-sky.jpg';" class="position-absolute top-0 start-0 w-100 h-100" style="object-fit: cover; z-index: 0;">
                <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to bottom, transparent 10%, rgba(10,12,16,0.95)); z-index: 1;"></div>
                <div class="position-absolute bottom-0 start-0 w-100 p-3 pb-2 text-white" style="z-index: 2;">
                  <h5 class="fw-bold mb-1 text-truncate" style="font-family: var(--rcw-font-title); font-size: 1.15rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">${esc(t.title)}</h5>
@@ -1138,16 +1061,61 @@
     const navLabel = document.getElementById("rank-nav-label");
     let currentPeriod = "year";
     let baseDate = new Date();
-    let customStart = "";
-    let customEnd = "";
     let cachedData = null;
 
     function updateLabel() {
       const navContainer = document.getElementById("rank-nav-container");
-      if (currentPeriod === "all" || currentPeriod === "custom") {
+      const datesContainer = document.getElementById("rank-dates-container");
+
+      if (currentPeriod === "all") {
         if (navContainer) navContainer.classList.add("d-none");
+        if (datesContainer) datesContainer.classList.add("d-none");
+        // Clear date inputs
+        if (sDate) {
+          if (sDate._flatpickr) sDate._flatpickr.clear();
+          else sDate.value = "";
+        }
+        if (eDate) {
+          if (eDate._flatpickr) {
+            eDate._flatpickr.clear();
+            eDate._flatpickr.set("minDate", null);
+          } else {
+            eDate.value = "";
+            eDate.min = "";
+          }
+        }
+      } else if (currentPeriod === "custom") {
+        if (navContainer) navContainer.classList.add("d-none");
+        if (datesContainer) datesContainer.classList.remove("d-none");
+        // Leave date inputs for user to fill — pre-fill with current year range if empty
+        const isEmpty =
+          sDate &&
+          (sDate._flatpickr
+            ? sDate._flatpickr.selectedDates.length === 0
+            : !sDate.value);
+        if (isEmpty) {
+          const fmt = (d) =>
+            d.getFullYear() +
+            "-" +
+            String(d.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(d.getDate()).padStart(2, "0");
+          const s = fmt(new Date(baseDate.getFullYear(), 0, 1));
+          const e = fmt(new Date(baseDate.getFullYear(), 11, 31));
+          if (sDate._flatpickr) sDate._flatpickr.setDate(s, false);
+          else if (sDate) sDate.value = s;
+          if (eDate._flatpickr) {
+            eDate._flatpickr.set("minDate", s);
+            eDate._flatpickr.setDate(e, false);
+          } else if (eDate) {
+            eDate.value = e;
+            eDate.min = s;
+          }
+        }
       } else {
+        // week / month / year
         if (navContainer) navContainer.classList.remove("d-none");
+        if (datesContainer) datesContainer.classList.remove("d-none");
         if (currentPeriod === "year")
           navLabel.textContent = baseDate.getFullYear();
         else if (currentPeriod === "month") {
@@ -1166,26 +1134,20 @@
               month: "short",
             });
         }
-      }
-
-      if (currentPeriod !== "custom" && currentPeriod !== "all") {
         const d = getDates();
         if (sDate) {
           if (sDate._flatpickr) sDate._flatpickr.setDate(d.start || "", false);
           else sDate.value = d.start || "";
+
+          if (eDate) {
+            if (eDate._flatpickr)
+              eDate._flatpickr.set("minDate", d.start || "");
+            else eDate.min = d.start || "";
+          }
         }
         if (eDate) {
           if (eDate._flatpickr) eDate._flatpickr.setDate(d.end || "", false);
           else eDate.value = d.end || "";
-        }
-      } else if (currentPeriod === "all") {
-        if (sDate) {
-          if (sDate._flatpickr) sDate._flatpickr.clear();
-          else sDate.value = "";
-        }
-        if (eDate) {
-          if (eDate._flatpickr) eDate._flatpickr.clear();
-          else eDate.value = "";
         }
       }
     }
@@ -1214,8 +1176,10 @@
         start = fmt(new Date(baseDate.getFullYear(), 0, 1));
         end = fmt(new Date(baseDate.getFullYear(), 11, 31));
       } else if (currentPeriod === "custom") {
-        start = customStart;
-        end = customEnd;
+        const sd = document.getElementById("rank-start-date");
+        const ed = document.getElementById("rank-end-date");
+        start = sd ? sd.value : "";
+        end = ed ? ed.value : "";
       }
       return { start, end };
     }
@@ -1302,14 +1266,20 @@
     sType.addEventListener("change", fetchRanking);
 
     pBtns.forEach((b) => {
-      b.addEventListener("click", (e) => {
+      b.addEventListener("click", () => {
         pBtns.forEach((btn) => {
-          btn.classList.remove("btn-light", "text-success", "active");
+          btn.classList.remove(
+            "btn-success",
+            "text-white",
+            "btn-light",
+            "text-success",
+            "active",
+          );
           btn.classList.add("btn-outline-light", "border-opacity-50");
         });
-        e.target.classList.remove("btn-outline-light", "border-opacity-50");
-        e.target.classList.add("btn-light", "text-success", "active");
-        currentPeriod = e.target.dataset.period;
+        b.classList.remove("btn-outline-light", "border-opacity-50");
+        b.classList.add("btn-success", "text-white", "active");
+        currentPeriod = b.dataset.period;
         baseDate = new Date();
         updateLabel();
         if (currentPeriod !== "custom") fetchRanking();
@@ -1321,11 +1291,17 @@
         currentPeriod = "year";
         baseDate = new Date();
         document.querySelectorAll(".rank-period-btn").forEach((btn) => {
-          btn.classList.remove("btn-light", "text-success", "active");
+          btn.classList.remove(
+            "btn-success",
+            "text-white",
+            "btn-light",
+            "text-success",
+            "active",
+          );
           btn.classList.add("btn-outline-light", "border-opacity-50");
           if (btn.dataset.period === "year") {
             btn.classList.remove("btn-outline-light", "border-opacity-50");
-            btn.classList.add("btn-light", "text-success", "active");
+            btn.classList.add("btn-success", "text-white", "active");
           }
         });
       }
@@ -1347,22 +1323,34 @@
     function switchToCustom() {
       currentPeriod = "custom";
       pBtns.forEach((btn) => {
-        btn.classList.remove("btn-light", "text-success", "active");
+        btn.classList.remove(
+          "btn-success",
+          "text-white",
+          "btn-light",
+          "text-success",
+          "active",
+        );
         btn.classList.add("btn-outline-light", "border-opacity-50");
         if (btn.dataset.period === "custom") {
           btn.classList.remove("btn-outline-light", "border-opacity-50");
-          btn.classList.add("btn-light", "text-success", "active");
+          btn.classList.add("btn-success", "text-white", "active");
         }
       });
-      updateLabel();
+      // Show date container
+      const datesContainer = document.getElementById("rank-dates-container");
+      if (datesContainer) datesContainer.classList.remove("d-none");
+      // Hide nav arrows
+      const navContainer = document.getElementById("rank-nav-container");
+      if (navContainer) navContainer.classList.add("d-none");
     }
 
     // Llamado desde initFlatpickr cuando el usuario cambia una fecha de estadísticas
     window.rankingOnDateChange = function (which, dateStr) {
-      if (which === "start") customStart = dateStr;
-      else customEnd = dateStr;
+      if (!dateStr) return; // limpieza programática — no cambiar periodo
       if (currentPeriod !== "custom") switchToCustom();
-      if (customStart && customEnd) fetchRanking();
+      const sVal = document.getElementById("rank-start-date")?.value;
+      const eVal = document.getElementById("rank-end-date")?.value;
+      if (sVal && eVal && sVal <= eVal) fetchRanking();
     };
 
     updateLabel();

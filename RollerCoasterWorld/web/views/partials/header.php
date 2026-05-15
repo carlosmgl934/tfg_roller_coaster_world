@@ -513,3 +513,22 @@ header("Expires: 0"); // Proxies
       </div>
     </div>
   </nav>
+
+  <script>
+    $(document).ready(function () {
+      const $mainMenu = $('#mainMenu');
+      $mainMenu.on('show.bs.collapse', function () {
+        $('body').addClass('navbar-open');
+      });
+      $mainMenu.on('hide.bs.collapse', function () {
+        $('body').removeClass('navbar-open');
+      });
+
+      // Cerrar al hacer clic fuera
+      $(document).on('click', function (event) {
+        if ($mainMenu.hasClass('show') && !$(event.target).closest('.custom-navbar').length) {
+          $mainMenu.collapse('hide');
+        }
+      });
+    });
+  </script>

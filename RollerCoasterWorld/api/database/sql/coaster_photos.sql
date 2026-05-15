@@ -10,3 +10,10 @@ CREATE TABLE IF NOT EXISTS coaster_photos (
     FOREIGN KEY (coaster_id) REFERENCES coasters(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+CREATE TABLE IF NOT EXISTS coaster_photo_likes (
+    photo_id INT NOT NULL,
+    user_id INT NOT NULL,
+    PRIMARY KEY (photo_id, user_id),
+    FOREIGN KEY (photo_id) REFERENCES coaster_photos(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);

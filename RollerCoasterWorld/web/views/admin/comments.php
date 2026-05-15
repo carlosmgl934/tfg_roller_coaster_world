@@ -111,7 +111,7 @@ if (!$is_logged || !$is_admin) {
         <div class="modal-content rounded-0 border-0 shadow" style="background:#161b22;">
             <div class="modal-header bg-danger text-white border-0">
                 <h5 class="modal-title">
-                    <i class="fa-solid fa-triangle-exclamation me-2"></i>Borrar reseña ofensiva
+                    <i class="fa-solid fa-eraser me-2"></i>Borrar texto de reseña
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -133,6 +133,50 @@ if (!$is_logged || !$is_admin) {
                     <i class="fa-solid fa-eraser me-1"></i>Borrar texto
                 </button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== MODAL ELIMINAR RESEÑA COMPLETA ===================== -->
+<div class="modal fade" id="modal-destroy-review" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-0 border-0 shadow" style="background:#161b22;">
+            <div class="modal-header border-0" style="background:#7f1d1d;">
+                <h5 class="modal-title text-white">
+                    <i class="fa-solid fa-trash me-2"></i>Eliminar reseña permanentemente
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="background:#161b22; color:#e6edf3;">
+                <p class="mb-1">Vas a <strong class="text-danger">eliminar permanentemente</strong> la reseña de <strong
+                        id="destroy-review-username" class="text-white"></strong>.</p>
+                <div class="p-3 my-3 bg-dark border border-danger rounded-1 text-muted fst-italic border-opacity-50"
+                    id="destroy-review-text" style="max-height: 150px; overflow-y: auto;">—</div>
+                <p class="text-danger small mt-2 mb-0">
+                    <i class="fa-solid fa-circle-exclamation me-1"></i>
+                    Esta acción <strong>no se puede deshacer</strong>. Se borrará la fila entera y la puntuación dejará
+                    de contar para el ranking de la coaster/parque.
+                </p>
+            </div>
+            <div class="modal-footer border-0" style="background:#161b22;">
+                <button type="button" class="btn btn-outline-secondary rounded-0"
+                    data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger rounded-0 fw-bold" id="confirm-destroy-review" data-id=""
+                    data-type="">
+                    <i class="fa-solid fa-trash me-1"></i>Eliminar permanentemente
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== TOAST CONTAINER ===================== -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+    <div id="admin-toast" class="toast align-items-center text-white border-0 rounded-0" role="alert"
+        aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body fw-semibold" id="admin-toast-body"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
         </div>
     </div>
 </div>

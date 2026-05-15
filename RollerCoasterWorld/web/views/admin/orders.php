@@ -18,12 +18,14 @@ if (!$is_logged || !$is_admin)
       </div>
       <div class="d-flex align-items-center gap-2">
         <div id="refund-alert-wrap" class="d-none">
-          <div class="bg-danger text-white p-2 shadow-sm text-center" style="border-radius: 4px; min-width: 220px; line-height: 1.2;">
+          <div class="bg-danger text-white p-2 shadow-sm text-center"
+            style="border-radius: 4px; min-width: 220px; line-height: 1.2;">
             <div class="fw-bold" style="font-size: 0.85rem;">
               <i class="fa-solid fa-circle-exclamation me-1"></i>
               <span id="admin-refunds-text">¡1 devolución pendiente!</span>
             </div>
-            <div style="font-size: 0.6rem; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;">
+            <div
+              style="font-size: 0.6rem; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;">
               Cancela su entrada para hacer el reembolso
             </div>
           </div>
@@ -38,26 +40,28 @@ if (!$is_logged || !$is_admin)
       <h6 class="mb-0 fw-semibold"><i class="fa-solid fa-filter me-2"></i>Filtros</h6>
     </div>
     <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 align-items-end">
-        <div>
+      <div class="row g-2 align-items-end">
+        <div class="col-12 col-sm-auto">
           <label class="form-label small text-muted fw-semibold mb-1">Estado</label>
-          <select id="filter-status" class="form-select shadow-sm rounded-0" style="width:auto;">
+          <select id="filter-status" class="form-select shadow-sm rounded-0">
             <option value="">Todos</option>
             <option value="confirmado" selected>Confirmados</option>
             <option value="solicitada_cancelacion">Solicitudes de cancelación</option>
             <option value="cancelado">Cancelados</option>
           </select>
         </div>
-        <div>
+        <div class="col-12 col-sm-auto">
           <label class="form-label small text-muted fw-semibold mb-1">Fecha de visita</label>
-          <input type="date" id="filter-date" class="form-control shadow-sm rounded-0" style="width:auto;">
+          <input type="date" id="filter-date" class="form-control shadow-sm rounded-0">
         </div>
-        <button class="btn btn-outline-secondary rounded-0 shadow-sm" id="btn-clear-filters">
-          <i class="fa-solid fa-eraser me-1"></i>Limpiar
-        </button>
-        <button class="btn btn-outline-success rounded-0 shadow-sm ms-auto" id="btn-refresh-orders">
-          <i class="fa-solid fa-rotate-right me-1"></i>Actualizar
-        </button>
+        <div class="col-12 col-sm-auto ms-sm-auto d-flex gap-2">
+          <button class="btn btn-outline-secondary rounded-0 shadow-sm" id="btn-clear-filters">
+            <i class="fa-solid fa-eraser me-1"></i>Limpiar
+          </button>
+          <button class="btn btn-outline-success rounded-0 shadow-sm" id="btn-refresh-orders">
+            <i class="fa-solid fa-rotate-right me-1"></i>Actualizar
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -151,8 +155,10 @@ if (!$is_logged || !$is_admin)
 </div>
 
 <!-- Toast para mensajes (Admin) -->
-<div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 2000; margin-top: 20px;">
-  <div id="cart-toast" class="toast align-items-center text-white border-0 rounded-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" style="min-width: 350px;">
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3"
+  style="z-index: 2000; margin-top: 20px;">
+  <div id="cart-toast" class="toast align-items-center text-white border-0 rounded-0 shadow-lg" role="alert"
+    aria-live="assertive" aria-atomic="true" style="min-width: 350px;">
     <div class="d-flex align-items-center p-3">
       <div class="toast-body flex-grow-1 text-center fw-medium" style="font-size: 0.95rem;">
         <i class="fa-solid fa-circle-info me-2" id="cart-toast-icon-tag"></i>

@@ -64,6 +64,8 @@ $user_uid = $_SESSION['firebase_uid'];
               class="fa-solid fa-gear me-2 w-20px text-center"></i> Configuración</a>
           <a href="#" id="menu-tops" class="list-group-item list-group-item-action py-3"><i
               class="fa-solid fa-list-ol me-2 w-20px text-center"></i> Mis tops</a>
+          <a href="#" id="menu-photos" class="list-group-item list-group-item-action py-3"><i
+              class="fa-solid fa-camera me-2 w-20px text-center"></i> Mis fotos</a>
           <a href="#" id="menu-reviews" class="list-group-item list-group-item-action py-3"><i
               class="fa-solid fa-pen-to-square me-2 w-20px text-center"></i> Mis reseñas</a>
           <a href="#" id="menu-friends" class="list-group-item list-group-item-action py-3"><i
@@ -72,6 +74,7 @@ $user_uid = $_SESSION['firebase_uid'];
               class="fa-solid fa-suitcase-rolling me-2 w-20px text-center"></i> Mis viajes</a>
           <a href="#" id="menu-map" class="list-group-item list-group-item-action py-3"><i
               class="fa-solid fa-map-pin me-2 w-20px text-center"></i> Mi mapa</a>
+
           <a href="#" class="list-group-item list-group-item-action text-danger mt-1 py-3 border-top signOutBtn"><i
               class="fa-solid fa-arrow-right-from-bracket me-2 w-20px text-center"></i> Cerrar sesión</a>
         </div>
@@ -256,7 +259,7 @@ $user_uid = $_SESSION['firebase_uid'];
 
       <!-- Card: Datos Personales -->
       <div class="card profile-card mb-4 content-section" id="section-config-personal">
-        <div class="card-header rounded-0 pt-3 pb-3 d-flex justify-content-between align-items-center">
+        <div class="card-header rounded-0 pt-3 pb-3 d-flex flex-wrap justify-content-between align-items-center gap-3">
           <div class="d-flex align-items-center gap-2">
             <i class="fa-solid fa-user-pen fs-5"></i>
             <h5 class="fw-bold mb-0">Datos Personales</h5>
@@ -464,12 +467,12 @@ $user_uid = $_SESSION['firebase_uid'];
       <div class="card profile-card mb-4 content-section" id="section-tops">
 
         <!-- Card Header -->
-        <div class="card-header rounded-0 pt-3 pb-3 d-flex justify-content-between align-items-center">
+        <div class="card-header rounded-0 pt-3 pb-3 d-flex flex-wrap justify-content-between align-items-center gap-3">
           <div class="d-flex align-items-center gap-2">
             <i class="fa-solid fa-list-ol fs-5"></i>
             <h5 class="fw-bold mb-0">Mis Tops</h5>
           </div>
-          <div class="d-flex gap-2" id="tops-header-actions">
+          <div class="d-flex flex-wrap gap-2" id="tops-header-actions">
             <button id="btn-tops-full-view" class="btn btn-sm btn-outline-success rounded-0 px-3 fw-bold shadow-sm">
               <i class="fa-solid fa-expand me-1"></i>Ver Top Completo
             </button>
@@ -587,13 +590,14 @@ $user_uid = $_SESSION['firebase_uid'];
                     </div>
                   </div>
                 </div>
-                <div id="top-coasters-full-container" class="row g-3"></div>
+                <div class="tops-full-grid-wrapper ps-2 pe-3">
+                  <div id="top-coasters-full-container" class="row g-3"></div>
+                </div>
               </div>
 
               <!-- MODO EDICIÓN -->
               <div id="coasters-mode-edit" class="d-none">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <h6 class="fw-bold mb-0"><i class="fa-solid fa-pen me-2"></i>Editar Top Coasters</h6>
+                <div class="d-flex justify-content-end mb-3">
                   <button class="btn btn-sm btn-success fw-bold rounded-0 shadow-sm" id="btn-save-coasters-top">
                     <i class="fa-solid fa-floppy-disk me-2"></i>Guardar Cambios
                   </button>
@@ -663,13 +667,14 @@ $user_uid = $_SESSION['firebase_uid'];
                     </div>
                   </div>
                 </div>
-                <div id="top-parks-full-container" class="row g-3"></div>
+                <div class="tops-full-grid-wrapper ps-2 pe-3">
+                  <div id="top-parks-full-container" class="row g-3"></div>
+                </div>
               </div>
 
               <!-- MODO EDICIÓN -->
               <div id="parks-mode-edit" class="d-none">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <h6 class="fw-bold mb-0"><i class="fa-solid fa-pen me-2"></i>Editar Top Parques</h6>
+                <div class="d-flex justify-content-end mb-3">
                   <button class="btn btn-sm btn-success fw-bold rounded-0 shadow-sm" id="btn-save-parks-top">
                     <i class="fa-solid fa-floppy-disk me-2"></i>Guardar Cambios
                   </button>
@@ -741,7 +746,7 @@ $user_uid = $_SESSION['firebase_uid'];
 
     <div class="col-lg-8 col-md-7 d-none" id="section-reviews-content">
       <div class="card profile-card mb-4">
-        <div class="card-header rounded-0 pt-3 pb-3 d-flex justify-content-between align-items-center">
+        <div class="card-header rounded-0 pt-3 pb-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
           <div class="d-flex align-items-center gap-2">
             <i class="fa-solid fa-pen-to-square fs-5"></i>
             <h5 class="fw-bold mb-0">Mis Reseñas</h5>
@@ -814,27 +819,24 @@ $user_uid = $_SESSION['firebase_uid'];
           <!-- Contenedor Vista Estadísticas -->
           <div id="trips-view-stats" class="d-none">
             <!-- Estadísticas de Viajes (Unificadas) -->
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
-              <div class="d-flex align-items-center gap-3">
-                <div class="bg-success bg-opacity-10 p-2 rounded-2 d-flex align-items-center justify-content-center"
-                  style="width: 40px; height: 40px;">
-                  <i class="fa-solid fa-chart-line fs-5 text-success"></i>
-                </div>
-                <div>
-                  <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">Estadísticas de</h5>
-                  <div class="stats-type-wrapper" style="cursor: pointer; margin-top: 2px; width: fit-content;">
-                    <select id="rank-type-select" class="rcw-stats-select">
-                      <option value="coasters">Coasters</option>
-                      <option value="parks">Parques</option>
-                    </select>
-                  </div>
-                </div>
+            <div class="d-flex align-items-center gap-3 mb-2">
+              <div class="bg-success bg-opacity-10 p-2 rounded-2 d-flex align-items-center justify-content-center"
+                style="width: 40px; height: 40px; flex-shrink: 0;">
+                <i class="fa-solid fa-chart-line fs-5 text-success"></i>
               </div>
-              <div class="d-flex align-items-center">
-                <span class="stats-trip-badge shadow-sm">
-                  <i class="fa-solid fa-suitcase text-success"></i> <span id="rank-trip-count">0 viajes</span>
-                </span>
-              </div>
+              <h5 class="fw-bold mb-0 d-flex align-items-center gap-2"
+                style="font-size: 1.1rem; flex-wrap: nowrap; white-space: nowrap;">
+                Estadísticas de
+                <select id="rank-type-select" class="rcw-stats-select">
+                  <option value="coasters">Coasters</option>
+                  <option value="parks">Parques</option>
+                </select>
+              </h5>
+            </div>
+            <div class="mb-3">
+              <span class="stats-trip-badge shadow-sm">
+                <i class="fa-solid fa-suitcase text-success"></i> <span id="rank-trip-count">0 viajes</span>
+              </span>
             </div>
             <div class="d-flex overflow-x-auto gap-1 pb-1 mb-3" id="rank-filter-btns" style="scrollbar-width: none;">
               <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary flex-shrink-0"
@@ -849,21 +851,25 @@ $user_uid = $_SESSION['firebase_uid'];
                 data-period="all">Siempre</button>
             </div>
             <div
-              class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-2 pb-3 mb-3 border-bottom border-secondary border-opacity-25">
-              <div class="d-flex align-items-center gap-2" id="rank-nav-container">
+              class="d-flex align-items-center flex-wrap gap-2 pt-2 pb-3 mb-3 border-bottom border-secondary border-opacity-25">
+              <div class="d-flex align-items-center gap-2 flex-shrink-0" id="rank-nav-container">
                 <button class="btn btn-sm btn-outline-secondary rounded-0" id="rank-prev-btn" title="Anterior"><i
                     class="fa-solid fa-chevron-left"></i></button>
-                <span id="rank-nav-label" class="fw-bold text-center" style="min-width: 100px;">2026</span>
+                <span id="rank-nav-label" class="fw-bold text-center" style="min-width: 80px;">2026</span>
                 <button class="btn btn-sm btn-outline-secondary rounded-0" id="rank-next-btn" title="Siguiente"><i
                     class="fa-solid fa-chevron-right"></i></button>
               </div>
-              <div class="d-flex align-items-center gap-2 ms-auto">
-                <small class="text-muted">Desde:</small>
-                <input type="date" class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white"
-                  id="rank-start-date" style="max-width: 120px;">
-                <small class="text-muted">Hasta:</small>
-                <input type="date" class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white"
-                  id="rank-end-date" style="max-width: 120px;">
+              <div class="d-flex flex-column gap-1" id="rank-dates-container">
+                <div class="d-flex align-items-center gap-2">
+                  <small class="text-muted" style="width: 40px; white-space: nowrap;">Desde:</small>
+                  <input type="date" class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white"
+                    id="rank-start-date" style="flex: 1;">
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <small class="text-muted" style="width: 40px; white-space: nowrap;">Hasta:</small>
+                  <input type="date" class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white"
+                    id="rank-end-date" style="flex: 1;">
+                </div>
               </div>
             </div>
             <div id="ranking-container" class="mt-4">
@@ -954,6 +960,23 @@ $user_uid = $_SESSION['firebase_uid'];
       </div>
     </div>
 
+    <!-- SECCIÓN: MIS FOTOS -->
+    <div class="col-lg-8 col-md-7 d-none" id="section-photos-content">
+      <div class="card profile-card mb-4">
+        <div class="card-header rounded-0 pt-3 pb-3 d-flex align-items-center gap-2">
+          <i class="fa-solid fa-camera fs-5"></i>
+          <h5 class="fw-bold mb-0">Mi Galería de Fotos</h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="tops-preview-scroll">
+            <div class="row g-3" id="photos-grid-container">
+              <!-- Inyectado via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- MODAL ESTADÍSTICAS AMPLIADAS -->
     <style>
       /* Fix para el bug visual de Chrome con backdrop-filter cortado en los bordes */
@@ -987,8 +1010,7 @@ $user_uid = $_SESSION['firebase_uid'];
                 <h5 class="modal-title fw-bold text-white mb-0" style="letter-spacing:0.5px;">Estadísticas
                   Ampliadas
                 </h5>
-                <p class="text-muted mb-0" style="font-size:0.75rem;">Resumen completo de tu actividad como
-                  enthusiast
+                <p class="text-muted mb-0" style="font-size:0.75rem;">Resumen completo de tus estadísticas
                 </p>
               </div>
             </div>
@@ -1176,17 +1198,48 @@ $user_uid = $_SESSION['firebase_uid'];
     </div>
 
   </div>
-</main>
+  <!-- MODAL FOTO -->
+  <div class="modal fade" id="ig-lightbox-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+      <div class="modal-content bg-dark text-white border-secondary rounded-0 overflow-visible position-relative">
+        <button id="ig-modal-prev"
+          class="btn text-white position-absolute top-50 translate-middle-y rounded-circle px-3 py-2"
+          style="z-index: 1055; left: -60px; font-size: 1.5rem; background: rgba(0,0,0,0.5);"><i
+            class="fa-solid fa-chevron-left"></i></button>
+        <button id="ig-modal-next"
+          class="btn text-white position-absolute top-50 translate-middle-y rounded-circle px-3 py-2"
+          style="z-index: 1055; right: -60px; font-size: 1.5rem; background: rgba(0,0,0,0.5);"><i
+            class="fa-solid fa-chevron-right"></i></button>
+        <div class="modal-header border-secondary d-flex align-items-center py-2 px-3">
+          <img id="ig-modal-avatar" src="" alt="Avatar" class="rounded-circle me-2"
+            style="width:32px; height:32px; object-fit:cover;">
+          <div id="ig-modal-avatar-fallback"
+            class="d-flex d-none align-items-center justify-content-center text-secondary bg-dark rounded-circle me-2"
+            style="width:32px;height:32px;"><i class="fa-solid fa-user"></i></div>
+          <span id="ig-modal-username" class="fw-bold fs-6"></span>
+          <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal"
+            aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-0">
+          <img id="ig-modal-img" src="" alt="Foto" class="w-100" style="aspect-ratio: 1/1; object-fit:cover;">
+        </div>
+        <div class="modal-footer border-secondary flex-column align-items-start py-3 px-3">
+          <div class="w-100">
+            <span id="ig-modal-caption-user" class="fw-bold text-success me-2"></span>
+            <span id="ig-modal-caption" class="text-light"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-
-
-<?php require_once __DIR__ . '/../../partials/footer.php'; ?>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-<script src="<?= Router::asset('web/js/components/trip_modals.js') ?>"></script>
-<script src="<?= Router::asset('web/js/users/map.js') ?>"></script>
-<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-<script src="<?= Router::asset('web/js/users/profile.js') ?>?v=<?= time() ?>"></script>
+  <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="<?= Router::asset('web/js/components/trip_modals.js') ?>"></script>
+  <script src="<?= Router::asset('web/js/users/map.js') ?>"></script>
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script src="<?= Router::asset('web/js/users/profile.js') ?>?v=<?= time() ?>"></script>

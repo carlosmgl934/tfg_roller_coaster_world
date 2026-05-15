@@ -172,28 +172,70 @@ $(document).ready(function () {
         L.DomEvent.disableClickPropagation(btn);
         L.DomEvent.on(btn, "click", function () {
           const mapEl = document.getElementById("profile-map");
-          const isFs = !!(
-            document.fullscreenElement || document.webkitFullscreenElement
+          const canFs = !!(
+            mapEl.requestFullscreen || mapEl.webkitRequestFullscreen
           );
+          const isFs = !!(
+            document.fullscreenElement ||
+            document.webkitFullscreenElement ||
+            mapEl.classList.contains("is-fullscreen")
+          );
+
           if (!isFs) {
-            (mapEl.requestFullscreen || mapEl.webkitRequestFullscreen).call(
-              mapEl,
-            );
+            if (canFs) {
+              (mapEl.requestFullscreen || mapEl.webkitRequestFullscreen).call(
+                mapEl,
+              );
+            } else {
+              // Fallback para móviles que no soportan Fullscreen API nativa
+              mapEl.classList.add("is-fullscreen");
+              document.body.style.overflow = "hidden";
+              if (mapInstance) mapInstance.invalidateSize();
+            }
             btn.innerHTML = '<i class="fa-solid fa-compress"></i>';
             btn.title = "Salir de pantalla completa";
           } else {
-            (document.exitFullscreen || document.webkitExitFullscreen).call(
-              document,
-            );
+            if (
+              document.fullscreenElement ||
+              document.webkitFullscreenElement
+            ) {
+              (document.exitFullscreen || document.webkitExitFullscreen).call(
+                document,
+              );
+            }
+            mapEl.classList.remove("is-fullscreen");
+            document.body.style.overflow = "";
+            if (mapInstance) mapInstance.invalidateSize();
             btn.innerHTML = '<i class="fa-solid fa-expand"></i>';
             btn.title = "Pantalla completa";
           }
         });
+
+        // Asegurar limpieza de estilos si se sale por escape (nativo)
         document.addEventListener("fullscreenchange", function () {
-          if (!document.fullscreenElement) {
+          if (
+            !document.fullscreenElement &&
+            !document.webkitFullscreenElement
+          ) {
             btn.innerHTML = '<i class="fa-solid fa-expand"></i>';
             btn.title = "Pantalla completa";
+            const mapEl = document.getElementById("profile-map");
+            if (mapEl) mapEl.classList.remove("is-fullscreen");
+            document.body.style.overflow = "";
             if (mapInstance) mapInstance.invalidateSize();
+          }
+        });
+
+        // Soporte tecla ESC para el modo fallback
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape") {
+            const mapEl = document.getElementById("profile-map");
+            if (mapEl && mapEl.classList.contains("is-fullscreen")) {
+              mapEl.classList.remove("is-fullscreen");
+              document.body.style.overflow = "";
+              btn.innerHTML = '<i class="fa-solid fa-expand"></i>';
+              if (mapInstance) mapInstance.invalidateSize();
+            }
           }
         });
         return btn;

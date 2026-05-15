@@ -24,7 +24,7 @@ if (!$uid) {
     exit;
 }
 
-$db     = new DBConexion();
+$db = new DBConexion();
 $action = $_GET['action'] ?? 'get';
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -38,7 +38,7 @@ if (!$userId) {
 }
 
 match (true) {
-    ($action === 'get'  && $method === 'GET')  => getRecommendations($db, $userId),
+    ($action === 'get' && $method === 'GET') => getRecommendations($db, $userId),
     ($action === 'refresh' && $method === 'GET') => getRecommendations($db, $userId, true),
     ($action === 'book' && $method === 'POST') => bookRecommendation($db, $userId),
     ($action === 'confirm' && $method === 'POST') => confirmAndSchedule($db, $userId),
@@ -132,7 +132,7 @@ function buildUserProfile(DBConexion $db, int $userId): array
     // Gasto medio en pedidos completados
     $stmt = $db->prepare(
         "SELECT COALESCE(AVG(price), 50) FROM pedidos
-         WHERE user_id = ? AND status = 'completado'"
+         WHERE user_id = ? AND status = 'confirmado'"
     );
     $stmt->execute([$userId]);
     $avgSpend = (float) $stmt->fetchColumn();
@@ -168,19 +168,19 @@ function buildUserProfile(DBConexion $db, int $userId): array
     $tripsCount = (int) $stmt->fetchColumn();
 
     return [
-        'user_id'       => $userId,
-        'username'      => $user['username'] ?? 'Usuario',
-        'city'          => $user['city'] ?? null,
-        'country'       => $user['country'] ?? null,
-        'fav_coaster'   => $user['favorite_coaster'] ?? null,
-        'max_speed'     => $maxSpeed,
-        'visited_ids'   => $visitedIds,
-        'fav_country'   => $favCountry,
-        'avg_spend'     => max($avgSpend, 30),
-        'fav_manu'      => $favManu,
-        'top_park'      => $topPark,
+        'user_id' => $userId,
+        'username' => $user['username'] ?? 'Usuario',
+        'city' => $user['city'] ?? null,
+        'country' => $user['country'] ?? null,
+        'fav_coaster' => $user['favorite_coaster'] ?? null,
+        'max_speed' => $maxSpeed,
+        'visited_ids' => $visitedIds,
+        'fav_country' => $favCountry,
+        'avg_spend' => max($avgSpend, 30),
+        'fav_manu' => $favManu,
+        'top_park' => $topPark,
         'total_credits' => $totalCredits,
-        'trips_count'   => $tripsCount,
+        'trips_count' => $tripsCount,
     ];
 }
 
@@ -230,7 +230,7 @@ function generateRecommendations(DBConexion $db, array $profile): array
     usort($scored, fn($a, $b) => $b['_score'] <=> $a['_score']);
 
     // Tomar top 2 (match) + 1 wildcard (diferente al perfil)
-    $matches   = array_slice($scored, 0, 2);
+    $matches = array_slice($scored, 0, 2);
     $wildcards = array_slice(array_reverse($scored), 0, 10);
     // Wildcard: el mejor puntuado de los últimos (diferente país al fav)
     $wildcard = null;
@@ -261,7 +261,7 @@ function scorePark(array $park, array $profile, DBConexion $db): float
     $score = 0.0;
 
     // Valoración global del parque (hasta 40 pts)
-    $score += (float)($park['stars'] ?? 0) * 8.0;
+    $score += (float) ($park['stars'] ?? 0) * 8.0;
 
     // Mismo país que el favorito del usuario (hasta 20 pts)
     if ($park['park_country'] && $park['park_country'] === $profile['fav_country']) {
@@ -274,10 +274,10 @@ function scorePark(array $park, array $profile, DBConexion $db): float
     }
 
     // Número de coasters operativas — premia parques grandes (hasta 15 pts)
-    $score += min((float)($park['operating_coasters'] ?? 0) * 0.5, 15.0);
+    $score += min((float) ($park['operating_coasters'] ?? 0) * 0.5, 15.0);
 
     // Precio dentro del presupuesto medio del usuario (hasta 10 pts)
-    $parkPrice = (float)($park['precio_entrada'] ?? 0);
+    $parkPrice = (float) ($park['precio_entrada'] ?? 0);
     if ($parkPrice > 0 && $parkPrice <= $profile['avg_spend'] * 2) {
         $score += 10.0;
     }
@@ -286,7 +286,7 @@ function scorePark(array $park, array $profile, DBConexion $db): float
     if ($profile['fav_manu']) {
         $stmt = $db->prepare(
             "SELECT COUNT(*) FROM coasters
-             WHERE park_id = ? AND coaster_manufacter ILIKE ?"
+             WHERE park_id = ? AND coaster_manufacter LIKE ?"
         );
         $stmt->execute([$park['id'], $profile['fav_manu']]);
         if ($stmt->fetchColumn() > 0) {
@@ -300,15 +300,15 @@ function scorePark(array $park, array $profile, DBConexion $db): float
 // ── Construye el item de recomendación con hotel y razón ─────────────────────
 function buildRecItem(array $park, array $profile, string $type): array
 {
-    $avgSpend   = $profile['avg_spend'];
-    $parkPrice  = (float)($park['precio_entrada'] ?? 50);
-    $duration   = ($profile['trips_count'] > 2) ? 3 : 2;
+    $avgSpend = $profile['avg_spend'];
+    $parkPrice = (float) ($park['precio_entrada'] ?? 50);
+    $duration = ($profile['trips_count'] > 2) ? 3 : 2;
 
     // Hotel: entre 60-80% del gasto diario restante
-    $dailyBudget    = max($avgSpend / $duration, 40);
-    $hotelNight     = round($dailyBudget * 0.65, 2);
-    $hotelStars     = $hotelNight < 60 ? 2 : ($hotelNight < 120 ? 3 : 4);
-    $hotelNames     = [
+    $dailyBudget = max($avgSpend / $duration, 40);
+    $hotelNight = round($dailyBudget * 0.65, 2);
+    $hotelStars = $hotelNight < 60 ? 2 : ($hotelNight < 120 ? 3 : 4);
+    $hotelNames = [
         2 => "Ibis Styles {$park['park_country']}",
         3 => "Holiday Inn {$park['park_name']}",
         4 => "Marriott Premium {$park['park_country']}",
@@ -319,19 +319,19 @@ function buildRecItem(array $park, array $profile, string $type): array
     $reason = buildReason($park, $profile, $type);
 
     return [
-        'park_id'           => $park['id'],
-        'park_name'         => $park['park_name'],
-        'park_country'      => $park['park_country'] ?? '—',
-        'park_image_url'    => $park['imagen_url'] ?? null,
-        'stars'             => $park['stars'] ?? 0,
-        'price_estimate'    => $parkPrice,
-        'hotel_name'        => $hotelName,
-        'hotel_stars'       => $hotelStars,
+        'park_id' => $park['id'],
+        'park_name' => $park['park_name'],
+        'park_country' => $park['park_country'] ?? '—',
+        'park_image_url' => $park['imagen_url'] ?? null,
+        'stars' => $park['stars'] ?? 0,
+        'price_estimate' => $parkPrice,
+        'hotel_name' => $hotelName,
+        'hotel_stars' => $hotelStars,
         'hotel_price_night' => $hotelNight,
-        'duration_days'     => $duration,
-        'affinity_score'    => round($park['_score'] / 100, 4),
-        'reason'            => $reason,
-        'rec_type'          => $type,
+        'duration_days' => $duration,
+        'affinity_score' => round($park['_score'] / 100, 4),
+        'reason' => $reason,
+        'rec_type' => $type,
     ];
 }
 
@@ -390,9 +390,9 @@ function saveRecommendation(DBConexion $db, int $userId, array $rec): void
 // ═════════════════════════════════════════════════════════════════════════════
 function bookRecommendation(DBConexion $db, int $userId): void
 {
-    $body   = json_decode(file_get_contents('php://input'), true) ?? [];
+    $body = json_decode(file_get_contents('php://input'), true) ?? [];
     $parkId = (int) ($body['park_id'] ?? 0);
-    $qty    = max(1, (int) ($body['quantity'] ?? 1));
+    $qty = max(1, (int) ($body['quantity'] ?? 1));
 
     if (!$parkId) {
         Response::error('park_id requerido', 422);
@@ -410,8 +410,8 @@ function bookRecommendation(DBConexion $db, int $userId): void
             return;
         }
 
-        $unitPrice = (float)($park['precio_entrada'] ?? 50);
-        $total     = round($unitPrice * $qty, 2);
+        $unitPrice = (float) ($park['precio_entrada'] ?? 50);
+        $total = round($unitPrice * $qty, 2);
 
         // Insertar o actualizar en carrito (pedidos en estado "pendiente")
         $stmtExist = $db->prepare(
@@ -420,26 +420,31 @@ function bookRecommendation(DBConexion $db, int $userId): void
         $stmtExist->execute([$userId, $parkId]);
         $existing = $stmtExist->fetchColumn();
 
+        // Fecha por defecto: hoy + 7 días para viajes sugeridos
+        $visitDate = date('Y-m-d', strtotime('+7 days'));
+
         if ($existing) {
-            $db->prepare("UPDATE pedidos SET quantity = ?, price = ? WHERE id = ?")
-               ->execute([$qty, $total, $existing]);
+            $db->prepare("UPDATE pedidos SET quantity = ?, price = ?, unit_price = ?, visit_date = ? WHERE id = ?")
+                ->execute([$qty, $total, $unitPrice, $visitDate, $existing]);
             $orderId = $existing;
         } else {
             $db->prepare(
-                "INSERT INTO pedidos (user_id, park_id, quantity, price, status)
-                 VALUES (?,?,?,?,'pendiente')"
-            )->execute([$userId, $parkId, $qty, $total]);
+                "INSERT INTO pedidos (user_id, park_id, quantity, price, unit_price, ticket_type, visit_date, status)
+                 VALUES (?,?,?,?,?,'entrada',?,'pendiente')"
+            )->execute([$userId, $parkId, $qty, $total, $unitPrice, $visitDate]);
             $orderId = $db->lastInsertId();
         }
 
-        Response::success(['data' => [
-            'order_id'   => $orderId,
-            'park_name'  => $park['park_name'],
-            'quantity'   => $qty,
-            'unit_price' => $unitPrice,
-            'total'      => $total,
-            'message'    => 'Carrito pre-configurado correctamente',
-        ]]);
+        Response::success([
+            'data' => [
+                'order_id' => $orderId,
+                'park_name' => $park['park_name'],
+                'quantity' => $qty,
+                'unit_price' => $unitPrice,
+                'total' => $total,
+                'message' => 'Carrito pre-configurado correctamente',
+            ]
+        ]);
     } catch (Exception $e) {
         error_log("Error bookRecommendation: " . $e->getMessage());
         Response::error('Error al preparar el carrito', 500);
@@ -451,11 +456,11 @@ function bookRecommendation(DBConexion $db, int $userId): void
 // ═════════════════════════════════════════════════════════════════════════════
 function confirmAndSchedule(DBConexion $db, int $userId): void
 {
-    $body    = json_decode(file_get_contents('php://input'), true) ?? [];
+    $body = json_decode(file_get_contents('php://input'), true) ?? [];
     $orderId = (int) ($body['order_id'] ?? 0);
-    $parkId  = (int) ($body['park_id']  ?? 0);
-    $days    = max(1, (int) ($body['duration_days'] ?? 2));
-    $start   = $body['start_date'] ?? date('Y-m-d', strtotime('+14 days'));
+    $parkId = (int) ($body['park_id'] ?? 0);
+    $days = max(1, (int) ($body['duration_days'] ?? 2));
+    $start = $body['start_date'] ?? date('Y-m-d', strtotime('+14 days'));
 
     if (!$orderId || !$parkId) {
         Response::error('order_id y park_id son requeridos', 422);
@@ -465,14 +470,20 @@ function confirmAndSchedule(DBConexion $db, int $userId): void
     try {
         $db->beginTransaction();
 
-        // 1. Marcar pedido como completado
-        $db->prepare("UPDATE pedidos SET status = 'completado' WHERE id = ? AND user_id = ?")
-           ->execute([$orderId, $userId]);
+        // 1. Marcar pedido como confirmado
+        $db->prepare("UPDATE pedidos SET status = 'confirmado' WHERE id = ? AND user_id = ?")
+            ->execute([$orderId, $userId]);
 
         // 2. Obtener datos del parque
-        $stmtP = $db->prepare("SELECT park_name, park_country FROM parks WHERE id = ?");
+        $stmtP = $db->prepare("SELECT park_name, park_country, imagen_url FROM parks WHERE id = ?");
         $stmtP->execute([$parkId]);
         $park = $stmtP->fetch(PDO::FETCH_ASSOC);
+
+        if (!$park) {
+            $db->rollBack();
+            Response::error('Parque no encontrado', 404);
+            return;
+        }
 
         // 3. Obtener top coaster del parque para itinerario
         $stmtC = $db->prepare(
@@ -483,7 +494,7 @@ function confirmAndSchedule(DBConexion $db, int $userId): void
 
         // 4. Calcular fechas
         $startDate = date('Y-m-d', strtotime($start));
-        $endDate   = date('Y-m-d', strtotime($start . " +{$days} days"));
+        $endDate = date('Y-m-d', strtotime($start . " +{$days} days"));
 
         // 5. Generar título e itinerario del viaje
         $tripTitle = "Viaje a {$park['park_name']}";
@@ -491,28 +502,42 @@ function confirmAndSchedule(DBConexion $db, int $userId): void
 
         // 6. Insertar en trips
         $stmtT = $db->prepare(
-            "INSERT INTO trips (user_id, title, start_date, end_date, parks_visited, new_credits)
-             VALUES (?,?,?,?,?,0)"
+            "INSERT INTO trips (user_id, title, description, start_date, end_date, cover_image, trip_type, status)
+             VALUES (?,?,?,?,?,?,?, 'planned')"
         );
-        $stmtT->execute([$userId, $tripTitle, $startDate, $endDate, $park['park_name']]);
+        $desc = "Viaje generado automáticamente por el motor de recomendación de RCW.";
+        $stmtT->execute([$userId, $tripTitle, $desc, $startDate, $endDate, $park['imagen_url'], 'ai']);
         $tripId = $db->lastInsertId();
 
-        // (Omitido: trips_parks no existe y en Postgres rompe la transacción entera si falla)
+        // 7. Asociar el parque a TODOS los días del viaje para que aparezca en el calendario como días de parque
+        for ($i = 0; $i < $days; $i++) {
+            $visitDate = date('Y-m-d', strtotime($startDate . " +{$i} days"));
+            $stmtTP = $db->prepare(
+                "INSERT INTO trip_parks (trip_id, park_id, visit_date, visit_order) 
+                 VALUES (?, ?, ?, ?)"
+            );
+            $stmtTP->execute([$tripId, $parkId, $visitDate, $i + 1]);
+        }
 
         $db->commit();
 
-        Response::success(['data' => [
-            'trip_id'    => $tripId,
-            'trip_title' => $tripTitle,
-            'start_date' => $startDate,
-            'end_date'   => $endDate,
-            'itinerary'  => $itinerary,
-            'message'    => '¡Reserva confirmada! Tu agenda ha sido actualizada.',
-        ]]);
+        Response::success([
+            'data' => [
+                'trip_id' => $tripId,
+                'trip_title' => $tripTitle,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'itinerary' => $itinerary,
+                'message' => '¡Reserva confirmada! Tu agenda ha sido actualizada.',
+            ]
+        ]);
     } catch (Exception $e) {
-        $db->rollBack();
-        error_log("Error confirmAndSchedule: " . $e->getMessage());
-        Response::error('Error al confirmar la reserva', 500);
+        try {
+            $db->rollBack();
+        } catch (Exception $re) {
+        }
+        error_log("[confirmAndSchedule] " . $e->getMessage() . " | Trace: " . $e->getTraceAsString());
+        Response::error('Error al confirmar la reserva: ' . $e->getMessage(), 500);
     }
 }
 
@@ -523,7 +548,7 @@ function buildItinerary(string $parkName, string $topCoaster, int $days): array
     for ($d = 1; $d <= $days; $d++) {
         if ($d === 1) {
             $itinerary[] = [
-                'day'   => "Día 1",
+                'day' => "Día 1",
                 'title' => "Llegada y primera jornada en {$parkName}",
                 'items' => [
                     "Check-in en el hotel y descanso",
@@ -534,7 +559,7 @@ function buildItinerary(string $parkName, string $topCoaster, int $days): array
             ];
         } elseif ($d === $days) {
             $itinerary[] = [
-                'day'   => "Día {$d}",
+                'day' => "Día {$d}",
                 'title' => "Últimas atracciones y regreso",
                 'items' => [
                     "Jornada completa de madrugada para evitar colas",
@@ -545,7 +570,7 @@ function buildItinerary(string $parkName, string $topCoaster, int $days): array
             ];
         } else {
             $itinerary[] = [
-                'day'   => "Día {$d}",
+                'day' => "Día {$d}",
                 'title' => "Jornada completa en {$parkName}",
                 'items' => [
                     "Desayuno en el hotel incluido",

@@ -1,8 +1,8 @@
-﻿/* ============================================================
-   profile.css â€” Dark mode premium Â· RollerCoaster World
+/* ============================================================
+   profile.css â Dark mode premium Â· RollerCoaster World
    ============================================================ */
 
-/* â”€â”€ AVATAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ââ AVATAR ââââââââââââââââââââââââââââââââââââââââââââââââââââ */
 .avatar-circle {
   width: 140px;
   height: 140px;
@@ -23,7 +23,7 @@
   overflow: hidden;
 }
 
-/* â”€â”€ PROFILE CARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ââ PROFILE CARD ââââââââââââââââââââââââââââââââââââââââââââââ */
 .profile-card {
   border-radius: 0 !important;
   border: 1px solid var(--rcw-border) !important;
@@ -56,7 +56,7 @@
   font-family: var(--rcw-font-title);
 }
 
-/* â”€â”€ MENÃš LATERAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ââ MENÃ LATERAL ââââââââââââââââââââââââââââââââââââââââââââââ */
 .profile-menu .list-group-item {
   border-radius: 0 !important;
   border: none;
@@ -82,7 +82,7 @@
   border-left: 3px solid var(--rcw-green-neon) !important;
 }
 
-/* â”€â”€ FORMULARIO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ââ FORMULARIO ââââââââââââââââââââââââââââââââââââââââââââââââ */
 .form-label {
   color: var(--rcw-text-muted);
   font-weight: 700;
@@ -126,7 +126,7 @@
   color: var(--rcw-text-muted);
 }
 
-/* â”€â”€ BADGE PERFIL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ââ BADGE PERFIL ââââââââââââââââââââââââââââââââââââââââââââââ */
 .badge-profile {
   background-color: var(--rcw-green-neon);
   color: #000;
@@ -149,7 +149,7 @@
   font-weight: 700;
 }
 
-/* â”€â”€ DATA/FAV BOXES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ââ DATA/FAV BOXES ââââââââââââââââââââââââââââââââââââââââââââ */
 .data-box {
   background-color: var(--rcw-bg-card-alt);
   border: 1px solid var(--rcw-border);
@@ -217,9 +217,9 @@
   border-radius: 0 !important;
 }
 
-/* â”€â”€ MIS TOPS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ââ MIS TOPS ââââââââââââââââââââââââââââââââââââââââââââââââââ */
 
-/* â”€â”€ MIS TOPS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ââ MIS TOPS ââââââââââââââââââââââââââââââââââââââââââââââââââ */
 
 /* Tabs */
 #tops-tabs .nav-link.active {
@@ -289,39 +289,34 @@
 }
 
 /* Full-view scrollable containers */
-#top-coasters-full-container,
-#top-parks-full-container {
-  max-height: 1250px; /* ~10 list rows Ã— 125px each */
+.tops-full-grid-wrapper {
+  max-height: 1250px; /* ~10 list rows Ã 125px each */
   overflow-y: auto;
   overflow-x: hidden;
   padding-right: 6px;
 }
 
-/* Custom scrollbars for edit lists and full-view â€” dark theme */
+/* Custom scrollbars for edit lists and full-view â dark theme */
 #top-coasters-list-edit::-webkit-scrollbar,
 #top-parks-list-edit::-webkit-scrollbar,
-#top-coasters-full-container::-webkit-scrollbar,
-#top-parks-full-container::-webkit-scrollbar {
+.tops-full-grid-wrapper::-webkit-scrollbar {
   width: 6px;
 }
 #top-coasters-list-edit::-webkit-scrollbar-track,
 #top-parks-list-edit::-webkit-scrollbar-track,
-#top-coasters-full-container::-webkit-scrollbar-track,
-#top-parks-full-container::-webkit-scrollbar-track {
+.tops-full-grid-wrapper::-webkit-scrollbar-track {
   background: var(--rcw-bg);
   border-radius: 4px;
 }
 #top-coasters-list-edit::-webkit-scrollbar-thumb,
 #top-parks-list-edit::-webkit-scrollbar-thumb,
-#top-coasters-full-container::-webkit-scrollbar-thumb,
-#top-parks-full-container::-webkit-scrollbar-thumb {
+.tops-full-grid-wrapper::-webkit-scrollbar-thumb {
   background: var(--rcw-border-strong);
   border-radius: 4px;
 }
 #top-coasters-list-edit::-webkit-scrollbar-thumb:hover,
 #top-parks-list-edit::-webkit-scrollbar-thumb:hover,
-#top-coasters-full-container::-webkit-scrollbar-thumb:hover,
-#top-parks-full-container::-webkit-scrollbar-thumb:hover {
+.tops-full-grid-wrapper::-webkit-scrollbar-thumb:hover {
   background: var(--rcw-text-muted);
 }
 
@@ -343,7 +338,7 @@
   cursor: grabbing;
 }
 
-/* â”€â”€ FLATPICKR DARK THEME â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ââ FLATPICKR DARK THEME ââââââââââââââââââââââââââââââââââââââ */
 .flatpickr-calendar {
   background: #161c22 !important;
   border: 1px solid #232a31 !important;
@@ -413,7 +408,7 @@ span.flatpickr-weekday {
   display: none !important;
 }
 
-/* â”€â”€ CONTRAST FIX PARA BOTONES OUTLINE-SUCCESS EN HOVER â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ââ CONTRAST FIX PARA BOTONES OUTLINE-SUCCESS EN HOVER ââââââââ */
 /* Cuando se hace hover, el fondo se vuelve verde de forma nativa en Bootstrap. 
    Forzamos a que el texto y el icono sean negros para que destaquen. */
 .btn-outline-success:hover,
@@ -421,7 +416,7 @@ span.flatpickr-weekday {
   color: #000 !important;
 }
 
-/* â”€â”€ TOPS: PREVIEW SCROLLABLE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ââ TOPS: PREVIEW SCROLLABLE ââââââââââââââââââââââââââââââââââ */
 .tops-preview-scroll {
   max-height: 680px;
   overflow-y: auto;
@@ -443,7 +438,7 @@ span.flatpickr-weekday {
   background: var(--rcw-text-muted);
 }
 
-/* â”€â”€ TOPS: SYMMETRIC FILTER BAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ââ TOPS: SYMMETRIC FILTER BAR ââââââââââââââââââââââââââââââââ */
 .stats-type-wrapper {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -539,7 +534,7 @@ span.flatpickr-weekday {
   background: transparent;
 }
 
-/* â”€â”€ Sort row: select + direction button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ââ Sort row: select + direction button ââââââââââââââââââââââ */
 .tops-sort-row {
   display: flex;
   gap: 0.5rem;
@@ -590,7 +585,7 @@ span.flatpickr-weekday {
   letter-spacing: 0.03em;
 }
 
-/* â”€â”€ TOPS: STATS SIDEBAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ââ TOPS: STATS SIDEBAR âââââââââââââââââââââââââââââââââââââââ */
 .tops-legend-card {
   position: sticky;
   top: 80px;
@@ -681,7 +676,7 @@ span.flatpickr-weekday {
   }
 }
 
-/* â”€â”€ FRIENDS MANAGER (from friends.php) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ââ FRIENDS MANAGER (from friends.php) ââââââââââââââââââââââââ */
 #requests-list .list-group-item,
 #sent-list .list-group-item {
   background-color: transparent;
@@ -702,7 +697,7 @@ span.flatpickr-weekday {
   filter: brightness(0) invert(0.7);
 }
 
-/* â”€â”€ FORUM INVITE BUTTONS HOVER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ââ FORUM INVITE BUTTONS HOVER ââââââââââââââââââââââââââââââââ */
 .rcw-forum-accept-btn {
   background: #7c3aed !important;
   color: #fff !important;
@@ -723,7 +718,7 @@ span.flatpickr-weekday {
   transform: scale(1.05);
 }
 
-/* â”€â”€ MI MAPA (Leaflet) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ââ MI MAPA (Leaflet) âââââââââââââââââââââââââââââââââââââââââ */
 #profile-map {
   height: 520px;
   width: 100%;
@@ -882,7 +877,7 @@ span.flatpickr-weekday {
   color: #00c853 !important;
 }
 
-/* BotÃ³n de pantalla completa */
+/* Botón de pantalla completa */
 .rcw-fullscreen-btn {
   width: 30px !important;
   height: 30px !important;
@@ -907,13 +902,23 @@ span.flatpickr-weekday {
 
 /* Mapa en modo fullscreen: ocupa toda la pantalla */
 #profile-map:fullscreen,
-#profile-map:-webkit-full-screen {
+#profile-map:-webkit-full-screen,
+#profile-map.is-fullscreen {
   height: 100vh !important;
   width: 100vw !important;
   border-radius: 0 !important;
 }
 
-/* â”€â”€ AJUSTES USER PROFILE ESPECÃFICOS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+#profile-map.is-fullscreen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 999999 !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+/* ââ AJUSTES USER PROFILE ESPECÃFICOS ââââââââââââââââââââââââââ */
 
 /* Select de tipo en estadÃ­sticas: anula el CSS transparent del ID */
 #rank-type-select.rcw-stats-select,
@@ -935,9 +940,27 @@ span.flatpickr-weekday {
   box-shadow: none !important;
 }
 
-/* El .stats-type-wrapper ya no necesita mostrar el chevron manual */
-.stats-type-wrapper > i.fa-chevron-down {
-  display: none !important;
+/* Variante inline para cabecera verde (trips.php): fondo semitransparente, texto blanco */
+.rcw-stats-inline {
+  padding: 0.25rem 1.6rem 0.25rem 0.6rem !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #fff !important;
+  cursor: pointer !important;
+  min-width: 100px !important;
+  border-radius: 3px !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23ffffff' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.5rem center !important;
+  box-shadow: none !important;
+}
+.rcw-stats-inline option {
+  background-color: #1a2a1a;
+  color: #fff;
 }
 
 .trips-empty-notice {
@@ -969,7 +992,6 @@ span.flatpickr-weekday {
   cursor: grabbing;
 }
 
-
 /* Prevenir selección de texto al arrastrar en el top */
 .tops-edit-item {
   user-select: none;
@@ -985,31 +1007,287 @@ span.flatpickr-weekday {
 }
 .sortable-drag {
   background: #2e59d9 !important;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
   z-index: 9999;
 }
-
 
 /* Force no selection */
 .tops-edit-item * {
   user-select: none !important;
   -webkit-user-select: none !important;
-} 
-
+}
 
 /* SoluciÃ³n definitiva de selecciÃ³n: Capa 2 y 3 */
-#top-coasters-list-edit, #top-parks-list-edit {
+#top-coasters-list-edit,
+#top-parks-list-edit {
   user-select: none !important;
   -webkit-user-select: none !important;
   -moz-user-select: none !important;
 }
 
-body.is-dragging, body.is-dragging * {
+body.is-dragging,
+body.is-dragging * {
   user-select: none !important;
   -webkit-user-select: none !important;
   cursor: grabbing !important;
 }
 
+.tops-filter-select option,
+.tops-sort-select option,
+.form-select option {
+  background-color: #161c22;
+  color: #fff;
+}
 
-.tops-filter-select option, .tops-sort-select option, .form-select option { background-color: #161c22; color: #fff; }
+.tops-filters-grid--2col {
+  grid-template-columns: 1fr;
+}
+.tops-filters-grid--2col > .tops-filter-item {
+  grid-column: 1 / -1;
+}
 
+/* ══ FLATPICKR TEMA RCW ══════════════════════════════════════════════ */
+.flatpickr-calendar {
+  background: var(--rcw-bg-card, #1a1f2e) !important;
+  border: 1px solid var(--rcw-border, #2a3150) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55) !important;
+  border-radius: 8px !important;
+  color: #e2e8f0 !important;
+}
+
+/* Flecha del puntero del calendario */
+.flatpickr-calendar.arrowTop::before,
+.flatpickr-calendar.arrowTop::after {
+  border-bottom-color: var(--rcw-border, #2a3150) !important;
+}
+.flatpickr-calendar.arrowBottom::before,
+.flatpickr-calendar.arrowBottom::after {
+  border-top-color: var(--rcw-border, #2a3150) !important;
+}
+
+/* Cabecera: mes y año */
+.flatpickr-months {
+  background: rgba(0, 200, 150, 0.07) !important;
+  border-radius: 8px 8px 0 0 !important;
+  padding: 4px 0 !important;
+}
+.flatpickr-month,
+.flatpickr-current-month {
+  color: #e2e8f0 !important;
+}
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+  background: #1a1f2e !important;
+  color: #e2e8f0 !important;
+  border: 1px solid #2a3150 !important;
+  border-radius: 4px !important;
+  padding: 2px 4px !important;
+  cursor: pointer !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+.flatpickr-current-month input.cur-year {
+  color: #e2e8f0 !important;
+  background: transparent !important;
+  font-weight: 700 !important;
+}
+
+/* Botones flechas del mes */
+.flatpickr-prev-month,
+.flatpickr-next-month {
+  color: #e2e8f0 !important;
+  fill: #e2e8f0 !important;
+}
+.flatpickr-prev-month:hover,
+.flatpickr-next-month:hover {
+  color: #00c896 !important;
+  fill: #00c896 !important;
+}
+
+/* Cabeceras de días de semana */
+.flatpickr-weekday {
+  color: #00c896 !important;
+  font-weight: 600 !important;
+}
+
+/* Días normales */
+.flatpickr-day {
+  color: #e2e8f0 !important;
+  border-radius: 4px !important;
+}
+.flatpickr-day:hover {
+  background: rgba(0, 200, 150, 0.15) !important;
+  border-color: transparent !important;
+}
+
+/* Día de hoy */
+.flatpickr-day.today {
+  border-color: #00c896 !important;
+  background: transparent !important;
+  font-weight: 700 !important;
+}
+.flatpickr-day.today:hover {
+  background: rgba(0, 200, 150, 0.2) !important;
+}
+
+/* Días seleccionados */
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+  background: #00c896 !important;
+  border-color: #00c896 !important;
+  color: #000 !important;
+  font-weight: 700 !important;
+}
+.flatpickr-day.selected:hover {
+  background: #00b386 !important;
+}
+
+/* Días deshabilitados / fuera de mes */
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay {
+  color: rgba(226, 232, 240, 0.25) !important;
+}
+
+/* ── Año Flatpickr: input nativo estilizado (sin <select>, sin desbordamiento) ── */
+.numInputWrapper {
+  background: rgba(0, 200, 150, 0.1) !important;
+  border: 1px solid rgba(0, 200, 150, 0.35) !important;
+  border-radius: 4px !important;
+  padding: 1px 4px 1px 2px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  min-width: 54px !important;
+}
+.numInputWrapper input.cur-year {
+  color: #00c896 !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  background: transparent !important;
+  border: none !important;
+  width: 46px !important;
+  text-align: center !important;
+  padding: 0 !important;
+  outline: none !important;
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
+}
+.numInputWrapper input.cur-year::-webkit-outer-spin-button,
+.numInputWrapper input.cur-year::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+}
+/* Flechas de incremento/decremento */
+.numInputWrapper span {
+  border-color: rgba(0, 200, 150, 0.2) !important;
+  background: transparent !important;
+}
+.numInputWrapper span.arrowUp::after {
+  border-bottom-color: #00c896 !important;
+}
+.numInputWrapper span.arrowDown::after {
+  border-top-color: #00c896 !important;
+}
+.numInputWrapper span:hover {
+  background: rgba(0, 200, 150, 0.15) !important;
+}
+
+/* --- Flatpickr Square Selects & Year Dropdown --- */
+.flatpickr-calendar.rcw-flatpickr {
+  border-radius: 0 !important;
+  background: #161b22 !important;
+  border: 1px solid #30363d !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6) !important;
+}
+
+.flatpickr-calendar.rcw-flatpickr .flatpickr-months .flatpickr-month {
+  background: #161b22 !important;
+  color: #fff !important;
+}
+
+.flatpickr-calendar.rcw-flatpickr .flatpickr-current-month {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+}
+
+.flatpickr-calendar.rcw-flatpickr .flatpickr-monthDropdown-months,
+.flatpickr-calendar.rcw-flatpickr .cur-year-select {
+  border-radius: 0 !important;
+  background: #0d1117 !important;
+  border: 1px solid #30363d !important;
+  color: #10b981 !important;
+  padding: 2px 10px !important;
+  font-weight: 700 !important;
+  height: 34px !important;
+  cursor: pointer;
+  outline: none;
+  font-size: 0.95rem !important;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2310b981' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 28px !important;
+}
+
+.flatpickr-calendar.rcw-flatpickr .flatpickr-monthDropdown-months:hover,
+.flatpickr-calendar.rcw-flatpickr .cur-year-select:hover {
+  border-color: #10b981 !important;
+  background-color: #1c2128 !important;
+}
+
+.flatpickr-calendar.rcw-flatpickr .flatpickr-monthDropdown-months option,
+.flatpickr-calendar.rcw-flatpickr .cur-year-select option {
+  background: #0d1117 !important;
+  color: #fff !important;
+  padding: 10px;
+}
+
+/* Ocultar flechas del año original */
+.flatpickr-calendar.rcw-flatpickr .numInputWrapper span {
+  display: none !important;
+}
+.flatpickr-calendar.rcw-flatpickr .numInputWrapper {
+  width: auto !important;
+}
+
+/* Día seleccionado cuadrado */
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.selected.prevMonthDay,
+.flatpickr-day.selected.nextMonthDay {
+  border-radius: 0 !important;
+  background: #10b981 !important;
+  border-color: #10b981 !important;
+  color: #000 !important;
+  font-weight: 700;
+}
+
+.flatpickr-day:hover,
+.flatpickr-day.prevMonthDay:hover,
+.flatpickr-day.nextMonthDay:hover,
+.flatpickr-day.today:hover {
+  border-radius: 0 !important;
+  background: rgba(16, 185, 129, 0.2) !important;
+  border-color: #10b981 !important;
+}
+
+.flatpickr-day.today {
+  border-radius: 0 !important;
+  border-bottom: 2px solid #10b981 !important;
+}
+
+/* Forzar ancho completo del input de fecha (Flatpickr altInput) */
+.flatpickr-wrapper,
+#config-user-birthdate-alt,
+.flatpickr-input {
+  width: 100% !important;
+  display: block !important;
+}
+
+/* Permitir que el wrapper flexione en contenedores flex */
+.d-flex > .flatpickr-wrapper {
+  flex: 1;
+}

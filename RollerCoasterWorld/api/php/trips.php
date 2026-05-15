@@ -84,6 +84,17 @@ function canEditTrip(DBConexion $db, int $tripId, int $userId): bool
     return (bool) $s2->fetchColumn();
 }
 
+function isTripParticipant(DBConexion $db, int $tripId, int $userId): bool
+{
+    $s = $db->prepare("SELECT id FROM trips WHERE id=? AND user_id=?");
+    $s->execute([$tripId, $userId]);
+    if ($s->fetchColumn())
+        return true;
+    $s2 = $db->prepare("SELECT id FROM trip_collaborators WHERE trip_id=? AND user_id=? AND status='accepted'");
+    $s2->execute([$tripId, $userId]);
+    return (bool) $s2->fetchColumn();
+}
+
 // ── LIST ──────────────────────────────────────────────────────────────────────
 function listTrips(DBConexion $db, int $userId): void
 {
@@ -163,6 +174,7 @@ function tripDetail(DBConexion $db, int $userId): void
     $trip['park_coasters'] = $s7->fetchAll(PDO::FETCH_ASSOC);
 
     $trip['can_edit'] = canEditTrip($db, $tripId, $userId);
+    $trip['is_participant'] = isTripParticipant($db, $tripId, $userId);
     Response::success(['data' => $trip]);
 }
 
@@ -441,7 +453,7 @@ function dayDetail(DBConexion $db, int $userId): void
         Response::error('date requerido', 422);
         return;
     }
-    $tripId = (int)($_GET['trip_id'] ?? 0);
+    $tripId = (int) ($_GET['trip_id'] ?? 0);
     // Si hay trip_id, mandan los permisos del viaje. Si no lo hay, es el calendario personal (siempre editable).
     $canEdit = $tripId ? false : true;
 
@@ -482,7 +494,7 @@ function dayDetail(DBConexion $db, int $userId): void
     $notesByPark = [];
     if (!empty($parkIds)) {
         $placeholders = implode(',', array_fill(0, count($parkIds), '?'));
-        
+
         // Coasters
         $sc = $db->prepare("SELECT id,coaster_name,imagen_url,park_id FROM coasters
             WHERE park_id IN($placeholders) AND coaster_status = 'Operating' ORDER BY coaster_name");
@@ -555,7 +567,7 @@ function createTrip(DBConexion $db, int $userId, array $body): void
     // Verificar solapamiento
     $chk = $db->prepare("SELECT COUNT(*) FROM trips WHERE (user_id=? OR id IN (SELECT trip_id FROM trip_collaborators WHERE user_id=? AND status='accepted')) AND start_date <= ? AND end_date >= ?");
     $chk->execute([$userId, $userId, $end, $start]);
-    if ((int)$chk->fetchColumn() > 0) {
+    if ((int) $chk->fetchColumn() > 0) {
         Response::error('Ya tienes otro viaje programado que coincide con estas fechas', 409);
         return;
     }
@@ -589,13 +601,13 @@ function updateTrip(DBConexion $db, int $userId, array $body): void
         $currS = $db->prepare("SELECT start_date, end_date FROM trips WHERE id=?");
         $currS->execute([$tripId]);
         $curr = $currS->fetch(PDO::FETCH_ASSOC);
-        
+
         $newStart = $body['start_date'] ?? $curr['start_date'];
         $newEnd = $body['end_date'] ?? $curr['end_date'];
-        
+
         $chk = $db->prepare("SELECT COUNT(*) FROM trips WHERE (user_id=? OR id IN (SELECT trip_id FROM trip_collaborators WHERE user_id=? AND status='accepted')) AND id != ? AND start_date <= ? AND end_date >= ?");
         $chk->execute([$userId, $userId, $tripId, $newEnd, $newStart]);
-        if ((int)$chk->fetchColumn() > 0) {
+        if ((int) $chk->fetchColumn() > 0) {
             Response::error('Ya tienes otro viaje programado que coincide con estas nuevas fechas', 409);
             return;
         }
@@ -625,12 +637,22 @@ function deleteTrip(DBConexion $db, int $userId, array $body): void
         Response::error('trip_id requerido', 422);
         return;
     }
-    $s = $db->prepare("SELECT id FROM trips WHERE id=? AND user_id=?");
-    $s->execute([$tripId, $userId]);
-    if (!$s->fetchColumn()) {
-        Response::error('Sin permisos', 403);
+
+    $s = $db->prepare("SELECT user_id FROM trips WHERE id=?");
+    $s->execute([$tripId]);
+    $trip = $s->fetch(PDO::FETCH_ASSOC);
+
+    if (!$trip) {
+        Response::error('El viaje no existe o ya ha sido eliminado', 404);
         return;
     }
+
+    $isAdmin = isset($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
+    if ((int) $trip['user_id'] !== $userId && !$isAdmin) {
+        Response::error('No tienes permisos para eliminar este viaje', 403);
+        return;
+    }
+
     $db->prepare("DELETE FROM trips WHERE id=?")->execute([$tripId]);
     Response::success(['message' => 'Viaje eliminado']);
 }
@@ -737,9 +759,21 @@ function logRide(DBConexion $db, int $userId, array $body): void
         $sRank = $db->prepare("SELECT COALESCE(MAX(rank_position), 0) FROM user_credits WHERE user_id=?");
         $sRank->execute([$userId]);
         $maxRank = (int) $sRank->fetchColumn();
-        
+
         $insCred = $db->prepare("INSERT INTO user_credits(user_id, coaster_id, rank_position) VALUES(?, ?, ?)");
         $insCred->execute([$userId, $coasterId, $maxRank + 1]);
+    }
+
+    // AUTO-ADD A TOP DE PARQUES (user_park_credits) SI NO EXISTE
+    $chkParkTop = $db->prepare("SELECT COUNT(*) FROM user_park_credits WHERE user_id=? AND park_id=?");
+    $chkParkTop->execute([$userId, $parkId]);
+    if ((int) $chkParkTop->fetchColumn() === 0) {
+        $sRankP = $db->prepare("SELECT COALESCE(MAX(rank_position), 0) FROM user_park_credits WHERE user_id=?");
+        $sRankP->execute([$userId]);
+        $maxRankP = (int) $sRankP->fetchColumn();
+
+        $insPark = $db->prepare("INSERT INTO user_park_credits(user_id, park_id, rank_position) VALUES(?, ?, ?)");
+        $insPark->execute([$userId, $parkId, $maxRankP + 1]);
     }
 
     Response::success(['data' => ['ride_id' => $id, 'first_time' => $firstTime], 'message' => 'Ride registrado']);

@@ -48,7 +48,7 @@
         })
       : "";
   const days = (a, b) =>
-    Math.max(1, Math.round((new Date(b) - new Date(a)) / 864e5)) + 1;
+    Math.max(0, Math.round((new Date(b) - new Date(a)) / 864e5)) + 1;
   const norm = (s) =>
     s
       .normalize("NFD")
@@ -468,7 +468,6 @@
       let h = `<div class="day-detail-hero" style="background: #111;">
             ${heroMediaHtml}
           <div class="day-detail-hero-overlay">
-              <button type="button" class="btn-close btn-close-white position-absolute" data-bs-dismiss="modal" style="top: 15px; right: 15px;"></button>
               <h2 class="text-white fw-bold mb-1" style="font-family: var(--rcw-font-title); font-size: 1.5rem; letter-spacing:-0.02em;">${esc(heroTitle)}</h2>
               <div class="text-white-50 small fw-semibold" style="letter-spacing:0.05em; text-transform:uppercase;">${heroSubtitle}</div>
           </div>
@@ -609,9 +608,13 @@
       }
 
       if (d.can_edit) {
-        h += `<div class="mt-3"><button class="btn btn-outline-secondary w-100 py-2 fw-bold" style="border-radius:6px; font-size:0.85rem; letter-spacing:0.04em;" onclick="openAddVisit('${ds}')"><i class="fa-solid fa-location-dot me-2 text-success"></i>Añadir otro parque visitado hoy</button></div>`;
+        const btnText =
+          allParks.length > 0
+            ? "Añadir otro parque visitado hoy"
+            : "Añadir un parque visitado hoy";
+        h += `<div class="mt-3"><button class="btn btn-outline-secondary w-100 py-2 fw-bold" style="border-radius:6px; font-size:0.85rem; letter-spacing:0.04em;" onclick="openAddVisit('${ds}')"><i class="fa-solid fa-location-dot me-2 text-success"></i>${btnText}</button></div>`;
       }
-      h += `</div>`; // End col-lg-6
+      h += `</div>`;
 
       h += `<div class="col-12 col-lg-6">`;
 
@@ -632,7 +635,7 @@
           h += `<h6 class="fw-bold text-warning mb-2 d-flex align-items-center gap-2" style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:.5rem; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.1em;">
             <i class="fa-solid fa-list-check"></i>
             Agenda de hoy (${d.rides.length})</h6>
-            <div class="ride-timeline custom-scrollbar" style="max-height: 650px; overflow-y: auto; padding-right: 8px; overscroll-behavior: contain;">`;
+            <div class="ride-timeline custom-scrollbar" style="max-height: calc(100dvh - 150px); overflow-y: auto; padding-right: 8px; overscroll-behavior: contain;">`;
 
           let lastTime = null;
           let lastParkId = null;
@@ -681,6 +684,11 @@
               <div class="ride-item-actions"><button onclick="deleteRide(${r.id},'${ds}')"><i class="fa-solid fa-trash"></i></button></div>
             </div>`;
           });
+          h += `<div class="text-center mt-4 mb-5 pb-3 text-muted small d-flex align-items-center opacity-50">
+                  <hr class="flex-grow-1 border-secondary">
+                  <span class="text-uppercase fw-bold px-3" style="letter-spacing:2px;font-size:0.65rem">Fin del día</span>
+                  <hr class="flex-grow-1 border-secondary">
+                </div>`;
           h += "</div>";
         } else {
           h += `<div class="text-center py-5 text-muted"><i class="fa-regular fa-clock mb-3 d-block" style="font-size:2.5rem;opacity:.2"></i>Aún no has montado en nada</div>`;
@@ -928,6 +936,10 @@
       ) {
         heroImg = t.parks_by_day[0].imagen_url;
       }
+      if (!heroImg) {
+        heroImg =
+          "https://st3.depositphotos.com/3436901/14792/i/450/depositphotos_147926787-stock-photo-plane-flying-over-blue-sky.jpg";
+      }
 
       // Unique parks & countries (calculated early for hero)
       const uniqueParks = [];
@@ -954,47 +966,123 @@
         ]),
       ];
 
-      const countriesHtml =
-        countries.length > 0
-          ? `<div class="d-flex align-items-center gap-2 bg-dark bg-opacity-75 px-3 py-1 rounded-1 border border-secondary border-opacity-50 flex-wrap">
-             ${countries.map((c) => `<span class="text-white fw-bold small">${getFlagEmoji(c)} ${esc(c)}</span>`).join('<span class="text-white-50">·</span>')}
-           </div>`
-          : "";
-
       const countdown = getTripCountdown(t.start_date, t.end_date);
 
-      let h = `<div class="pro-trip-hero" style="background: #111;">
-              ${heroImg ? `<img src="${esc(heroImg)}" class="pro-trip-hero-img" onerror="this.onerror=null; this.src='${window.RCW_BASE_URL}/dummy.jpg';">` : ""}
-          <div class="pro-trip-hero-overlay"></div>
-          <div class="pro-trip-hero-content d-flex justify-content-between align-items-end w-100 flex-wrap gap-3">
-              <div style="flex-grow:1; max-width:800px;">
-                  <div class="d-flex align-items-center gap-3 mb-2 flex-wrap">
-                    <h2 class="pro-trip-title mb-0">${esc(t.title)}</h2>
-                    <span class="trip-countdown-pill ${countdown.customClass || ""}">
+      let h = `<style>
+        #td-body { overscroll-behavior: contain; }
+        .pro-scroll-x-thick::-webkit-scrollbar { height: 12px; }
+        .pro-scroll-x-thick::-webkit-scrollbar-thumb { background-color: rgba(255,255,255,0.2); border-radius: 6px; }
+        .pro-scroll-x-thick { scrollbar-width: auto !important; }
+        .pro-scroll-y::-webkit-scrollbar { width: 6px; }
+        .pro-scroll-y::-webkit-scrollbar-thumb { background-color: rgba(255,255,255,0.2); border-radius: 6px; }
+        
+        .trip-info-bar {
+          display: flex;
+          align-items: center;
+          font-size: 0.85rem;
+          color: #aaa;
+          margin-top: 10px;
+        }
+        .trip-info-line {
+          display: flex;
+          align-items: center;
+        }
+        .trip-stats-grid {
+          display: flex;
+          flex-wrap: wrap;
+          border-bottom: 2px solid #00ff88;
+        }
+        .trip-stat-item {
+          flex: 1 1 0;
+          border-left: 1px solid #222;
+          padding: 1rem;
+          text-align: center;
+        }
+        .trip-stat-item:first-child {
+          border-left: none;
+        }
+        @media (max-width: 480px) {
+          .trip-info-bar {
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+          }
+          .trip-info-line {
+            justify-content: center;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+          }
+          .trip-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-bottom: none;
+            background: transparent;
+            margin-bottom: 1.5rem !important;
+          }
+          .trip-stat-item {
+            border-left: none;
+            border-right: 1px solid #222;
+            border-bottom: 1px solid #222;
+            padding: 1.25rem 0.5rem;
+          }
+          .trip-stat-item:nth-child(even) {
+            border-right: none;
+          }
+          .trip-stat-item:nth-child(5) {
+            grid-column: 1 / -1;
+            border-bottom: 1px solid #222;
+            border-right: none;
+          }
+          .trip-action-btns {
+            align-self: center !important;
+            margin-top: 1rem;
+          }
+          .trip-timeline-card {
+            min-width: 180px !important;
+            max-width: 180px !important;
+            height: 150px !important;
+          }
+        }
+        .trip-timeline-card {
+          min-width: 220px;
+          max-width: 220px;
+          height: 180px;
+        }
+      </style>
+      <div class="position-relative" style="background: #111; overflow: hidden; border-bottom: 1px solid #222;">
+          ${heroImg ? `<img src="${esc(heroImg)}" style="position:absolute; width:100%; height:100%; object-fit:cover; opacity: 0.3; filter: grayscale(50%);" onerror="this.style.display='none'">` : ""}
+          <div style="position:absolute; width:100%; height:100%; background: linear-gradient(to top, #111, transparent);"></div>
+          
+          <div class="position-relative d-flex flex-column flex-sm-row justify-content-between align-items-sm-end w-100 flex-wrap gap-3 p-4">
+              <div style="flex-grow:1; max-width:800px;" class="d-flex flex-column align-items-center align-items-sm-start text-center text-sm-start">
+                  <div class="d-flex align-items-center justify-content-center justify-content-sm-start gap-3 mb-2 flex-wrap">
+                    <h2 class="mb-0 text-white" style="font-size: 1.8rem; font-weight: 800; letter-spacing: -0.02em;">${esc(t.title)}</h2>
+                    <span class="${countdown.customClass || ""} border" style="font-size: 0.65rem; font-weight: 800; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 6px; background: transparent !important;">
                       ${countdown.text}
                     </span>
                   </div>
-                  <div class="pro-trip-desc pe-4 mb-3">${esc(t.description || "Sin descripción")}</div>
+                  <div class="pe-4 mb-4 pro-scroll-y" style="color: #aaa; font-size: 0.95rem; font-weight: 400; line-height: 1.5; max-height: 4.5em; overflow-y: auto;">${esc(t.description || "Sin descripción")}</div>
                   
-                  <div class="d-flex align-items-center gap-3 flex-wrap">
-                      <div class="d-flex align-items-center gap-2 bg-dark bg-opacity-75 px-3 py-1 rounded-1 border border-secondary border-opacity-50">
-                          <i class="fa-solid fa-plane-departure text-success"></i>
-                          <span class="text-white fw-bold small" style="letter-spacing:0.5px;">${fd(t.start_date)}</span>
+                  <div class="trip-info-bar">
+                      <div class="trip-info-line">
+                          <i class="fa-solid fa-plane-departure me-1"></i> <span class="text-white fw-semibold">${fd(t.start_date)}</span>
+                          <span class="mx-2 text-white">&mdash;</span>
+                          <i class="fa-solid fa-plane-arrival me-1"></i> <span class="text-white fw-semibold">${fd(t.end_date)}</span>
                       </div>
-                      <div class="text-white-50 fw-semibold small px-1">${tripDaysCount} DÍAS</div>
-                      <div class="d-flex align-items-center gap-2 bg-dark bg-opacity-75 px-3 py-1 rounded-1 border border-secondary border-opacity-50">
-                          <span class="text-white fw-bold small" style="letter-spacing:0.5px;">${fd(t.end_date)}</span>
-                          <i class="fa-solid fa-plane-arrival text-warning"></i>
+                      <span class="d-none d-sm-inline mx-3 text-white">&mdash;</span>
+                      <div class="trip-info-line">
+                          <i class="fa-regular fa-clock me-1"></i> <span class="text-white fw-semibold">${tripDaysCount} ${tripDaysCount === 1 ? "DÍA" : "DÍAS"}</span>
+                          ${countries.length > 0 ? `<span class="mx-2">&middot;</span><i class="fa-solid fa-earth-americas me-1"></i><span class="text-white fw-semibold">${countries.map((c) => `${getFlagEmoji(c)} ${esc(c)}`).join(", ")}</span>` : ""}
                       </div>
-                      ${countriesHtml}
                   </div>
               </div>
-              <div class="d-flex gap-2 flex-shrink-0 align-self-end">
+              <div class="trip-action-btns d-flex gap-2 flex-shrink-0 align-self-end mt-sm-0 mt-2">
                   ${
                     t.can_edit
                       ? `
-                  <button class="btn-hero-action btn-hero-edit" onclick="openEditTrip(${t.id})"><i class="fa-solid fa-pen"></i><span>Editar</span></button>
-                  <button class="btn-hero-action btn-hero-team" onclick="openCollabs(${t.id})"><i class="fa-solid fa-users"></i><span>Equipo</span></button>
+                  <button class="btn btn-outline-secondary text-white border-secondary" style="font-size:0.85rem; font-weight:600; border-radius:6px;" onclick="openEditTrip(${t.id})"><i class="fa-solid fa-pen me-2"></i>Editar</button>
+                  <button class="btn btn-outline-secondary text-white border-secondary" style="font-size:0.85rem; font-weight:600; border-radius:6px;" onclick="openCollabs(${t.id})"><i class="fa-solid fa-users me-2"></i>Equipo</button>
                   `
                       : ""
                   }
@@ -1004,74 +1092,49 @@
 
       h += `<div class="container-fluid py-4 px-4">`;
 
-      // 1. STATS GRID
+      // 1. STATS GRID (Barra horizontal editorial)
       const totalCoasters = t.park_coasters ? t.park_coasters.length : 0;
-      h += `<div class="row g-2 mb-5">`;
 
-      // Duración
-      h += `<div class="col-6 col-md">
-              <div class="pro-stat-card" style="--accent-color:#10b981;">
-                <div class="pro-stat-header"><span class="pro-stat-label">Duración</span><i class="fa-solid fa-calendar-days pro-stat-icon"></i></div>
-                <div class="pro-stat-value">${tripDaysCount}</div>
-                <div class="pro-stat-footer">DÍAS TOTALES</div>
-              </div>
-            </div>`;
-
-      // Parques
-      h += `<div class="col-6 col-md">
-              <div class="pro-stat-card" style="--accent-color:#3b82f6;">
-                <div class="pro-stat-header"><span class="pro-stat-label">Parques</span><i class="fa-solid fa-map-location-dot pro-stat-icon"></i></div>
-                <div class="pro-stat-value">${totalParksCount}</div>
-                <div class="pro-stat-footer">${totalParksCount === 1 ? "PARQUE" : "PARQUES"}</div>
-              </div>
-            </div>`;
-
-      // Coasters
-      h += `<div class="col-6 col-md">
-              <div class="pro-stat-card" style="--accent-color:#10b981;">
-                <div class="pro-stat-header"><span class="pro-stat-label">Coasters</span><i class="fa-solid fa-roller-coaster pro-stat-icon"></i></div>
-                <div class="pro-stat-value" style="color:#10b981;">${totalCoasters}</div>
-                <div class="pro-stat-footer">A PROBAR</div>
-              </div>
-            </div>`;
-
-      // Países
-      h += `<div class="col-6 col-md">
-              <div class="pro-stat-card" style="--accent-color:#f59e0b;">
-                <div class="pro-stat-header"><span class="pro-stat-label">Países</span><i class="fa-solid fa-earth-europe pro-stat-icon"></i></div>
-                <div class="pro-stat-value">${countries.length || 1}</div>
-                <div class="pro-stat-footer">${countries.length === 1 ? "PAÍS" : "PAÍSES"}</div>
-              </div>
-            </div>`;
-
-      // Equipo
-      h += `<div class="col-6 col-md">
-              <div class="pro-stat-card" style="--accent-color:#a78bfa;">
-                <div class="pro-stat-header"><span class="pro-stat-label">Equipo</span><i class="fa-solid fa-users pro-stat-icon"></i></div>
-                <div class="pro-stat-value">${(t.collaborators ? t.collaborators.length : 0) + 1}</div>
-                <div class="pro-stat-footer d-flex align-items-center gap-1">`;
-
-      // Dueño siempre primero
+      let teamAvatarsHtml = "";
       const ownerImg = resolveAvatar(t.owner_image);
-      h += `<img src="${ownerImg}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;border:2px solid #a78bfa;" title="Creador: ${esc(t.owner_name)}">`;
-
+      teamAvatarsHtml += `<img src="${ownerImg}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid #111;z-index:5;position:relative;" title="Creador: ${esc(t.owner_name)}">`;
       if (t.collaborators && t.collaborators.length > 0) {
-        t.collaborators.slice(0, 3).forEach((c) => {
+        t.collaborators.slice(0, 3).forEach((c, idx) => {
           const pImg = resolveAvatar(c.profile_image);
-          h += `<img src="${pImg}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,0.2);" title="${esc(c.username)}">`;
+          teamAvatarsHtml += `<img src="${pImg}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid #111;margin-left:-10px;z-index:${4 - idx};position:relative;" title="${esc(c.username)}">`;
         });
         if (t.collaborators.length > 3)
-          h += `<span class="text-muted small ms-1 fw-bold">+${t.collaborators.length - 3}</span>`;
+          teamAvatarsHtml += `<div class="rounded-circle d-flex align-items-center justify-content-center text-white" style="width:32px;height:32px;background:#333;border:2px solid #111;margin-left:-10px;z-index:1;position:relative;font-size:0.7rem;font-weight:700;">+${t.collaborators.length - 3}</div>`;
       }
-      h += `      </div>
+
+      h += `<div class="trip-stats-grid pb-0 pb-sm-4 mb-4 mb-sm-5">
+              <div class="trip-stat-item">
+                <div class="mb-1 text-white" style="font-size: 2.2rem; font-weight: 800; line-height: 1;">${tripDaysCount}</div>
+                <div style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; color: #aaa; text-transform: uppercase;">${tripDaysCount === 1 ? "Día Total" : "Días Totales"}</div>
+              </div>
+              <div class="trip-stat-item">
+                <div class="mb-1 text-white" style="font-size: 2.2rem; font-weight: 800; line-height: 1;">${totalParksCount}</div>
+                <div style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; color: #aaa; text-transform: uppercase;">Parques</div>
+              </div>
+              <div class="trip-stat-item">
+                <div class="mb-1 text-white" style="font-size: 2.2rem; font-weight: 800; line-height: 1;">${totalCoasters}</div>
+                <div style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; color: #aaa; text-transform: uppercase;">Coasters a Probar</div>
+              </div>
+              <div class="trip-stat-item">
+                <div class="mb-1 text-white" style="font-size: 2.2rem; font-weight: 800; line-height: 1;">${countries.length || 1}</div>
+                <div style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; color: #aaa; text-transform: uppercase;">${countries.length === 1 ? "País" : "Países"}</div>
+              </div>
+              <div class="trip-stat-item d-flex flex-column align-items-center justify-content-center">
+                <div class="mb-1 d-flex align-items-center justify-content-center" style="height: 2.2rem;">
+                    ${teamAvatarsHtml}
+                </div>
+                <div style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; color: #aaa; text-transform: uppercase;">Equipo</div>
               </div>
             </div>`;
 
-      h += `</div>`; // End Stats Grid
-
-      // 2. ITINERARIO TIMELINE
-      h += `<div class="pro-section-title">Timeline del Itinerario</div>`;
-      h += `<div class="pro-timeline-container mb-5">`;
+      // 2. ITINERARIO TIMELINE (Aerolínea horizontal gruesa)
+      h += `<div class="mb-3" style="font-size: 0.85rem; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 0.1em;">Itinerario de Viaje</div>`;
+      h += `<div class="d-flex flex-row overflow-auto pb-4 mb-5 gap-3 pro-scroll-x-thick">`;
 
       const parksByDate = {};
       if (t.parks_by_day?.length) {
@@ -1088,115 +1151,155 @@
         const isFirstDay = dateStr === startDate.toISOString().split("T")[0];
         const isLastDay = dateStr === endDate.toISOString().split("T")[0];
 
-        if (parksToday.length > 0) {
-          let mediaHtml = "";
-          let titleHtml = "";
-
-          if (parksToday.length >= 2) {
-            const p1 = parksToday[0];
-            const p2 = parksToday[1];
-            const img1 = p1.imagen_url ? esc(p1.imagen_url) : "";
-            const img2 = p2.imagen_url ? esc(p2.imagen_url) : "";
-
-            mediaHtml = `<div class="pro-timeline-dual">
-                           <img src="${img1}" class="pro-timeline-img-dual-1" onerror="this.src='${B}/web/img/placeholder_park.jpg'">
-                           <img src="${img2}" class="pro-timeline-img-dual-2" onerror="this.src='${B}/web/img/placeholder_park.jpg'">
-                           <div class="pro-timeline-diagonal-sep"></div>
-                         </div>`;
-            titleHtml = ""; // Hide title for 2+ parks
-          } else {
-            const primaryPark = parksToday[0];
-            const imgUrl = esc(primaryPark.imagen_url || "");
-            mediaHtml = imgUrl
-              ? `<img src="${imgUrl}" class="pro-timeline-img" onerror="this.style.display='none'">`
-              : `<div class="pro-timeline-img" style="background:linear-gradient(135deg,#0f2d1f,#1a3a2a);"></div>`;
-            titleHtml = `<div class="pro-timeline-title text-truncate">${esc(primaryPark.park_name)}</div>`;
-          }
-
-          let flightBadge = "";
-          if (isFirstDay)
-            flightBadge = `<div class="position-absolute top-0 end-0 bg-success text-white px-2 py-1 z-3" style="font-size:0.65rem; font-weight:800; text-transform:uppercase; border-bottom-left-radius: 4px;"><i class="fa-solid fa-plane-departure me-1"></i>Ida</div>`;
-          if (isLastDay)
-            flightBadge = `<div class="position-absolute top-0 end-0 bg-warning text-dark px-2 py-1 z-3" style="font-size:0.65rem; font-weight:800; text-transform:uppercase; border-bottom-left-radius: 4px;"><i class="fa-solid fa-plane-arrival me-1"></i>Vuelta</div>`;
-
-          h += `<div class="pro-timeline-card" onclick="openDay('${dateStr}', ${t.id})">
-                  ${flightBadge}
-                  ${mediaHtml}
-                  <div class="pro-timeline-overlay">
-                    <div class="pro-timeline-date">${new Date(dateStr).toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" })}</div>
-                    <div>
-                      ${titleHtml}
-                      ${parksToday.length > 1 ? `<div style="font-size:0.75rem; font-weight:700; color:#fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">${parksToday.length} parques visitados</div>` : ""}
-                    </div>
-                  </div>
-                </div>`;
-        } else {
-          // Empty day
-          let emptyIconHtml =
-            '<i class="fa-solid fa-person-walking-luggage" style="font-size:2rem;color:rgba(255,255,255,0.2);"></i>';
-          let emptyText = "Día libre";
-          let bgClass =
-            "background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1);";
-
-          if (isFirstDay) {
-            emptyIconHtml =
-              '<i class="fa-solid fa-plane-departure text-success" style="font-size:2rem;opacity:0.8;"></i>';
-            emptyText = "Vuelo de Ida";
-            bgClass =
-              "background: rgba(16,185,129,0.05); border: 1px dashed rgba(16,185,129,0.3);";
-          } else if (isLastDay) {
-            emptyIconHtml =
-              '<i class="fa-solid fa-plane-arrival text-warning" style="font-size:2rem;opacity:0.8;"></i>';
-            emptyText = "Vuelo de Vuelta";
-            bgClass =
-              "background: rgba(245,158,11,0.05); border: 1px dashed rgba(245,158,11,0.3);";
-          }
-
-          h += `<div class="pro-timeline-card d-flex flex-column align-items-center justify-content-center gap-2" style="${bgClass}" onclick="openDay('${dateStr}', ${t.id})">
-                  <div class="position-absolute" style="top:0.75rem;left:0.75rem;">
-                    <div class="pro-timeline-date text-muted bg-transparent p-0">${new Date(dateStr).toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" })}</div>
-                  </div>
-                  ${emptyIconHtml}
-                  <div class="fw-bold text-white-50" style="font-size:0.85rem;">${emptyText}</div>
-                </div>`;
+        let flightBadge = "";
+        let flightWatermark = "";
+        if (isFirstDay && isLastDay) {
+          flightBadge = `<span style="background: rgba(0,80,40,0.8); color: #00ff88; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 4px 8px; border-radius: 4px;"><i class="fa-solid fa-plane"></i> Ida/Vuelta</span>`;
+          flightWatermark = `<i class="fa-solid fa-plane"></i>`;
+        } else if (isFirstDay) {
+          flightBadge = `<span style="background: rgba(0,80,40,0.8); color: #00ff88; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 4px 8px; border-radius: 4px;"><i class="fa-solid fa-plane-departure"></i> Ida</span>`;
+          flightWatermark = `<i class="fa-solid fa-plane-departure"></i>`;
+        } else if (isLastDay) {
+          flightBadge = `<span style="background: rgba(0,80,40,0.8); color: #00ff88; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 4px 8px; border-radius: 4px;"><i class="fa-solid fa-plane-arrival"></i> Vuelta</span>`;
+          flightWatermark = `<i class="fa-solid fa-plane-arrival"></i>`;
         }
+
+        const dayDateFormatted = new Date(dateStr).toLocaleDateString("es-ES", {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+        });
+
+        const firstPark = parksToday.length > 0 ? parksToday[0] : null;
+        const secondPark = parksToday.length > 1 ? parksToday[1] : null;
+
+        let bgContent = "";
+        let textContent = "";
+
+        if (parksToday.length === 0) {
+          if (isFirstDay && isLastDay) {
+            bgContent = `<div style="width: 100%; height: 100%; background: #0a1628; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+                           <i class="fa-solid fa-plane" style="font-size: 3rem; color: rgba(255,255,255,0.2); position: absolute; z-index: 0;"></i>
+                           <div class="text-white" style="font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em; z-index: 1;">VUELO EXPRÉS</div>
+                         </div>`;
+          } else if (isFirstDay) {
+            bgContent = `<div style="width: 100%; height: 100%; background: #0a1628; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+                           <i class="fa-solid fa-plane-departure" style="font-size: 3rem; color: rgba(255,255,255,0.2); position: absolute; z-index: 0;"></i>
+                           <div class="text-white" style="font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em; z-index: 1;">VUELO DE IDA</div>
+                         </div>`;
+          } else if (isLastDay) {
+            bgContent = `<div style="width: 100%; height: 100%; background: #1a0a0a; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+                           <i class="fa-solid fa-plane-arrival" style="font-size: 3rem; color: rgba(255,255,255,0.2); position: absolute; z-index: 0;"></i>
+                           <div class="text-white" style="font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em; z-index: 1;">VUELO DE VUELTA</div>
+                         </div>`;
+          } else {
+            bgContent = `<div style="width: 100%; height: 100%; background: #111; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+                           <i class="fa-solid fa-car" style="font-size: 3rem; color: rgba(255,255,255,0.1); position: absolute; z-index: 0;"></i>
+                           <div class="text-white-50" style="font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em; z-index: 1;">DÍA DE DESCANSO</div>
+                         </div>`;
+          }
+        } else if (parksToday.length === 1) {
+          const bgImgUrl = firstPark.imagen_url
+            ? esc(firstPark.imagen_url)
+            : "";
+          bgContent = `
+            ${flightWatermark ? `<div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 4rem; opacity: 0.15; color: white; z-index: 0;">${flightWatermark}</div>` : ""}
+            ${bgImgUrl ? `<img src="${bgImgUrl}" style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;" onerror="this.style.display='none'">` : ""}
+          `;
+          textContent = `
+            <div class="text-white text-truncate" style="font-size: 0.9rem; font-weight: 600;">
+              ${esc(firstPark.park_name)}
+            </div>
+          `;
+        } else {
+          const bgImgUrl1 = firstPark.imagen_url
+            ? esc(firstPark.imagen_url)
+            : "";
+          const bgImgUrl2 = secondPark.imagen_url
+            ? esc(secondPark.imagen_url)
+            : "";
+          bgContent = `
+            ${flightWatermark ? `<div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 4rem; opacity: 0.15; color: white; z-index: 0;">${flightWatermark}</div>` : ""}
+            ${bgImgUrl1 ? `<img src="${bgImgUrl1}" style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1; clip-path: polygon(0 0, 65% 0, 35% 100%, 0 100%);" onerror="this.style.display='none'">` : ""}
+            ${bgImgUrl2 ? `<img src="${bgImgUrl2}" style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1; clip-path: polygon(65% 0, 100% 0, 100% 100%, 35% 100%);" onerror="this.style.display='none'">` : ""}
+          `;
+          textContent = `
+            <div class="d-flex flex-column gap-1 w-100">
+              <div class="text-white text-truncate" style="font-size: 0.85rem; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">${esc(firstPark.park_name)}</div>
+              <div class="text-white text-truncate" style="font-size: 0.85rem; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">${esc(secondPark.park_name)}</div>
+              ${parksToday.length > 2 ? `<div style="color: #aaa; font-size: 0.7rem; font-weight: 500; margin-top: 2px; text-shadow: 0 1px 2px #000;">+ ${parksToday.length - 2} parque(s) más</div>` : ""}
+            </div>
+          `;
+        }
+
+        const click = t.is_participant
+          ? `onclick="openDay('${dateStr}', ${t.id})" style="cursor:pointer;"`
+          : firstPark
+            ? `onclick="window.location.href='${B}/web/views/public/parks/parks.php?id=${firstPark.park_id}'" style="cursor:pointer;"`
+            : "";
+
+        h += `
+          <div class="trip-timeline-card d-flex flex-column" style="background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; flex-shrink: 0; overflow: hidden; position: relative; transition: border-color 0.2s;" onmouseover="this.style.borderColor='#555'" onmouseout="this.style.borderColor='#2a2a2a'" ${click}>
+            
+            ${bgContent}
+            
+            ${parksToday.length > 0 ? `<div style="position: absolute; bottom: 0; left: 0; right: 0; height: 50%; background: linear-gradient(transparent, rgba(0,0,0,0.85)); z-index: 2;"></div>` : ""}
+            
+            <div class="d-flex align-items-start justify-content-between p-2" style="position: absolute; top: 0; left: 0; right: 0; z-index: 3;">
+              <span style="background: rgba(0,0,0,0.6); color: #fff; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 4px 8px; border-radius: 4px;">
+                ${dayDateFormatted}
+              </span>
+              ${flightBadge}
+            </div>
+            
+            ${
+              textContent
+                ? `
+            <div class="p-3 w-100" style="position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;">
+               ${textContent}
+            </div>
+            `
+                : ""
+            }
+            
+          </div>`;
         currDate.setDate(currDate.getDate() + 1);
       }
       h += `</div>`; // End Timeline
 
-      // 3. PARQUES Y COASTERS (2 columnas en pantallas grandes)
-      h += `<div class="row g-4">`;
+      // 3. PARQUES Y COASTERS (Estilo lista documentación)
+      h += `<div class="row g-5">`;
 
       // Columna Izquierda: Parques
       h += `<div class="col-12 col-lg-6">
-              <div class="pro-section-title">Parques a Visitar</div>
-              <div class="d-flex flex-column gap-2" style="max-height:350px; overflow-y:auto; padding-right:8px;">`;
+              <div class="mb-3" style="font-size: 0.85rem; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 1px solid #222; padding-bottom: 0.5rem;">Parques a Visitar</div>
+              <div class="d-flex flex-column" style="max-height:400px; overflow-y:auto; padding-right:8px;">`;
       if (uniqueParks.length > 0) {
         uniqueParks.forEach((p) => {
           const pImg = p.imagen_url ? esc(p.imagen_url) : "";
-          h += `<a href="${B}/web/views/public/parks/parks.php?id=${p.park_id}" class="pro-park-card" style="display:flex;align-items:center;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;min-height:72px;padding:0 12px;gap:12px;text-decoration:none;margin-bottom:8px;transition:all 0.2s;">
+          h += `<a href="${B}/web/views/public/parks/parks.php?id=${p.park_id}" style="display:flex;align-items:center;padding:12px 0;border-bottom:1px solid #1a1a1a;gap:16px;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
                       ${
                         pImg
-                          ? `<img src="${pImg}" style="width:56px;height:56px;border-radius:8px;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">`
-                          : `<div style="width:56px;height:56px;border-radius:8px;background:linear-gradient(135deg,#0a2518,#134d30);flex-shrink:0;"></div>`
+                          ? `<img src="${pImg}" style="width:64px;height:48px;border-radius:4px;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">`
+                          : `<div style="width:64px;height:48px;border-radius:4px;background:#1a1a1a;flex-shrink:0;"></div>`
                       }
                       <div style="flex:1;min-width:0;">
-                          <div style="font-size:15px;font-weight:700;color:#fff;">${esc(p.park_name)}</div>
+                          <div style="font-size:0.95rem;font-weight:600;color:#fff;">${esc(p.park_name)}</div>
                       </div>
-                      <i class="fa-solid fa-chevron-right" style="color:rgba(255,255,255,0.2);font-size:0.85rem;flex-shrink:0;"></i>
+                      <i class="fa-solid fa-chevron-right" style="color:#444;font-size:0.8rem;flex-shrink:0;"></i>
                     </a>`;
         });
       } else {
-        h += `<div class="text-muted fst-italic">No hay parques asignados.</div>`;
+        h += `<div class="text-muted fst-italic py-3">No hay parques asignados.</div>`;
       }
       h += `  </div>
             </div>`;
 
       // Columna Derecha: Coasters
       h += `<div class="col-12 col-lg-6">
-              <div class="pro-section-title">Coasters Totales</div>`;
+              <div class="mb-3" style="font-size: 0.85rem; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 1px solid #222; padding-bottom: 0.5rem;">Coasters a Probar</div>`;
       if (t.park_coasters && t.park_coasters.length > 0) {
-        h += `<div class="d-flex flex-column gap-1 pro-scroll-y" style="max-height:350px; overflow-y:auto; padding-right:8px;">`;
+        h += `<div class="d-flex flex-column pro-scroll-y" style="max-height:400px; overflow-y:auto; padding-right:8px;">`;
 
         const coastersByPark = {};
         t.park_coasters.forEach((c) => {
@@ -1207,44 +1310,42 @@
         uniqueParks.forEach((p) => {
           const coasters = coastersByPark[p.park_id];
           if (coasters && coasters.length > 0) {
-            h += `<div class="pro-section-group-header">
-                          <div class="pro-section-group-title">${esc(p.park_name)}</div>
-                          <div class="pro-section-group-line"></div>
-                        </div>`;
+            h += `<div style="font-size:0.75rem; font-weight:700; color:#666; text-transform:uppercase; margin-top:16px; margin-bottom:4px;">${esc(p.park_name)}</div>`;
             coasters.forEach((c) => {
-              const cImg = c.imagen_url ? esc(c.imagen_url) : "";
+              const cImg = c.imagen_url || c.imagen || "";
 
               let coasterData = [];
               if (c.speed)
                 coasterData.push(
-                  `<span style="color:#10b981;">${c.speed} km/h</span>`,
+                  `<span style="color:#aaa;"><i class="fa-solid fa-gauge-high text-success me-1"></i>${c.speed} km/h</span>`,
                 );
               if (c.height)
                 coasterData.push(
-                  `<span style="color:#3fb1ff;">${c.height} m</span>`,
+                  `<span style="color:#aaa;"><i class="fa-solid fa-ruler-vertical text-info me-1"></i>${c.height} m</span>`,
                 );
               if (c.inversions && c.inversions > 0)
                 coasterData.push(
-                  `<span style="color:#f59e0b;">${c.inversions} inv.</span>`,
+                  `<span style="color:#aaa;"><i class="fa-solid fa-rotate me-1" style="color:#a3aed0;"></i>${c.inversions} inv.</span>`,
                 );
+
               const dataHtml =
                 coasterData.length > 0
-                  ? `<div class="pro-coaster-meta mt-1">${coasterData.join(' <span style="opacity:0.3;">|</span> ')}</div>`
+                  ? `<div style="font-size:0.75rem; margin-top:2px;">${coasterData.join('<span class="mx-2 text-muted">|</span>')}</div>`
                   : "";
 
-              h += `<a href="${B}/web/views/public/coasters/coasters.php?id=${c.id}" class="pro-coaster-item" style="display:flex;align-items:center;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:6px;min-height:56px;padding:0 12px;gap:12px;text-decoration:none;margin-bottom:6px;transition:all 0.2s;">
-                              <div style="width:44px;height:44px;flex-shrink:0;border-radius:6px;overflow:hidden;background:#1c2128;">
+              h += `<a href="${B}/web/views/public/coasters/coasters.php?id=${c.id}" style="display:flex;align-items:center;padding:12px 0;border-bottom:1px solid #1a1a1a;gap:16px;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                              <div style="width:72px;height:54px;flex-shrink:0;border-radius:4px;overflow:hidden;background:#1a1a1a;position:relative;">
                                   ${
                                     cImg
                                       ? `<img src="${cImg}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">`
-                                      : `<i class="fa-solid fa-roller-coaster text-muted opacity-25" style="line-height:44px;text-align:center;display:block;"></i>`
+                                      : `<i class="fa-solid fa-roller-coaster text-muted opacity-25" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.2rem;"></i>`
                                   }
                               </div>
-                              <div style="flex:1;min-width:0;">
-                                  <div style="font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(c.coaster_name)}</div>
+                              <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;">
+                                  <div style="font-size:0.95rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(c.coaster_name)}</div>
                                   ${dataHtml}
                               </div>
-                              <i class="fa-solid fa-chevron-right" style="color:rgba(255,255,255,0.2);font-size:0.75rem;flex-shrink:0;"></i>
+                              <i class="fa-solid fa-chevron-right" style="color:#444;font-size:0.8rem;flex-shrink:0;"></i>
                             </a>`;
             });
           }
@@ -1566,6 +1667,8 @@
 
   window.openEditTrip = async (id) => {
     gm("trip-detail-modal").hide();
+    const err = document.getElementById("ct-error");
+    if (err) err.classList.add("d-none");
 
     const j = await api("detail&trip_id=" + id);
     if (!j.success) {
@@ -1584,8 +1687,10 @@
     }
 
     if (document.getElementById("ct-end")._flatpickr) {
+      document.getElementById("ct-end")._flatpickr.set("minDate", t.start_date);
       document.getElementById("ct-end")._flatpickr.setDate(t.end_date);
     } else {
+      document.getElementById("ct-end").min = t.start_date || "";
       document.getElementById("ct-end").value = t.end_date || "";
     }
 
@@ -1617,7 +1722,7 @@
     document.getElementById("ct-submit-btn").innerHTML =
       '<i class="fa-solid fa-save me-1"></i>Guardar Cambios';
 
-    window.currentEditTripId = id;
+    document.getElementById("ct-trip-id").value = id;
     document.getElementById("ct-days-container").classList.add("d-none");
 
     setTimeout(() => gm("create-trip-modal").show(), 300);
@@ -1647,10 +1752,12 @@
       btn.innerHTML = '<div class="spinner-border spinner-border-sm"></div>';
       btn.disabled = true;
 
+      const editTripId = document.getElementById("ct-trip-id").value;
+
       let j;
-      if (window.currentEditTripId) {
+      if (editTripId) {
         j = await api("update", {
-          trip_id: window.currentEditTripId,
+          trip_id: editTripId,
           title,
           description: desc,
           start_date: start,
@@ -1683,13 +1790,8 @@
       if (j.success) {
         gm("create-trip-modal").hide();
         callReloads();
-        toast(
-          window.currentEditTripId
-            ? "Viaje actualizado"
-            : "Viaje creado correctamente",
-        );
-        if (window.currentEditTripId && window.openTrip)
-          window.openTrip(window.currentEditTripId);
+        toast(editTripId ? "Viaje actualizado" : "Viaje creado correctamente");
+        if (editTripId && window.openTrip) window.openTrip(editTripId);
       } else {
         err.textContent = j.error || "Error";
         err.classList.remove("d-none");

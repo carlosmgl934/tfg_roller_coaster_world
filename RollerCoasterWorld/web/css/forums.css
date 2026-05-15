@@ -426,8 +426,9 @@
 
 .forum-card-item {
   display: block;
-  background: var(--rcw-bg-card-alt);
+  background: #1a1a1a;
   border: 1px solid var(--rcw-border);
+  border-left: 3px solid #00ff88;
   border-radius: 0;
   margin-bottom: 12px;
   padding: 18px 24px;
@@ -437,8 +438,9 @@
   overflow: hidden;
 }
 .forum-card-item:hover {
-  background: var(--rcw-bg-input);
+  background: #202020;
   border-color: var(--rcw-green-neon);
+  border-left-color: #33ffaa;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
@@ -482,42 +484,37 @@
   display: flex;
   flex-direction: column;
   height: calc(
-    100vh - 120px
-  ); /* Deja hueco con el top y también hueco abajo para separar del footer */
+    100dvh - 56px
+  ); /* Altura exacta de la pantalla dinámica menos el navbar */
   max-width: 1600px;
-  width: 94%; /* Márgenes a los lados */
-  margin: 15px auto 40px auto; /* Centrado y gap con el footer abajo */
+  width: 100%; /* Anchura máxima completa */
+  margin: 0 auto; /* Centrado */
   background: transparent; /* Totalmente integrado visualmente, sin recuadros */
   border: none;
   border-radius: 0;
   position: relative;
-  overflow: hidden;
+  overflow: hidden; /* Ocultar cualquier desborde, el scroll va dentro de messages-area */
   box-shadow: none;
 }
 
 /* ── HEADER FIJO ──────────────────────────────────────────── */
 .forum-chat-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 10px 1%;
-  background: transparent;
+  align-items: center;
+  padding: 8px 3%;
+  background: #0d1117;
   border-bottom: 2px solid var(--rcw-green-neon);
   flex-shrink: 0;
-  gap: 15px;
-  min-height: 90px;
-}
-.forum-header-left {
-  display: flex;
-  align-items: center;
   gap: 10px;
-  min-width: 0;
+  min-height: 50px;
 }
 .forum-header-right {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 .forum-back-btn {
@@ -543,56 +540,47 @@
   flex-shrink: 0;
 }
 .forum-header-avatar > i.fa-comments {
-  width: 42px;
-  height: 42px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: rgba(16, 185, 129, 0.15);
-  border: 2px solid var(--rcw-green-muted);
+  border: 1px solid var(--rcw-green-muted);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--rcw-green-neon);
-  font-size: 1.1rem;
+  font-size: 0.85rem;
 }
 
-.forum-header-info {
-  min-width: 0;
-}
 .forum-header-title {
-  font-weight: 700;
-  font-size: 0.98rem;
+  flex: 1;
+  min-width: 0; /* CRITICAL */
+  font-weight: 500;
+  font-size: 0.95rem; /* Let's make it a bit smaller and elegant */
   color: var(--rcw-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 320px;
-}
-.forum-header-sub {
-  font-size: 0.75rem;
-  color: var(--rcw-text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 320px;
 }
 
 /* Privacy badge */
 .forum-privacy-badge {
   display: inline-flex;
   align-items: center;
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 20px;
+  padding: 2px 8px;
+  border-radius: 3px;
   white-space: nowrap;
+  background: transparent !important;
 }
 .forum-privacy-badge.public {
-  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid var(--rcw-green-neon);
   color: var(--rcw-green-neon);
 }
 .forum-privacy-badge.private {
-  background: rgba(255, 193, 7, 0.12);
-  color: #ffd54f;
+  border: 1px solid #888;
+  color: #aaa;
 }
 
 /* Mod button */
@@ -601,8 +589,8 @@
   border: 1px solid var(--rcw-green-muted);
   border-radius: 8px;
   color: var(--rcw-green-neon);
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -610,7 +598,8 @@
   transition:
     background 0.15s,
     transform 0.15s;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+  flex-shrink: 0;
 }
 .forum-mod-btn:hover {
   background: rgba(16, 185, 129, 0.25);
@@ -621,7 +610,7 @@
 .forum-messages-area {
   flex: 1 1 0;
   overflow-y: auto;
-  padding: 14px 4% 14px; /* Padding fluido horizontal */
+  padding: 14px 4% 210px; /* Padding extra abajo para que el input fixed no tape el último mensaje */
   scrollbar-width: thin;
   scrollbar-color: var(--rcw-border) transparent;
 }
@@ -979,10 +968,15 @@
 
 /* ── INPUT ÁREA ───────────────────────────────────────────── */
 .forum-input-area {
-  padding: 16px 2%;
-  background: transparent;
+  padding: 16px 2% calc(16px + env(safe-area-inset-bottom));
+  background: #0d1117;
   border-top: 1px solid rgba(255, 255, 255, 0.08); /* Suave delimitación */
   flex-shrink: 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
 }
 .forum-input-row {
   display: flex;
@@ -1012,7 +1006,7 @@
   border: 1px solid var(--rcw-border-strong);
   border-radius: 20px;
   color: var(--rcw-text-primary);
-  font-size: 0.9rem;
+  font-size: 16px; /* 16px previene el zoom en iOS Safari */
   font-family: var(--rcw-font-body);
   padding: 9px 14px;
   resize: none;
@@ -1194,12 +1188,6 @@
 @media (max-width: 576px) {
   .forum-chat-wrapper {
     height: calc(100vh - 56px);
-  }
-  .forum-header-title {
-    max-width: 180px;
-  }
-  .forum-header-sub {
-    max-width: 180px;
   }
   .forum-msg-wrap {
     max-width: 90%;

@@ -1,8 +1,8 @@
 /* ================================================================
-   trips.css — Agenda de Parques · RollerCoaster World v2
+   trips.css â€” Agenda de Parques Â· RollerCoaster World v2
    ================================================================ */
 
-/* ── DARK INPUTS OVERRIDE (Bootstrap resets) ─────────────────── */
+/* â”€â”€ DARK INPUTS OVERRIDE (Bootstrap resets) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .modal .form-control,
 .modal .form-select,
 .modal textarea,
@@ -31,7 +31,7 @@
   color: var(--rcw-text-muted) !important;
 }
 
-/* ── QUICK STATS BAR ─────────────────────────────────────────── */
+/* â”€â”€ QUICK STATS BAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .trips-stats-bar {
   display: flex;
   flex-wrap: wrap;
@@ -59,7 +59,7 @@
   font-size: 1.05rem;
 }
 
-/* ── TRIP CARDS ───────────────────────────────────────────────── */
+/* â”€â”€ TRIP CARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .trips-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -100,7 +100,7 @@
   position: relative;
 }
 
-/* ── CUSTOM SCROLLBARS ───────────────────────────────────────── */
+/* â”€â”€ CUSTOM SCROLLBARS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .custom-scrollbar::-webkit-scrollbar,
 .pro-scroll-y::-webkit-scrollbar {
   width: 6px;
@@ -209,7 +209,7 @@
   font-size: 0.7rem;
 }
 
-/* ── TRIP STAT BADGE (modal) ─────────────────────────────────── */
+/* â”€â”€ TRIP STAT BADGE (modal) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .trip-stat-badge {
   display: inline-flex;
   align-items: center;
@@ -220,7 +220,7 @@
   color: var(--rcw-text-secondary);
 }
 
-/* ── DAY PANEL ───────────────────────────────────────────────── */
+/* â”€â”€ DAY PANEL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .day-panel-park {
   display: flex;
   align-items: center;
@@ -258,7 +258,7 @@
   color: var(--rcw-text-muted);
 }
 
-/* ── RIDE LOG TIMELINE ───────────────────────────────────────── */
+/* â”€â”€ RIDE LOG TIMELINE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .ride-timeline {
   position: relative;
   padding-left: 1.25rem;
@@ -343,7 +343,7 @@
   color: #ef4444;
 }
 
-/* ── DAY MODAL COASTERS LIST ─────────────────────────────────── */
+/* â”€â”€ DAY MODAL COASTERS LIST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .day-coaster-row {
   display: flex;
   align-items: center;
@@ -374,7 +374,7 @@
   gap: 0.5rem;
 }
 
-/* ── RANKING TABLE ───────────────────────────────────────────── */
+/* â”€â”€ RANKING TABLE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .ride-ranking-table {
   width: 100%;
   border-collapse: collapse;
@@ -420,7 +420,7 @@
   font-size: 1rem;
 }
 
-/* ── AUTOCOMPLETE ────────────────────────────────────────────── */
+/* â”€â”€ AUTOCOMPLETE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .ac-dropdown {
   position: absolute;
   top: 100%;
@@ -461,7 +461,7 @@
   font-size: 0.72rem;
 }
 
-/* ── FULLCALENDAR OVERRIDES (dark mode) ──────────────────────── */
+/* â”€â”€ FULLCALENDAR OVERRIDES (dark mode) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #calendar {
   color: var(--rcw-text-secondary);
 }
@@ -553,7 +553,7 @@
   opacity: 1 !important;
 }
 
-/* ── PREMIUM EVENT CELL (Full background) ────────────────────── */
+/* â”€â”€ PREMIUM EVENT CELL (Full background) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .fc-cell-overlay {
   position: absolute;
   inset: 0;
@@ -690,7 +690,7 @@
   border-color: var(--rcw-border) !important;
 }
 
-/* ── BORDER TOP HELPER ───────────────────────────────────────── */
+/* â”€â”€ BORDER TOP HELPER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .border-top-only {
   border-top: 3px solid #198754 !important;
   border-right: 1px solid var(--rcw-border) !important;
@@ -698,7 +698,7 @@
   border-left: 1px solid var(--rcw-border) !important;
 }
 
-/* ── SECTION HEADERS ─────────────────────────────────────────── */
+/* â”€â”€ SECTION HEADERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .trips-section-header {
   display: flex;
   align-items: center;
@@ -720,7 +720,7 @@
   gap: 0.5rem;
 }
 
-/* ── EMPTY STATE ─────────────────────────────────────────────── */
+/* â”€â”€ EMPTY STATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .trips-empty {
   text-align: center;
   padding: 2.5rem 1.5rem;
@@ -733,7 +733,7 @@
   display: block;
 }
 
-/* ── COLLAB AVATARS ──────────────────────────────────────────── */
+/* â”€â”€ COLLAB AVATARS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .collab-avatars {
   display: flex;
   align-items: center;
@@ -762,7 +762,7 @@
   object-fit: cover;
 }
 
-/* ── INVITE BANNER ───────────────────────────────────────────── */
+/* â”€â”€ INVITE BANNER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .invite-banner {
   background: rgba(99, 102, 241, 0.1);
   border: 1px solid rgba(99, 102, 241, 0.3);
@@ -783,7 +783,7 @@
   gap: 0.5rem;
 }
 
-/* ── RANK PERIOD FILTER ──────────────────────────────────── */
+/* â”€â”€ RANK PERIOD FILTER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .rank-period-btn {
   background: var(--rcw-bg-card-alt);
   border: 1px solid var(--rcw-border);
@@ -804,7 +804,7 @@
   color: var(--rcw-green-neon);
 }
 
-/* ── DAY DETAIL MODAL REFINEMENTS ─────────────────────────── */
+/* â”€â”€ DAY DETAIL MODAL REFINEMENTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .day-detail-hero {
   position: relative;
   height: 140px;
@@ -937,7 +937,7 @@
   color: #fff;
 }
 
-/* ── RESPONSIVE ──────────────────────────────────────────────── */
+/* â”€â”€ RESPONSIVE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @media (max-width: 768px) {
   .trips-grid {
     grid-template-columns: 1fr;
@@ -963,7 +963,7 @@
   }
 }
 
-/* ── PRO TRIP MODAL REDESIGN ─────────────────────────────── */
+/* â”€â”€ PRO TRIP MODAL REDESIGN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .pro-trip-hero {
   position: relative;
   padding: 3rem 2rem 2rem 2rem;
@@ -1106,7 +1106,7 @@
 }
 
 .pro-timeline-card {
-  min-width: 240px;
+  width: 240px;
   height: 160px;
   position: relative;
   border-radius: 4px;
@@ -1383,7 +1383,7 @@
     font-size: 0.75rem !important;
   }
 }
-/* ── UPCOMING TRIPS & NOTES ENHANCEMENTS ─────────────────────── */
+/* â”€â”€ UPCOMING TRIPS & NOTES ENHANCEMENTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #upcoming-trips-grid {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
@@ -1414,7 +1414,7 @@
   opacity: 1 !important;
 }
 
-/* ── FLATPICKR PREMIUM DARK THEME OVERRIDES ─────────────────── */
+/* â”€â”€ FLATPICKR PREMIUM DARK THEME OVERRIDES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .flatpickr-calendar {
   background: var(--rcw-bg-card) !important;
   border: 1px solid var(--rcw-border) !important;
@@ -1475,6 +1475,20 @@
   color: var(--rcw-text-muted) !important;
   font-weight: 700 !important;
 }
+.flatpickr-calendar .numInputWrapper span.arrowUp,
+.flatpickr-calendar .numInputWrapper span.arrowDown {
+  opacity: 1 !important;
+  border-left-color: rgba(255, 255, 255, 0.1) !important;
+}
+.flatpickr-calendar .numInputWrapper span.arrowUp:after {
+  border-bottom-color: rgba(255, 255, 255, 0.7) !important;
+}
+.flatpickr-calendar .numInputWrapper span.arrowDown:after {
+  border-top-color: rgba(255, 255, 255, 0.7) !important;
+}
+.flatpickr-calendar .numInputWrapper span:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
 .flatpickr-time {
   border-top: 1px solid var(--rcw-border) !important;
 }
@@ -1485,7 +1499,7 @@
   background: rgba(255, 255, 255, 0.05) !important;
 }
 
-/* ── TRIP COUNTDOWN PILL ─────────────────────────────────────── */
+/* â”€â”€ TRIP COUNTDOWN PILL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .trip-countdown-pill {
   display: inline-flex;
   align-items: center;
@@ -1539,7 +1553,7 @@
   }
 }
 
-/* ── HERO ACTION BUTTONS ─────────────────────────────────────── */
+/* â”€â”€ HERO ACTION BUTTONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .btn-hero-action {
   display: inline-flex;
   align-items: center;
@@ -1594,7 +1608,7 @@
   color: #c7d2fe;
 }
 
-/* ── DAY TECH BAR MULTI-PARK ─────────────────────────────────── */
+/* â”€â”€ DAY TECH BAR MULTI-PARK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .day-tech-bar-multi {
   flex-wrap: nowrap;
   gap: 0;
@@ -1640,4 +1654,98 @@
     width: auto;
     height: 1px;
   }
+}
+
+/* --- Flatpickr Square Selects & Year Dropdown (Copied from Profile) --- */
+.flatpickr-calendar.rcw-flatpickr {
+  border-radius: 0 !important;
+  background: #161b22 !important;
+  border: 1px solid #30363d !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6) !important;
+}
+
+.flatpickr-calendar.rcw-flatpickr .flatpickr-months .flatpickr-month {
+  background: #161b22 !important;
+  color: #fff !important;
+}
+
+.flatpickr-calendar.rcw-flatpickr .flatpickr-current-month {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+}
+
+.flatpickr-calendar.rcw-flatpickr .flatpickr-monthDropdown-months,
+.flatpickr-calendar.rcw-flatpickr .cur-year-select {
+  border-radius: 0 !important;
+  background: #0d1117 !important;
+  border: 1px solid #30363d !important;
+  color: #10b981 !important;
+  padding: 2px 10px !important;
+  font-weight: 700 !important;
+  height: 34px !important;
+  cursor: pointer;
+  outline: none;
+  font-size: 0.95rem !important;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2310b981' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 28px !important;
+}
+
+.flatpickr-calendar.rcw-flatpickr .flatpickr-monthDropdown-months:hover,
+.flatpickr-calendar.rcw-flatpickr .cur-year-select:hover {
+  border-color: #10b981 !important;
+  background-color: #1c2128 !important;
+}
+
+.flatpickr-calendar.rcw-flatpickr .flatpickr-monthDropdown-months option,
+.flatpickr-calendar.rcw-flatpickr .cur-year-select option {
+  background: #0d1117 !important;
+  color: #fff !important;
+  padding: 10px;
+}
+
+/* Ocultar flechas del año original */
+.flatpickr-calendar.rcw-flatpickr .numInputWrapper span {
+  display: none !important;
+}
+.flatpickr-calendar.rcw-flatpickr .numInputWrapper {
+  width: auto !important;
+}
+
+/* Día seleccionado cuadrado */
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.selected.prevMonthDay,
+.flatpickr-day.selected.nextMonthDay {
+  border-radius: 0 !important;
+  background: #10b981 !important;
+  border-color: #10b981 !important;
+  color: #000 !important;
+  font-weight: 700;
+}
+
+.flatpickr-day:hover,
+.flatpickr-day.prevMonthDay:hover,
+.flatpickr-day.nextMonthDay:hover,
+.flatpickr-day.today:hover {
+  border-radius: 0 !important;
+  background: rgba(16, 185, 129, 0.2) !important;
+  border-color: #10b981 !important;
+}
+
+.flatpickr-day.today {
+  border-radius: 0 !important;
+  border-bottom: 2px solid #10b981 !important;
+}
+
+/* Evitar que el dropdown se vea blanco en navegadores que no heredan el tema oscuro */
+.cur-year-select,
+.flatpickr-monthDropdown-months {
+  color-scheme: dark;
 }

@@ -1,5 +1,5 @@
 <?php
-$page_css = ['web/css/profile.css', 'web/css/trips.css'];
+$page_css = ['web/css/profile.css', 'web/css/trips.css', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css'];
 require_once __DIR__ . '/../../partials/header.php';
 require_once __DIR__ . '/../../partials/modals/trip_modals.php';
 /** @var string $base_url */
@@ -226,8 +226,7 @@ $user_id = $_GET['id'] ?? null;
                             <i class="fa-solid fa-ranking-star fs-5 text-warning"></i>
                             <h5 class="fw-bold mb-0">Ranking Personal</h5>
                         </div>
-                        <select id="tops-type-selector"
-                            class="form-select w-auto fw-bold rcw-stats-select">
+                        <select id="tops-type-selector" class="form-select w-auto fw-bold rcw-stats-select">
                             <option value="coasters">Tops Coasters</option>
                             <option value="parks">Tops Parques</option>
                         </select>
@@ -310,9 +309,10 @@ $user_id = $_GET['id'] ?? null;
                             <h5 class="fw-bold mb-0">Viajes de este usuario</h5>
                         </div>
                     </div>
-                    <div class="card-body p-0 d-flex" style="min-height: 220px;">
-                        <div id="trips-grid" class="trips-grid-scrollable w-100">
-                            <div class="trips-empty-notice"><i class="fa-solid fa-suitcase fa-3x mb-3 opacity-50"></i><br>Cargando viajes...</div>
+                    <div class="card-body p-2">
+                        <div id="trips-grid" class="row g-2 w-100">
+                            <div class="col-12 text-center py-4 text-muted"><i
+                                    class="fa-solid fa-suitcase fa-2x mb-2 opacity-50"></i><br>Cargando viajes...</div>
                         </div>
                     </div>
                 </div>
@@ -322,26 +322,25 @@ $user_id = $_GET['id'] ?? null;
             <div class="content-section" id="section-ranking" style="display:none;">
                 <div class="card profile-card mb-4">
                     <div class="card-header pt-3 pb-3 d-flex flex-column gap-3">
-                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-2">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="bg-success bg-opacity-10 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fa-solid fa-chart-line fs-5 text-success"></i>
-                                </div>
-                                <div>
-                                    <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">Estadísticas de</h5>
-                                    <div class="stats-type-wrapper" style="cursor: pointer; margin-top: 2px; width: fit-content;">
-                                        <select id="rank-type-select" class="rcw-stats-select">
-                                            <option value="coasters">Coasters</option>
-                                            <option value="parks">Parques</option>
-                                        </select>
-                                    </div>
-                                </div>
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <div class="bg-success bg-opacity-10 p-2 d-flex align-items-center justify-content-center"
+                                style="width: 40px; height: 40px; flex-shrink: 0;">
+                                <i class="fa-solid fa-chart-line fs-5 text-success"></i>
                             </div>
-                            <div class="d-flex align-items-center">
-                                <span class="stats-trip-badge shadow-sm">
-                                    <i class="fa-solid fa-suitcase text-success"></i> <span id="rank-trip-count">0 viajes</span>
-                                </span>
-                            </div>
+                            <h5 class="fw-bold mb-0 d-flex align-items-center gap-2"
+                                style="font-size: 1.1rem; flex-wrap: nowrap; white-space: nowrap;">
+                                Estadísticas de
+                                <select id="rank-type-select" class="rcw-stats-select">
+                                    <option value="coasters">Coasters</option>
+                                    <option value="parks">Parques</option>
+                                </select>
+                            </h5>
+                        </div>
+                        <div class="mb-3">
+                            <span class="stats-trip-badge shadow-sm">
+                                <i class="fa-solid fa-suitcase text-success"></i> <span id="rank-trip-count">0
+                                    viajes</span>
+                            </span>
                         </div>
                         <div class="d-flex overflow-x-auto gap-1 pb-1" id="rank-filter-btns"
                             style="scrollbar-width: none;">
@@ -357,25 +356,28 @@ $user_id = $_GET['id'] ?? null;
                             <button class="btn btn-sm rounded-0 rank-period-btn btn-outline-secondary flex-shrink-0"
                                 data-period="all">Siempre</button>
                         </div>
-                        <div
-                            class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-1 pt-2 border-top border-secondary">
-                            <div class="d-flex align-items-center gap-2" id="rank-nav-container">
+                        <div class="d-flex align-items-center flex-wrap gap-2 mt-1 pt-2 border-top border-secondary">
+                            <div class="d-flex align-items-center gap-2 flex-shrink-0" id="rank-nav-container">
                                 <button class="btn btn-sm btn-outline-secondary rounded-0" id="rank-prev-btn"
                                     title="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
                                 <span id="rank-nav-label" class="fw-bold text-center"
-                                    style="min-width: 100px;">2026</span>
+                                    style="min-width: 80px;">2026</span>
                                 <button class="btn btn-sm btn-outline-secondary rounded-0" id="rank-next-btn"
                                     title="Siguiente"><i class="fa-solid fa-chevron-right"></i></button>
                             </div>
-                            <div class="d-flex align-items-center gap-2 ms-auto">
-                                <small class="text-muted">Desde:</small>
-                                <input type="date"
-                                    class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white"
-                                    id="rank-start-date" style="max-width: 120px;">
-                                <small class="text-muted">Hasta:</small>
-                                <input type="date"
-                                    class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white"
-                                    id="rank-end-date" style="max-width: 120px;">
+                            <div class="d-flex flex-column gap-1" id="rank-dates-container">
+                                <div class="d-flex align-items-center gap-2">
+                                    <small class="text-muted" style="width: 40px; white-space: nowrap;">Desde:</small>
+                                    <input type="date"
+                                        class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white"
+                                        id="rank-start-date" style="flex: 1;">
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <small class="text-muted" style="width: 40px; white-space: nowrap;">Hasta:</small>
+                                    <input type="date"
+                                        class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white"
+                                        id="rank-end-date" style="flex: 1;">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -460,6 +462,8 @@ $user_id = $_GET['id'] ?? null;
     <p class="mt-3 text-muted fw-bold text-uppercase" style="letter-spacing: 0.05em;">Cargando perfil...</p>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 <script src="<?= Router::asset('web/js/components/trip_modals.js') ?>?v=<?= time() ?>"></script>
 <script src="<?= Router::asset('web/js/users/user_profile.js') ?>?v=<?= time() ?>"></script>
 

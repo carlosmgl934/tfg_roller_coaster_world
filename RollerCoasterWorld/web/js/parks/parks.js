@@ -898,7 +898,10 @@ $(document).ready(function () {
           placeholderValue: "Selecciona las ventajas...",
         });
       }
-      if (!editContrasChoices && document.getElementById("edit-contras-select")) {
+      if (
+        !editContrasChoices &&
+        document.getElementById("edit-contras-select")
+      ) {
         editContrasChoices = new Choices("#edit-contras-select", {
           removeItemButton: true,
           placeholderValue: "Selecciona las contras...",
@@ -925,18 +928,22 @@ $(document).ready(function () {
       initEditChoices();
       const rawTags = $(this).attr("data-tags") || "[]";
       let tags = [];
-      try { tags = JSON.parse(rawTags); } catch(e) { tags = []; }
+      try {
+        tags = JSON.parse(rawTags);
+      } catch (e) {
+        tags = [];
+      }
 
       if (tags && tags.length > 0) {
-          const pros = tags.filter(t => t.type === 'pro').map(t => t.tag);
-          const contras = tags.filter(t => t.type === 'con').map(t => t.tag);
-          editProsChoices.removeActiveItems();
-          editProsChoices.setChoiceByValue(pros);
-          editContrasChoices.removeActiveItems();
-          editContrasChoices.setChoiceByValue(contras);
+        const pros = tags.filter((t) => t.type === "pro").map((t) => t.tag);
+        const contras = tags.filter((t) => t.type === "con").map((t) => t.tag);
+        editProsChoices.removeActiveItems();
+        editProsChoices.setChoiceByValue(pros);
+        editContrasChoices.removeActiveItems();
+        editContrasChoices.setChoiceByValue(contras);
       } else {
-          editProsChoices.removeActiveItems();
-          editContrasChoices.removeActiveItems();
+        editProsChoices.removeActiveItems();
+        editContrasChoices.removeActiveItems();
       }
 
       if (editReviewModalPark) editReviewModalPark.show();
@@ -962,8 +969,8 @@ $(document).ready(function () {
       // Añadir tags
       const pros = editProsChoices.getValue(true);
       const contras = editContrasChoices.getValue(true);
-      pros.forEach(p => fd.append('pros[]', p));
-      contras.forEach(c => fd.append('contras[]', c));
+      pros.forEach((p) => fd.append("pros[]", p));
+      contras.forEach((c) => fd.append("contras[]", c));
       try {
         const res = await fetch(
           `${window.BASE_URL}/api/php/parks.php?action=update_review`,
@@ -1087,26 +1094,37 @@ $(document).ready(function () {
   // --- COMPARTIR ---
   $("#btn-share").on("click", async function () {
     const title =
-      document.querySelector(".park-name")?.textContent ||
+      document.getElementById("park-name")?.textContent ||
       "RollerCoaster World";
     const text = `Mira este parque en RollerCoaster World: ${title}`;
     const url = window.location.href;
+
+    const fallbackCopy = async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+        if (window.rcwToast) {
+          window.rcwToast("Enlace copiado al portapapeles", "success");
+        } else {
+          alert("Enlace copiado al portapapeles");
+        }
+      } catch (err) {
+        console.error("Error copying to clipboard:", err);
+      }
+    };
 
     if (navigator.share) {
       try {
         await navigator.share({ title, text, url });
       } catch (err) {
-        if (err.name !== "AbortError") console.error("Error sharing:", err);
+        if (err.name === "InvalidStateError") {
+          await fallbackCopy();
+        } else if (err.name !== "AbortError") {
+          console.error("Error sharing:", err);
+          await fallbackCopy();
+        }
       }
     } else {
-      try {
-        await navigator.clipboard.writeText(url);
-        if (window.rcwToast)
-          window.rcwToast("Enlace copiado al portapapeles", "success");
-        else alert("Enlace copiado al portapapeles");
-      } catch (err) {
-        console.error("Error copying:", err);
-      }
+      await fallbackCopy();
     }
   });
 });

@@ -2,6 +2,8 @@
 <div class="modal fade" id="day-detail-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content rounded-0 border-0" style="background:var(--rcw-bg-card); overflow:hidden;">
+            <button type="button" class="btn-close btn-close-white position-absolute" data-bs-dismiss="modal"
+                style="top: 15px; right: 15px; z-index: 1050; text-shadow: 0 1px 2px rgba(0,0,0,0.5);"></button>
             <div class="modal-body p-0" id="day-modal-body"></div>
         </div>
     </div>
@@ -70,9 +72,11 @@
 <div class="modal fade" id="trip-detail-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
         <div class="modal-content rounded-0 border-0" style="background:var(--rcw-bg-card); overflow:hidden;">
-            <button type="button" class="btn-close btn-close-white position-absolute" data-bs-dismiss="modal" style="top: 15px; right: 15px; z-index: 1050; text-shadow: 0 1px 2px rgba(0,0,0,0.5);"></button>
+            <button type="button" class="btn-close btn-close-white position-absolute" data-bs-dismiss="modal"
+                style="top: 15px; right: 15px; z-index: 1050; text-shadow: 0 1px 2px rgba(0,0,0,0.5);"></button>
             <div class="modal-body p-0" id="td-body"></div>
-            <div class="modal-footer rounded-0" style="background:var(--rcw-bg-card-alt); border-top:1px solid var(--rcw-border);">
+            <div class="modal-footer rounded-0"
+                style="background:var(--rcw-bg-card-alt); border-top:1px solid var(--rcw-border);">
                 <button type="button" class="btn btn-outline-secondary rounded-0 px-4"
                     data-bs-dismiss="modal">Cerrar</button>
                 <button type="button" class="btn btn-danger rounded-0 px-4" id="td-delete-btn"><i
@@ -147,12 +151,15 @@
             </div>
             <div class="modal-body" id="collabs-body"></div>
             <div class="modal-footer rounded-0 d-flex flex-column align-items-center position-relative">
-                <p class="small text-muted mb-2 text-center w-100">Escribe el nombre de usuario de tu amigo para añadirlo</p>
+                <p class="small text-muted mb-2 text-center w-100">Escribe el nombre de usuario de tu amigo para
+                    añadirlo</p>
                 <div class="input-group rounded-0 position-relative" style="max-width:320px; width:100%;">
-                    <input type="text" class="form-control rounded-0" id="collab-username" placeholder="Nombre de usuario..." autocomplete="off">
+                    <input type="text" class="form-control rounded-0" id="collab-username"
+                        placeholder="Nombre de usuario..." autocomplete="off">
                     <button class="btn btn-info rounded-0 fw-bold" id="collab-invite-btn" style="z-index:2"><i
                             class="fa-solid fa-paper-plane me-1"></i>Invitar</button>
-                    <div class="ac-dropdown w-100 position-absolute" id="collab-dropdown" style="top:100%; left:0; z-index:1000; display:none;"></div>
+                    <div class="ac-dropdown w-100 position-absolute" id="collab-dropdown"
+                        style="top:100%; left:0; z-index:1000; display:none;"></div>
                 </div>
             </div>
         </div>
@@ -164,15 +171,18 @@
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content rounded-0">
             <div class="modal-header rounded-0" id="gcm-header" style="background:#dc3545">
-                <h6 class="modal-title fw-bold mb-0 text-white" id="gcm-title"><i class="fa-solid fa-triangle-exclamation me-2"></i>Confirmar</h6>
+                <h6 class="modal-title fw-bold mb-0 text-white" id="gcm-title"><i
+                        class="fa-solid fa-triangle-exclamation me-2"></i>Confirmar</h6>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body py-3">
                 <p class="mb-0" id="gcm-message">¿Estás seguro?</p>
             </div>
             <div class="modal-footer rounded-0 py-2">
-                <button type="button" class="btn btn-outline-secondary btn-sm rounded-0 px-3" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-sm rounded-0 px-3 fw-bold" id="gcm-confirm-btn" style="background:#dc3545;color:#fff">Confirmar</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm rounded-0 px-3"
+                    data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-sm rounded-0 px-3 fw-bold" id="gcm-confirm-btn"
+                    style="background:#dc3545;color:#fff">Confirmar</button>
             </div>
         </div>
     </div>
@@ -188,7 +198,8 @@
                 <p class="text-muted small mb-0">Primera vez en esta montaña rusa. ¡Añadida a tu colección!</p>
             </div>
             <div class="modal-footer justify-content-center py-2 border-0">
-                <button type="button" class="btn btn-success rounded-0 px-4 fw-bold" data-bs-dismiss="modal">¡Genial!</button>
+                <button type="button" class="btn btn-success rounded-0 px-4 fw-bold"
+                    data-bs-dismiss="modal">¡Genial!</button>
             </div>
         </div>
     </div>
@@ -204,22 +215,30 @@
             </div>
             <div class="modal-body">
                 <p class="text-muted small mb-3"><span class="text-danger fw-bold">*</span> Campos obligatorios</p>
+                <input type="hidden" id="ct-trip-id">
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Nombre del viaje <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control rounded-0" id="ct-title" placeholder="Ej: Verano Europa 2026" maxlength="150">
+                    <input type="text" class="form-control rounded-0" id="ct-title" placeholder="Ej: Verano Europa 2026"
+                        maxlength="150">
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Descripción</label>
-                    <textarea class="form-control rounded-0" id="ct-desc" rows="2" placeholder="Describe tu viaje..."></textarea>
+                    <textarea class="form-control rounded-0" id="ct-desc" rows="2"
+                        placeholder="Describe tu viaje..."></textarea>
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Países visitados</label>
                     <input type="hidden" id="ct-countries">
-                    <div id="ct-countries-container" class="form-control rounded-0 d-flex flex-wrap gap-1 p-1 align-items-center" style="min-height: 38px; cursor: text;">
-                        <input type="text" id="ct-countries-input" class="border-0 bg-transparent flex-grow-1 px-1" style="outline: none; min-width: 120px;" placeholder="Escribe y pulsa Enter..." autocomplete="off">
+                    <div id="ct-countries-container"
+                        class="form-control rounded-0 d-flex flex-wrap gap-1 p-1 align-items-center"
+                        style="min-height: 38px; cursor: text;">
+                        <input type="text" id="ct-countries-input" class="border-0 bg-transparent flex-grow-1 px-1"
+                            style="outline: none; min-width: 120px;" placeholder="Escribe y pulsa Enter..."
+                            autocomplete="off">
                     </div>
                     <div class="position-relative">
-                        <ul id="ct-countries-dropdown" class="dropdown-menu w-100 rounded-0 shadow-sm" style="max-height: 180px; overflow-y: auto; display: none;"></ul>
+                        <ul id="ct-countries-dropdown" class="dropdown-menu w-100 rounded-0 shadow-sm"
+                            style="max-height: 180px; overflow-y: auto; display: none;"></ul>
                     </div>
                 </div>
                 <div class="row g-3 mb-3">
@@ -232,16 +251,20 @@
                         <input type="date" class="form-control rounded-0" id="ct-end" placeholder="dd/mm/aaaa">
                     </div>
                 </div>
-                <div id="ct-error" class="alert alert-danger border-0 rounded-0 d-none fw-bold small mt-3 mb-3" style="background-color: #dc3545 !important; color: #ffffff !important;"></div>
+                <div id="ct-error" class="alert alert-danger border-0 rounded-0 d-none fw-bold small mt-3 mb-3"
+                    style="background-color: #dc3545 !important; color: #ffffff !important;"></div>
                 <div id="ct-days-container" class="d-none">
                     <hr>
-                    <h6 class="fw-bold mb-3"><i class="fa-solid fa-map-location-dot text-success me-2"></i>Parques por día</h6>
+                    <h6 class="fw-bold mb-3"><i class="fa-solid fa-map-location-dot text-success me-2"></i>Parques por
+                        día</h6>
                     <div id="ct-days-list"></div>
                 </div>
             </div>
             <div class="modal-footer rounded-0">
-                <button type="button" class="btn btn-outline-secondary rounded-0 px-4" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success rounded-0 px-4 fw-bold" id="ct-submit-btn"><i class="fa-solid fa-plus me-1"></i>Crear Viaje</button>
+                <button type="button" class="btn btn-outline-secondary rounded-0 px-4"
+                    data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success rounded-0 px-4 fw-bold" id="ct-submit-btn"><i
+                        class="fa-solid fa-plus me-1"></i>Crear Viaje</button>
             </div>
         </div>
     </div>

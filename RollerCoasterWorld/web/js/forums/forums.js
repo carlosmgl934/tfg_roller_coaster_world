@@ -386,10 +386,8 @@ $(document).ready(function () {
           : "";
         let autor = "";
         if (forum.author_name) {
-          autor = `<div class="d-flex flex-wrap align-items-center gap-3">
-                     <div class="d-flex align-items-center">
-                       <small class="text-muted"><i class="fa-solid fa-user me-1"></i>${forum.author_name}</small>
-                     </div>`;
+          autor = `<div class="d-flex align-items-center gap-2">
+                     <span style="color: #666; font-size: 0.75rem;"><i class="fa-solid fa-user me-1"></i>${forum.author_name}</span>`;
 
           if (forum.collaborators_json) {
             try {
@@ -400,10 +398,8 @@ $(document).ready(function () {
               if (collabs && collabs.length > 0) {
                 collabs = collabs.filter((c) => c && c.username);
                 if (collabs.length > 0) {
-                  autor += `<div class="d-flex align-items-center bg-dark bg-opacity-50 px-2 py-1 rounded-pill border border-secondary border-opacity-25" title="Colaboradores">
-                               <small class="text-muted me-2 fw-semibold" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">Colabs</small>
-                               <div class="d-flex">`;
-                  collabs.slice(0, 3).forEach((c) => {
+                  autor += `<div class="d-flex align-items-center ms-1" title="Colaboradores"><span style="color: #666; font-size: 0.70rem; margin-right: 4px;">colaborando con:</span>`;
+                  collabs.slice(0, 3).forEach((c, idx) => {
                     let imgSrc =
                       window.BASE_URL + "/web/img/avatars/default_avatar.svg";
                     if (c.profile_image) {
@@ -424,12 +420,13 @@ $(document).ready(function () {
                           c.profile_image;
                       }
                     }
-                    autor += `<img src="${imgSrc}" alt="${c.username}" title="${c.username}" class="rounded-circle border border-dark shadow-sm" style="width: 24px; height: 24px; object-fit: cover; margin-left: -6px; z-index: 1; position: relative;">`;
+                    const zIndex = 10 - idx;
+                    autor += `<img src="${imgSrc}" alt="${c.username}" title="${c.username}" class="rounded-circle border border-dark shadow-sm" style="width: 20px; height: 20px; object-fit: cover; margin-left: ${idx > 0 ? "-8px" : "0"}; z-index: ${zIndex}; position: relative;">`;
                   });
                   if (collabs.length > 3) {
-                    autor += `<div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center border border-dark shadow-sm" style="width: 24px; height: 24px; font-size: 0.65rem; margin-left: -6px; z-index: 1; position: relative;">+${collabs.length - 3}</div>`;
+                    autor += `<div class="rounded-circle text-white d-flex align-items-center justify-content-center border border-dark shadow-sm" style="width: 20px; height: 20px; font-size: 0.55rem; margin-left: -8px; z-index: 1; position: relative; background: #333;">+${collabs.length - 3}</div>`;
                   }
-                  autor += `</div></div>`;
+                  autor += `</div>`;
                 }
               }
             } catch (e) {
@@ -448,20 +445,20 @@ $(document).ready(function () {
         return `
         <a href="${href}" ${extraAttr} class="forum-card-item d-flex flex-column h-100">
           <div class="d-flex justify-content-between align-items-start mb-3 gap-3">
-            <h5 class="mb-0 text-white fw-bold d-flex align-items-center gap-2 min-w-0" style="flex: 1;">
-              <span class="forum-icon-bg flex-shrink-0"><i class="fa-regular fa-comments"></i></span>
-              <span class="text-truncate">${forum.title}</span>
+            <h5 class="mb-0 text-white d-flex align-items-start gap-2 min-w-0" style="flex: 1;">
+              <span class="forum-icon-bg flex-shrink-0" style="margin-top: 0.15rem;"><i class="fa-regular fa-comments"></i></span>
+              <span style="font-weight: 700; word-break: break-word; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: normal;">${forum.title}</span>
             </h5>
             <span class="forum-privacy-badge flex-shrink-0 ${forum.privacy === "private" ? "private" : "public"}">
               <i class="fa-solid ${privacyIcon} me-1"></i>${privacyLabel}
             </span>
           </div>
-          <p class="mb-3 text-white-50 text-truncate" style="width: 100%; font-size: 0.95rem;">
+          <p class="mb-3 text-white-50" style="width: 100%; font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: normal;">
             ${forum.forum_subject}
           </p>
-          <div class="mt-auto pt-3 border-top border-secondary border-opacity-10 d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
+          <div class="mt-auto pt-3 border-top border-secondary border-opacity-10 d-flex justify-content-between align-items-center w-100">
             ${autor}
-            <div class="text-secondary small text-nowrap ms-sm-auto bg-dark bg-opacity-25 px-2 py-1 rounded">
+            <div style="color: #666; font-size: 0.75rem;" class="text-nowrap ms-2">
               <i class="fa-regular fa-calendar me-1"></i>${fecha}
             </div>
           </div>

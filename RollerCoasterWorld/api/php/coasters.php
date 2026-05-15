@@ -9,7 +9,7 @@ if (isset($_SESSION['firebase_uid']) && !isset($_SESSION['user_id'])) {
     $stmt_init->execute([':uid' => $_SESSION['firebase_uid']]);
     $user_init = $stmt_init->fetch(PDO::FETCH_ASSOC);
     if ($user_init) {
-        $_SESSION['user_id'] = (int)$user_init['id'];
+        $_SESSION['user_id'] = (int) $user_init['id'];
     }
 }
 require_once __DIR__ . '/../database/db_conexion.php';
@@ -182,7 +182,8 @@ function listCoasters()
             'total' => $total
         ]);
     } catch (PDOException $e) {
-        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
+        error_log($e->getMessage());
+        Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -430,9 +431,9 @@ function getCoasterReviews()
 
     $orderSql = match ($order) {
         'recent' => 'cr.created_at DESC',
-        'best'   => 'cr.note DESC',
-        'worst'  => 'cr.note ASC',
-        default  => 'cr.created_at DESC'
+        'best' => 'cr.note DESC',
+        'worst' => 'cr.note ASC',
+        default => 'cr.created_at DESC'
     };
 
     try {
@@ -480,9 +481,12 @@ function getCoasterPhotos()
         Response::error('ID no válido');
     }
 
+    $current_user_id = $_SESSION['user_id'] ?? 0;
+
     try {
         global $db;
-        $sql = "SELECT coaster_photos.*, users.username, users.profile_image 
+        $sql = "SELECT coaster_photos.*, users.username, users.profile_image,
+                       (SELECT 1 FROM coaster_photo_likes cpl WHERE cpl.photo_id = coaster_photos.id AND cpl.user_id = :current_user) AS user_has_liked
                 FROM coaster_photos
                 INNER JOIN users ON coaster_photos.user_id = users.id
                 WHERE coaster_photos.coaster_id = :id AND coaster_photos.status = 'approved'
@@ -490,9 +494,13 @@ function getCoasterPhotos()
 
         $stmt = $db->prepare($sql);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':current_user', $current_user_id, PDO::PARAM_INT);
         $stmt->execute();
 
         $photos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($photos as &$p) {
+            $p['user_has_liked'] = !empty($p['user_has_liked']);
+        }
 
         Response::success([
             'photos' => $photos,
@@ -578,7 +586,8 @@ function saveReview()
         Response::success();
     } catch (PDOException $e) {
         $db->rollBack();
-        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
+        error_log($e->getMessage());
+        Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -626,12 +635,12 @@ function updateReview()
         Response::unauthorized();
     }
 
-    $userId    = (int) $_SESSION['user_id'];
-    $reviewId  = (int) ($_POST['review_id'] ?? 0);
-    $note      = (float) ($_POST['note'] ?? 0);
+    $userId = (int) $_SESSION['user_id'];
+    $reviewId = (int) ($_POST['review_id'] ?? 0);
+    $note = (float) ($_POST['note'] ?? 0);
     $reviewTxt = trim($_POST['review'] ?? '');
-    $pros      = $_POST['pros'] ?? [];
-    $contras   = $_POST['contras'] ?? [];
+    $pros = $_POST['pros'] ?? [];
+    $contras = $_POST['contras'] ?? [];
 
     if ($reviewId <= 0 || $note <= 0) {
         Response::error('Datos inválidos', 400);
@@ -652,15 +661,15 @@ function updateReview()
 
         // Actualizar nota y texto
         $db->prepare("UPDATE coaster_ratings SET note = :note, review = :review WHERE id = :id")
-           ->execute([':note' => $note, ':review' => empty($reviewTxt) ? null : $reviewTxt, ':id' => $reviewId]);
+            ->execute([':note' => $note, ':review' => empty($reviewTxt) ? null : $reviewTxt, ':id' => $reviewId]);
 
         // Regenerar tags
         $db->prepare("DELETE FROM review_tags WHERE review_id = :id")->execute([':id' => $reviewId]);
         $tagStmt = $db->prepare("INSERT INTO review_tags (review_id, tag, type) VALUES (:review_id, :tag, :type)");
-        foreach ((array)$pros as $tag) {
+        foreach ((array) $pros as $tag) {
             $tagStmt->execute([':review_id' => $reviewId, ':tag' => $tag, ':type' => 'pro']);
         }
-        foreach ((array)$contras as $tag) {
+        foreach ((array) $contras as $tag) {
             $tagStmt->execute([':review_id' => $reviewId, ':tag' => $tag, ':type' => 'con']);
         }
 
@@ -668,8 +677,10 @@ function updateReview()
         StatsHelper::updateCoasterStats($coasterId);
         Response::success();
     } catch (PDOException $e) {
-        if ($db->inTransaction()) $db->rollBack();
-        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
+        if ($db->inTransaction())
+            $db->rollBack();
+        error_log($e->getMessage());
+        Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -723,6 +734,11 @@ function likePhoto()
     $photo_id = intval($_POST['photo_id'] ?? 0);
     $unlike = isset($_POST['unlike']) && $_POST['unlike'] === 'true';
 
+    if (!isset($_SESSION['user_id'])) {
+        Response::unauthorized();
+    }
+    $user_id = $_SESSION['user_id'];
+
     if ($photo_id <= 0) {
         Response::error('ID de foto no válido');
         return;
@@ -731,12 +747,22 @@ function likePhoto()
     try {
         global $db;
         if ($unlike) {
-            $stmt = $db->prepare("UPDATE coaster_photos SET likes = GREATEST(COALESCE(likes, 0) - 1, 0) WHERE id = :id");
+            $stmt = $db->prepare("DELETE FROM coaster_photo_likes WHERE photo_id = :id AND user_id = :uid");
+            $stmt->bindValue(':id', $photo_id, PDO::PARAM_INT);
+            $stmt->bindValue(':uid', $user_id, PDO::PARAM_INT);
+            $stmt->execute();
+            if ($stmt->rowCount() > 0) {
+                $db->prepare("UPDATE coaster_photos SET likes = GREATEST(COALESCE(likes, 0) - 1, 0) WHERE id = :id")->execute([':id' => $photo_id]);
+            }
         } else {
-            $stmt = $db->prepare("UPDATE coaster_photos SET likes = COALESCE(likes, 0) + 1 WHERE id = :id");
+            $stmt = $db->prepare("INSERT INTO coaster_photo_likes (photo_id, user_id) VALUES (:id, :uid) ON CONFLICT DO NOTHING");
+            $stmt->bindValue(':id', $photo_id, PDO::PARAM_INT);
+            $stmt->bindValue(':uid', $user_id, PDO::PARAM_INT);
+            $stmt->execute();
+            if ($stmt->rowCount() > 0) {
+                $db->prepare("UPDATE coaster_photos SET likes = COALESCE(likes, 0) + 1 WHERE id = :id")->execute([':id' => $photo_id]);
+            }
         }
-        $stmt->bindValue(':id', $photo_id, PDO::PARAM_INT);
-        $stmt->execute();
 
         // Devolver los likes actualizados
         $stmt_likes = $db->prepare("SELECT likes FROM coaster_photos WHERE id = :id");
@@ -848,7 +874,8 @@ function getUserCoasterTops()
         Response::success(['data' => $users]);
     } catch (Exception $e) {
         error_log('getUserCoasterTops error: ' . $e->getMessage());
-        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
+        error_log($e->getMessage());
+        Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -896,7 +923,8 @@ function getRanking()
             'total' => $total
         ]);
     } catch (PDOException $e) {
-        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
+        error_log($e->getMessage());
+        Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }
 
@@ -905,9 +933,9 @@ function getAllReviews()
     $limit = 10;
     $page = max(1, intval($_GET['page'] ?? 1));
     $offset = ($page - 1) * $limit;
-    
+
     $search = trim($_GET['search'] ?? '');
-    
+
     // Controles de Ordenación y Filtros
     $sort = $_GET['sort'] ?? 'date';
     $order = strtolower($_GET['order'] ?? 'desc') === 'asc' ? 'ASC' : 'DESC';
@@ -967,7 +995,7 @@ function getAllReviews()
                 $whereClause 
                 $orderBy 
                 LIMIT :limit OFFSET :offset";
-                
+
         $stmt = $db->prepare($sql);
         foreach ($params as $param => $val) {
             $stmt->bindValue($param, $val);
@@ -979,9 +1007,10 @@ function getAllReviews()
 
         Response::success([
             'reviews' => $reviews,
-            'total'   => $total
+            'total' => $total
         ]);
     } catch (PDOException $e) {
-        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
+        error_log($e->getMessage());
+        Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }

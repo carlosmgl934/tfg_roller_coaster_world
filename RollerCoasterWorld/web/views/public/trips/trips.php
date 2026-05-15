@@ -44,7 +44,8 @@ if (!isset($_SESSION['firebase_uid'])) {
 
     <!-- ══ CALENDARIO ═══════════════════════════════════════════ -->
     <div class="card shadow-sm rounded-0 border-top-only mb-5">
-        <div class="card-header bg-success text-white rounded-0 d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-1 gap-md-2">
+        <div
+            class="card-header bg-success text-white rounded-0 d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-1 gap-md-2">
             <h5 class="mb-0"><i class="fa-solid fa-calendar-days me-2"></i>Calendario</h5>
             <small class="opacity-75">Haz clic en un día para ver detalles o registrar actividad</small>
         </div>
@@ -55,7 +56,8 @@ if (!isset($_SESSION['firebase_uid'])) {
 
     <!-- ══ MIS VIAJES ═══════════════════════════════════════════ -->
     <div class="card shadow-sm rounded-0 border-top-only mb-5">
-        <div class="card-header bg-success text-white rounded-0 d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-1 gap-md-2">
+        <div
+            class="card-header bg-success text-white rounded-0 d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-1 gap-md-2">
             <h5 class="mb-0"><i class="fa-solid fa-suitcase-rolling me-2"></i>Mis Viajes</h5>
             <small class="opacity-75">Tus viajes planificados y pasados</small>
         </div>
@@ -69,16 +71,18 @@ if (!isset($_SESSION['firebase_uid'])) {
     <!-- ══ ESTADÍSTICAS Y RANKING ══════════════════════════════ -->
     <div class="card shadow-sm rounded-0 border-top-only mb-5">
         <div class="card-header bg-success text-white rounded-0 d-flex flex-column gap-3">
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                <h5 class="mb-0 d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2 flex-wrap gap-3">
+                <h5 class="mb-0 d-flex align-items-center gap-2" style="flex-wrap: nowrap; white-space: nowrap;">
                     <i class="fa-solid fa-chart-line me-2"></i>Estadísticas de
                     <select id="rank-type-select"
-                        class="form-select form-select-sm ms-1 d-inline-block w-auto shadow-none fw-bold border-0 bg-transparent text-white"
+                        class="form-select form-select-sm ms-1 d-inline-block w-auto shadow-none fw-bold border-0 bg-transparent text-white rcw-stats-inline"
                         style="cursor: pointer;">
                         <option value="coasters" class="text-dark">Coasters</option>
                         <option value="parks" class="text-dark">Parques</option>
                     </select>
                 </h5>
+            </div>
+            <div class="mt-1">
                 <span class="badge bg-dark px-3 py-2 border border-secondary border-opacity-50">
                     <i class="fa-solid fa-suitcase me-1 text-success"></i> <span id="rank-trip-count">0 viajes</span>
                 </span>
@@ -96,26 +100,26 @@ if (!isset($_SESSION['firebase_uid'])) {
                     data-period="all">Siempre</button>
             </div>
             <div
-                class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 mt-1 pt-2 border-top border-light border-opacity-25">
-                <div class="d-flex align-items-center gap-2" id="rank-nav-container">
+                class="d-flex align-items-center flex-wrap gap-2 gap-3 mt-1 pt-2 border-top border-light border-opacity-25">
+                <div class="d-flex align-items-center gap-2 flex-shrink-0" id="rank-nav-container">
                     <button class="btn btn-sm btn-outline-light border-opacity-50 rounded-0" id="rank-prev-btn"
                         title="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
                     <span id="rank-nav-label" class="fw-bold text-center" style="min-width: 80px;">2026</span>
                     <button class="btn btn-sm btn-outline-light border-opacity-50 rounded-0" id="rank-next-btn"
                         title="Siguiente"><i class="fa-solid fa-chevron-right"></i></button>
                 </div>
-                <div class="d-flex align-items-center flex-wrap gap-2 ms-auto">
-                    <div class="d-flex align-items-center gap-1">
-                        <small class="text-light opacity-75">Desde:</small>
+                <div class="d-flex flex-column gap-1" id="rank-dates-container">
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-light opacity-75" style="width: 40px; white-space: nowrap;">Desde:</small>
                         <input type="date"
                             class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white p-1"
-                            id="rank-start-date" style="max-width: 115px; font-size: 0.75rem;" placeholder="dd/mm/aaaa">
+                            id="rank-start-date" style="flex: 1; font-size: 0.75rem;" placeholder="dd/mm/aaaa">
                     </div>
-                    <div class="col-6 col-md-auto d-flex align-items-center gap-1">
-                        <small class="text-light opacity-75">Hasta:</small>
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-light opacity-75" style="width: 40px; white-space: nowrap;">Hasta:</small>
                         <input type="date"
                             class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white p-1"
-                            id="rank-end-date" style="max-width: 115px; font-size: 0.75rem;" placeholder="dd/mm/aaaa">
+                            id="rank-end-date" style="flex: 1; font-size: 0.75rem;" placeholder="dd/mm/aaaa">
                     </div>
                 </div>
             </div>

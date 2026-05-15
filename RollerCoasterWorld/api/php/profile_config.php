@@ -18,6 +18,7 @@ $router->register('save_top_coasters', 'saveTopCoasters', 'POST');
 $router->register('save_top_parks', 'saveTopParks', 'POST');
 $router->register('get_my_reviews', 'getMyReviews');
 $router->register('get_map_parks', 'getMapParks');
+$router->register('get_my_photos', 'getMyPhotos');
 $router->dispatch();
 
 // ── Helper: obtiene el user_id de la sesión, con fallback por firebase_uid ──────
@@ -607,5 +608,32 @@ function getMyReviews()
     } catch (PDOException $e) {
         error_log($e->getMessage());
         Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
+    }
+}
+
+// ── Obtener fotos aprobadas del propio usuario ──────────────────────────────
+function getMyPhotos()
+{
+    $user_id = getUserId();
+    if (!$user_id) {
+        Response::unauthorized('No estás logueado');
+    }
+    global $db;
+    try {
+        $stmt = $db->prepare("
+            SELECT cp.id, cp.photo_url, cp.caption, c.coaster_name, p.park_name, u.username, u.profile_image
+            FROM coaster_photos cp 
+            JOIN coasters c ON cp.coaster_id = c.id 
+            JOIN parks p ON c.park_id = p.id
+            JOIN users u ON cp.user_id = u.id
+            WHERE cp.user_id = :uid AND cp.status = 'approved'
+            ORDER BY cp.created_at DESC
+        ");
+        $stmt->execute([':uid' => $user_id]);
+        $photos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        Response::success(['photos' => $photos]);
+    } catch (PDOException $e) {
+        error_log($e->getMessage());
+        Response::error('Error interno del servidor.', 500);
     }
 }

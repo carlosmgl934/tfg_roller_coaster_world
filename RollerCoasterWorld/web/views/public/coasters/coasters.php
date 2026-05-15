@@ -375,6 +375,7 @@ require_once __DIR__ . '/../../partials/header.php';
                 <option value="recorrido">Layout</option>
                 <option value="tematizacion">Tematización</option>
                 <option value="velocidad">Velocidad</option>
+                <option value="buen_ritmo">Buen ritmo</option>
             </select>
         </div>
         <!-- Contras -->
@@ -396,6 +397,7 @@ require_once __DIR__ . '/../../partials/header.php';
                 <option value="decepcionante">Decepcionante</option>
                 <option value="tematizacion">Tematización</option>
                 <option value="velocidad_nula">Poca velocidad</option>
+                <option value="pierde_ritmo">Pierde ritmo</option>
             </select>
         </div>
       </div>

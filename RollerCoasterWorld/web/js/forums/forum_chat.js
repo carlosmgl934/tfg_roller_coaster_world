@@ -74,9 +74,8 @@
 
         // Avatar del propietario → enlace a su perfil
         let authorHtml = `
-          <a href="${authorProfileUrl}" class="d-flex align-items-center gap-2 text-decoration-none" title="Ver perfil de ${esc(forum.author_name)}" style="transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
-            <img src="${avatarUrl(forum.author_image, forum.author_name)}" class="rounded-circle" style="width: 48px; height: 48px; object-fit: cover; border: 2px solid var(--rcw-green-neon);">
-            <span class="badge bg-success bg-opacity-25 text-success rounded-pill d-none d-sm-inline" style="font-size: 0.65rem;">Propietario</span>
+          <a href="${authorProfileUrl}" class="d-flex align-items-center text-decoration-none" title="Ver perfil de ${esc(forum.author_name)}" style="transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+            <img src="${avatarUrl(forum.author_image, forum.author_name)}" class="rounded-circle" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid var(--rcw-green-neon);">
           </a>`;
 
         // Avatares de colaboradores → cada uno enlaza a su perfil
@@ -113,12 +112,8 @@
         avatarEl.style.cursor = "default";
       }
 
-      // Zona derecha: badge + botón owner
+      // Zona derecha: botón owner
       const rightEl = el("forum-header-right");
-      const privBadge =
-        forum.privacy === "private"
-          ? `<span class="forum-privacy-badge private"><i class="fa-solid fa-lock me-1"></i>Privado</span>`
-          : `<span class="forum-privacy-badge public"><i class="fa-solid fa-earth-europe me-1"></i>Público</span>`;
 
       let ownerBtn = "";
       if (role === "owner" || role === "collaborator" || IS_ADMIN) {
@@ -126,10 +121,13 @@
                       <i class="fa-solid fa-shield-halved"></i>
                     </button>`;
       }
-      rightEl.innerHTML = privBadge + ownerBtn;
+      rightEl.innerHTML = ownerBtn;
 
       if (el("open-mod-btn")) {
-        el("open-mod-btn").addEventListener("click", openModPanel);
+        el("open-mod-btn").addEventListener("click", (e) => {
+          e.stopPropagation();
+          openModPanel();
+        });
       }
 
       // Banned
@@ -149,7 +147,8 @@
       document.title = `${forum.title} — RollerCoaster World`;
 
       // ── Evento info modal ─────────────────────────────────────────
-      const textClickArea = el("forum-header-title").parentElement;
+      const textClickArea = el("forum-header-title");
+      textClickArea.style.cursor = "pointer";
       const avatarClickArea = avatarEl;
 
       const openInfoModal = () => {
