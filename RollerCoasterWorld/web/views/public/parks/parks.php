@@ -70,23 +70,27 @@ require_once __DIR__ . '/../../partials/header.php';
             </div>
 
             <!-- Botones de Acción -->
-            <div class="d-flex gap-2">
-                <a href="#" target="_blank" id="btn-website" class="btn btn-outline-success fw-bold flex-grow-1 d-flex align-items-center justify-content-center gap-2" style="border-radius:0; padding: 10px;">
+            <div class="d-flex flex-wrap gap-2" id="park-action-buttons">
+                <!-- Fila 1: Comprar (se inserta por JS) + Web Oficial -->
+                <a href="#" target="_blank" id="btn-website" class="btn btn-outline-success fw-bold flex-grow-1 d-flex align-items-center justify-content-center gap-2" style="border-radius:0; padding: 10px; min-width: 130px;">
                     <i class="fa-solid fa-globe fs-5"></i>
                     <span>Web Oficial</span>
                 </a>
-                <button id="btn-map" class="btn btn-outline-secondary" style="border-radius:0; padding:10px 14px;" title="Ver en mapa">
-                    <i class="fa-solid fa-location-arrow fs-5"></i>
-                </button>
-                <button id="btn-share" class="btn btn-outline-secondary" style="border-radius:0; padding:10px 14px;" title="Compartir">
-                    <i class="fa-solid fa-share-nodes fs-5"></i>
-                </button>
-                <?php if (isset($is_admin) && $is_admin): ?>
-                <a href="<?= Router::url('admin_parks') ?>?edit_park=<?= $id ?>"
-                   class="btn btn-outline-primary" style="border-radius:0; padding:10px 14px;" title="Editar parque (Admin)">
-                    <i class="fa-solid fa-pen-to-square fs-5"></i>
-                </a>
-                <?php endif; ?>
+                <!-- Fila 2: iconos secundarios -->
+                <div class="d-flex gap-2 flex-shrink-0">
+                    <button id="btn-map" class="btn btn-outline-secondary" style="border-radius:0; padding:10px 14px;" title="Ver en mapa">
+                        <i class="fa-solid fa-location-arrow fs-5"></i>
+                    </button>
+                    <button id="btn-share" class="btn btn-outline-secondary" style="border-radius:0; padding:10px 14px;" title="Compartir">
+                        <i class="fa-solid fa-share-nodes fs-5"></i>
+                    </button>
+                    <?php if (isset($is_admin) && $is_admin): ?>
+                    <a href="<?= Router::url('admin_parks') ?>?edit_park=<?= $id ?>"
+                       class="btn btn-outline-primary" style="border-radius:0; padding:10px 14px;" title="Editar parque (Admin)">
+                        <i class="fa-solid fa-pen-to-square fs-5"></i>
+                    </a>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>

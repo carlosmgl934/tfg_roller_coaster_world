@@ -90,24 +90,24 @@ require_once __DIR__ . '/../../partials/header.php';
         </aside>
         <!-- CENTRO: Lista -->
         <div class="col-12 col-lg-6 order-3 order-lg-2">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <p class="mb-0 text-muted fw-bold" id="coaster-count"></p>
-                <div class="d-flex align-items-center">
-                    <select class="form-select shadow-sm rounded-0 w-auto border-success me-2" id="sort-filter"
-                        style="cursor: pointer; font-weight: 500;">
-                        <option value="id" selected>Por defecto</option>
-                        <option value="name">Nombre</option>
-                        <option value="height">Altura</option>
-                        <option value="speed">Velocidad</option>
-                        <option value="year">Año de apertura</option>
-                    </select>
-                    <button id="sort-direction-btn" class="btn btn-outline-success shadow-sm rounded-0" type="button"
-                        title="Cambiar orden">
-                        <i class="fa-solid fa-arrow-down-wide-short"></i>
-                    </button>
-                    <input type="hidden" id="sort-direction" value="DESC">
-                </div>
+            <!-- Fila 1: Controles de ordenar (fila propia, ancho completo) -->
+            <div class="d-flex justify-content-end align-items-center mb-2">
+                <select class="form-select shadow-sm rounded-0 w-auto border-success me-2" id="sort-filter"
+                    style="cursor: pointer; font-weight: 500;">
+                    <option value="id" selected>Por defecto</option>
+                    <option value="name">Nombre</option>
+                    <option value="height">Altura</option>
+                    <option value="speed">Velocidad</option>
+                    <option value="year">Año de apertura</option>
+                </select>
+                <button id="sort-direction-btn" class="btn btn-outline-success shadow-sm rounded-0 flex-shrink-0"
+                    type="button" title="Cambiar orden">
+                    <i class="fa-solid fa-arrow-down-wide-short"></i>
+                </button>
+                <input type="hidden" id="sort-direction" value="DESC">
             </div>
+            <!-- Fila 2: Contador de resultados -->
+            <p class="mb-3 text-muted fw-bold" id="coaster-count"></p>
             <div class="list-group shadow-sm rounded-0" id="coaster-list" style="border-radius: 0;"></div>
             <div class="pagination mt-4 justify-content-center" id="pagination"></div>
         </div>

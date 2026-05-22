@@ -203,6 +203,23 @@ $isAdmin = $userRole === 'admin';
     </div>
 </div>
 
+<!-- ── MODAL CONFIRMAR ELIMINAR FORO ────────────────────── -->
+<div class="modal fade" id="deleteForumModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
+                <i class="fa-solid fa-trash-can fa-2x text-danger mb-3"></i>
+                <p class="fw-bold mb-1">¿Eliminar este foro?</p>
+                <small class="text-muted d-block mb-3">Se borrarán permanentemente todos los mensajes, colaboradores y datos del foro. Esta acción no se puede deshacer.</small>
+                <div class="d-flex gap-2 justify-content-center mt-3">
+                    <button class="btn btn-outline-secondary px-4 rounded-0 fw-bold border-1" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-danger px-4 rounded-0 fw-bold border-1" id="confirm-delete-forum-btn">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ── MODAL INFO FORO ────────────────────────────────────── -->
 <div class="modal fade" id="forumInfoModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">

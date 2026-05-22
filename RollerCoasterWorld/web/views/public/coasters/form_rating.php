@@ -42,8 +42,12 @@ require_once __DIR__ . '/../../partials/header.php';
                         <p class="text-muted mb-4" style="font-size: 1.1rem;">Solo se permite una única reseña por
                             usuario en cada atracción para mantener la precisión de nuestras notas. ¡Gracias por aportar
                             tu opinión!</p>
-                        <a href="<?= Router::url('coasters') ?>?id=<?= $id ?>"
-                            class="btn btn-success rounded-pill px-5 py-2 fw-bold">Volver a la atracción</a>
+                        <div class="d-flex justify-content-center gap-3 mt-2 flex-wrap">
+                            <a href="<?= Router::url('coasters') ?>?id=<?= $id ?>"
+                                class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-bold">Volver a la atracción</a>
+                            <a href="<?= Router::url('coasters') ?>?id=<?= $id ?>&edit=true"
+                                class="btn btn-success rounded-pill px-4 py-2 fw-bold">Editar mi reseña</a>
+                        </div>
                     </div>
 
                     <form id="review-form" action="#">

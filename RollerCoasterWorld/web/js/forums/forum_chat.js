@@ -31,6 +31,7 @@
   let rateLimitInterval = null;
   let forumPrivacy = null;
   let isBannedSelf = false; // estado de baneo del usuario actual (sync en tiempo real)
+  let modPanelDirty = true; // caché dinámica para el panel de moderación
 
   /* ── ELEMENTOS ───────────────────────────────────────────── */
   const el = (id) => document.getElementById(id);
@@ -280,6 +281,7 @@
       // Actualizar lastMsgTime con el último mensaje
       if (msgs.length > 0) {
         lastMsgTime = msgs[msgs.length - 1].created_at;
+        modPanelDirty = true; // invalidar caché del panel de moderación
       }
 
       // Bind acciones de los mensajes
@@ -591,6 +593,7 @@
           );
           if (wrap) wrap.remove();
           pendingDeleteId = null;
+          modPanelDirty = true; // invalidar caché al borrar mensaje
         } else {
           showToast(data.error || "Error al borrar", "error");
         }
@@ -940,13 +943,94 @@
     if (bannedSection) bannedSection.style.display = canManage ? "" : "none";
     if (bannedTitle) bannedTitle.style.display = canManage ? "" : "none";
 
-    await loadCollaboratorsList(canManage);
-    if (canManage) {
-      await loadFriendsForInvite();
-      await loadBannedList();
+    if (modPanelDirty) {
+      await loadCollaboratorsList(canManage);
+      if (canManage) {
+        await loadFriendsForInvite();
+        await loadBannedList();
+      }
+      if (showParticipants) {
+        await loadParticipants();
+      }
+      modPanelDirty = false;
     }
-    if (showParticipants) {
-      await loadParticipants();
+    // Botón de eliminar foro — solo owner o admin
+    const modBody = el("moderationModal")?.querySelector(".modal-body");
+    if (modBody && canManage) {
+      if (!modBody.querySelector("#delete-forum-section")) {
+        const divider = document.createElement("div");
+        divider.id = "delete-forum-section";
+        divider.innerHTML = `
+          <hr class="border-secondary my-3">
+          <p class="form-section-title text-danger"><i class="fa-solid fa-triangle-exclamation me-1"></i>Zona de peligro</p>
+          <button class="btn btn-outline-danger w-100 fw-bold rounded-0 d-flex align-items-center justify-content-center gap-2" id="delete-forum-btn">
+            <i class="fa-solid fa-trash-can"></i> Eliminar foro
+          </button>
+        `;
+        modBody.appendChild(divider);
+      }
+      bindDeleteForum();
+    }
+  }
+  function bindDeleteForum() {
+    const btn = el("delete-forum-btn");
+    if (!btn || btn.dataset.bound) return;
+    btn.dataset.bound = "1";
+    btn.addEventListener("click", () => {
+      // Cerrar el panel de moderación antes de abrir el de confirmación
+      bootstrap.Modal.getInstance(el("moderationModal"))?.hide();
+      const confirmModal =
+        bootstrap.Modal.getInstance(el("deleteForumModal")) ||
+        new bootstrap.Modal(el("deleteForumModal"));
+      confirmModal.show();
+    });
+
+    const confirmBtn = el("confirm-delete-forum-btn");
+    if (confirmBtn && !confirmBtn.dataset.bound) {
+      confirmBtn.dataset.bound = "1";
+      confirmBtn.addEventListener("click", async () => {
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML =
+          '<i class="fa-solid fa-spinner fa-spin me-1"></i>Eliminando...';
+
+        try {
+          const fd = new FormData();
+          fd.append("forum_id", FORUM_ID);
+          const res = await fetch(
+            `${BASE}/api/php/forums.php?action=delete_forum`,
+            {
+              headers: {
+                "X-CSRF-Token":
+                  document
+                    .querySelector('meta[name="csrf-token"]')
+                    ?.getAttribute("content") ?? "",
+              },
+              method: "POST",
+              body: fd,
+            },
+          );
+          const data = await res.json();
+
+          if (data.success) {
+            bootstrap.Modal.getInstance(el("deleteForumModal"))?.hide();
+            showToast("Foro eliminado correctamente", "success");
+            // Redirigir al listado de foros tras un breve instante
+            setTimeout(() => {
+              window.location.href = `${BASE}/web/views/public/forums/forum_search.php`;
+            }, 1200);
+          } else {
+            bootstrap.Modal.getInstance(el("deleteForumModal"))?.hide();
+            showToast(data.error || "Error al eliminar el foro", "error");
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = "Eliminar";
+          }
+        } catch (e) {
+          bootstrap.Modal.getInstance(el("deleteForumModal"))?.hide();
+          showToast("Error de red", "error");
+          confirmBtn.disabled = false;
+          confirmBtn.innerHTML = "Eliminar";
+        }
+      });
     }
   }
 
@@ -989,15 +1073,14 @@
               <span class="text-success" style="font-size:0.75rem;">Colaborador</span>
             </div>
           </div>
-          ${
-            canInvite
+          ${canInvite
               ? `
           <button class="btn btn-sm text-danger p-1 ms-2 remove-collab-btn flex-shrink-0" title="Expulsar" data-user-id="${c.user_id}" data-username="${esc(c.username)}" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">
             <i class="fa-solid fa-user-xmark fs-5"></i>
           </button>
           `
               : ""
-          }
+            }
         </div>
       `,
         )
@@ -1080,16 +1163,15 @@
                 <span class="text-muted" style="font-size:0.75rem;">${roleLabel}${p.message_count} ${msgLabel}</span>
               </div>
             </div>
-            ${
-              showBan
-                ? `
+            ${showBan
+              ? `
             <button class="btn btn-sm text-danger p-1 ms-2 participant-ban-btn flex-shrink-0" title="Banear"
               data-user-id="${p.user_id}" data-username="${esc(p.username)}" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">
               <i class="fa-solid fa-user-slash fs-5"></i>
             </button>`
-                : isAuthor
-                  ? '<span class="badge bg-success bg-opacity-25 text-success rounded-pill px-2 py-1" style="font-size:0.65rem;">Creador</span>'
-                  : ""
+              : isAuthor
+                ? '<span class="badge bg-success bg-opacity-25 text-success rounded-pill px-2 py-1" style="font-size:0.65rem;">Creador</span>'
+                : ""
             }
           </div>`;
         })
@@ -1468,8 +1550,8 @@
     return sameDay
       ? d.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })
       : d.toLocaleDateString("es-ES", { day: "numeric", month: "short" }) +
-          " " +
-          d.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+      " " +
+      d.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
   }
 
   function avatarUrl(img, username) {

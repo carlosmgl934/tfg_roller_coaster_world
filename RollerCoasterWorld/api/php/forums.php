@@ -29,6 +29,7 @@ $router->register('remove_collaborator', 'removeCollaborator', 'POST');
 $router->register('invite_collaborator', 'inviteCollaborator', 'POST');
 $router->register('get_participants',    'getParticipants');
 $router->register('get_forum_state',     'getForumState');
+$router->register('delete_forum',        'deleteForum',        'POST');
 $router->dispatch();
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1101,6 +1102,56 @@ function getForumState()
             'privileged'    => $isPrivileged,
         ]);
     } catch (PDOException $e) {
+        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
+    }
+}
+
+/**
+ * Eliminar un foro completo (solo el owner del foro o admin global)
+ */
+function deleteForum()
+{
+    if (!isset($_SESSION['user_id'])) Response::unauthorized('No autenticado');
+
+    $forumId = (int)($_POST['forum_id'] ?? 0);
+    $userId  = $_SESSION['user_id'];
+
+    if (!$forumId) Response::error('forum_id requerido');
+
+    global $db;
+    try {
+        $stmtF = $db->prepare("SELECT author_id FROM forums WHERE id = :fid");
+        $stmtF->bindValue(':fid', $forumId, PDO::PARAM_INT);
+        $stmtF->execute();
+        $forum = $stmtF->fetch(PDO::FETCH_ASSOC);
+
+        if (!$forum) Response::error('Foro no encontrado', 404);
+
+        $isOwner = (int)$forum['author_id'] === (int)$userId;
+        $isAdmin = isset($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
+
+        if (!$isOwner && !$isAdmin) {
+            Response::error('Sin permiso para eliminar este foro', 403);
+        }
+
+        $db->beginTransaction();
+
+        // Eliminar en cascada: mensajes, colaboradores, baneados, invitaciones
+        $tables = ['forum_messages', 'forum_collaborators', 'forum_banned', 'forum_invitations'];
+        foreach ($tables as $table) {
+            $stmtD = $db->prepare("DELETE FROM {$table} WHERE forum_id = :fid");
+            $stmtD->bindValue(':fid', $forumId, PDO::PARAM_INT);
+            $stmtD->execute();
+        }
+
+        $stmtF2 = $db->prepare("DELETE FROM forums WHERE id = :fid");
+        $stmtF2->bindValue(':fid', $forumId, PDO::PARAM_INT);
+        $stmtF2->execute();
+
+        $db->commit();
+        Response::success(['message' => 'Foro eliminado correctamente']);
+    } catch (PDOException $e) {
+        $db->rollBack();
         error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }

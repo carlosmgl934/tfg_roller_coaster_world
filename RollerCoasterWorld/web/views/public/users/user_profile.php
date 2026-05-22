@@ -439,8 +439,15 @@ $user_id = $_GET['id'] ?? null;
                     <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-0">
+                <div class="modal-body p-0" style="position:relative;">
                     <img id="ig-modal-img" src="" alt="Foto" class="w-100" style="aspect-ratio: 1/1; object-fit:cover;">
+                    <!-- Flechas móvil — solo visibles en pantallas pequeñas via CSS -->
+                    <button class="ig-mobile-nav ig-mobile-nav-prev" id="ig-mob-prev" aria-label="Anterior">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button class="ig-mobile-nav ig-mobile-nav-next" id="ig-mob-next" aria-label="Siguiente">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
                 </div>
                 <!-- Removemos los likes, dejamos solo el caption si es necesario o eliminamos todo el footer si solo quiere la foto -->
                 <div class="modal-footer border-secondary flex-column align-items-start py-3 px-3">

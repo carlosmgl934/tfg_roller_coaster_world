@@ -29,6 +29,17 @@
 
     loadRecommendations();
     bindRefreshBtn();
+
+    // ── Auto-confirmación al volver de Stripe ─────────────────────────────────
+    // Si el servidor inyectó STRIPE_RETURN con status=success, confirmamos el viaje
+    if (
+      window.STRIPE_RETURN &&
+      window.STRIPE_RETURN.status === "success" &&
+      window.STRIPE_RETURN.session_id &&
+      window.STRIPE_RETURN.order_id
+    ) {
+      autoConfirmAfterStripe(window.STRIPE_RETURN);
+    }
   });
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -301,8 +312,19 @@
         <button type="button" class="btn btn-outline-secondary rounded-0 px-4"
                 data-bs-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-success rounded-0 fw-bold px-5" id="checkout-confirm-btn">
-            <i class="fa-solid fa-credit-card me-2"></i>Confirmar y pagar (simulado)
+            <i class="fa-brands fa-stripe me-2"></i>Pagar con Stripe
         </button>`;
+
+    // Nota modo test
+    document.getElementById("checkout-modal-body").insertAdjacentHTML(
+      "beforeend",
+      `
+        <div class="mt-3 p-3 rounded-2" style="background:rgba(245,158,11,0.08);border-left:3px solid #f59e0b;">
+            <small class="text-warning fw-semibold"><i class="fa-solid fa-triangle-exclamation me-1"></i>MODO TEST</small>
+            <small class="text-muted d-block mt-1">Este pago es totalmente falso, se hace con dinero irreal, no te preocupes por gastarlo</small>
+            <small class="text-muted d-block mt-1">Usar tarjeta: <span class="fw-bold text-white font-monospace">4242 4242 4242 4242</span> &middot; Fecha: 12/30 &middot; CVC: 123</small>
+        </div>`,
+    );
 
     // Bind controles
     bindQtyControls(unitPrice);
@@ -335,7 +357,7 @@
   }
 
   // ═════════════════════════════════════════════════════════════════════════
-  // 3. CONFIRM → BOOK → SCHEDULE
+  // 3. CONFIRM → BOOK → STRIPE → (retorno) → SCHEDULE
   // ═════════════════════════════════════════════════════════════════════════
   async function handleCheckoutConfirm() {
     const btn = document.getElementById("checkout-confirm-btn");
@@ -343,10 +365,10 @@
 
     btn.disabled = true;
     btn.innerHTML =
-      '<span class="spinner-border spinner-border-sm me-2"></span>Procesando…';
+      '<span class="spinner-border spinner-border-sm me-2"></span>Creando pedido…';
 
     try {
-      // Paso A: Crear / actualizar pedido
+      // Paso A: Crear / actualizar pedido pendiente
       const bookResp = await fetch(API + "?action=book", {
         method: "POST",
         credentials: "same-origin",
@@ -364,13 +386,53 @@
       });
       const bookJson = await bookResp.json();
       if (!bookJson.success)
-        throw new Error(bookJson.error || "Error al reservar");
+        throw new Error(bookJson.error || "Error al crear el pedido");
 
       currentOrderId = bookJson.data.order_id;
       const startDate =
         document.getElementById("checkout-start-date")?.value || "";
 
-      // Paso B: Confirmar pago y generar agenda
+      // Paso B: Crear Stripe Checkout Session para el viaje
+      btn.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-2"></span>Abriendo pasarela de pago…';
+
+      const sessionResp = await fetch(API + "?action=create_trip_session", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "X-CSRF-Token":
+            document
+              .querySelector('meta[name="csrf-token"]')
+              ?.getAttribute("content") ?? "",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          park_id: currentRec.park_id,
+          order_id: currentOrderId,
+          quantity: currentQty,
+          duration_days: currentRec.duration_days,
+          start_date: startDate,
+        }),
+      });
+      const sessionJson = await sessionResp.json();
+      if (!sessionJson.success)
+        throw new Error(sessionJson.error || "Error al iniciar el pago");
+
+      // Paso C: Redirigir a Stripe (la página abandonará el modal)
+      // Response::success fusiona los campos en la raíz → sessionJson.url (no .data.url)
+      window.location.href = sessionJson.url;
+    } catch (err) {
+      console.error("[Checkout Stripe]", err);
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-brands fa-stripe me-2"></i>Reintentar pago';
+      showToast("Error: " + err.message, "danger");
+    }
+  }
+
+  // ── Auto-confirmación al volver de Stripe (success) ──────────────────────────
+  async function autoConfirmAfterStripe(ret) {
+    showStripeVerifyingOverlay();
+    try {
       const confirmResp = await fetch(API + "?action=confirm", {
         method: "POST",
         credentials: "same-origin",
@@ -382,23 +444,63 @@
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          order_id: currentOrderId,
-          park_id: currentRec.park_id,
-          duration_days: currentRec.duration_days,
-          start_date: startDate,
+          order_id: ret.order_id,
+          park_id: ret.park_id,
+          duration_days: ret.duration,
+          start_date: ret.start_date,
+          stripe_session_id: ret.session_id,
         }),
       });
       const confirmJson = await confirmResp.json();
       if (!confirmJson.success)
-        throw new Error(confirmJson.error || "Error al confirmar");
+        throw new Error(confirmJson.error || "Error al confirmar el viaje");
 
-      showPaymentSuccess(confirmJson.data);
+      hideStripeVerifyingOverlay();
+      openSuccessModalFromReturn(confirmJson.data);
     } catch (err) {
-      console.error("[Checkout]", err);
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fa-solid fa-credit-card me-2"></i>Reintentar';
-      showToast("Error: " + err.message, "danger");
+      console.error("[AutoConfirm]", err);
+      hideStripeVerifyingOverlay();
+      showToast(
+        "Pago recibido pero hubo un error al crear el viaje: " + err.message,
+        "danger",
+      );
     }
+  }
+
+  // ── Overlay de verificación ───────────────────────────────────────────────────
+  function showStripeVerifyingOverlay() {
+    let ov = document.getElementById("rcw-stripe-verifying");
+    if (!ov) {
+      ov = document.createElement("div");
+      ov.id = "rcw-stripe-verifying";
+      ov.style.cssText =
+        "position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;";
+      ov.innerHTML = `
+        <div class="spinner-border text-success" style="width:3.5rem;height:3.5rem;"></div>
+        <p class="text-white fw-semibold mb-0" style="font-size:1.1rem;">
+          <i class="fa-brands fa-stripe me-2 text-primary"></i>Verificando pago y creando tu viaje…
+        </p>
+        <small class="text-muted">Por favor, no cierres esta página</small>`;
+      document.body.appendChild(ov);
+    }
+    ov.style.display = "flex";
+  }
+
+  function hideStripeVerifyingOverlay() {
+    const ov = document.getElementById("rcw-stripe-verifying");
+    if (ov) ov.style.display = "none";
+  }
+
+  // ── Modal de éxito tras auto-confirmar ────────────────────────────────────────
+  function openSuccessModalFromReturn(data) {
+    ensureModal();
+    if (!modalEl) {
+      modalEl = new bootstrap.Modal(
+        document.getElementById("rec-checkout-modal"),
+      );
+    }
+    showPaymentSuccess(data);
+    modalEl.show();
   }
 
   // ── Pantalla de éxito dentro del modal ────────────────────────────────────

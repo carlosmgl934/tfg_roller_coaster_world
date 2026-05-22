@@ -4,17 +4,49 @@
  * Motor de Recomendación Inteligente Autónomo ("Zero-Click")
  *
  * Acciones GET:
- *   ?action=get       → Devuelve las 3 recomendaciones del usuario (cacheadas o generadas al vuelo)
- *   ?action=refresh   → Fuerza regeneración aunque el caché sea válido
+ *   ?action=get                → Devuelve las 3 recomendaciones (cacheadas o generadas)
+ *   ?action=refresh            → Fuerza regeneración aunque el caché sea válido
  *
  * Acciones POST:
- *   ?action=book      → Registra un pedido pre-configurado desde una recomendación
- *   ?action=confirm   → Confirma pago y genera evento en la agenda (trips)
+ *   ?action=book               → Pre-configura el pedido desde una recomendación
+ *   ?action=create_trip_session → Crea una Stripe Checkout Session para el viaje
+ *   ?action=confirm            → Verifica el pago Stripe y genera evento en la agenda
  */
 
 require_once __DIR__ . '/utils/SessionManager.php';
 require_once __DIR__ . '/../database/db_conexion.php';
 require_once __DIR__ . '/utils/Response.php';
+
+// ── Cargar Stripe SDK ────────────────────────────────────────────────────────
+$autoloadPath = __DIR__ . '/../../vendor/autoload.php';
+if (!file_exists($autoloadPath)) {
+    $autoloadPath = __DIR__ . '/../../../vendor/autoload.php';
+}
+if (file_exists($autoloadPath)) {
+    require_once $autoloadPath;
+}
+
+// ── Leer .env ────────────────────────────────────────────────────────────────
+function loadEnvRec(): array
+{
+    $envFile = __DIR__ . '/../../.env';
+    if (!file_exists($envFile))
+        $envFile = __DIR__ . '/../../../.env';
+    $env = [];
+    if (file_exists($envFile)) {
+        foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+            if (str_starts_with(trim($line), '#') || !str_contains($line, '='))
+                continue;
+            [$k, $v] = explode('=', $line, 2);
+            $env[trim($k)] = trim($v);
+        }
+    }
+    return $env;
+}
+$_rcwEnv = loadEnvRec();
+if (!empty($_rcwEnv['STRIPE_SECRET_KEY']) && class_exists('\Stripe\Stripe')) {
+    \Stripe\Stripe::setApiKey($_rcwEnv['STRIPE_SECRET_KEY']);
+}
 
 header('Content-Type: application/json');
 
@@ -41,6 +73,7 @@ match (true) {
     ($action === 'get' && $method === 'GET') => getRecommendations($db, $userId),
     ($action === 'refresh' && $method === 'GET') => getRecommendations($db, $userId, true),
     ($action === 'book' && $method === 'POST') => bookRecommendation($db, $userId),
+    ($action === 'create_trip_session' && $method === 'POST') => createTripStripeSession($db, $userId),
     ($action === 'confirm' && $method === 'POST') => confirmAndSchedule($db, $userId),
     default => Response::error("Acción no soportada: $action", 400),
 };
@@ -452,27 +485,152 @@ function bookRecommendation(DBConexion $db, int $userId): void
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-// POST /confirm — Pago simulado + genera evento en la Agenda de Parques
+// POST /create_trip_session — Crea una Stripe Checkout Session para un viaje IA
+// ═════════════════════════════════════════════════════════════════════════════
+function createTripStripeSession(DBConexion $db, int $userId): void
+{
+    global $_rcwEnv;
+
+    if (empty($_rcwEnv['STRIPE_SECRET_KEY']) || !class_exists('\Stripe\Stripe')) {
+        Response::error('Stripe no configurado', 500);
+        return;
+    }
+
+    $body = json_decode(file_get_contents('php://input'), true) ?? [];
+    $parkId = (int) ($body['park_id'] ?? 0);
+    $orderId = (int) ($body['order_id'] ?? 0);
+    $quantity = max(1, (int) ($body['quantity'] ?? 1));
+    $durationDays = max(1, (int) ($body['duration_days'] ?? 2));
+    $startDate = $body['start_date'] ?? date('Y-m-d', strtotime('+14 days'));
+
+    if (!$parkId || !$orderId) {
+        Response::error('park_id y order_id son requeridos', 422);
+        return;
+    }
+
+    // Obtener datos del parque y precio
+    $stmtP = $db->prepare("SELECT park_name, precio_entrada FROM parks WHERE id = ?");
+    $stmtP->execute([$parkId]);
+    $park = $stmtP->fetch(PDO::FETCH_ASSOC);
+    if (!$park) {
+        Response::error('Parque no encontrado', 404);
+        return;
+    }
+
+    $unitPrice = max(0.50, (float) ($park['precio_entrada'] ?? 50));
+    $amountCents = (int) round($unitPrice * 100);
+    $label = "Entrada — {$park['park_name']} ({$quantity} pers.)";
+
+    // Construir URLs de retorno
+    $proto = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $script = $_SERVER['SCRIPT_NAME'] ?? '';
+    if (str_contains($script, '/RollerCoasterWorld/')) {
+        $base = preg_replace('#/RollerCoasterWorld/.*$#', '/RollerCoasterWorld', $script) ?? '';
+    } else {
+        $base = '';
+    }
+    $baseUrl = $proto . '://' . $host . $base;
+
+    $successUrl = $baseUrl . '/web/views/public/trips/trip_generator.php'
+        . '?payment=success'
+        . '&session_id={CHECKOUT_SESSION_ID}'
+        . '&order_id=' . $orderId
+        . '&park_id=' . $parkId
+        . '&duration_days=' . $durationDays
+        . '&start_date=' . urlencode($startDate);
+    $cancelUrl = $baseUrl . '/web/views/public/trips/trip_generator.php?payment=cancel';
+
+    try {
+        $session = \Stripe\Checkout\Session::create([
+            'payment_method_types' => ['card'],
+            'mode' => 'payment',
+            'line_items' => [
+                [
+                    'price_data' => [
+                        'currency' => 'eur',
+                        'unit_amount' => $amountCents,
+                        'product_data' => ['name' => $label],
+                    ],
+                    'quantity' => $quantity,
+                ]
+            ],
+            'metadata' => [
+                'order_id' => (string) $orderId,
+                'park_id' => (string) $parkId,
+                'user_id' => (string) $userId,
+                'duration_days' => (string) $durationDays,
+                'start_date' => $startDate,
+                'source' => 'trip_generator',
+            ],
+            'success_url' => $successUrl,
+            'cancel_url' => $cancelUrl,
+        ]);
+
+        Response::success([
+            'url' => $session->url,
+            'session_id' => $session->id,
+        ]);
+    } catch (\Stripe\Exception\ApiErrorException $e) {
+        error_log('[createTripStripeSession] ' . $e->getMessage());
+        Response::error('Error al crear la sesión de pago. Inténtalo de nuevo.', 500);
+    }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// POST /confirm — Verifica pago Stripe y genera evento en la Agenda de Parques
 // ═════════════════════════════════════════════════════════════════════════════
 function confirmAndSchedule(DBConexion $db, int $userId): void
 {
+    global $_rcwEnv;
+
     $body = json_decode(file_get_contents('php://input'), true) ?? [];
     $orderId = (int) ($body['order_id'] ?? 0);
     $parkId = (int) ($body['park_id'] ?? 0);
     $days = max(1, (int) ($body['duration_days'] ?? 2));
     $start = $body['start_date'] ?? date('Y-m-d', strtotime('+14 days'));
+    $stripeSessionId = trim($body['stripe_session_id'] ?? '');
 
     if (!$orderId || !$parkId) {
         Response::error('order_id y park_id son requeridos', 422);
         return;
     }
 
+    // ── Verificar pago con Stripe si se proporcionó session_id ───────────────
+    if ($stripeSessionId !== '' && !empty($_rcwEnv['STRIPE_SECRET_KEY']) && class_exists('\Stripe\Stripe')) {
+        // Evitar doble procesamiento
+        if (isset($_SESSION['rcw_trip_stripe_processed'][$stripeSessionId])) {
+            // Ya fue procesado: devolver los datos guardados
+            $saved = $_SESSION['rcw_trip_stripe_processed'][$stripeSessionId];
+            Response::success(['data' => $saved]);
+            return;
+        }
+
+        try {
+            $session = \Stripe\Checkout\Session::retrieve($stripeSessionId);
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            error_log('[confirmAndSchedule] Stripe retrieve: ' . $e->getMessage());
+            Response::error('No se pudo verificar el pago con Stripe.', 500);
+            return;
+        }
+
+        if ($session->payment_status !== 'paid') {
+            Response::error('El pago no está completado (status: ' . $session->payment_status . ')', 402);
+            return;
+        }
+    }
+
     try {
         $db->beginTransaction();
 
-        // 1. Marcar pedido como confirmado
-        $db->prepare("UPDATE pedidos SET status = 'confirmado' WHERE id = ? AND user_id = ?")
-            ->execute([$orderId, $userId]);
+        // 1. Marcar pedido como confirmado (guardar stripe_session_id si existe)
+        if ($stripeSessionId !== '') {
+            $db->prepare("UPDATE pedidos SET status = 'confirmado', stripe_session_id = ? WHERE id = ? AND user_id = ?")
+                ->execute([$stripeSessionId, $orderId, $userId]);
+        } else {
+            $db->prepare("UPDATE pedidos SET status = 'confirmado' WHERE id = ? AND user_id = ?")
+                ->execute([$orderId, $userId]);
+        }
 
         // 2. Obtener datos del parque
         $stmtP = $db->prepare("SELECT park_name, park_country, imagen_url FROM parks WHERE id = ?");
@@ -496,7 +654,7 @@ function confirmAndSchedule(DBConexion $db, int $userId): void
         $startDate = date('Y-m-d', strtotime($start));
         $endDate = date('Y-m-d', strtotime($start . " +{$days} days"));
 
-        // 5. Generar título e itinerario del viaje
+        // 5. Generar título e itinerario
         $tripTitle = "Viaje a {$park['park_name']}";
         $itinerary = buildItinerary($park['park_name'], $topCoaster, $days);
 
@@ -509,28 +667,35 @@ function confirmAndSchedule(DBConexion $db, int $userId): void
         $stmtT->execute([$userId, $tripTitle, $desc, $startDate, $endDate, $park['imagen_url'], 'ai']);
         $tripId = $db->lastInsertId();
 
-        // 7. Asociar el parque a TODOS los días del viaje para que aparezca en el calendario como días de parque
+        // 7. Asociar el parque a cada día del viaje
         for ($i = 0; $i < $days; $i++) {
             $visitDate = date('Y-m-d', strtotime($startDate . " +{$i} days"));
-            $stmtTP = $db->prepare(
-                "INSERT INTO trip_parks (trip_id, park_id, visit_date, visit_order) 
-                 VALUES (?, ?, ?, ?)"
-            );
-            $stmtTP->execute([$tripId, $parkId, $visitDate, $i + 1]);
+            $db->prepare(
+                "INSERT INTO trip_parks (trip_id, park_id, visit_date, visit_order) VALUES (?, ?, ?, ?)"
+            )->execute([$tripId, $parkId, $visitDate, $i + 1]);
         }
 
         $db->commit();
 
-        Response::success([
-            'data' => [
-                'trip_id' => $tripId,
-                'trip_title' => $tripTitle,
-                'start_date' => $startDate,
-                'end_date' => $endDate,
-                'itinerary' => $itinerary,
-                'message' => '¡Reserva confirmada! Tu agenda ha sido actualizada.',
-            ]
-        ]);
+        $result = [
+            'trip_id' => $tripId,
+            'trip_title' => $tripTitle,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'itinerary' => $itinerary,
+            'message' => '¡Reserva confirmada! Tu agenda ha sido actualizada.',
+        ];
+
+        // Guardar en sesión para evitar doble procesamiento
+        if ($stripeSessionId !== '') {
+            if (!isset($_SESSION['rcw_trip_stripe_processed'])) {
+                $_SESSION['rcw_trip_stripe_processed'] = [];
+            }
+            $_SESSION['rcw_trip_stripe_processed'][$stripeSessionId] = $result;
+        }
+
+        Response::success(['data' => $result]);
+
     } catch (Exception $e) {
         try {
             $db->rollBack();

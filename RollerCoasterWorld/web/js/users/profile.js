@@ -2,6 +2,8 @@
 // TODO: editar bio/avatar, gestionar solicitudes de amistad, top personal
 
 $(document).ready(function () {
+  let birthYearSelect = null; // referencia al <select> de año para sincronizarlo externamente
+
   const birthPicker = flatpickr("#config-user-birthdate", {
     dateFormat: "Y-m-d",
     altInput: true,
@@ -42,12 +44,19 @@ $(document).ready(function () {
           fp.changeYear(parseInt(e.target.value));
         });
 
-        // Sincronizar si el año cambia por otros medios (flechas, etc - aunque el select lo reemplaza)
+        // Sincronizar cuando el año cambia por flechas u otros medios
         fp.set("onYearChange", () => {
           yearSelect.value = fp.currentYear;
         });
 
         yearInput.parentNode.replaceChild(yearSelect, yearInput);
+        birthYearSelect = yearSelect; // guardar referencia externa
+      }
+    },
+    onChange: function (selectedDates, dateStr, fp) {
+      // Sincronizar el select de año cuando se establece una fecha (ej: setDate desde JS)
+      if (birthYearSelect && selectedDates.length > 0) {
+        birthYearSelect.value = selectedDates[0].getFullYear();
       }
     },
   });
@@ -361,7 +370,13 @@ $(document).ready(function () {
           data.user.email || "";
 
         if (data.user.birthdate) {
-          birthPicker.setDate(data.user.birthdate);
+          birthPicker.setDate(data.user.birthdate, true);
+          // Asegurar que el select de año muestra el año de la fecha cargada
+          if (birthYearSelect) {
+            const yr = new Date(data.user.birthdate + "T00:00:00").getFullYear();
+            birthYearSelect.value = yr;
+            birthPicker.changeYear(yr);
+          }
         } else {
           birthPicker.clear();
         }
@@ -785,9 +800,9 @@ $(document).ready(function () {
       data.sort((a, b) =>
         asc
           ? (parseFloat(a.coaster_length) || 0) -
-            (parseFloat(b.coaster_length) || 0)
+          (parseFloat(b.coaster_length) || 0)
           : (parseFloat(b.coaster_length) || 0) -
-            (parseFloat(a.coaster_length) || 0),
+          (parseFloat(a.coaster_length) || 0),
       );
     } else if (sort === "inversions") {
       data.sort((a, b) =>
@@ -1132,11 +1147,14 @@ $(document).ready(function () {
         animation: 150,
         forceFallback: true,
         fallbackTolerance: 3,
-        touchStartThreshold: 3,
-        delay: 50,
+        touchStartThreshold: 5,
+        delay: 200,
         delayOnTouchOnly: true,
+        scrollSensitivity: 80,
+        scrollSpeed: 15,
         ghostClass: "sortable-ghost",
         dragClass: "sortable-drag",
+        chosenClass: "sortable-chosen",
         onStart: function () {
           document.body.classList.add("is-dragging");
           window.getSelection().removeAllRanges();
@@ -1208,11 +1226,14 @@ $(document).ready(function () {
         animation: 150,
         forceFallback: true,
         fallbackTolerance: 3,
-        touchStartThreshold: 3,
-        delay: 50,
+        touchStartThreshold: 5,
+        delay: 200,
         delayOnTouchOnly: true,
+        scrollSensitivity: 80,
+        scrollSpeed: 15,
         ghostClass: "sortable-ghost",
         dragClass: "sortable-drag",
+        chosenClass: "sortable-chosen",
         onStart: function () {
           document.body.classList.add("is-dragging");
           window.getSelection().removeAllRanges();
@@ -1550,98 +1571,60 @@ $(document).ready(function () {
   $("#btn-tops-edit").on("click", () => setTopsMode("edit"));
   $("#btn-tops-back").on("click", () => setTopsMode("preview"));
 
-  // Guardar Cambios
+  // Guardar Cambios — guarda AMBOS tops simultáneamente
 
-  async function saveCoastersTop() {
-    const $btn = $("#btn-save-coasters-top");
-    const items = [];
+  async function saveBothTops() {
+    const $btns = $("#btn-save-coasters-top, #btn-save-parks-top");
+    $btns.prop("disabled", true).html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Guardando…');
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ?? "";
+
+    const coastersItems = [];
     $("#top-coasters-list-edit .tops-edit-item").each(function (i) {
-      items.push({ coaster_id: $(this).data("id"), rank_position: i + 1 });
+      coastersItems.push({ coaster_id: $(this).data("id"), rank_position: i + 1 });
     });
 
-    $btn
-      .prop("disabled", true)
-      .html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Guardando…');
-
-    try {
-      const res = await fetch(
-        `${BASE_URL}/api/php/profile_config.php?action=save_top_coasters`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-Token":
-              document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute("content") ?? "",
-          },
-          body: JSON.stringify({ items }),
-        },
-      );
-      const data = await res.json();
-      if (data.success) {
-        await cargarTops(); // recarga datos frescos desde DB
-        await cargarDatos(); // recarga panel de estadísticas automático
-        setTopsMode("preview"); // vuelve al preview
-      } else {
-        alert("Error al guardar: " + (data.error || "desconocido"));
-      }
-    } catch (e) {
-      console.error(e);
-      alert("Error de red al guardar el top de coasters.");
-    } finally {
-      $btn
-        .prop("disabled", false)
-        .html('<i class="fa-solid fa-floppy-disk me-2"></i>Guardar Cambios');
-    }
-  }
-
-  async function saveParksTop() {
-    const $btn = $("#btn-save-parks-top");
-    const items = [];
+    const parksItems = [];
     $("#top-parks-list-edit .tops-edit-item").each(function (i) {
-      items.push({ park_id: $(this).data("id"), rank_position: i + 1 });
+      parksItems.push({ park_id: $(this).data("id"), rank_position: i + 1 });
     });
 
-    $btn
-      .prop("disabled", true)
-      .html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Guardando…');
-
     try {
-      const res = await fetch(
-        `${BASE_URL}/api/php/profile_config.php?action=save_top_parks`,
-        {
+      const [resC, resP] = await Promise.all([
+        fetch(`${BASE_URL}/api/php/profile_config.php?action=save_top_coasters`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-Token":
-              document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute("content") ?? "",
-          },
-          body: JSON.stringify({ items }),
-        },
-      );
-      const data = await res.json();
-      if (data.success) {
+          headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
+          body: JSON.stringify({ items: coastersItems }),
+        }),
+        fetch(`${BASE_URL}/api/php/profile_config.php?action=save_top_parks`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
+          body: JSON.stringify({ items: parksItems }),
+        }),
+      ]);
+
+      const [dataC, dataP] = await Promise.all([resC.json(), resP.json()]);
+
+      if (dataC.success && dataP.success) {
         await cargarTops();
-        await cargarDatos(); // recarga panel de estadísticas automático
+        await cargarDatos();
         setTopsMode("preview");
       } else {
-        alert("Error al guardar: " + (data.error || "desconocido"));
+        const err = (!dataC.success ? "Coasters: " + (dataC.error || "error") : "") +
+          (!dataP.success ? " Parques: " + (dataP.error || "error") : "");
+        alert("Error al guardar: " + err.trim());
       }
     } catch (e) {
       console.error(e);
-      alert("Error de red al guardar el top de parques.");
+      alert("Error de red al guardar los tops.");
     } finally {
-      $btn
+      $btns
         .prop("disabled", false)
         .html('<i class="fa-solid fa-floppy-disk me-2"></i>Guardar Cambios');
     }
   }
 
-  $("#btn-save-coasters-top").on("click", saveCoastersTop);
-  $("#btn-save-parks-top").on("click", saveParksTop);
+  $("#btn-save-coasters-top, #btn-save-parks-top").on("click", saveBothTops);
 
   // Sort y Filtros (Vista Completa)
 
@@ -2320,14 +2303,14 @@ $(document).ready(function () {
           if (typeof showAlert === "function") {
             showAlert(
               "¡Listo! Hemos enviado un enlace a " +
-                email +
-                " para que puedas restablecer tu contraseña. Revisa también la carpeta de SPAM.",
+              email +
+              " para que puedas restablecer tu contraseña. Revisa también la carpeta de SPAM.",
             );
           } else {
             alert(
               "¡Listo! Hemos enviado un enlace a " +
-                email +
-                " para restablecer tu contraseña.",
+              email +
+              " para restablecer tu contraseña.",
             );
           }
         })
@@ -2372,11 +2355,11 @@ $(document).ready(function () {
     const empty = 5 - full - half;
     let html = "";
     for (let i = 0; i < full; i++)
-      html += '<i class="fa-solid fa-star text-warning"></i>';
+      html += '<i class="fa-solid fa-star text-success" style="font-size:0.75rem;"></i>';
     if (half)
-      html += '<i class="fa-solid fa-star-half-stroke text-warning"></i>';
+      html += '<i class="fa-solid fa-star-half-stroke text-success" style="font-size:0.75rem;"></i>';
     for (let i = 0; i < empty; i++)
-      html += '<i class="fa-regular fa-star text-warning"></i>';
+      html += '<i class="fa-regular fa-star text-success opacity-50" style="font-size:0.75rem;"></i>';
     return html;
   }
 
@@ -2451,80 +2434,65 @@ $(document).ready(function () {
         ? `${BASE_URL}/web/views/public/coasters/coasters.php?id=${r.item_id}`
         : `${BASE_URL}/web/views/public/parks/parks.php?id=${r.item_id}`;
 
-      const typeIcon = isCoaster
-        ? '<i class="fa-solid fa-ticket me-1 text-success"></i>'
-        : '<i class="fa-solid fa-map-location-dot me-1 text-info"></i>';
-      const typeLabel = isCoaster ? "Coaster" : "Parque";
+      const typePill = isCoaster
+        ? `<span class="rcw-review-type-pill rcw-review-type-coaster"><i class="fa-solid fa-ticket"></i> Coaster</span>`
+        : `<span class="rcw-review-type-pill rcw-review-type-park"><i class="fa-solid fa-map-location-dot"></i> Parque</span>`;
 
-      const imgHtml = r.imagen_url
-        ? `<img src="${r.imagen_url.startsWith("/") ? BASE_URL + r.imagen_url : r.imagen_url}"
-               alt="${r.title}" loading="lazy"
-               style="width:100%;height:100%;object-fit:cover;"
-               onerror="this.parentElement.innerHTML='<div class=\'d-flex align-items-center justify-content-center h-100 text-secondary\'><i class=\'fa-solid fa-image fs-3\'></i></div>'">`
-        : `<div class="d-flex align-items-center justify-content-center h-100 text-secondary">
-             <i class="fa-solid fa-image fs-3"></i>
-           </div>`;
+      const dateStr = formatReviewDate(r.created_at);
+
+      const imgSrc = r.imagen_url
+        ? (r.imagen_url.startsWith("/") ? BASE_URL + r.imagen_url : r.imagen_url)
+        : "";
+      const imgHtml = imgSrc
+        ? `<img src="${imgSrc}" alt="${r.title}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'d-flex align-items-center justify-content-center h-100 text-secondary\\'><i class=\\'fa-solid fa-image fs-3\\'></i></div>'">`
+        : `<div class="d-flex align-items-center justify-content-center h-100 text-secondary"><i class="fa-solid fa-image fs-3"></i></div>`;
 
       const nota = parseFloat(r.note) || 0;
       const notaText = nota % 1 === 0 ? nota.toFixed(0) : nota.toFixed(1);
+
       let tagsHtml = "";
       if (r.tags && r.tags.length > 0) {
-        tagsHtml = '<div class="d-flex flex-wrap gap-1 mt-2 mb-2">';
+        tagsHtml = '<div class="d-flex flex-wrap gap-1 mt-2 mb-1">';
         r.tags.forEach((t) => {
           const bgColor = t.type === "pro" ? "#05c46b" : "#ff3f34";
-          tagsHtml += `<span class="badge text-white rounded-pill px-2 py-1" style="background-color:${bgColor}; font-weight:600; font-size:0.65rem;">${t.tag.replace(/_/g, " ").toUpperCase()}</span>`;
+          tagsHtml += `<span class="badge text-white rounded-pill px-2 py-1" style="background-color:${bgColor}; font-weight:600; font-size:0.62rem;">${t.tag.replace(/_/g, " ").toUpperCase()}</span>`;
         });
         tagsHtml += "</div>";
       }
 
-      const reviewText = r.review
-        ? `<p class="mb-0 text-secondary small" style="line-height:1.6;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;">${r.review}</p>`
-        : `<p class="mb-0 text-muted small fst-italic">Sin texto de reseña.</p>`;
+      const reviewBody = r.review
+        ? `<p class="rcw-review-text">${r.review}</p>`
+        : `<p class="rcw-review-text rcw-review-empty"><i>Sin texto de reseña.</i></p>`;
 
       $list.append(`
-        <div class="top-card d-flex flex-row align-items-stretch mb-3" style="min-height:130px;" data-review-id="${r.id}" data-review-type="${r.type}" data-item-id="${r.item_id}">
-          <!-- Miniatura -->
-          <div class="flex-shrink-0 bg-dark overflow-hidden d-none d-sm-block" style="width:130px;">
+        <div class="rcw-review-card" data-review-id="${r.id}" data-review-type="${r.type}" data-item-id="${r.item_id}">
+          <div class="rcw-review-img">
             ${imgHtml}
           </div>
-          <div class="flex-shrink-0 bg-dark overflow-hidden d-block d-sm-none" style="width:90px;">
-            ${imgHtml}
-          </div>
-          
-          <!-- Contenido -->
-          <div class="p-3 flex-grow-1 d-flex flex-column justify-content-between min-w-0">
-            <div>
-              <div class="d-flex justify-content-between align-items-start mb-1 gap-2">
-                <a href="${detailUrl}" class="fw-bold text-white text-decoration-none text-truncate-2"
-                   style="font-size:0.95rem; line-height: 1.2; flex:1; min-width:0;">${r.title}</a>
-                <span class="badge rounded-0 fw-bold px-2 py-1 flex-shrink-0"
-                      style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.6rem;white-space:nowrap; height: fit-content;">
-                  ${typeLabel}
-                </span>
+          <div class="rcw-review-body">
+            <div class="rcw-review-header">
+              <div class="rcw-review-meta">
+                ${typePill}
+                <span class="rcw-review-date"><i class="fa-regular fa-calendar"></i> ${dateStr}</span>
               </div>
-              <small class="text-secondary d-block mb-2 text-truncate" style="font-size: 0.75rem;">${r.subtitle || ""}</small>
-              ${tagsHtml}
-              ${reviewText}
+              <div class="rcw-review-score">
+                <div class="rcw-review-stars">${starsHtml(r.note)}</div>
+                <span class="rcw-review-note">${notaText}</span>
+              </div>
             </div>
-            
-            <!-- Footer: Estrellas y Botón -->
-            <div class="d-flex flex-wrap justify-content-between align-items-center mt-3 pt-2 border-top border-secondary border-opacity-10 gap-2">
-              <div class="d-flex align-items-center gap-2">
-                <div class="stars-container d-flex gap-1" style="font-size: 0.75rem;">${starsHtml(r.note)}</div>
-                <span class="fw-bold text-warning" style="font-size:0.8rem;">${notaText}</span>
-              </div>
-              
-              <div class="d-flex align-items-center gap-2 ms-auto">
-                <small class="text-muted d-none d-md-inline" style="font-size: 0.7rem;">${formatReviewDate(r.created_at)}</small>
-                <button class="btn btn-link p-0 text-warning profile-edit-review-btn d-flex align-items-center gap-1"
-                        data-id="${r.id}" data-type="${r.type}"
-                        data-note="${nota}" data-text="${encodeURIComponent(r.review || "")}"
-                        data-tags='${JSON.stringify(r.tags || [])}'
-                        title="Editar reseña" style="text-decoration:none;">
-                  <i class="fa-solid fa-pen-to-square"></i>
-                  <span class="fw-bold text-uppercase" style="font-size:0.65rem;">Editar</span>
-                </button>
-              </div>
+            <a href="${detailUrl}" class="rcw-review-title text-decoration-none">${r.title}</a>
+            <p class="rcw-review-subtitle"><i class="fa-solid fa-location-dot"></i> ${r.subtitle || ""}</p>
+            ${tagsHtml}
+            ${reviewBody}
+            <div class="d-flex justify-content-end mt-2 pt-2" style="border-top: 1px solid rgba(255,255,255,0.05);">
+              <button class="btn btn-link p-0 text-warning profile-edit-review-btn d-flex align-items-center gap-1"
+                      data-id="${r.id}" data-type="${r.type}"
+                      data-note="${nota}" data-text="${encodeURIComponent(r.review || "")}"
+                      data-tags='${JSON.stringify(r.tags || [])}'
+                      title="Editar reseña" style="text-decoration:none; font-size:0.78rem;">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span class="fw-bold text-uppercase" style="font-size:0.62rem;">Editar</span>
+              </button>
             </div>
           </div>
         </div>`);
@@ -2624,13 +2592,13 @@ $(document).ready(function () {
               <label class="form-label text-muted small fw-semibold">Puntuación</label>
               <div class="star-rating pedit-star-rating-container" style="font-size: 2rem;">
                 ${[10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
-                  .map((i) => {
-                    const val = i / 2;
-                    const half = i % 2 !== 0;
-                    return `<input type="radio" name="pedit_note" id="pstar${i}" value="${val}">
+        .map((i) => {
+          const val = i / 2;
+          const half = i % 2 !== 0;
+          return `<input type="radio" name="pedit_note" id="pstar${i}" value="${val}">
                           <label for="pstar${i}" class="${half ? "half" : "full"}" title="${val}"></label>`;
-                  })
-                  .join("")}
+        })
+        .join("")}
               </div>
               <input type="hidden" id="pedit-review-note" value="0">
             </div>
@@ -2899,9 +2867,9 @@ $(document).ready(function () {
     if (!source.length) {
       $list.html(
         '<div class="text-center text-muted py-5">' +
-          '<i class="fa-solid fa-ghost fs-1 mb-3 opacity-50 d-block"></i>' +
-          "<p>Todavía no tienes amigos agregados.</p>" +
-          "</div>",
+        '<i class="fa-solid fa-ghost fs-1 mb-3 opacity-50 d-block"></i>' +
+        "<p>Todavía no tienes amigos agregados.</p>" +
+        "</div>",
       );
       return;
     }
@@ -2917,17 +2885,17 @@ $(document).ready(function () {
 
       var imgHtml = imgSrc
         ? '<img src="' +
-          imgSrc +
-          '" alt="' +
-          f.username +
-          '" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'
+        imgSrc +
+        '" alt="' +
+        f.username +
+        '" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'
         : '<div class="d-flex align-items-center justify-content-center h-100 text-secondary bg-dark"><i class="fa-solid fa-user fs-3"></i></div>';
 
       var ubicacion =
         f.city || f.country
           ? '<small class="text-secondary d-block mb-2"><i class="fa-solid fa-location-dot me-1"></i>' +
-            [f.city, f.country].filter(Boolean).join(", ") +
-            "</small>"
+          [f.city, f.country].filter(Boolean).join(", ") +
+          "</small>"
           : '<small class="text-muted d-block mb-2"><i class="fa-solid fa-location-crosshairs me-1"></i>Ubicaci\u00f3n desconocida</small>';
 
       var creditsText = f.credits || 0;
@@ -2950,36 +2918,36 @@ $(document).ready(function () {
 
       $list.append(
         '<div class="top-card d-flex align-items-center mb-3 p-3">' +
-          '<div style="width:70px;height:70px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid rgba(16,185,129,0.3);" class="me-3">' +
-          imgHtml +
-          "</div>" +
-          '<div class="flex-grow-1" style="min-width:0;">' +
-          '<a href="' +
-          BASE_URL +
-          "/web/views/public/users/user_profile.php?id=" +
-          f.id +
-          '" class="fw-bold text-white text-decoration-none fs-6 d-block text-truncate">' +
-          f.username +
-          "</a>" +
-          ubicacion +
-          '<div class="d-flex gap-2 mt-1 flex-wrap">' +
-          '<span class="badge rounded-0" style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.7rem;"><i class="fa-solid fa-ticket text-success me-1"></i>' +
-          creditsText +
-          " credits</span>" +
-          '<span class="badge rounded-0" style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.7rem;"><i class="fa-solid fa-heart text-danger me-1"></i>Top 1: ' +
-          topCoaster +
-          "</span>" +
-          friendSinceHtml +
-          "</div>" +
-          "</div>" +
-          '<div class="ms-3 flex-shrink-0">' +
-          '<a href="' +
-          BASE_URL +
-          "/web/views/public/users/user_profile.php?id=" +
-          f.id +
-          '" class="btn btn-sm btn-outline-success rounded-0 px-3">Ver perfil</a>' +
-          "</div>" +
-          "</div>",
+        '<div style="width:70px;height:70px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid rgba(16,185,129,0.3);" class="me-3">' +
+        imgHtml +
+        "</div>" +
+        '<div class="flex-grow-1" style="min-width:0;">' +
+        '<a href="' +
+        BASE_URL +
+        "/web/views/public/users/user_profile.php?id=" +
+        f.id +
+        '" class="fw-bold text-white text-decoration-none fs-6 d-block text-truncate">' +
+        f.username +
+        "</a>" +
+        ubicacion +
+        '<div class="d-flex gap-2 mt-1 flex-wrap">' +
+        '<span class="badge rounded-0" style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.7rem;"><i class="fa-solid fa-ticket text-success me-1"></i>' +
+        creditsText +
+        " credits</span>" +
+        '<span class="badge rounded-0" style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.7rem;"><i class="fa-solid fa-heart text-danger me-1"></i>Top 1: ' +
+        topCoaster +
+        "</span>" +
+        friendSinceHtml +
+        "</div>" +
+        "</div>" +
+        '<div class="ms-3 flex-shrink-0">' +
+        '<a href="' +
+        BASE_URL +
+        "/web/views/public/users/user_profile.php?id=" +
+        f.id +
+        '" class="btn btn-sm btn-outline-success rounded-0 px-3">Ver perfil</a>' +
+        "</div>" +
+        "</div>",
       );
     });
   }
@@ -3635,6 +3603,8 @@ $(document).ready(function () {
       // Mostrar/ocultar flechas si es la primera o ultima
       $("#ig-modal-prev").toggle(index > 0);
       $("#ig-modal-next").toggle(index < allPhotosList.length - 1);
+      $("#ig-mob-prev").toggle(index > 0);
+      $("#ig-mob-next").toggle(index < allPhotosList.length - 1);
     }
 
     $(".photo-square-container")
@@ -3652,6 +3622,14 @@ $(document).ready(function () {
       .off("click")
       .on("click", () => updateModalContent(currentPhotoIndex + 1));
 
+    // Botones móvil (dentro de la imagen)
+    $("#ig-mob-prev")
+      .off("click")
+      .on("click", () => updateModalContent(currentPhotoIndex - 1));
+    $("#ig-mob-next")
+      .off("click")
+      .on("click", () => updateModalContent(currentPhotoIndex + 1));
+
     $(document)
       .off("keydown.igmodal")
       .on("keydown.igmodal", function (e) {
@@ -3659,6 +3637,16 @@ $(document).ready(function () {
         if (e.key === "ArrowLeft") updateModalContent(currentPhotoIndex - 1);
         if (e.key === "ArrowRight") updateModalContent(currentPhotoIndex + 1);
       });
+
+    // Bloquear scroll de página al abrir el lightbox
+    const igModalEl = document.getElementById("ig-lightbox-modal");
+    igModalEl.addEventListener("show.bs.modal", () => {
+      document.body.style.overflow = "hidden";
+      document.body.style.paddingRight = ""; // evitar salto de layout
+    });
+    igModalEl.addEventListener("hidden.bs.modal", () => {
+      document.body.style.overflow = "";
+    });
   }
 });
 

@@ -2,8 +2,13 @@
 // Configuración de cookies de sesión segura
 if (session_status() === PHP_SESSION_ACTIVE)
     return;
+
+// 30 días de duración para la sesión (servidor y cookie)
+$lifetime = 30 * 24 * 60 * 60;
+ini_set('session.gc_maxlifetime', $lifetime);
+
 session_set_cookie_params([
-    'lifetime' => 86400, // 24 horas
+    'lifetime' => $lifetime,
     'path' => '/',
     'domain' => '', // Dominio actual
     'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off', // Solo HTTPS si está disponible

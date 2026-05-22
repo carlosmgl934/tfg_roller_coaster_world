@@ -4,7 +4,7 @@ require_once __DIR__ . '/../../partials/header.php';
 /** @var string $base_url */
 ?>
 
- <!-- Reutilizamos el mismo CSS -->
+<!-- Reutilizamos el mismo CSS -->
 <main class="container-fluid px-lg-5 my-5">
   <div class="row mb-4">
     <div class="col-12">
@@ -39,7 +39,8 @@ require_once __DIR__ . '/../../partials/header.php';
             <label for="opening-year-min" class="form-label d-flex justify-content-between">
               Año de apertura (Desde) <span class="badge bg-success" id="year-val">1800</span>
             </label>
-            <input type="range" class="form-range" id="opening-year-min" min="1800" max="<?= date('Y') + 5 ?>" value="1800">
+            <input type="range" class="form-range" id="opening-year-min" min="1800" max="<?= date('Y') + 5 ?>"
+              value="1800">
           </div>
 
           <!-- Número de montañas rusas mínimo -->
@@ -66,21 +67,23 @@ require_once __DIR__ . '/../../partials/header.php';
 
     <!-- CENTRO: Lista -->
     <div class="col-12 col-lg-6 order-3 order-lg-2">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <div id="park-count" class="text-muted fw-bold"></div>
-        <div class="d-flex align-items-center">
-            <select id="sort-filter" class="form-select shadow-sm rounded-0 w-auto border-success me-2" style="cursor: pointer; font-weight: 500;">
-              <option value="coasters" selected>Cantidad de montañas rusas</option>
-              <option value="name">Nombre</option>
-              <option value="stars">Valoración</option>
-              <option value="year">Año de apertura</option>
-            </select>
-            <button id="sort-direction-btn" class="btn btn-outline-success shadow-sm rounded-0" type="button" title="Cambiar orden">
-                 <i class="fa-solid fa-arrow-down-wide-short"></i>
-            </button>
-            <input type="hidden" id="sort-direction" value="DESC">
-        </div>
+      <!-- Fila 1: Controles de ordenar (fila propia, ancho completo) -->
+      <div class="d-flex justify-content-end align-items-center mb-2">
+        <select id="sort-filter" class="form-select shadow-sm rounded-0 w-auto border-success me-2"
+          style="cursor: pointer; font-weight: 500;">
+          <option value="coasters" selected>Cantidad de montañas rusas</option>
+          <option value="name">Nombre</option>
+          <option value="stars">Valoración</option>
+          <option value="year">Año de apertura</option>
+        </select>
+        <button id="sort-direction-btn" class="btn btn-outline-success shadow-sm rounded-0 flex-shrink-0" type="button"
+          title="Cambiar orden">
+          <i class="fa-solid fa-arrow-down-wide-short"></i>
+        </button>
+        <input type="hidden" id="sort-direction" value="DESC">
       </div>
+      <!-- Fila 2: Contador de resultados -->
+      <p class="mb-3 text-muted fw-bold" id="park-count"></p>
 
       <div id="park-list" class="list-group shadow-sm rounded-0" style="border-radius: 0;">
         <div class="list-group-item text-center py-5 border-0">

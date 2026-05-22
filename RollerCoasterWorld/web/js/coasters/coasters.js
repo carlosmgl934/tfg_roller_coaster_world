@@ -1145,6 +1145,17 @@ $(document).ready(function () {
             </div>`,
             );
           });
+
+          // Auto-abrir modal de edición si viene del botón "Editar mi reseña"
+          if (new URLSearchParams(window.location.search).get("edit") === "true") {
+            const editBtn = $(".edit-review-btn").first();
+            if (editBtn.length) {
+              setTimeout(() => {
+                editBtn.click();
+                window.history.replaceState({}, document.title, window.location.pathname + "?id=" + coasterId);
+              }, 200);
+            }
+          }
         }
       } catch (e) {
         console.error("Error cargando reseñas:", e);
@@ -1171,9 +1182,11 @@ $(document).ready(function () {
         if (!editProsChoices && document.getElementById("edit-pros-select")) {
           editProsChoices = new Choices("#edit-pros-select", {
             removeItemButton: true,
+            searchEnabled: false,
             placeholderValue: "Selecciona las ventajas...",
             noChoicesText: "No hay más opciones",
-            itemSelectText: "Presiona para seleccionar",
+            itemSelectText: "",
+            position: 'bottom',
           });
         }
         if (
@@ -1182,9 +1195,11 @@ $(document).ready(function () {
         ) {
           editContrasChoices = new Choices("#edit-contras-select", {
             removeItemButton: true,
+            searchEnabled: false,
             placeholderValue: "Selecciona las contras...",
             noChoicesText: "No hay más opciones",
-            itemSelectText: "Presiona para seleccionar",
+            itemSelectText: "",
+            position: 'bottom',
           });
         }
       } catch (e) {
@@ -1323,11 +1338,17 @@ $(document).ready(function () {
 
     new Choices("#pros-select", {
       removeItemButton: true,
+      searchEnabled: false,
       placeholderValue: "Selecciona las ventajas...",
+      itemSelectText: "",
+      position: 'bottom',
     });
     new Choices("#contras-select", {
       removeItemButton: true,
+      searchEnabled: false,
       placeholderValue: "Selecciona las contras...",
+      itemSelectText: "",
+      position: 'bottom',
     });
 
     document
@@ -1475,7 +1496,7 @@ $(document).ready(function () {
             } catch (e) {
               throw new Error(
                 "El servidor devolvió una respuesta inválida: " +
-                  rawText.substring(0, 200),
+                rawText.substring(0, 200),
               );
             }
 
@@ -1523,7 +1544,7 @@ $(document).ready(function () {
               showNotify(
                 "Error al guardar",
                 "Error al guardar la foto: " +
-                  (saveData.error || "Desconocido"),
+                (saveData.error || "Desconocido"),
                 true,
               );
             }

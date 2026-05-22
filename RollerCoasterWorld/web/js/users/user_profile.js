@@ -480,6 +480,8 @@ $(document).ready(function () {
 
       $("#ig-modal-prev").toggle(index > 0);
       $("#ig-modal-next").toggle(index < allPhotosList.length - 1);
+      $("#ig-mob-prev").toggle(index > 0);
+      $("#ig-mob-next").toggle(index < allPhotosList.length - 1);
     }
 
     $("#photos-grid-container")
@@ -503,6 +505,23 @@ $(document).ready(function () {
       .on("click", function () {
         updateModalContent(currentPhotoIndex + 1);
       });
+
+    // Botones móvil (overlay sobre la imagen)
+    $("#ig-mob-prev")
+      .off("click")
+      .on("click", () => updateModalContent(currentPhotoIndex - 1));
+    $("#ig-mob-next")
+      .off("click")
+      .on("click", () => updateModalContent(currentPhotoIndex + 1));
+
+    // Bloquear scroll de página al abrir el lightbox
+    const igModalEl = document.getElementById("ig-lightbox-modal");
+    igModalEl.addEventListener("show.bs.modal", () => {
+      document.body.style.overflow = "hidden";
+    });
+    igModalEl.addEventListener("hidden.bs.modal", () => {
+      document.body.style.overflow = "";
+    });
   }
 
   // ─── Renderizar amigos del perfil visitado ──────────────────────
@@ -580,14 +599,14 @@ $(document).ready(function () {
               <div class="fw-bold text-white text-truncate" style="font-size: 0.95rem;">${friend.username}</div>
               <div class="text-muted d-flex flex-wrap align-items-center mt-1 gap-y-1" style="font-size: 0.75rem;">
                 ${details
-                  .map(
-                    (d, index) => `
+          .map(
+            (d, index) => `
                   <span class="d-flex align-items-center">
                     ${d}${index < details.length - 1 ? '<span class="mx-2 opacity-25">&bull;</span>' : ""}
                   </span>
                 `,
-                  )
-                  .join("")}
+          )
+          .join("")}
               </div>
             </div>
           </div>
@@ -680,7 +699,7 @@ $(document).ready(function () {
       currentReviews.forEach((r) => {
         const dateStr = new Date(r.created_at).toLocaleDateString("es-ES", {
           year: "numeric",
-          month: "long",
+          month: "short",
           day: "numeric",
         });
         const link =
@@ -691,48 +710,51 @@ $(document).ready(function () {
           r.imagen_url && r.imagen_url.startsWith("/")
             ? BASE_URL + r.imagen_url
             : r.imagen_url ||
-              "https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png";
+            "https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png";
 
         let starsHtml = "";
         const fullStars = Math.floor(r.note);
         const hasHalfStar = r.note % 1 !== 0;
         const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-
         for (let i = 0; i < fullStars; i++)
-          starsHtml += '<i class="fa-solid fa-star text-success"></i>';
+          starsHtml += '<i class="fa-solid fa-star text-success" style="font-size:0.7rem;"></i>';
         if (hasHalfStar)
-          starsHtml +=
-            '<i class="fa-solid fa-star-half-stroke text-success"></i>';
+          starsHtml += '<i class="fa-solid fa-star-half-stroke text-success" style="font-size:0.7rem;"></i>';
         for (let i = 0; i < emptyStars; i++)
-          starsHtml +=
-            '<i class="fa-regular fa-star text-success opacity-50"></i>';
+          starsHtml += '<i class="fa-regular fa-star text-success opacity-40" style="font-size:0.7rem;"></i>';
+
+        const isCoaster = r.type === "coaster";
+        const typePill = isCoaster
+          ? `<span class="rcw-review-type-pill rcw-review-type-coaster"><i class="fa-solid fa-ticket"></i> Coaster</span>`
+          : `<span class="rcw-review-type-pill rcw-review-type-park"><i class="fa-solid fa-map-location-dot"></i> Parque</span>`;
+
+        const reviewBody = r.review
+          ? `<p class="rcw-review-text">${r.review}</p>`
+          : `<p class="rcw-review-text rcw-review-empty"><i>Sin reseña escrita.</i></p>`;
 
         html += `
-            <a href="${link}" class="list-group-item list-group-item-action bg-transparent px-3 py-3" style="border-bottom: 1px solid var(--rcw-border); transition: background 0.2s;" onmouseover="this.style.background='rgba(25,135,84,0.06)'" onmouseout="this.style.background='transparent'">
-                <div class="row g-3">
-                    <div class="col-sm-2 col-3">
-                        <img src="${imgUrl}" alt="${r.title}" class="w-100 rounded shadow-sm object-fit-cover" style="aspect-ratio: 4/3;">
-                    </div>
-                    <div class="col-sm-10 col-9 d-flex flex-column justify-content-between">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="fw-bold mb-1 text-light">${r.title} <span class="badge ${r.type === "coaster" ? "bg-primary" : "bg-success"} fw-normal ms-2" style="font-size: 0.70rem;">${r.type === "coaster" ? "Coaster" : "Parque"}</span></h6>
-                                <p class="mb-1 text-muted small"><i class="fa-solid fa-location-dot me-1"></i>${r.subtitle}</p>
-                            </div>
-                            <div class="text-end">
-                                <div class="mb-1 d-flex justify-content-end align-items-center gap-1" style="font-size: 0.9rem;">
-                                    ${starsHtml}
-                                    <span class="ms-1 fw-bold text-success">${Number(r.note).toFixed(1)}</span>
-                                </div>
-                                <small class="text-muted d-block" style="font-size: 0.75rem;">${dateStr}</small>
-                            </div>
-                        </div>
-                        <div class="mt-2 text-white opacity-75" style="font-size: 0.9rem;">
-                            ${r.review ? r.review : "<i>Valoración sin reseña escrita.</i>"}
-                        </div>
-                    </div>
+          <a href="${link}" class="rcw-review-card" style="text-decoration:none;"
+             onmouseover="this.style.background='rgba(16,185,129,0.05)';this.style.borderColor='rgba(16,185,129,0.25)'"
+             onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,255,255,0.06)'">
+            <div class="rcw-review-img">
+              <img src="${imgUrl}" alt="${r.title}" onerror="this.src='https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png'">
+            </div>
+            <div class="rcw-review-body">
+              <div class="rcw-review-header">
+                <div class="rcw-review-meta">
+                  ${typePill}
+                  <span class="rcw-review-date"><i class="fa-regular fa-calendar"></i> ${dateStr}</span>
                 </div>
-            </a>`;
+                <div class="rcw-review-score">
+                  <div class="rcw-review-stars">${starsHtml}</div>
+                  <span class="rcw-review-note">${Number(r.note).toFixed(1)}</span>
+                </div>
+              </div>
+              <h6 class="rcw-review-title">${r.title}</h6>
+              <p class="rcw-review-subtitle"><i class="fa-solid fa-location-dot"></i> ${r.subtitle || ""}</p>
+              ${reviewBody}
+            </div>
+          </a>`;
       });
       container.html(html);
     }

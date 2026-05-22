@@ -305,7 +305,7 @@ $(document).ready(function () {
             if (c) $("#country-filter").append(new Option(c, c));
           });
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     let isFiltering = false;
@@ -540,14 +540,14 @@ $(document).ready(function () {
               park.id;
             const btnBuy = $(`
               <a id="btn-buy-tickets" href="${ticketsUrl}"
-                 class="btn btn-success fw-bold flex-grow-1 d-flex align-items-center justify-content-center gap-2"
+                 class="btn btn-success fw-bold d-flex align-items-center justify-content-center gap-2 w-100"
                  style="border-radius:0;padding:10px;">
                 <i class="fa-solid fa-ticket fs-5"></i>
                 <span>Comprar Entradas</span>
                 <span class="badge bg-dark ms-1" style="font-size:.75rem;">${parseFloat(park.precio_entrada).toFixed(2)}€</span>
               </a>`);
-            // Insertar antes del primer botón del grupo
-            $("#btn-website").parent().prepend(btnBuy);
+            // Insertar al inicio del contenedor, ocupa toda la línea (w-100)
+            $("#park-action-buttons").prepend(btnBuy);
           }
 
           if (park.park_location) {
@@ -683,28 +683,28 @@ $(document).ready(function () {
 
               return `
                <a href="${window.BASE_URL || ""}/web/views/public/coasters/coasters.php?id=${c.id}" class="list-group-item list-group-item-action bg-transparent border-bottom border-secondary border-opacity-25 px-0 py-3 text-decoration-none animate__animated animate__fadeIn" style="transition: all 0.2s ease-in-out;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.03)'" onmouseout="this.style.backgroundColor='transparent'">
-                   <div class="d-flex align-items-center gap-3 px-3">
+                   <div class="d-flex align-items-center gap-2 gap-sm-3 px-2 px-sm-3">
                        
-                       <!-- Imagen (Más grande, con border-radius) -->
-                       <img src="${img}" class="rounded-3 shadow-sm flex-shrink-0" style="width: 150px; height: 100px; object-fit: cover;" onerror="this.src='${fallback}'">
+                       <!-- Imagen adaptable -->
+                       <img src="${img}" class="rounded-3 shadow-sm flex-shrink-0" style="width: clamp(70px, 20vw, 130px); height: clamp(55px, 15vw, 90px); object-fit: cover;" onerror="this.src='${fallback}'">
 
                        <!-- Contenido central: nombre + subtítulo + stats -->
-                       <div class="flex-grow-1 min-w-0 py-1">
-                           <h5 class="fw-bold text-white text-truncate mb-1" style="font-size:1.15rem;">${c.coaster_name}</h5>
-                           <div class="text-truncate" style="font-size:0.85rem; color: #8b949e; margin-bottom: 6px;">
+                       <div class="flex-grow-1 min-w-0 py-1" style="overflow: hidden;">
+                           <h5 class="fw-bold text-white mb-1" style="font-size: clamp(0.85rem, 3vw, 1.1rem); overflow-wrap: break-word; word-break: break-word; white-space: normal;">${c.coaster_name}</h5>
+                           <div class="text-truncate d-none d-sm-block" style="font-size:0.82rem; color: #8b949e; margin-bottom: 4px;">
                              ${subtitleParts.join(' <span class="mx-1 opacity-50">&bull;</span> ')}
                            </div>
-                           <div class="d-flex flex-wrap" style="gap: 12px; font-size:0.8rem; color: #6e7681;">
-                             ${statItems.length > 0 ? statItems.join("") : '<span class="fst-italic opacity-50">Sin datos estadísticos</span>'}
+                           <div class="d-flex flex-column flex-sm-row flex-wrap" style="gap: 4px 10px; font-size:0.78rem; color: #6e7681;">
+                             ${statItems.length > 0 ? statItems.join("") : '<span class="fst-italic opacity-50 d-none d-sm-inline">Sin datos estadísticos</span>'}
                            </div>
                        </div>
 
-                       <!-- Lado derecho: Estado como Texto -->
-                       <div class="px-3 text-end d-flex align-items-center flex-shrink-0">
-                           <span style="color: ${statusColor}; font-weight: 800; font-size: 0.8rem; letter-spacing: 0.5px; text-transform: uppercase;">
+                       <!-- Lado derecho: Estado -->
+                       <div class="text-end d-flex flex-column align-items-center flex-shrink-0" style="min-width: 60px;">
+                           <span style="color: ${statusColor}; font-weight: 800; font-size: 0.72rem; letter-spacing: 0.4px; text-transform: uppercase; white-space: nowrap;">
                                ${statusLabel}
                            </span>
-                           <i class="fa-solid fa-chevron-right ms-3" style="color: #495057; font-size: 0.9rem;"></i>
+                           <i class="fa-solid fa-chevron-right mt-1" style="color: #495057; font-size: 0.85rem;"></i>
                        </div>
                    </div>
                </a>`;
@@ -854,17 +854,27 @@ $(document).ready(function () {
                   </div>
                 </div>
                 ${tagsHtml}
-                ${
-                  review.review
-                    ? `
+                ${review.review
+                ? `
                 <div class="mt-3 p-3 bg-dark bg-opacity-25 rounded border-start border-3 border-success border-opacity-50">
                   <p class="mb-0 text-white-50" style="font-size:0.92rem; line-height:1.7;">${review.review}</p>
                 </div>`
-                    : ""
-                }
+                : ""
+              }
               </div>
             `);
           });
+
+          // Auto-abrir modal de edición si viene del botón "Editar mi reseña"
+          if (new URLSearchParams(window.location.search).get("edit") === "true") {
+            const editBtn = $(".edit-review-btn").first();
+            if (editBtn.length) {
+              setTimeout(() => {
+                editBtn.click();
+                window.history.replaceState({}, document.title, window.location.pathname + "?id=" + parkId);
+              }, 200);
+            }
+          }
         } else {
           $("#reviews-list").html(
             '<div class="text-center text-muted py-5"><i class="fa-regular fa-comment-dots fa-3x mb-3 d-block"></i>Aún no hay reseñas para este parque</div>',
@@ -895,7 +905,10 @@ $(document).ready(function () {
       if (!editProsChoices && document.getElementById("edit-pros-select")) {
         editProsChoices = new Choices("#edit-pros-select", {
           removeItemButton: true,
+          searchEnabled: false,
           placeholderValue: "Selecciona las ventajas...",
+          itemSelectText: "",
+          position: 'bottom',
         });
       }
       if (
@@ -904,7 +917,10 @@ $(document).ready(function () {
       ) {
         editContrasChoices = new Choices("#edit-contras-select", {
           removeItemButton: true,
+          searchEnabled: false,
           placeholderValue: "Selecciona las contras...",
+          itemSelectText: "",
+          position: 'bottom',
         });
       }
     }
@@ -1032,11 +1048,17 @@ $(document).ready(function () {
 
     new Choices("#pros-select", {
       removeItemButton: true,
+      searchEnabled: false,
       placeholderValue: "Selecciona las ventajas...",
+      itemSelectText: "",
+      position: 'bottom',
     });
     new Choices("#contras-select", {
       removeItemButton: true,
+      searchEnabled: false,
       placeholderValue: "Selecciona las contras...",
+      itemSelectText: "",
+      position: 'bottom',
     });
 
     document

@@ -72,7 +72,7 @@ $(document).ready(function () {
         // Expirada: eliminar
         localStorage.removeItem(cacheKey);
       }
-    } catch (_) {}
+    } catch (_) { }
 
     // No hay cache valida -> llamar a Nominatim
     const nominatimFetch = async (q) => {
@@ -121,10 +121,10 @@ $(document).ready(function () {
         };
         try {
           localStorage.setItem(cacheKey, JSON.stringify(coords));
-        } catch (_) {}
+        } catch (_) { }
         return { lat: coords.lat, lng: coords.lng };
       }
-    } catch (_) {}
+    } catch (_) { }
     return null;
   }
 
@@ -137,7 +137,7 @@ $(document).ready(function () {
       if (entry.ts && Date.now() - entry.ts < GEOCODE_TTL) {
         return { lat: entry.lat, lng: entry.lng };
       }
-    } catch (_) {}
+    } catch (_) { }
     return null;
   }
 
@@ -255,7 +255,7 @@ $(document).ready(function () {
 
     mapMarkerCluster = L.markerClusterGroup({
       showCoverageOnHover: false,
-      maxClusterRadius: 60,
+      maxClusterRadius: 30, // reducido de 60 para evitar que se junten parques cercanos
       spiderfyOnMaxZoom: true,
     });
     mapInstance.addLayer(mapMarkerCluster);
