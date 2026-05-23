@@ -33,18 +33,15 @@ if (isset($input['firebase_uid']) && isset($input['email'])) {
       $_SESSION['user_email']    = $row['email'] ?? $input['email']; // Usa el correo de la bd si existe
       
       file_put_contents($logFile, date('Y-m-d H:i:s') . " - Sesión guardada: UID=" . $input['firebase_uid'] . " | user_id=" . $row['id'] . "\n", FILE_APPEND);
-      session_write_close(); // Forzar escritura en BD antes de devolver respuesta al JS
       echo json_encode(['success' => true, 'message' => 'Sesión PHP actualizada', 'user_id' => $row['id']]);
     } else {
       // El usuario aún no existe en BD (registro justo hecho); guardar sin user_id por ahora
       file_put_contents($logFile, date('Y-m-d H:i:s') . " - Usuario no encontrado en BD para UID=" . $input['firebase_uid'] . "\n", FILE_APPEND);
-      session_write_close(); // Forzar escritura
       echo json_encode(['success' => true, 'message' => 'Sesión guardada (usuario pendiente de BD)']);
     }
   } catch (Throwable $e) {
     // Si falla la BD, al menos guardamos la sesión Firebase
     file_put_contents($logFile, date('Y-m-d H:i:s') . " - Error BD: " . $e->getMessage() . "\n", FILE_APPEND);
-    session_write_close();
     echo json_encode(['success' => true, 'message' => 'Sesión Firebase guardada (BD no disponible)']);
   }
 } else {
