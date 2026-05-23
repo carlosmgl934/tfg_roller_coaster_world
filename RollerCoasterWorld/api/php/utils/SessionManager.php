@@ -6,6 +6,9 @@ if (session_status() === PHP_SESSION_ACTIVE)
 // 30 días de duración para la sesión (servidor y cookie)
 $lifetime = 30 * 24 * 60 * 60;
 ini_set('session.gc_maxlifetime', $lifetime);
+// Asegurar que el GC de PHP salte de forma probabilística (algunos SO lo desactivan por defecto)
+ini_set('session.gc_probability', 1);
+ini_set('session.gc_divisor', 100);
 
 session_set_cookie_params([
     'lifetime' => $lifetime,
