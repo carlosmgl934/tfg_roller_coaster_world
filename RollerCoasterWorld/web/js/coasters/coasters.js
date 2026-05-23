@@ -590,6 +590,7 @@ $(document).ready(function () {
       try {
         const res = await fetch(
           `${BASE_URL}/api/php/coasters.php?action=coaster&id=${id}`,
+          { cache: 'no-store' },
         );
         const data = await res.json();
         if (data.success) {

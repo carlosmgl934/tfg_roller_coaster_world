@@ -1,7 +1,5 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/../../../../api/php/utils/SessionManager.php';
 
 require_once __DIR__ . '/../../../routes/Router.php';
 $base_url = Router::getBaseUrl();
@@ -39,10 +37,14 @@ require_once __DIR__ . '/../../partials/header.php';
                     <div id="already-reviewed-msg" class="text-center py-5 d-none">
                         <i class="fa-solid fa-star text-warning display-1 mb-4 opacity-75"></i>
                         <h3 class="fw-bold text-white mb-3">¡Ya has valorado este parque!</h3>
-                        <p class="text-muted mb-4" style="font-size: 1.1rem;">Solo se permite una única reseña por usuario en cada parque para mantener la precisión de nuestras notas. ¡Gracias por aportar tu opinión!</p>
+                        <p class="text-muted mb-4" style="font-size: 1.1rem;">Solo se permite una única reseña por
+                            usuario en cada parque para mantener la precisión de nuestras notas. ¡Gracias por aportar tu
+                            opinión!</p>
                         <div class="d-flex justify-content-center gap-3 mt-2 flex-wrap">
-                            <a href="<?= Router::url('parks') ?>?id=<?= $id ?>" class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-bold">Volver al parque</a>
-                            <a href="<?= Router::url('parks') ?>?id=<?= $id ?>&edit=true" class="btn btn-success rounded-pill px-4 py-2 fw-bold">Editar mi reseña</a>
+                            <a href="<?= Router::url('parks') ?>?id=<?= $id ?>"
+                                class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-bold">Volver al parque</a>
+                            <a href="<?= Router::url('parks') ?>?id=<?= $id ?>&edit=true"
+                                class="btn btn-success rounded-pill px-4 py-2 fw-bold">Editar mi reseña</a>
                         </div>
                     </div>
 

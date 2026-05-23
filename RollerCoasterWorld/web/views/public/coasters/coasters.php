@@ -330,7 +330,7 @@ require_once __DIR__ . '/../../partials/header.php';
 
 <!-- MODAL EDITAR RESEÑA (coaster) -->
 <div class="modal fade" id="edit-review-modal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-scrollable">
     <div class="modal-content bg-dark border-secondary text-white">
       <div class="modal-header bg-success">
         <h5 class="modal-title fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i>Editar reseña</h5>
@@ -379,7 +379,7 @@ require_once __DIR__ . '/../../partials/header.php';
             </select>
         </div>
         <!-- Contras -->
-        <div class="mb-3 wrapper-contras">
+        <div class="mb-0 wrapper-contras">
             <label class="form-label text-muted small fw-semibold"><i class="fa-solid fa-minus-circle text-danger me-1"></i> Contras</label>
             <select id="edit-contras-select" multiple>
                 <option value="airtime">Airtime</option>

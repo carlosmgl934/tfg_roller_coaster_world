@@ -80,7 +80,7 @@ if (!$is_logged || !$is_admin) {
 
 <!-- ===== MODAL ELIMINAR ===== -->
 <div class="modal fade" id="modal-delete-park" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content rounded-0 border-0 shadow">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title"><i class="fa-solid fa-triangle-exclamation me-2"></i>Eliminar parque</h5>
@@ -103,7 +103,7 @@ if (!$is_logged || !$is_admin) {
 
 <!-- ===== MODAL AÑADIR ===== -->
 <div class="modal fade" id="modal-add-park" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width:900px;">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width:900px;">
         <div class="modal-content rounded-0 border-0 shadow-lg" style="background:#161b22;">
             <div class="modal-header bg-success text-white border-0 py-3 px-4">
                 <h5 class="modal-title fw-bold mb-0">Añadir nuevo parque</h5>
@@ -265,7 +265,7 @@ if (!$is_logged || !$is_admin) {
 
 <!-- ===== MODAL EDITAR ===== -->
 <div class="modal fade" id="modal-edit-park" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width:860px;">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width:860px;">
         <div class="modal-content rounded-0 border-0 shadow-lg" style="background:#161b22;">
             <div class="modal-header bg-primary text-white border-0 py-3 px-4">
                 <div class="d-flex align-items-center gap-2">

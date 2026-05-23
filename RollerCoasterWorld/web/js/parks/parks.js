@@ -473,7 +473,7 @@ $(document).ready(function () {
 
     async function loadParkData(id) {
       try {
-        const res = await fetch(`${apiBase}?action=details&id=${id}`);
+        const res = await fetch(`${apiBase}?action=details&id=${id}`, { cache: 'no-store' });
         const data = await res.json();
 
         if (data.success) {

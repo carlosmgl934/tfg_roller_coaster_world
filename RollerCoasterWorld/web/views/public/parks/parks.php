@@ -248,7 +248,6 @@ require_once __DIR__ . '/../../partials/header.php';
 
 </main>
 
-<!-- MODAL EDITAR RESEÑA (parque) -->
 <div class="modal fade" id="edit-review-modal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content bg-dark border-secondary text-white">

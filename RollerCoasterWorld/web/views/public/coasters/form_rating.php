@@ -1,7 +1,5 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/../../../../api/php/utils/SessionManager.php';
 
 require_once __DIR__ . '/../../../routes/Router.php';
 $base_url = Router::getBaseUrl();
@@ -44,7 +42,8 @@ require_once __DIR__ . '/../../partials/header.php';
                             tu opinión!</p>
                         <div class="d-flex justify-content-center gap-3 mt-2 flex-wrap">
                             <a href="<?= Router::url('coasters') ?>?id=<?= $id ?>"
-                                class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-bold">Volver a la atracción</a>
+                                class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-bold">Volver a la
+                                atracción</a>
                             <a href="<?= Router::url('coasters') ?>?id=<?= $id ?>&edit=true"
                                 class="btn btn-success rounded-pill px-4 py-2 fw-bold">Editar mi reseña</a>
                         </div>

@@ -532,3 +532,62 @@ header("Expires: 0"); // Proxies
       });
     });
   </script>
+
+  <script>
+    // ── Modal Scroll Lock Fix (iOS + Android) ─────────────────────────────
+    // En iOS Safari y Chrome móvil, overflow:hidden en body no bloquea
+    // el scroll táctil. Aplicamos position:fixed + top inmediatamente en JS
+    // (sin esperar a que Bootstrap añada modal-open) para eliminar el gap.
+    // ─────────────────────────────────────────────────────────────────────
+    (function () {
+      // Aplicar en cualquier dispositivo con pantalla pequeña o táctil
+      var isMobile = window.innerWidth < 992 || ('ontouchstart' in window);
+      if (!isMobile) return;
+
+      var scrollY = 0;
+
+      // show.bs.modal → bloqueo inmediato antes de la animación de apertura
+      document.addEventListener('show.bs.modal', function () {
+        scrollY = window.scrollY || window.pageYOffset || 0;
+        var body = document.body;
+        body.style.overflow = 'hidden';
+        body.style.position = 'fixed';
+        body.style.top = '-' + scrollY + 'px';
+        body.style.width = '100%';
+        // NO ponemos touch-action:none en el body — bloquea gestos táctiles
+        // tras cerrar; el overflow:hidden + position:fixed ya es suficiente
+      }, true);
+
+      // hidden.bs.modal → animación de cierre TERMINADA, restauramos scroll
+      document.addEventListener('hidden.bs.modal', function () {
+        var body = document.body;
+
+        // Leer la posición guardada en el propio style.top del body
+        // (más fiable que la variable en ciertos casos de modal anidados)
+        var savedScrollY = Math.abs(parseInt(body.style.top || '0', 10)) || scrollY;
+
+        // Quitar estilos de bloqueo
+        body.style.overflow = '';
+        body.style.position = '';
+        body.style.top = '';
+        body.style.width = '';
+
+        // Restaurar scroll de forma INSTANTÁNEA:
+        // - Desactivamos scroll-behavior:smooth en <html> temporalmente
+        //   para que ni el browser ni el CSS animen el salto.
+        // - Usamos scrollTo con behavior:'instant' como doble seguro.
+        var html = document.documentElement;
+        var prevBehavior = html.style.scrollBehavior;
+        html.style.scrollBehavior = 'auto';
+        body.style.scrollBehavior = 'auto';
+
+        window.scrollTo({ top: savedScrollY, left: 0, behavior: 'instant' });
+
+        // Restaurar el comportamiento de scroll original en el siguiente frame
+        requestAnimationFrame(function () {
+          html.style.scrollBehavior = prevBehavior || '';
+          body.style.scrollBehavior = '';
+        });
+      }, true);
+    })();
+  </script>

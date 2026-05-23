@@ -16,6 +16,13 @@ session_set_cookie_params([
     'samesite' => 'Lax' // Protección CSRF básica a nivel de cookie
 ]);
 
+require_once __DIR__ . '/../../database/db_conexion.php';
+require_once __DIR__ . '/DatabaseSessionHandler.php';
+
+$dbSession = new DBConexion();
+$handler = new DatabaseSessionHandler($dbSession);
+session_set_save_handler($handler, true);
+
 session_start();
 
 // Generar token CSRF al iniciar sesión
@@ -30,7 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $_SERVER['REQUEST_METHOD'] !== 'OPTI
     $excluded = [
         'stripe_webhook.php',
         'auth.php',
-        'save_session.php'
+        'save_session.php',
+        'logout.php'
     ];
 
     $currentFile = basename($_SERVER['SCRIPT_FILENAME']);

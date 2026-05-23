@@ -261,3 +261,15 @@
 .flatpickr-monthDropdown-months {
   color-scheme: dark;
 }
+
+/* ============================================================
+   FIX: <form> dentro de .modal-content rompe el flex layout
+   de Bootstrap necesario para modal-dialog-scrollable.
+   ============================================================ */
+.modal-dialog-scrollable .modal-content > form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}

@@ -194,6 +194,54 @@ h6 {
   border-color: var(--rcw-border);
 }
 
+/* ── MOBILE MODAL: bloquear scroll del fondo ──────────────────
+   En iOS/Android el scroll táctil puede traspasar al body.
+   Bootstrap añade .modal-open al body, pero en ciertos casos
+   el overscroll pasa igual. Esta regla lo bloquea de forma
+   explícita y además hace el modal internamente scrollable.
+   ─────────────────────────────────────────────────────────── */
+body.modal-open {
+  overflow: hidden !important;
+  /* iOS Safari: bloquear touch-scroll del body */
+  touch-action: none;
+}
+
+/* El contenedor del modal sí puede scrollear internamente */
+.modal {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* En móvil: asegurar que el dialog no sobrepase la pantalla
+   y que el body quede siempre fijo detrás */
+@media (max-width: 767px) {
+  body.modal-open {
+    position: fixed;
+    width: 100%;
+  }
+
+  .modal-dialog {
+    max-height: calc(100dvh - 2rem);
+    display: flex;
+    flex-direction: column;
+    margin: 1rem auto;
+  }
+
+  .modal-content {
+    max-height: calc(100dvh - 2rem);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .modal-body {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    flex: 1 1 auto;
+  }
+}
+
 /* Dropdowns */
 .dropdown-menu {
   background-color: var(--rcw-bg-card) !important;
