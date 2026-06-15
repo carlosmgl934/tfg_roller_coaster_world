@@ -373,7 +373,9 @@ $(document).ready(function () {
           birthPicker.setDate(data.user.birthdate, true);
           // Asegurar que el select de año muestra el año de la fecha cargada
           if (birthYearSelect) {
-            const yr = new Date(data.user.birthdate + "T00:00:00").getFullYear();
+            const yr = new Date(
+              data.user.birthdate + "T00:00:00",
+            ).getFullYear();
             birthYearSelect.value = yr;
             birthPicker.changeYear(yr);
           }
@@ -698,9 +700,10 @@ $(document).ready(function () {
   // Datos cacheados para no repetir fetch cada vez que se cambia de modo
   let topsData = { coasters: [], parks: [] };
 
-  // Tipo de vista actual por pestaña ('list' | 'grid')
-  let coastersViewType = "list";
-  let parksViewType = "list";
+  // Tipo de vista actual por pestaña ('list' | 'grid' | 'mini')
+  // Se persiste en localStorage
+  let coastersViewType = localStorage.getItem("tops-coasters-view") || "list";
+  let parksViewType = localStorage.getItem("tops-parks-view") || "list";
 
   // Plantillas HTML
 
@@ -761,6 +764,11 @@ $(document).ready(function () {
 
   // Vista completa: tarjetas ricas con sort + filtros
   function renderCoastersFull() {
+    // Delegar a la vista mini si está activa
+    if (coastersViewType === "mini") {
+      renderCoastersMini();
+      return;
+    }
     const sort = $("#coasters-sort").val();
     const sortDir = $("#coasters-sort-dir").attr("data-dir") || "desc";
     const fPark = $("#coasters-filter-park").val();
@@ -800,9 +808,9 @@ $(document).ready(function () {
       data.sort((a, b) =>
         asc
           ? (parseFloat(a.coaster_length) || 0) -
-          (parseFloat(b.coaster_length) || 0)
+            (parseFloat(b.coaster_length) || 0)
           : (parseFloat(b.coaster_length) || 0) -
-          (parseFloat(a.coaster_length) || 0),
+            (parseFloat(a.coaster_length) || 0),
       );
     } else if (sort === "inversions") {
       data.sort((a, b) =>
@@ -977,7 +985,245 @@ $(document).ready(function () {
     });
   }
 
+  // ── Vista Mini (ultra compacta, idealmente solo móvil) ──────────────────────
+  function renderCoastersMini(dataIn) {
+    // Aplicar mismos filtros que la vista completa
+    const sort = $("#coasters-sort").val();
+    const sortDir = $("#coasters-sort-dir").attr("data-dir") || "desc";
+    const fPark = $("#coasters-filter-park").val();
+    const fCountry = $("#coasters-filter-country").val();
+    const fMfr = $("#coasters-filter-manufacter").val();
+    const fModel = $("#coasters-filter-model").val();
+
+    let data = [...topsData.coasters];
+    if (fPark) data = data.filter((d) => d.park_name === fPark);
+    if (fCountry) data = data.filter((d) => d.country_name === fCountry);
+    if (fMfr) data = data.filter((d) => d.manufacter === fMfr);
+    if (fModel) data = data.filter((d) => d.model === fModel);
+
+    // Mismo sort que la vista completa
+    const asc = sortDir === "asc";
+    if (sort === "name")
+      data.sort((a, b) =>
+        asc
+          ? a.coaster_name.localeCompare(b.coaster_name)
+          : b.coaster_name.localeCompare(a.coaster_name),
+      );
+    else if (sort === "height")
+      data.sort((a, b) =>
+        asc
+          ? (parseFloat(a.height) || 0) - (parseFloat(b.height) || 0)
+          : (parseFloat(b.height) || 0) - (parseFloat(a.height) || 0),
+      );
+    else if (sort === "speed")
+      data.sort((a, b) =>
+        asc
+          ? (parseFloat(a.speed) || 0) - (parseFloat(b.speed) || 0)
+          : (parseFloat(b.speed) || 0) - (parseFloat(a.speed) || 0),
+      );
+    else if (sort === "length")
+      data.sort((a, b) =>
+        asc
+          ? (parseFloat(a.coaster_length) || 0) - (parseFloat(b.coaster_length) || 0)
+          : (parseFloat(b.coaster_length) || 0) - (parseFloat(a.coaster_length) || 0),
+      );
+    else if (sort === "inversions")
+      data.sort((a, b) =>
+        asc
+          ? (parseInt(a.inversions) || 0) - (parseInt(b.inversions) || 0)
+          : (parseInt(b.inversions) || 0) - (parseInt(a.inversions) || 0),
+      );
+    else if (sort === "year")
+      data.sort((a, b) => {
+        const ya = parseInt(a.opening_year) || 9999;
+        const yb = parseInt(b.opening_year) || 9999;
+        return asc ? ya - yb : yb - ya;
+      });
+    else if (sort === "rank") {
+      data.sort((a, b) => {
+        const ra = parseInt(a.rank_position) || 9999,
+          rb = parseInt(b.rank_position) || 9999;
+        return asc ? ra - rb : rb - ra;
+      });
+    }
+
+    const container = $("#top-coasters-full-container").empty();
+    const count = data.length;
+    $("#coasters-full-count").text(count);
+    $("#coasters-full-label").text(count === 1 ? "coaster" : "coasters");
+
+    if (!data.length) {
+      container.html(emptyState("Ningún elemento coincide con los filtros."));
+      return;
+    }
+
+    // Wrapper que ocupa todo el ancho (col-12)
+    const $col = $('<div class="col-12 p-0"></div>');
+    container.append($col);
+
+    data.forEach((item) => {
+      const detailUrl = `${BASE_URL}/web/views/public/coasters/coasters.php?id=${item.coaster_id}`;
+
+      // Miniatura segura
+      const hasImg = item.imagen_url && item.imagen_url.length > 0;
+      const imgSrc = hasImg
+        ? item.imagen_url.startsWith("/")
+          ? BASE_URL + item.imagen_url
+          : item.imagen_url
+        : "";
+
+      const $a = $(document.createElement("a"));
+      $a.attr("href", detailUrl)
+        .attr("tabindex", "0")
+        .addClass("tops-mini-item");
+
+      // Badge ranking
+      const rankVal = parseInt(item.rank_position) || 0;
+      const $rank = $(document.createElement("span"));
+      $rank.addClass("tops-mini-rank").text(rankVal);
+
+      // Color classes
+      if (rankVal === 1) $rank.addClass("rank-gold");
+      else if (rankVal === 2) $rank.addClass("rank-silver");
+      else if (rankVal === 3) $rank.addClass("rank-bronze");
+      else if (rankVal === 4 || rankVal === 5) $rank.addClass("rank-top5");
+
+      // Size classes
+      const digits = rankVal.toString().length;
+      if (digits === 1) $rank.addClass("rank-1d");
+      else if (digits === 2) $rank.addClass("rank-2d");
+      else $rank.addClass("rank-3d");
+
+      // Miniatura
+      let $thumb;
+      if (hasImg) {
+        $thumb = $(document.createElement("img"));
+        $thumb
+          .addClass("tops-mini-thumb")
+          .attr("src", imgSrc)
+          .attr("alt", item.coaster_name)
+          .attr("loading", "lazy");
+      } else {
+        $thumb = $(document.createElement("div"));
+        $thumb.addClass("tops-mini-thumb-placeholder");
+        $thumb.html('<i class="fa-solid fa-image" aria-hidden="true"></i>');
+      }
+
+      // Info
+      const $info = $(document.createElement("div")).addClass("tops-mini-info");
+      const $name = $(document.createElement("div")).addClass("tops-mini-name");
+      $name.text(item.coaster_name);
+      const $sub = $(document.createElement("div")).addClass("tops-mini-sub");
+      $sub.text(
+        (item.park_name || "") +
+          (item.country_name ? " · " + item.country_name : ""),
+      );
+      $info.append($name, $sub);
+
+      // Chevron
+      const $chev = $(document.createElement("i"));
+      $chev
+        .addClass("fa-solid fa-chevron-right tops-mini-chevron")
+        .attr("aria-hidden", "true");
+
+      $a.append($rank, $thumb, $info, $chev);
+      $col.append($a);
+    });
+  }
+
+  function renderParksMini() {
+    const fCountry = $("#parks-filter-country").val();
+    let data = [...topsData.parks];
+    if (fCountry) data = data.filter((d) => d.country_name === fCountry);
+
+    const sort = $("#parks-sort").val();
+    if (sort === "name")
+      data.sort((a, b) => a.park_name.localeCompare(b.park_name));
+    else if (sort === "coasters")
+      data.sort(
+        (a, b) =>
+          (parseInt(b.operating_coasters) || 0) -
+          (parseInt(a.operating_coasters) || 0),
+      );
+
+    const container = $("#top-parks-full-container").empty();
+    $("#parks-full-count").text(data.length);
+
+    if (!data.length) {
+      container.html(emptyState("Ningún elemento coincide con los filtros."));
+      return;
+    }
+
+    const $col = $('<div class="col-12 p-0"></div>');
+    container.append($col);
+
+    data.forEach((item) => {
+      const detailUrl = `${BASE_URL}/web/views/public/parks/parks.php?id=${item.park_id}`;
+      const hasImg = item.imagen_url && item.imagen_url.length > 0;
+      const imgSrc = hasImg
+        ? item.imagen_url.startsWith("/")
+          ? BASE_URL + item.imagen_url
+          : item.imagen_url
+        : "";
+
+      const $a = $(document.createElement("a"));
+      $a.attr("href", detailUrl)
+        .attr("tabindex", "0")
+        .addClass("tops-mini-item");
+
+      const rankVal = parseInt(item.rank_position) || 0;
+      const $rank = $(document.createElement("span"));
+      $rank.addClass("tops-mini-rank").text(rankVal);
+
+      if (rankVal === 1) $rank.addClass("rank-gold");
+      else if (rankVal === 2) $rank.addClass("rank-silver");
+      else if (rankVal === 3) $rank.addClass("rank-bronze");
+      else if (rankVal === 4 || rankVal === 5) $rank.addClass("rank-top5");
+
+      const digits = rankVal.toString().length;
+      if (digits === 1) $rank.addClass("rank-1d");
+      else if (digits === 2) $rank.addClass("rank-2d");
+      else $rank.addClass("rank-3d");
+
+      let $thumb;
+      if (hasImg) {
+        $thumb = $(document.createElement("img"));
+        $thumb
+          .addClass("tops-mini-thumb")
+          .attr("src", imgSrc)
+          .attr("alt", item.park_name)
+          .attr("loading", "lazy");
+      } else {
+        $thumb = $(document.createElement("div")).addClass(
+          "tops-mini-thumb-placeholder",
+        );
+        $thumb.html('<i class="fa-solid fa-image" aria-hidden="true"></i>');
+      }
+
+      const $info = $(document.createElement("div")).addClass("tops-mini-info");
+      const $name = $(document.createElement("div"))
+        .addClass("tops-mini-name")
+        .text(item.park_name);
+      const $sub = $(document.createElement("div"))
+        .addClass("tops-mini-sub")
+        .text(item.country_name || "");
+      $info.append($name, $sub);
+
+      const $chev = $(document.createElement("i"))
+        .addClass("fa-solid fa-chevron-right tops-mini-chevron")
+        .attr("aria-hidden", "true");
+
+      $a.append($rank, $thumb, $info, $chev);
+      $col.append($a);
+    });
+  }
+
   function renderParksFull() {
+    // Delegar a la vista mini si está activa
+    if (parksViewType === "mini") {
+      renderParksMini();
+      return;
+    }
     const sort = $("#parks-sort").val();
     const fCountry = $("#parks-filter-country").val();
     const isGrid = parksViewType === "grid";
@@ -1385,15 +1631,15 @@ $(document).ready(function () {
     sortedCountries.forEach(([name, count], idx) => {
       const pct = Math.round((count / maxCountry) * 100);
       $modalCountries.append(`
-        <div class="px-4 py-3 d-flex align-items-center" style="border-bottom: 1px solid rgba(255,255,255,0.06); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
-          <div class="flex-shrink-0 d-flex align-items-center justify-content-center fw-bold me-3" style="width:28px;height:28px;background:rgba(16,185,129,0.1);color:#10b981;font-size:0.75rem;">${idx + 1}</div>
-          <div class="flex-grow-1 pe-3" style="min-width:0;">
+        <div class="px-4 py-3 d-flex align-items-center" style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background='transparent'">
+          <div class="flex-shrink-0 d-flex align-items-center justify-content-center fw-bold me-3 rounded-circle shadow-sm" style="width:32px;height:32px;background:linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05));color:#10b981;font-size:0.8rem;border:1px solid rgba(16,185,129,0.3);">${idx + 1}</div>
+          <div class="flex-grow-1 pe-2" style="min-width:0;">
             <div class="d-flex align-items-end mb-2 gap-2" style="min-width:0;">
               <span class="fw-bold text-white small text-truncate flex-grow-1" style="min-width:0;" title="${name}">${name}</span>
-              <span class="fw-bold text-success flex-shrink-0 text-end" style="font-size:0.85rem; min-width:30px;">${count}</span>
+              <span class="fw-black text-white flex-shrink-0 text-end" style="font-size:0.9rem; min-width:30px;">${count}</span>
             </div>
-            <div style="height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;">
-              <div style="height:100%;width:${pct}%;background:linear-gradient(90deg, #059669, #10b981);border-radius:2px;box-shadow:0 0 5px rgba(16,185,129,0.5);"></div>
+            <div style="height:6px;background:rgba(0,0,0,0.3);border-radius:3px;overflow:hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);">
+              <div style="height:100%;width:${pct}%;background:linear-gradient(90deg, #059669, #10b981);border-radius:3px;box-shadow:0 0 8px rgba(16,185,129,0.6);"></div>
             </div>
           </div>
         </div>
@@ -1417,15 +1663,15 @@ $(document).ready(function () {
     sortedMfrs.forEach(([name, count], idx) => {
       const pct = Math.round((count / maxMfr) * 100);
       $modalMfrs.append(`
-        <div class="px-4 py-3 d-flex align-items-center" style="border-bottom: 1px solid rgba(255,255,255,0.06); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
-          <div class="flex-shrink-0 d-flex align-items-center justify-content-center fw-bold me-3" style="width:28px;height:28px;background:rgba(16,185,129,0.1);color:#10b981;font-size:0.75rem;">${idx + 1}</div>
-          <div class="flex-grow-1 pe-3" style="min-width:0;">
+        <div class="px-4 py-3 d-flex align-items-center" style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background='transparent'">
+          <div class="flex-shrink-0 d-flex align-items-center justify-content-center fw-bold me-3 rounded-circle shadow-sm" style="width:32px;height:32px;background:linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05));color:#10b981;font-size:0.8rem;border:1px solid rgba(16,185,129,0.3);">${idx + 1}</div>
+          <div class="flex-grow-1 pe-2" style="min-width:0;">
             <div class="d-flex align-items-end mb-2 gap-2" style="min-width:0;">
               <span class="fw-bold text-white small text-truncate flex-grow-1" style="min-width:0;" title="${name}">${name}</span>
-              <span class="fw-bold text-success flex-shrink-0 text-end" style="font-size:0.85rem; min-width:30px;">${count}</span>
+              <span class="fw-black text-white flex-shrink-0 text-end" style="font-size:0.9rem; min-width:30px;">${count}</span>
             </div>
-            <div style="height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;">
-              <div style="height:100%;width:${pct}%;background:linear-gradient(90deg, #059669, #10b981);border-radius:2px;box-shadow:0 0 5px rgba(16,185,129,0.5);"></div>
+            <div style="height:6px;background:rgba(0,0,0,0.3);border-radius:3px;overflow:hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);">
+              <div style="height:100%;width:${pct}%;background:linear-gradient(90deg, #059669, #10b981);border-radius:3px;box-shadow:0 0 8px rgba(16,185,129,0.6);"></div>
             </div>
           </div>
         </div>
@@ -1575,13 +1821,21 @@ $(document).ready(function () {
 
   async function saveBothTops() {
     const $btns = $("#btn-save-coasters-top, #btn-save-parks-top");
-    $btns.prop("disabled", true).html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Guardando…');
+    $btns
+      .prop("disabled", true)
+      .html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Guardando…');
 
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ?? "";
+    const csrfToken =
+      document
+        .querySelector('meta[name="csrf-token"]')
+        ?.getAttribute("content") ?? "";
 
     const coastersItems = [];
     $("#top-coasters-list-edit .tops-edit-item").each(function (i) {
-      coastersItems.push({ coaster_id: $(this).data("id"), rank_position: i + 1 });
+      coastersItems.push({
+        coaster_id: $(this).data("id"),
+        rank_position: i + 1,
+      });
     });
 
     const parksItems = [];
@@ -1591,14 +1845,23 @@ $(document).ready(function () {
 
     try {
       const [resC, resP] = await Promise.all([
-        fetch(`${BASE_URL}/api/php/profile_config.php?action=save_top_coasters`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
-          body: JSON.stringify({ items: coastersItems }),
-        }),
+        fetch(
+          `${BASE_URL}/api/php/profile_config.php?action=save_top_coasters`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRF-Token": csrfToken,
+            },
+            body: JSON.stringify({ items: coastersItems }),
+          },
+        ),
         fetch(`${BASE_URL}/api/php/profile_config.php?action=save_top_parks`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": csrfToken,
+          },
           body: JSON.stringify({ items: parksItems }),
         }),
       ]);
@@ -1610,7 +1873,8 @@ $(document).ready(function () {
         await cargarDatos();
         setTopsMode("preview");
       } else {
-        const err = (!dataC.success ? "Coasters: " + (dataC.error || "error") : "") +
+        const err =
+          (!dataC.success ? "Coasters: " + (dataC.error || "error") : "") +
           (!dataP.success ? " Parques: " + (dataP.error || "error") : "");
         alert("Error al guardar: " + err.trim());
       }
@@ -1648,39 +1912,146 @@ $(document).ready(function () {
 
   $("#parks-sort, #parks-filter-country").on("change", renderParksFull);
 
-  // Toggle lista / cuadrícula
-
-  $("#coasters-view-list").on("click", function () {
-    coastersViewType = "list";
-    $(this).removeClass("btn-outline-secondary").addClass("btn-success");
-    $("#coasters-view-grid")
+  // Helper: sincronizar estado visual de los botones de vista
+  function syncCoastersViewButtons() {
+    $("#coasters-view-list, #coasters-view-grid, #coasters-view-mini")
       .removeClass("btn-success")
       .addClass("btn-outline-secondary");
+    const id =
+      coastersViewType === "list"
+        ? "#coasters-view-list"
+        : coastersViewType === "grid"
+          ? "#coasters-view-grid"
+          : "#coasters-view-mini";
+    $(id).removeClass("btn-outline-secondary").addClass("btn-success");
+  }
+
+  function syncParksViewButtons() {
+    $("#parks-view-list, #parks-view-grid, #parks-view-mini")
+      .removeClass("btn-success")
+      .addClass("btn-outline-secondary");
+    const id =
+      parksViewType === "list"
+        ? "#parks-view-list"
+        : parksViewType === "grid"
+          ? "#parks-view-grid"
+          : "#parks-view-mini";
+    $(id).removeClass("btn-outline-secondary").addClass("btn-success");
+  }
+
+  // Inicializar estado de botones según preferencia guardada
+  syncCoastersViewButtons();
+  syncParksViewButtons();
+
+  // Toggle lista / cuadrícula / mini
+
+  $("#coasters-view-list").on("click", function () {
+    if (window.innerWidth < 769 && coastersViewType === "mini") {
+      // mini button was active on mobile, now switching to list
+    }
+    coastersViewType = "list";
+    localStorage.setItem("tops-coasters-view", "list");
+    syncCoastersViewButtons();
     renderCoastersFull();
   });
   $("#coasters-view-grid").on("click", function () {
     coastersViewType = "grid";
-    $(this).removeClass("btn-outline-secondary").addClass("btn-success");
-    $("#coasters-view-list")
-      .removeClass("btn-success")
-      .addClass("btn-outline-secondary");
+    localStorage.setItem("tops-coasters-view", "grid");
+    syncCoastersViewButtons();
     renderCoastersFull();
+  });
+  $("#coasters-view-mini").on("click", function () {
+    // En escritorio: no aplicar (botón deshabilitado visualmente)
+    if (window.innerWidth >= 769) return;
+    coastersViewType = "mini";
+    localStorage.setItem("tops-coasters-view", "mini");
+    syncCoastersViewButtons();
+    renderCoastersMini();
   });
   $("#parks-view-list").on("click", function () {
     parksViewType = "list";
-    $(this).removeClass("btn-outline-secondary").addClass("btn-success");
-    $("#parks-view-grid")
-      .removeClass("btn-success")
-      .addClass("btn-outline-secondary");
+    localStorage.setItem("tops-parks-view", "list");
+    syncParksViewButtons();
     renderParksFull();
   });
   $("#parks-view-grid").on("click", function () {
     parksViewType = "grid";
-    $(this).removeClass("btn-outline-secondary").addClass("btn-success");
-    $("#parks-view-list")
-      .removeClass("btn-success")
-      .addClass("btn-outline-secondary");
+    localStorage.setItem("tops-parks-view", "grid");
+    syncParksViewButtons();
     renderParksFull();
+  });
+  $("#parks-view-mini").on("click", function () {
+    if (window.innerWidth >= 769) return;
+    parksViewType = "mini";
+    localStorage.setItem("tops-parks-view", "mini");
+    syncParksViewButtons();
+    renderParksMini();
+  });
+
+  // ═══════════════════════════════════════════════════════
+  //  FILTROS COLAPSABLES EN MÓVIL — coasters
+  // ═══════════════════════════════════════════════════════
+
+  function updateCoastersBadge() {
+    const fPark = $("#coasters-filter-park").val();
+    const fCountry = $("#coasters-filter-country").val();
+    const fMfr = $("#coasters-filter-manufacter").val();
+    const fModel = $("#coasters-filter-model").val();
+    const active = [fPark, fCountry, fMfr, fModel].filter(
+      (v) => v && v !== "",
+    ).length;
+    const $badge = $("#coasters-filters-badge");
+    if (active > 0) {
+      $badge.text(active).removeClass("d-none");
+    } else {
+      $badge.addClass("d-none");
+    }
+  }
+
+  $("#coasters-filters-toggle").on("click", function () {
+    const $panel = $("#coasters-filters-collapsible");
+    const isOpen = $panel.hasClass("is-open");
+    $panel.toggleClass("is-open", !isOpen);
+    $(this).toggleClass("is-open", !isOpen);
+    $(this).attr("aria-expanded", !isOpen);
+  });
+
+  // Re-calcular badge cuando cambia cualquier filtro (aplicación en tiempo real)
+  $(
+    "#coasters-sort, #coasters-filter-park, #coasters-filter-country, #coasters-filter-manufacter, #coasters-filter-model",
+  ).on("change", function () {
+    updateCoastersBadge();
+  });
+
+  // ═══════════════════════════════════════════════════════
+  //  FILTROS COLAPSABLES EN MÓVIL — parks
+  // ═══════════════════════════════════════════════════════
+
+  function updateParksBadge() {
+    const fCountry = $("#parks-filter-country").val();
+    const fSort = $("#parks-sort").val();
+    const active = [
+      fCountry && fCountry !== "" ? 1 : 0,
+      fSort && fSort !== "rank" ? 1 : 0,
+    ].reduce((a, b) => a + b, 0);
+    const $badge = $("#parks-filters-badge");
+    if (active > 0) {
+      $badge.text(active).removeClass("d-none");
+    } else {
+      $badge.addClass("d-none");
+    }
+  }
+
+  $("#parks-filters-toggle").on("click", function () {
+    const $panel = $("#parks-filters-collapsible");
+    const isOpen = $panel.hasClass("is-open");
+    $panel.toggleClass("is-open", !isOpen);
+    $(this).toggleClass("is-open", !isOpen);
+    $(this).attr("aria-expanded", !isOpen);
+  });
+
+  $("#parks-sort, #parks-filter-country").on("change", function () {
+    updateParksBadge();
   });
 
   // Eliminar items en modo edición
@@ -2303,14 +2674,14 @@ $(document).ready(function () {
           if (typeof showAlert === "function") {
             showAlert(
               "¡Listo! Hemos enviado un enlace a " +
-              email +
-              " para que puedas restablecer tu contraseña. Revisa también la carpeta de SPAM.",
+                email +
+                " para que puedas restablecer tu contraseña. Revisa también la carpeta de SPAM.",
             );
           } else {
             alert(
               "¡Listo! Hemos enviado un enlace a " +
-              email +
-              " para restablecer tu contraseña.",
+                email +
+                " para restablecer tu contraseña.",
             );
           }
         })
@@ -2355,11 +2726,14 @@ $(document).ready(function () {
     const empty = 5 - full - half;
     let html = "";
     for (let i = 0; i < full; i++)
-      html += '<i class="fa-solid fa-star text-success" style="font-size:0.75rem;"></i>';
+      html +=
+        '<i class="fa-solid fa-star text-success" style="font-size:0.75rem;"></i>';
     if (half)
-      html += '<i class="fa-solid fa-star-half-stroke text-success" style="font-size:0.75rem;"></i>';
+      html +=
+        '<i class="fa-solid fa-star-half-stroke text-success" style="font-size:0.75rem;"></i>';
     for (let i = 0; i < empty; i++)
-      html += '<i class="fa-regular fa-star text-success opacity-50" style="font-size:0.75rem;"></i>';
+      html +=
+        '<i class="fa-regular fa-star text-success opacity-50" style="font-size:0.75rem;"></i>';
     return html;
   }
 
@@ -2441,7 +2815,9 @@ $(document).ready(function () {
       const dateStr = formatReviewDate(r.created_at);
 
       const imgSrc = r.imagen_url
-        ? (r.imagen_url.startsWith("/") ? BASE_URL + r.imagen_url : r.imagen_url)
+        ? r.imagen_url.startsWith("/")
+          ? BASE_URL + r.imagen_url
+          : r.imagen_url
         : "";
       const imgHtml = imgSrc
         ? `<img src="${imgSrc}" alt="${r.title}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'d-flex align-items-center justify-content-center h-100 text-secondary\\'><i class=\\'fa-solid fa-image fs-3\\'></i></div>'">`
@@ -2592,13 +2968,13 @@ $(document).ready(function () {
               <label class="form-label text-muted small fw-semibold">Puntuación</label>
               <div class="star-rating pedit-star-rating-container" style="font-size: 2rem;">
                 ${[10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
-        .map((i) => {
-          const val = i / 2;
-          const half = i % 2 !== 0;
-          return `<input type="radio" name="pedit_note" id="pstar${i}" value="${val}">
+                  .map((i) => {
+                    const val = i / 2;
+                    const half = i % 2 !== 0;
+                    return `<input type="radio" name="pedit_note" id="pstar${i}" value="${val}">
                           <label for="pstar${i}" class="${half ? "half" : "full"}" title="${val}"></label>`;
-        })
-        .join("")}
+                  })
+                  .join("")}
               </div>
               <input type="hidden" id="pedit-review-note" value="0">
             </div>
@@ -2867,9 +3243,9 @@ $(document).ready(function () {
     if (!source.length) {
       $list.html(
         '<div class="text-center text-muted py-5">' +
-        '<i class="fa-solid fa-ghost fs-1 mb-3 opacity-50 d-block"></i>' +
-        "<p>Todavía no tienes amigos agregados.</p>" +
-        "</div>",
+          '<i class="fa-solid fa-ghost fs-1 mb-3 opacity-50 d-block"></i>' +
+          "<p>Todavía no tienes amigos agregados.</p>" +
+          "</div>",
       );
       return;
     }
@@ -2885,17 +3261,17 @@ $(document).ready(function () {
 
       var imgHtml = imgSrc
         ? '<img src="' +
-        imgSrc +
-        '" alt="' +
-        f.username +
-        '" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'
+          imgSrc +
+          '" alt="' +
+          f.username +
+          '" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'
         : '<div class="d-flex align-items-center justify-content-center h-100 text-secondary bg-dark"><i class="fa-solid fa-user fs-3"></i></div>';
 
       var ubicacion =
         f.city || f.country
           ? '<small class="text-secondary d-block mb-2"><i class="fa-solid fa-location-dot me-1"></i>' +
-          [f.city, f.country].filter(Boolean).join(", ") +
-          "</small>"
+            [f.city, f.country].filter(Boolean).join(", ") +
+            "</small>"
           : '<small class="text-muted d-block mb-2"><i class="fa-solid fa-location-crosshairs me-1"></i>Ubicaci\u00f3n desconocida</small>';
 
       var creditsText = f.credits || 0;
@@ -2918,36 +3294,36 @@ $(document).ready(function () {
 
       $list.append(
         '<div class="top-card d-flex align-items-center mb-3 p-3">' +
-        '<div style="width:70px;height:70px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid rgba(16,185,129,0.3);" class="me-3">' +
-        imgHtml +
-        "</div>" +
-        '<div class="flex-grow-1" style="min-width:0;">' +
-        '<a href="' +
-        BASE_URL +
-        "/web/views/public/users/user_profile.php?id=" +
-        f.id +
-        '" class="fw-bold text-white text-decoration-none fs-6 d-block text-truncate">' +
-        f.username +
-        "</a>" +
-        ubicacion +
-        '<div class="d-flex gap-2 mt-1 flex-wrap">' +
-        '<span class="badge rounded-0" style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.7rem;"><i class="fa-solid fa-ticket text-success me-1"></i>' +
-        creditsText +
-        " credits</span>" +
-        '<span class="badge rounded-0" style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.7rem;"><i class="fa-solid fa-heart text-danger me-1"></i>Top 1: ' +
-        topCoaster +
-        "</span>" +
-        friendSinceHtml +
-        "</div>" +
-        "</div>" +
-        '<div class="ms-3 flex-shrink-0">' +
-        '<a href="' +
-        BASE_URL +
-        "/web/views/public/users/user_profile.php?id=" +
-        f.id +
-        '" class="btn btn-sm btn-outline-success rounded-0 px-3">Ver perfil</a>' +
-        "</div>" +
-        "</div>",
+          '<div style="width:70px;height:70px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid rgba(16,185,129,0.3);" class="me-3">' +
+          imgHtml +
+          "</div>" +
+          '<div class="flex-grow-1" style="min-width:0;">' +
+          '<a href="' +
+          BASE_URL +
+          "/web/views/public/users/user_profile.php?id=" +
+          f.id +
+          '" class="fw-bold text-white text-decoration-none fs-6 d-block text-truncate">' +
+          f.username +
+          "</a>" +
+          ubicacion +
+          '<div class="d-flex gap-2 mt-1 flex-wrap">' +
+          '<span class="badge rounded-0" style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.7rem;"><i class="fa-solid fa-ticket text-success me-1"></i>' +
+          creditsText +
+          " credits</span>" +
+          '<span class="badge rounded-0" style="background:rgba(255,255,255,0.07);color:#aaa;font-size:0.7rem;"><i class="fa-solid fa-heart text-danger me-1"></i>Top 1: ' +
+          topCoaster +
+          "</span>" +
+          friendSinceHtml +
+          "</div>" +
+          "</div>" +
+          '<div class="ms-3 flex-shrink-0">' +
+          '<a href="' +
+          BASE_URL +
+          "/web/views/public/users/user_profile.php?id=" +
+          f.id +
+          '" class="btn btn-sm btn-outline-success rounded-0 px-3">Ver perfil</a>' +
+          "</div>" +
+          "</div>",
       );
     });
   }
