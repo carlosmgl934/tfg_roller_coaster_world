@@ -1632,7 +1632,7 @@ $(document).ready(function () {
       const pct = Math.round((count / maxCountry) * 100);
       $modalCountries.append(`
         <div class="px-4 py-3 d-flex align-items-center" style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background='transparent'">
-          <div class="flex-shrink-0 d-flex align-items-center justify-content-center fw-bold me-3 rounded-circle shadow-sm" style="width:32px;height:32px;background:linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05));color:#10b981;font-size:0.8rem;border:1px solid rgba(16,185,129,0.3);">${idx + 1}</div>
+          <div class="flex-shrink-0 d-flex align-items-center justify-content-center fw-bold me-3 rounded-0 shadow-sm" style="width:32px;height:32px;background:linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05));color:#10b981;font-size:0.8rem;border:1px solid rgba(16,185,129,0.3);">${idx + 1}</div>
           <div class="flex-grow-1 pe-2" style="min-width:0;">
             <div class="d-flex align-items-end mb-2 gap-2" style="min-width:0;">
               <span class="fw-bold text-white small text-truncate flex-grow-1" style="min-width:0;" title="${name}">${name}</span>
@@ -1664,7 +1664,7 @@ $(document).ready(function () {
       const pct = Math.round((count / maxMfr) * 100);
       $modalMfrs.append(`
         <div class="px-4 py-3 d-flex align-items-center" style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background='transparent'">
-          <div class="flex-shrink-0 d-flex align-items-center justify-content-center fw-bold me-3 rounded-circle shadow-sm" style="width:32px;height:32px;background:linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05));color:#10b981;font-size:0.8rem;border:1px solid rgba(16,185,129,0.3);">${idx + 1}</div>
+          <div class="flex-shrink-0 d-flex align-items-center justify-content-center fw-bold me-3 rounded-0 shadow-sm" style="width:32px;height:32px;background:linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05));color:#10b981;font-size:0.8rem;border:1px solid rgba(16,185,129,0.3);">${idx + 1}</div>
           <div class="flex-grow-1 pe-2" style="min-width:0;">
             <div class="d-flex align-items-end mb-2 gap-2" style="min-width:0;">
               <span class="fw-bold text-white small text-truncate flex-grow-1" style="min-width:0;" title="${name}">${name}</span>

@@ -1015,23 +1015,27 @@ $user_uid = $_SESSION['firebase_uid'];
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7), 0 0 0 1px rgba(16,185,129,0.2) !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(16, 185, 129, 0.2) !important;
       }
+
       #statsExpandedModal .stat-card {
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 1rem;
+        border-radius: 0;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
+
       #statsExpandedModal .stat-card:hover {
         background: rgba(255, 255, 255, 0.06);
         transform: translateY(-4px);
-        box-shadow: 0 10px 20px -10px rgba(0,0,0,0.5);
+        box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.5);
       }
+
       #statsExpandedModal .metric-card {
-        border-radius: 1rem;
+        border-radius: 0;
         transition: all 0.3s ease;
       }
+
       #statsExpandedModal .metric-card:hover {
         transform: scale(1.03);
         z-index: 10;
@@ -1039,18 +1043,19 @@ $user_uid = $_SESSION['firebase_uid'];
     </style>
     <div class="modal fade" id="statsExpandedModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
-        <div class="modal-content rounded-4 overflow-hidden">
+        <div class="modal-content rounded-0 overflow-hidden">
 
           <!-- HEADER -->
           <div class="modal-header border-0 px-4 py-4"
             style="background: linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(0,0,0,0) 100%); border-bottom: 1px solid rgba(255,255,255,0.05) !important;">
             <div class="d-flex align-items-center gap-3">
-              <div class="d-flex align-items-center justify-content-center rounded-3 shadow-sm"
+              <div class="d-flex align-items-center justify-content-center rounded-0 shadow-sm"
                 style="width:48px;height:48px;background:linear-gradient(135deg, #059669, #10b981);border:1px solid rgba(255,255,255,0.2);">
                 <i class="fa-solid fa-chart-pie text-white fs-5"></i>
               </div>
               <div>
-                <h5 class="modal-title fw-bolder text-white mb-0" style="letter-spacing:0.5px; font-size: 1.4rem;">Estadísticas
+                <h5 class="modal-title fw-bolder text-white mb-0" style="letter-spacing:0.5px; font-size: 1.4rem;">
+                  Estadísticas
                   Ampliadas
                 </h5>
                 <p class="text-white-50 mb-0" style="font-size:0.85rem;">Resumen completo de tu trayectoria</p>
@@ -1063,12 +1068,15 @@ $user_uid = $_SESSION['firebase_uid'];
           <div class="modal-body p-0">
 
             <!-- HERO STATS -->
-            <div class="row g-3 p-4" style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <div class="row g-3 m-0 p-4" style="border-bottom: 1px solid rgba(255,255,255,0.05);">
               <div class="col-12 col-md-4">
                 <div class="stat-card text-center py-4 px-3 h-100 position-relative overflow-hidden">
-                  <div class="position-absolute top-0 start-50 translate-middle" style="width: 100px; height: 100px; background: rgba(16,185,129,0.2); filter: blur(40px); border-radius: 50%;"></div>
+                  <div class="position-absolute top-0 start-50 translate-middle"
+                    style="width: 100px; height: 100px; background: rgba(16,185,129,0.2); filter: blur(40px);">
+                  </div>
                   <div class="mb-3" style="font-size:2.2rem;line-height:1;">
-                    <i class="fa-solid fa-ticket text-success" style="filter:drop-shadow(0 0 12px rgba(16,185,129,0.6));"></i>
+                    <i class="fa-solid fa-ticket text-success"
+                      style="filter:drop-shadow(0 0 12px rgba(16,185,129,0.6));"></i>
                   </div>
                   <div class="fw-black text-white" id="modal-stat-total-coasters"
                     style="font-size:3.2rem;line-height:1;font-weight:900;letter-spacing:-1px;">0</div>
@@ -1079,9 +1087,12 @@ $user_uid = $_SESSION['firebase_uid'];
               </div>
               <div class="col-12 col-md-4">
                 <div class="stat-card text-center py-4 px-3 h-100 position-relative overflow-hidden">
-                  <div class="position-absolute top-0 start-50 translate-middle" style="width: 100px; height: 100px; background: rgba(16,185,129,0.2); filter: blur(40px); border-radius: 50%;"></div>
+                  <div class="position-absolute top-0 start-50 translate-middle"
+                    style="width: 100px; height: 100px; background: rgba(16,185,129,0.2); filter: blur(40px);">
+                  </div>
                   <div class="mb-3" style="font-size:2.2rem;line-height:1;">
-                    <i class="fa-solid fa-map-location-dot text-success" style="filter:drop-shadow(0 0 12px rgba(16,185,129,0.6));"></i>
+                    <i class="fa-solid fa-map-location-dot text-success"
+                      style="filter:drop-shadow(0 0 12px rgba(16,185,129,0.6));"></i>
                   </div>
                   <div class="fw-black text-white" id="modal-stat-total-parks"
                     style="font-size:3.2rem;line-height:1;font-weight:900;letter-spacing:-1px;">0</div>
@@ -1092,9 +1103,12 @@ $user_uid = $_SESSION['firebase_uid'];
               </div>
               <div class="col-12 col-md-4">
                 <div class="stat-card text-center py-4 px-3 h-100 position-relative overflow-hidden">
-                  <div class="position-absolute top-0 start-50 translate-middle" style="width: 100px; height: 100px; background: rgba(16,185,129,0.2); filter: blur(40px); border-radius: 50%;"></div>
+                  <div class="position-absolute top-0 start-50 translate-middle"
+                    style="width: 100px; height: 100px; background: rgba(16,185,129,0.2); filter: blur(40px);">
+                  </div>
                   <div class="mb-3" style="font-size:2.2rem;line-height:1;">
-                    <i class="fa-solid fa-earth-americas text-success" style="filter:drop-shadow(0 0 12px rgba(16,185,129,0.6));"></i>
+                    <i class="fa-solid fa-earth-americas text-success"
+                      style="filter:drop-shadow(0 0 12px rgba(16,185,129,0.6));"></i>
                   </div>
                   <div class="fw-black text-white" id="modal-stat-total-countries"
                     style="font-size:3.2rem;line-height:1;font-weight:900;letter-spacing:-1px;">0</div>
@@ -1106,12 +1120,14 @@ $user_uid = $_SESSION['firebase_uid'];
             </div>
 
             <!-- LISTAS PAÍS / FABRICANTE -->
-            <div class="row g-0" style="border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.15);">
+            <div class="row g-0 m-0"
+              style="border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.15);">
 
               <!-- Países -->
               <div class="col-lg-6" style="border-right: 1px solid rgba(255,255,255,0.05);">
                 <div class="px-4 pt-4 pb-3 d-flex align-items-center gap-2">
-                  <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 28px; height: 28px; background: rgba(16,185,129,0.15);">
+                  <div class="d-flex align-items-center justify-content-center rounded-0"
+                    style="width: 28px; height: 28px; background: rgba(16,185,129,0.15);">
                     <i class="fa-solid fa-earth-europe text-success" style="font-size:0.85rem;"></i>
                   </div>
                   <span class="fw-bold text-white"
@@ -1126,7 +1142,8 @@ $user_uid = $_SESSION['firebase_uid'];
               <!-- Fabricantes -->
               <div class="col-lg-6">
                 <div class="px-4 pt-4 pb-3 d-flex align-items-center gap-2">
-                  <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 28px; height: 28px; background: rgba(16,185,129,0.15);">
+                  <div class="d-flex align-items-center justify-content-center rounded-0"
+                    style="width: 28px; height: 28px; background: rgba(16,185,129,0.15);">
                     <i class="fa-solid fa-industry text-success" style="font-size:0.85rem;"></i>
                   </div>
                   <span class="fw-bold text-white"
@@ -1142,24 +1159,30 @@ $user_uid = $_SESSION['firebase_uid'];
 
             <!-- MÉTRICAS TOP COASTERS -->
             <div class="px-4 pt-4 pb-3 d-flex align-items-center gap-2">
-              <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 32px; height: 32px; background: rgba(245,158,11,0.15);">
+              <div class="d-flex align-items-center justify-content-center rounded-0"
+                style="width: 32px; height: 32px; background: rgba(245,158,11,0.15);">
                 <i class="fa-solid fa-bolt text-warning" style="font-size:0.9rem;"></i>
               </div>
               <span class="fw-bold text-white"
                 style="font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;">Métricas de las Coasters
                 Top</span>
             </div>
-            <div class="row g-3 px-4 pb-4">
+            <div class="row g-3 m-0 px-4 pb-4">
 
               <!-- Más alta -->
               <div class="col-6 col-md">
                 <div class="metric-card h-100 text-center p-3"
                   style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2); box-shadow: inset 0 0 20px rgba(16,185,129,0.02);">
-                  <div class="mb-2"><div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 36px; height: 36px; background: rgba(16,185,129,0.2);"><i class="fa-solid fa-arrow-up-long text-success"></i></div></div>
+                  <div class="mb-2">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-0"
+                      style="width: 36px; height: 36px; background: rgba(16,185,129,0.2);"><i
+                        class="fa-solid fa-arrow-up-long text-success"></i></div>
+                  </div>
                   <div class="fw-black text-white mb-1" id="max-stat-height" style="font-size:1.5rem;line-height:1.1;">
                     <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
                   </div>
-                  <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-height-name" style="font-size:0.8rem;">...
+                  <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-height-name"
+                    style="font-size:0.8rem;">...
                   </div>
                   <div class="text-uppercase mt-2 fw-bold"
                     style="font-size:0.65rem;letter-spacing:1.5px;color:rgba(16,185,129,0.8);">Más Alta</div>
@@ -1170,11 +1193,16 @@ $user_uid = $_SESSION['firebase_uid'];
               <div class="col-6 col-md">
                 <div class="metric-card h-100 text-center p-3"
                   style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2); box-shadow: inset 0 0 20px rgba(245,158,11,0.02);">
-                  <div class="mb-2"><div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 36px; height: 36px; background: rgba(245,158,11,0.2);"><i class="fa-solid fa-gauge-high text-warning"></i></div></div>
+                  <div class="mb-2">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-0"
+                      style="width: 36px; height: 36px; background: rgba(245,158,11,0.2);"><i
+                        class="fa-solid fa-gauge-high text-warning"></i></div>
+                  </div>
                   <div class="fw-black text-white mb-1" id="max-stat-speed" style="font-size:1.5rem;line-height:1.1;">
                     <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
                   </div>
-                  <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-speed-name" style="font-size:0.8rem;">...
+                  <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-speed-name"
+                    style="font-size:0.8rem;">...
                   </div>
                   <div class="text-uppercase mt-2 fw-bold"
                     style="font-size:0.65rem;letter-spacing:1.5px;color:rgba(245,158,11,0.8);">Más Rápida
@@ -1186,11 +1214,16 @@ $user_uid = $_SESSION['firebase_uid'];
               <div class="col-6 col-md">
                 <div class="metric-card h-100 text-center p-3"
                   style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2); box-shadow: inset 0 0 20px rgba(59,130,246,0.02);">
-                  <div class="mb-2"><div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 36px; height: 36px; background: rgba(59,130,246,0.2);"><i class="fa-solid fa-ruler-horizontal text-primary"></i></div></div>
+                  <div class="mb-2">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-0"
+                      style="width: 36px; height: 36px; background: rgba(59,130,246,0.2);"><i
+                        class="fa-solid fa-ruler-horizontal text-primary"></i></div>
+                  </div>
                   <div class="fw-black text-white mb-1" id="max-stat-length" style="font-size:1.5rem;line-height:1.1;">
                     <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
                   </div>
-                  <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-length-name" style="font-size:0.8rem;">...
+                  <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-length-name"
+                    style="font-size:0.8rem;">...
                   </div>
                   <div class="text-uppercase mt-2 fw-bold"
                     style="font-size:0.65rem;letter-spacing:1.5px;color:rgba(59,130,246,0.8);">Más Larga
@@ -1202,12 +1235,17 @@ $user_uid = $_SESSION['firebase_uid'];
               <div class="col-6 col-md">
                 <div class="metric-card h-100 text-center p-3"
                   style="background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.2); box-shadow: inset 0 0 20px rgba(168,85,247,0.02);">
-                  <div class="mb-2"><div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 36px; height: 36px; background: rgba(168,85,247,0.2);"><i class="fa-solid fa-rotate-right" style="color:#a855f7;"></i></div></div>
+                  <div class="mb-2">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-0"
+                      style="width: 36px; height: 36px; background: rgba(168,85,247,0.2);"><i
+                        class="fa-solid fa-rotate-right" style="color:#a855f7;"></i></div>
+                  </div>
                   <div class="fw-black text-white mb-1" id="max-stat-inversions"
                     style="font-size:1.5rem;line-height:1.1;">
                     <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
                   </div>
-                  <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-inversions-name" style="font-size:0.8rem;">
+                  <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-inversions-name"
+                    style="font-size:0.8rem;">
                     ...</div>
                   <div class="text-uppercase mt-2 fw-bold"
                     style="font-size:0.65rem;letter-spacing:1.5px;color:rgba(168,85,247,0.8);">Más Invers.
@@ -1219,11 +1257,16 @@ $user_uid = $_SESSION['firebase_uid'];
               <div class="col-6 col-md">
                 <div class="metric-card h-100 text-center p-3"
                   style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2); box-shadow: inset 0 0 20px rgba(239,68,68,0.02);">
-                  <div class="mb-2"><div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 36px; height: 36px; background: rgba(239,68,68,0.2);"><i class="fa-solid fa-hourglass-start text-danger"></i></div></div>
+                  <div class="mb-2">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-0"
+                      style="width: 36px; height: 36px; background: rgba(239,68,68,0.2);"><i
+                        class="fa-solid fa-hourglass-start text-danger"></i></div>
+                  </div>
                   <div class="fw-black text-white mb-1" id="max-stat-year" style="font-size:1.5rem;line-height:1.1;">
                     <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
                   </div>
-                  <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-year-name" style="font-size:0.8rem;">...
+                  <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-year-name"
+                    style="font-size:0.8rem;">...
                   </div>
                   <div class="text-uppercase mt-2 fw-bold"
                     style="font-size:0.65rem;letter-spacing:1.5px;color:rgba(239,68,68,0.8);">Más Antigua
