@@ -140,10 +140,12 @@ $(document).ready(function () {
         .then((data) => {
           resultsContainer.empty();
           let total = data.total || 0;
-          if (countContainer.length)
-            countContainer.text(
-              `Mostrando ${total} parque${total !== 1 ? "s" : ""}`,
-            );
+          if (countContainer.length) {
+            let tKey = total === 1 ? 'parks.search.showing_one' : 'parks.search.showing_many';
+            let tMsg = window.t(tKey) || tKey;
+            if (tMsg === tKey) tMsg = `Mostrando ${total} parque${total !== 1 ? "s" : ""}`;
+            countContainer.text(tMsg.replace('{total}', total));
+          }
 
           let parks = [];
           if (Array.isArray(data)) parks = data;
@@ -502,7 +504,10 @@ $(document).ready(function () {
             park.stars ? parseFloat(park.stars).toFixed(2) : "0.00",
           );
           $("#stat-num-coasters").text(park.num_coasters || "0");
-          $("#current-state").text("Abierto").addClass("text-success"); // Default
+          const _statusOpen = (window.rcwI18n && typeof window.rcwI18n.t === 'function')
+            ? window.rcwI18n.t('parks.detail.status_open') || 'Abierto'
+            : 'Abierto';
+          $("#current-state").text(_statusOpen).addClass("text-success"); // Default
 
           // Estadísticas Rápidas
           $("#opening-year-val").text(park.opening_year || "—");
@@ -532,7 +537,8 @@ $(document).ready(function () {
             $("#btn-website").addClass("disabled");
           }
 
-          // Botón comprar entradas (solo si tiene precio)
+          // HIDDEN-TFG-START: Botón comprar entradas (ocultado temporalmente)
+          /*
           if (park.precio_entrada && parseFloat(park.precio_entrada) > 0) {
             const ticketsUrl =
               (window.BASE_URL || "") +
@@ -549,6 +555,8 @@ $(document).ready(function () {
             // Insertar al inicio del contenedor, ocupa toda la línea (w-100)
             $("#park-action-buttons").prepend(btnBuy);
           }
+          */
+          // HIDDEN-TFG-END
 
           if (park.park_location) {
             $("#btn-map")
@@ -1024,6 +1032,11 @@ $(document).ready(function () {
 
       $("#reviews-sort").on("change", function () {
         loadReviews($(this).val());
+      });
+
+      // Al cambiar idioma, re-renderizar la ficha con las nuevas traducciones
+      window.addEventListener('rcw:langchanged', function () {
+        loadParkData(parkId);
       });
     }
   }

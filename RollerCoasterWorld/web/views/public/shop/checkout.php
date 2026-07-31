@@ -1,17 +1,25 @@
 <?php
 $page_css = ['web/css/coasters.css', 'web/css/tickets.css'];
 require_once __DIR__ . '/../../partials/header.php';
-if (!$is_logged) Router::redirect('login');
+// HIDDEN-TFG-START: Bloquear acceso directo a la vista de tienda
+Router::redirect('home');
+// HIDDEN-TFG-END
+if (!$is_logged)
+  Router::redirect('login');
 
 // Leer claves Stripe del .env
 $envFile = __DIR__ . '/../../../../.env';
 $stripePublicKey = '';
 if (file_exists($envFile)) {
-    foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
-        if (str_starts_with(trim($line), '#') || !str_contains($line, '=')) continue;
-        [$k, $v] = explode('=', $line, 2);
-        if (trim($k) === 'STRIPE_PUBLIC_KEY') { $stripePublicKey = trim($v); break; }
+  foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+    if (str_starts_with(trim($line), '#') || !str_contains($line, '='))
+      continue;
+    [$k, $v] = explode('=', $line, 2);
+    if (trim($k) === 'STRIPE_PUBLIC_KEY') {
+      $stripePublicKey = trim($v);
+      break;
     }
+  }
 }
 
 // Detectar retorno de Stripe
@@ -39,7 +47,8 @@ $stripeSessionId = $_GET['session_id'] ?? '';
         <div class="card bg-dark text-white rounded-0 border-warning shadow text-center p-4">
           <i class="fa-solid fa-circle-xmark fa-2x text-warning d-block mb-3"></i>
           <h5 class="fw-bold text-warning">Pago cancelado</h5>
-          <p class="mb-4 text-white-50">No se ha completado el pago. Tu carrito sigue guardado y puedes intentarlo de nuevo cuando quieras.</p>
+          <p class="mb-4 text-white-50">No se ha completado el pago. Tu carrito sigue guardado y puedes intentarlo de
+            nuevo cuando quieras.</p>
           <div>
             <a href="<?= Router::url('checkout') ?>" class="btn btn-warning rounded-0 fw-bold me-2">
               <i class="fa-solid fa-rotate-left me-1"></i>Reintentar pago
@@ -71,15 +80,18 @@ $stripeSessionId = $_GET['session_id'] ?? '';
           <div class="card-body text-center py-4">
             <div class="mb-3">
               <i class="fa-brands fa-stripe fa-2x text-primary opacity-75"></i>
-              <small class="d-block text-muted mt-1" style="font-size:.75rem;">Pago procesado de forma segura por Stripe</small>
+              <small class="d-block text-muted mt-1" style="font-size:.75rem;">Pago procesado de forma segura por
+                Stripe</small>
             </div>
             <h4 class="text-success fw-bold mb-3"><i class="fa-solid fa-circle-check me-2"></i>¡Pedido Confirmado!</h4>
             <div class="bg-dark border border-success rounded-0 py-3 px-4 mb-4 d-inline-block">
               <small class="text-muted d-block mb-1">Referencia del pedido</small>
               <span class="fw-bold fs-5 text-success font-monospace" id="success-order-ref">—</span>
             </div>
-            <p class="text-muted small mb-3">Tus entradas digitales ya están disponibles en tu cuenta para descargar.</p>
-            <div class="alert alert-success rounded-0 border-success d-flex align-items-center gap-2 mb-4 text-start" style="font-size:.88rem;">
+            <p class="text-muted small mb-3">Tus entradas digitales ya están disponibles en tu cuenta para descargar.
+            </p>
+            <div class="alert alert-success rounded-0 border-success d-flex align-items-center gap-2 mb-4 text-start"
+              style="font-size:.88rem;">
               <i class="fa-solid fa-envelope fa-lg flex-shrink-0"></i>
               <span>Te hemos enviado las entradas en PDF al correo electrónico indicado en el pedido.</span>
             </div>
@@ -138,15 +150,17 @@ $stripeSessionId = $_GET['session_id'] ?? '';
           <div class="card-body">
             <div class="row g-3">
               <div class="col-12 col-sm-6">
-                <label class="form-label text-muted small fw-semibold"><i class="fa-solid fa-user me-1"></i>Nombre del titular</label>
+                <label class="form-label text-muted small fw-semibold"><i class="fa-solid fa-user me-1"></i>Nombre del
+                  titular</label>
                 <input type="text" id="checkout-name" class="form-control shadow-sm rounded-0"
-                       value="<?= htmlspecialchars($_SESSION['user_name'] ?? $_SESSION['display_name'] ?? '') ?>"
-                       placeholder="Tu nombre completo" required>
+                  value="<?= htmlspecialchars($_SESSION['user_name'] ?? $_SESSION['display_name'] ?? '') ?>"
+                  placeholder="Tu nombre completo" required>
               </div>
               <div class="col-12 col-sm-6">
-                <label class="form-label text-muted small fw-semibold"><i class="fa-solid fa-envelope me-1"></i>Email para recibir las entradas</label>
+                <label class="form-label text-muted small fw-semibold"><i class="fa-solid fa-envelope me-1"></i>Email
+                  para recibir las entradas</label>
                 <input type="email" id="checkout-email" class="form-control shadow-sm rounded-0"
-                       value="<?= htmlspecialchars($_SESSION['user_email'] ?? '') ?>" required>
+                  value="<?= htmlspecialchars($_SESSION['user_email'] ?? '') ?>" required>
               </div>
             </div>
           </div>
@@ -161,7 +175,9 @@ $stripeSessionId = $_GET['session_id'] ?? '';
                   <div class="text-white-50" style="font-size:.8rem; line-height:1.5;">
                     No se cargará dinero real y las entradas son ficticias.<br>
                     Tarjeta de prueba:
-                    <span class="fw-bold text-white ms-1" style="font-family:'Courier New',monospace; letter-spacing:.12em; font-size:.9rem;">4242 4242 4242 4242</span>
+                    <span class="fw-bold text-white ms-1"
+                      style="font-family:'Courier New',monospace; letter-spacing:.12em; font-size:.9rem;">4242 4242 4242
+                      4242</span>
                     <span class="text-muted ms-2" style="font-size:.75rem;">· Fecha: 12/30 · CVC: 123</span>
                   </div>
                 </div>
@@ -209,8 +225,10 @@ $stripeSessionId = $_GET['session_id'] ?? '';
 
 
 <!-- Toast para mensajes (Diseño mejorado y centrado) -->
-<div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 2000; margin-top: 85px;">
-  <div id="cart-toast" class="toast align-items-center text-white border-0 rounded-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" style="min-width: 350px;">
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3"
+  style="z-index: 2000; margin-top: 85px;">
+  <div id="cart-toast" class="toast align-items-center text-white border-0 rounded-0 shadow-lg" role="alert"
+    aria-live="assertive" aria-atomic="true" style="min-width: 350px;">
     <div class="d-flex align-items-center p-3">
       <div class="toast-body flex-grow-1 text-center fw-medium" style="font-size: 0.95rem;">
         <i class="fa-solid fa-circle-info me-2" id="cart-toast-icon-tag"></i>
@@ -224,14 +242,14 @@ $stripeSessionId = $_GET['session_id'] ?? '';
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 <script src="https://js.stripe.com/v3/"></script>
 <script>
-window.TICKETS_API    = '<?= Router::getBaseUrl() ?>/api/php/tickets.php';
-window.STRIPE_API     = '<?= Router::getBaseUrl() ?>/api/php/stripe_checkout.php';
-window.STRIPE_PK      = '<?= htmlspecialchars($stripePublicKey) ?>';
-window.ORDERS_URL     = '<?= Router::url('orders') ?>';
-window.CARRITO_URL    = '<?= Router::url('carrito') ?>';
-window.CHECKOUT_URL   = '<?= Router::url('checkout') ?>';
-// Retorno de Stripe
-window.STRIPE_RETURN_STATUS   = '<?= htmlspecialchars($paymentStatus) ?>';
-window.STRIPE_RETURN_SESSION  = '<?= htmlspecialchars($stripeSessionId) ?>';
+  window.TICKETS_API = '<?= Router::getBaseUrl() ?>/api/php/tickets.php';
+  window.STRIPE_API = '<?= Router::getBaseUrl() ?>/api/php/stripe_checkout.php';
+  window.STRIPE_PK = '<?= htmlspecialchars($stripePublicKey) ?>';
+  window.ORDERS_URL = '<?= Router::url('orders') ?>';
+  window.CARRITO_URL = '<?= Router::url('carrito') ?>';
+  window.CHECKOUT_URL = '<?= Router::url('checkout') ?>';
+  // Retorno de Stripe
+  window.STRIPE_RETURN_STATUS = '<?= htmlspecialchars($paymentStatus) ?>';
+  window.STRIPE_RETURN_SESSION = '<?= htmlspecialchars($stripeSessionId) ?>';
 </script>
 <script src="<?= Router::asset('web/js/shop/tickets.js') ?>?v=<?= time() ?>"></script>

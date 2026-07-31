@@ -7,17 +7,17 @@ require_once __DIR__ . '/../../partials/header.php';
         <div
             class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-center border-bottom pb-3">
             <h1 class="display-6 fw-bold text-success mb-3 mb-md-0">
-                <i class="fa-solid fa-comments me-2"></i>Búsqueda de Foros
+                <i class="fa-solid fa-comments me-2"></i><span data-i18n="forums.search.title">Búsqueda de Foros</span>
             </h1>
             <?php if ($is_logged): ?>
                 <a href="<?= $base_url ?>/web/views/public/forums/forum_config.php"
                     class="btn btn-success fw-bold shadow-sm rounded-0 px-4" id="create-forum-btn">
-                    <i class="fa-solid fa-plus me-2"></i>Crear Foro
+                    <i class="fa-solid fa-plus me-2"></i><span data-i18n="forums.search.create_forum">Crear Foro</span>
                 </a>
             <?php else: ?>
                 <button class="btn btn-success fw-bold shadow-sm rounded-0 px-4" id="create-forum-btn"
                     data-bs-toggle="modal" data-bs-target="#loginModal">
-                    <i class="fa-solid fa-plus me-2"></i>Crear Foro
+                    <i class="fa-solid fa-plus me-2"></i><span data-i18n="forums.search.create_forum">Crear Foro</span>
                 </button>
             <?php endif; ?>
         </div>
@@ -31,12 +31,16 @@ require_once __DIR__ . '/../../partials/header.php';
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </span>
                 <input type="text" id="forum-search-input" class="form-control border-success rounded-0"
+                    data-i18n-placeholder="forums.search.placeholder"
                     placeholder="Buscar título o descripción del foro..." aria-label="Buscar foros"
                     aria-describedby="search-addon" style="border-width: 2px;">
             </div>
             <?php if ($is_logged): ?>
-                <button type="button" class="btn btn-outline-success shadow-sm rounded-0 fw-bold d-flex align-items-center text-nowrap" id="filter-mine-btn" data-mine="false">
-                    <i class="fa-solid fa-filter me-sm-2"></i> <span class="d-none d-sm-inline">Mis Foros</span>
+                <button type="button"
+                    class="btn btn-outline-success shadow-sm rounded-0 fw-bold d-flex align-items-center text-nowrap"
+                    id="filter-mine-btn" data-mine="false">
+                    <i class="fa-solid fa-filter me-sm-2"></i> <span class="d-none d-sm-inline"
+                        data-i18n="forums.search.my_forums">Mis Foros</span>
                 </button>
             <?php endif; ?>
         </div>
@@ -58,7 +62,7 @@ $login_msg = 'Para crear o participar en foros necesitas iniciar sesión.';
 require_once __DIR__ . '/../../partials/login_modal.php';
 ?>
 <script>
-window.BASE_URL = '<?= $base_url ?>';
-window.IS_LOGGED_IN = <?= $is_logged ? 'true' : 'false' ?>;
+    window.BASE_URL = '<?= $base_url ?>';
+    window.IS_LOGGED_IN = <?= $is_logged ? 'true' : 'false' ?>;
 </script>
 <script src="<?= Router::asset('web/js/forums/forums.js') ?>"></script>

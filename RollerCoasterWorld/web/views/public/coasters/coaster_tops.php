@@ -7,9 +7,11 @@ require_once __DIR__ . '/../../partials/header.php';
     <div class="row mb-5">
         <div class="col-12 text-center">
             <h1 class="display-6 fw-bold border-bottom border-light border-opacity-50 pb-2 text-success">
-                <i class="fa-solid fa-ranking-star me-2"></i> Tops de la Comunidad
+                <i class="fa-solid fa-ranking-star me-2"></i> <span data-i18n="coasters.tops.title">Tops de la
+                    Comunidad</span>
             </h1>
-            <p class="text-muted text-uppercase fw-bold mt-3" style="letter-spacing: 0.1em; font-size: 0.85rem;">
+            <p class="text-muted text-uppercase fw-bold mt-3" style="letter-spacing: 0.1em; font-size: 0.85rem;"
+                data-i18n="coasters.tops.subtitle">
                 Descubre las coasters favoritas de otros usuarios
             </p>
         </div>
@@ -25,7 +27,8 @@ require_once __DIR__ . '/../../partials/header.php';
                 <div class="flex-grow-1 position-relative" style="min-width: 200px;">
                     <input type="text" id="top-search"
                         class="form-control bg-transparent text-white border-success rounded-0 ps-3 pe-5 py-2 shadow-sm"
-                        placeholder="Buscar usuario..." style="border-width: 2px;">
+                        data-i18n-placeholder="coasters.tops.search_placeholder" placeholder="Buscar usuario..."
+                        style="border-width: 2px;">
                     <i class="fa-solid fa-magnifying-glass position-absolute text-muted"
                         style="right: 14px; top: 50%; transform: translateY(-50%);"></i>
                 </div>
@@ -34,9 +37,12 @@ require_once __DIR__ . '/../../partials/header.php';
                 <select id="sort-select"
                     class="form-select bg-transparent text-white border-success rounded-0 py-2 shadow-sm w-auto"
                     style="border-width: 2px;">
-                    <option value="date_desc" style="background: #212529;" selected>Última modificación</option>
-                    <option value="credits_desc" style="background: #212529;">Mayor nº credits</option>
-                    <option value="alpha_asc" style="background: #212529;">Orden alfabético</option>
+                    <option value="date_desc" style="background: #212529;" selected data-i18n="coasters.tops.sort_date">
+                        Última modificación</option>
+                    <option value="credits_desc" style="background: #212529;" data-i18n="coasters.tops.sort_credits">
+                        Mayor nº credits</option>
+                    <option value="alpha_asc" style="background: #212529;" data-i18n="coasters.tops.sort_alpha">Orden
+                        alfabético</option>
                 </select>
 
                 <!-- Filtro Amigos -->
@@ -47,7 +53,8 @@ require_once __DIR__ . '/../../partials/header.php';
                         style="width: 2.5em; height: 1.2em; border-width: 2px; cursor: pointer;">
                     <label class="form-check-label ms-2 text-white" for="filterFriends"
                         style="font-size: 0.95rem; cursor: pointer;"><i
-                            class="fa-solid fa-user-group text-success me-1"></i> Solo amigos</label>
+                            class="fa-solid fa-user-group text-success me-1"></i> <span
+                            data-i18n="coasters.tops.friends_only">Solo amigos</span></label>
                 </div>
 
             </div>
@@ -58,7 +65,7 @@ require_once __DIR__ . '/../../partials/header.php';
     <div class="row g-4 justify-content-center" id="tops-grid">
         <div class="col-12 text-center py-5" id="tops-loading">
             <div class="spinner-border text-success" role="status"></div>
-            <p class="mt-3 text-muted">Cargando tops...</p>
+            <p class="mt-3 text-muted" data-i18n="coasters.tops.loading">Cargando tops...</p>
         </div>
     </div>
 </main>

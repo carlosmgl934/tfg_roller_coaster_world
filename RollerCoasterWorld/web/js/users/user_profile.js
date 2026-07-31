@@ -315,8 +315,9 @@ $(document).ready(function () {
       container.empty();
       if (!items || items.length === 0) {
         container.html(
-          `<div class="trips-empty-notice"><i class="fa-solid fa-ghost fa-3x mb-3 opacity-50"></i><br>No hay ranking definido aún.</div>`,
+          `<div class="trips-empty-notice"><i class="fa-solid fa-ghost fa-3x mb-3 opacity-50"></i><br><span data-i18n="user_profile.empty_ranking">No hay ranking definido aún.</span></div>`,
         );
+        if (window.rcwI18n) window.rcwI18n.applyToContainer(container[0]);
         return;
       }
 
@@ -401,8 +402,9 @@ $(document).ready(function () {
 
     if (!photos || photos.length === 0) {
       container.html(
-        '<div class="col-12 text-center py-5 text-muted"><i class="fa-solid fa-camera-viewfinder fs-1 mb-3 opacity-50"></i><br>No hay fotos públicas de este viajero.</div>',
+        '<div class="col-12 text-center py-5 text-muted"><i class="fa-solid fa-camera-viewfinder fs-1 mb-3 opacity-50"></i><br><span data-i18n="user_profile.empty_photos">No hay fotos públicas de este viajero.</span></div>',
       );
+      if (window.rcwI18n) window.rcwI18n.applyToContainer(container[0]);
       return;
     }
 
@@ -534,8 +536,9 @@ $(document).ready(function () {
 
     if (!friends || friends.length === 0) {
       container.html(
-        '<div class="p-5 text-center text-muted"><i class="fa-solid fa-user-group fa-3x mb-3 d-block opacity-25"></i>Este usuario aún no tiene amigos en la plataforma.</div>',
+        '<div class="p-5 text-center text-muted"><i class="fa-solid fa-user-group fa-3x mb-3 d-block opacity-25"></i><span data-i18n="user_profile.empty_friends_platform">Este usuario aún no tiene amigos en la plataforma.</span></div>',
       );
+      if (window.rcwI18n) window.rcwI18n.applyToContainer(container[0]);
       return;
     }
 
@@ -690,8 +693,9 @@ $(document).ready(function () {
       container.empty();
       if (currentReviews.length === 0) {
         container.html(
-          '<div class="p-5 text-center text-muted"><i class="fa-solid fa-star-half-stroke fa-3x mb-3 d-block opacity-25"></i>Este usuario no ha escrito ninguna reseña.</div>',
+          '<div class="p-5 text-center text-muted"><i class="fa-solid fa-star-half-stroke fa-3x mb-3 d-block opacity-25"></i><span data-i18n="user_profile.empty_reviews">Este usuario no ha escrito ninguna reseña.</span></div>',
         );
+        if (window.rcwI18n) window.rcwI18n.applyToContainer(container[0]);
         return;
       }
 
@@ -801,8 +805,9 @@ $(document).ready(function () {
       const d = j.data || [];
       if (!d.length) {
         container.html(
-          '<div class="text-center py-4 text-muted"><i class="fa-solid fa-suitcase fa-2x mb-2 opacity-50"></i><br>Este usuario no tiene viajes registrados.</div>',
+          '<div class="text-center py-4 text-muted"><i class="fa-solid fa-suitcase fa-2x mb-2 opacity-50"></i><br><span data-i18n="user_profile.empty_trips">Este usuario no tiene viajes registrados.</span></div>',
         );
+        if (window.rcwI18n) window.rcwI18n.applyToContainer(container[0]);
         return;
       }
       let html = "";
@@ -1105,7 +1110,8 @@ $(document).ready(function () {
     function renderRanking() {
       if (!cachedData || !cachedData.length) {
         container.innerHTML =
-          '<div class="text-center py-5 text-muted"><i class="fa-solid fa-chart-line fa-2x mb-3 opacity-50"></i><br>No hay datos en este periodo.</div>';
+          '<div class="text-center py-5 text-muted"><i class="fa-solid fa-chart-line fa-2x mb-3 opacity-50"></i><br><span data-i18n="user_profile.empty_period_data">No hay datos en este periodo.</span></div>';
+        if (window.rcwI18n) window.rcwI18n.applyToContainer(container);
         return;
       }
 

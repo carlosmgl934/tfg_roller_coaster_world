@@ -1,0 +1,31 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Redirigir la raíz del proyecto hacia el index principal
+    # Esto soluciona el error 403 Forbidden al entrar sin especificar la ruta
+    RewriteRule ^$ web/views/public/index.php [L]
+
+    # REGLA CRÍTICA: Si el archivo existe físicamente en disco → servirlo DIRECTAMENTE, sin pasar por PHP
+    # Esto soluciona el bug donde /web/lang/*.json devuelve HTML en producción
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
+    # Si es un directorio existente → servirlo directamente
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+</IfModule>
+
+# Forzar MIME type correcto para JSON (por si el servidor no lo detecta bien)
+<IfModule mod_mime.c>
+    AddType application/json .json
+    AddType application/javascript .js
+</IfModule>
+
+# Headers de caché para assets estáticos
+<IfModule mod_headers.c>
+    <FilesMatch "\.(json|js|css|png|jpg|jpeg|gif|svg|webp|woff2|woff|ttf)$">
+        Header set Cache-Control "public, max-age=3600"
+    </FilesMatch>
+</IfModule>

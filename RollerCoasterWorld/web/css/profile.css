@@ -367,7 +367,9 @@
 body.is-dragging .tops-edit-item.sortable-chosen {
   border-color: var(--rcw-green-neon) !important;
   background: rgba(0, 200, 83, 0.08) !important;
-  box-shadow: 0 0 0 2px rgba(0, 200, 83, 0.35), 0 4px 16px rgba(0, 0, 0, 0.4);
+  box-shadow:
+    0 0 0 2px rgba(0, 200, 83, 0.35),
+    0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 body.is-dragging .tops-edit-item.sortable-chosen .drag-handle {
@@ -407,7 +409,9 @@ body.is-dragging .tops-edit-item.sortable-chosen .drag-handle {
   font-weight: 700 !important;
 }
 
-.flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month {
+.flatpickr-current-month
+  .flatpickr-monthDropdown-months
+  .flatpickr-monthDropdown-month {
   background-color: #161c22 !important;
   color: #e0e6ed !important;
 }
@@ -560,7 +564,7 @@ span.flatpickr-weekday {
   margin-bottom: 0;
 }
 
-.tops-filters-grid>.tops-filter-item:first-child {
+.tops-filters-grid > .tops-filter-item:first-child {
   grid-column: 1 / -1;
 }
 
@@ -766,6 +770,200 @@ span.flatpickr-weekday {
 
   .tops-legend-card {
     position: static;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   TOPS: MINI LIST VIEW (view = 'mini')
+   Objetivo: 10 tarjetas en ~650px de altura
+   56px * 10 + 1px separadores = 570px ✅
+═══════════════════════════════════════════ */
+.tops-mini-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 56px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #232a31;
+  text-decoration: none;
+  transition: background 0.15s ease;
+  overflow: hidden;
+}
+
+.tops-mini-item:last-child {
+  border-bottom: none;
+}
+
+.tops-mini-item:hover,
+.tops-mini-item:focus {
+  background: rgba(255, 255, 255, 0.03);
+  outline: none;
+}
+
+.tops-mini-rank {
+  font-weight: 800;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  /* Default color (6+) */
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+}
+
+/* Font-size adaptativo por número de dígitos */
+.tops-mini-rank.rank-1d { font-size: 12px; }
+.tops-mini-rank.rank-2d { font-size: 10px; }
+.tops-mini-rank.rank-3d { font-size: 8px; }
+
+/* Colores de podium */
+.tops-mini-rank.rank-gold {
+  background: #FFD700;
+  color: #1a1a1a;
+}
+.tops-mini-rank.rank-silver {
+  background: #C0C0C0;
+  color: #1a1a1a;
+}
+.tops-mini-rank.rank-bronze {
+  background: #CD7F32;
+  color: #fff;
+}
+.tops-mini-rank.rank-top5 {
+  background: #065f46;
+  color: #6ee7b7;
+}
+
+.tops-mini-thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+  background: #0d1117;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tops-mini-thumb-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  background: #0d1117;
+  border: 1px solid #232a31;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #444d56;
+  font-size: 0.85rem;
+}
+
+.tops-mini-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.tops-mini-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #e0e6ed;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.tops-mini-sub {
+  font-size: 11px;
+  color: #8b949e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.tops-mini-chevron {
+  color: #444d56;
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════
+   FILTROS COLAPSABLES EN MÓVIL
+═══════════════════════════════════════════ */
+.tops-filters-mobile-toggle {
+  display: none; /* solo visible en móvil */
+}
+
+@media (max-width: 768px) {
+  /* Botón toggle — siempre visible en móvil */
+  .tops-filters-mobile-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: rgba(22, 27, 34, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0;
+    cursor: pointer;
+    margin-bottom: 0;
+    width: 100%;
+    text-align: left;
+    color: #c9d1d9;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    transition: background 0.2s;
+    user-select: none;
+  }
+
+  .tops-filters-mobile-toggle:hover {
+    background: rgba(22, 27, 34, 0.9);
+  }
+
+  .tops-filters-mobile-toggle .toggle-arrow {
+    transition: transform 0.25s ease;
+    color: var(--rcw-green);
+    font-size: 0.75rem;
+  }
+
+  .tops-filters-mobile-toggle.is-open .toggle-arrow {
+    transform: rotate(180deg);
+  }
+
+  .tops-filters-active-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--rcw-green-neon);
+    color: #000;
+    font-size: 0.65rem;
+    font-weight: 800;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    padding: 0 5px;
+    margin-left: 6px;
+  }
+
+  /* Panel de filtros colapsable en móvil */
+  .tops-filters-collapsible {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease;
+  }
+
+  .tops-filters-collapsible.is-open {
+    max-height: 600px; /* suficiente para todos los filtros */
   }
 }
 
@@ -1165,7 +1363,7 @@ body.is-dragging * {
   grid-template-columns: 1fr;
 }
 
-.tops-filters-grid--2col>.tops-filter-item {
+.tops-filters-grid--2col > .tops-filter-item {
   grid-column: 1 / -1;
 }
 
@@ -1426,7 +1624,7 @@ body.is-dragging * {
 }
 
 /* Permitir que el wrapper flexione en contenedores flex */
-.d-flex>.flatpickr-wrapper {
+.d-flex > .flatpickr-wrapper {
   flex: 1;
 }
 
@@ -1438,7 +1636,10 @@ body.is-dragging * {
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-left: 3px solid rgba(255, 255, 255, 0.07);
   margin-bottom: 8px;
-  transition: background 0.2s ease, border-color 0.2s ease, border-left-color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    border-left-color 0.2s ease;
   color: inherit;
   text-decoration: none;
 }
@@ -1642,7 +1843,6 @@ body.is-dragging * {
 
 /* ── LIGHTBOX MODAL — flechas en móvil sobre la imagen ── */
 @media (max-width: 767px) {
-
   /* En móvil las flechas exteriores no caben — las metemos dentro */
   #ig-modal-prev,
   #ig-modal-next {

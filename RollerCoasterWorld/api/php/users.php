@@ -42,9 +42,12 @@ function getUserId(): ?int
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
             $_SESSION['user_id'] = (int) $row['id'];
+            session_write_close(); // Cerramos sesión tras cachear user_id para no interferir con escrituras paralelas
             return (int) $row['id'];
         }
     }
+    // Cerramos la sesión en cualquier caso: esta API no necesita seguir escribiendo en ella
+    session_write_close();
     return null;
 }
 
@@ -258,11 +261,11 @@ function getFriendsData()
 
         Response::success([
             'data' => [
-                'friends'           => $friends,
+                'friends' => $friends,
                 'received_requests' => $received,
-                'sent_requests'     => $sent,
+                'sent_requests' => $sent,
                 'forum_invitations' => $forum_invitations,
-                'trip_invitations'  => $trip_invitations
+                'trip_invitations' => $trip_invitations
             ]
         ]);
     } catch (Exception $e) {
@@ -274,18 +277,21 @@ function acceptForumInvite()
 {
     $db = getDb();
     $current_user_id = getUserId();
-    if (!$current_user_id) Response::error("No autorizado", 401);
+    if (!$current_user_id)
+        Response::error("No autorizado", 401);
 
-    $body      = json_decode(file_get_contents('php://input'), true) ?? $_POST;
-    $invite_id = (int)($body['invite_id'] ?? 0);
-    if (!$invite_id) Response::error("ID de invitación inválido");
+    $body = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+    $invite_id = (int) ($body['invite_id'] ?? 0);
+    if (!$invite_id)
+        Response::error("ID de invitación inválido");
 
     try {
         // Verificar que la invitación es para este usuario
         $stmt = $db->prepare("SELECT forum_id FROM forum_invitations WHERE id = ? AND receiver_id = ? AND status = 'pending'");
         $stmt->execute([$invite_id, $current_user_id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$row) Response::error("Invitación no encontrada o ya procesada");
+        if (!$row)
+            Response::error("Invitación no encontrada o ya procesada");
 
         $forum_id = $row['forum_id'];
 
@@ -294,7 +300,7 @@ function acceptForumInvite()
 
         // Añadir al usuario como colaborador
         $db->prepare("INSERT INTO forum_collaborators (forum_id, user_id) VALUES (?, ?) ON CONFLICT DO NOTHING")
-           ->execute([$forum_id, $current_user_id]);
+            ->execute([$forum_id, $current_user_id]);
 
         Response::success(['message' => 'Invitación aceptada']);
     } catch (Exception $e) {
@@ -306,16 +312,19 @@ function declineForumInvite()
 {
     $db = getDb();
     $current_user_id = getUserId();
-    if (!$current_user_id) Response::error("No autorizado", 401);
+    if (!$current_user_id)
+        Response::error("No autorizado", 401);
 
-    $body      = json_decode(file_get_contents('php://input'), true) ?? $_POST;
-    $invite_id = (int)($body['invite_id'] ?? 0);
-    if (!$invite_id) Response::error("ID de invitación inválido");
+    $body = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+    $invite_id = (int) ($body['invite_id'] ?? 0);
+    if (!$invite_id)
+        Response::error("ID de invitación inválido");
 
     try {
         $stmt = $db->prepare("UPDATE forum_invitations SET status = 'declined' WHERE id = ? AND receiver_id = ? AND status = 'pending'");
         $stmt->execute([$invite_id, $current_user_id]);
-        if ($stmt->rowCount() === 0) Response::error("Invitación no encontrada o ya procesada");
+        if ($stmt->rowCount() === 0)
+            Response::error("Invitación no encontrada o ya procesada");
         Response::success(['message' => 'Invitación rechazada']);
     } catch (Exception $e) {
         Response::error("Error al rechazar la invitación", 500);
@@ -471,7 +480,7 @@ function getPublicProfile()
         $stmtFastest = $db->prepare("SELECT c.coaster_name FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :tid AND c.speed IS NOT NULL ORDER BY c.speed DESC LIMIT 1");
         $stmtFastest->execute([':tid' => $target_id]);
         $tech_stats['fastest_coaster'] = $stmtFastest->fetchColumn() ?: '—';
-        
+
         // Más larga
         $stmtLongest = $db->prepare("SELECT c.coaster_name FROM user_credits uc JOIN coasters c ON uc.coaster_id = c.id WHERE uc.user_id = :tid AND c.coaster_length IS NOT NULL ORDER BY c.coaster_length DESC LIMIT 1");
         $stmtLongest->execute([':tid' => $target_id]);
@@ -570,6 +579,7 @@ function getPublicProfile()
         ]);
 
     } catch (Exception $e) {
-        error_log($e->getMessage()); Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
+        error_log($e->getMessage());
+        Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
     }
 }

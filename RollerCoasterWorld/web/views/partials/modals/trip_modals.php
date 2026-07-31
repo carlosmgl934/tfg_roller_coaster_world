@@ -21,48 +21,52 @@
                             stroke-width="4" stroke-linecap="round" />
                         <path d="M4 56 C 24 56,28 24,40 24 C 50 24,54 38,60 56" fill="none" stroke="currentColor"
                             stroke-width="4" stroke-linecap="round" />
-                    </svg>Registrar Ride
+                    </svg><span data-i18n="trips.modal.register_ride_title">Registrar Ride</span>
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p class="text-muted small mb-3"><span class="text-danger fw-bold">*</span> Campos obligatorios</p>
+                <p class="text-muted small mb-3"><span class="text-danger fw-bold">*</span> <span
+                        data-i18n="trips.modal.required_fields">Campos obligatorios</span></p>
                 <input type="hidden" id="lr-park-id"><input type="hidden" id="lr-trip-id"><input type="hidden"
                     id="lr-date">
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Parque</label>
+                    <label class="form-label fw-semibold" data-i18n="trips.modal.park_label">Parque</label>
                     <input type="text" class="form-control rounded-0" id="lr-park-name" readonly>
                 </div>
                 <div class="mb-3 position-relative">
-                    <label class="form-label fw-semibold">Montaña rusa <span class="text-danger">*</span></label>
+                    <label class="form-label fw-semibold"><span data-i18n="trips.modal.coaster_label">Montaña
+                            rusa</span> <span class="text-danger">*</span></label>
                     <input type="text" class="form-control rounded-0" id="lr-coaster-search"
-                        placeholder="Buscar coaster..." autocomplete="off">
+                        data-i18n-placeholder="trips.modal.search_coaster_placeholder" placeholder="Buscar coaster..."
+                        autocomplete="off">
                     <input type="hidden" id="lr-coaster-id">
                     <div class="ac-dropdown" id="lr-coaster-dropdown"></div>
                 </div>
                 <div class="row g-3 mb-3">
                     <div class="col-6">
-                        <label class="form-label fw-semibold">Fila</label>
+                        <label class="form-label fw-semibold" data-i18n="trips.modal.row_label">Fila</label>
                         <input type="number" class="form-control rounded-0" id="lr-seat" min="1" max="30"
                             placeholder="Ej: 1">
                     </div>
                     <div class="col-6">
-                        <label class="form-label fw-semibold">Hora</label>
+                        <label class="form-label fw-semibold" data-i18n="trips.modal.time_label">Hora</label>
                         <input type="time" class="form-control rounded-0" id="lr-time">
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Notas</label>
-                    <input type="text" class="form-control rounded-0" id="lr-notes" placeholder="Opcional"
-                        maxlength="200">
+                    <label class="form-label fw-semibold" data-i18n="trips.modal.notes_label">Notas</label>
+                    <input type="text" class="form-control rounded-0" id="lr-notes"
+                        data-i18n-placeholder="trips.modal.optional_placeholder" placeholder="Opcional" maxlength="200">
                 </div>
                 <div id="lr-error" class="alert alert-danger rounded-0 d-none small"></div>
             </div>
             <div class="modal-footer rounded-0">
-                <button type="button" class="btn btn-outline-secondary rounded-0"
-                    data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal"
+                    data-i18n="trips.modal.cancel">Cancelar</button>
                 <button type="button" class="btn btn-warning rounded-0 fw-bold" id="lr-submit-btn"><i
-                        class="fa-solid fa-check me-1"></i>Registrar</button>
+                        class="fa-solid fa-check me-1"></i><span
+                        data-i18n="trips.modal.register_btn">Registrar</span></button>
             </div>
         </div>
     </div>
@@ -77,10 +81,11 @@
             <div class="modal-body p-0" id="td-body"></div>
             <div class="modal-footer rounded-0"
                 style="background:var(--rcw-bg-card-alt); border-top:1px solid var(--rcw-border);">
-                <button type="button" class="btn btn-outline-secondary rounded-0 px-4"
-                    data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-outline-secondary rounded-0 px-4" data-bs-dismiss="modal"
+                    data-i18n="trips.modal.close">Cerrar</button>
                 <button type="button" class="btn btn-danger rounded-0 px-4" id="td-delete-btn"><i
-                        class="fa-solid fa-trash me-1"></i>Eliminar</button>
+                        class="fa-solid fa-trash me-1"></i><span
+                        data-i18n="trips.modal.delete_btn">Eliminar</span></button>
             </div>
         </div>
     </div>
@@ -91,18 +96,21 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-0">
             <div class="modal-header bg-danger text-white rounded-0">
-                <h5 class="modal-title fw-bold mb-0"><i class="fa-solid fa-triangle-exclamation me-2"></i>Eliminar viaje
+                <h5 class="modal-title fw-bold mb-0"><i class="fa-solid fa-triangle-exclamation me-2"></i><span
+                        data-i18n="trips.modal.delete_trip_title">Eliminar viaje</span>
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p class="mb-0">¿Estás seguro? Esta acción no se puede deshacer.</p>
+                <p class="mb-0" data-i18n="trips.modal.delete_confirm_text">¿Estás seguro? Esta acción no se puede
+                    deshacer.</p>
             </div>
             <div class="modal-footer rounded-0">
-                <button type="button" class="btn btn-outline-secondary rounded-0 px-4"
-                    data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-outline-secondary rounded-0 px-4" data-bs-dismiss="modal"
+                    data-i18n="trips.modal.cancel">Cancelar</button>
                 <button type="button" class="btn btn-danger rounded-0 px-4" id="confirm-delete-btn"><i
-                        class="fa-solid fa-trash me-1"></i>Sí, eliminar</button>
+                        class="fa-solid fa-trash me-1"></i><span data-i18n="trips.modal.yes_delete_btn">Sí,
+                        eliminar</span></button>
             </div>
         </div>
     </div>
@@ -113,29 +121,34 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-0">
             <div class="modal-header bg-primary text-white rounded-0">
-                <h5 class="modal-title fw-bold mb-0"><i class="fa-solid fa-location-dot me-2"></i>Registrar Visita</h5>
+                <h5 class="modal-title fw-bold mb-0"><i class="fa-solid fa-location-dot me-2"></i><span
+                        data-i18n="trips.modal.register_visit_title">Registrar Visita</span></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p class="text-muted small mb-3"><span class="text-danger fw-bold">*</span> Campos obligatorios</p>
+                <p class="text-muted small mb-3"><span class="text-danger fw-bold">*</span> <span
+                        data-i18n="trips.modal.required_fields">Campos obligatorios</span></p>
                 <input type="hidden" id="av-date">
                 <div class="mb-3 position-relative">
-                    <label class="form-label fw-semibold">Parque <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control rounded-0" id="av-park-search" placeholder="Buscar parque..."
+                    <label class="form-label fw-semibold"><span data-i18n="trips.modal.park_label">Parque</span> <span
+                            class="text-danger">*</span></label>
+                    <input type="text" class="form-control rounded-0" id="av-park-search"
+                        data-i18n-placeholder="trips.modal.search_park_placeholder" placeholder="Buscar parque..."
                         autocomplete="off">
                     <input type="hidden" id="av-park-id">
                     <div class="ac-dropdown" id="av-park-dropdown"></div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Notas</label>
-                    <input type="text" class="form-control rounded-0" id="av-notes" placeholder="Opcional">
+                    <label class="form-label fw-semibold" data-i18n="trips.modal.notes_label">Notas</label>
+                    <input type="text" class="form-control rounded-0" id="av-notes"
+                        data-i18n-placeholder="trips.modal.optional_placeholder" placeholder="Opcional">
                 </div>
             </div>
             <div class="modal-footer rounded-0">
-                <button type="button" class="btn btn-outline-secondary rounded-0"
-                    data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal"
+                    data-i18n="trips.modal.cancel">Cancelar</button>
                 <button type="button" class="btn btn-primary rounded-0 fw-bold" id="av-submit-btn"><i
-                        class="fa-solid fa-plus me-1"></i>Añadir</button>
+                        class="fa-solid fa-plus me-1"></i><span data-i18n="trips.modal.add_btn">Añadir</span></button>
             </div>
         </div>
     </div>
@@ -146,18 +159,22 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-0">
             <div class="modal-header bg-info text-dark rounded-0">
-                <h5 class="modal-title fw-bold mb-0"><i class="fa-solid fa-users me-2"></i>Colaboradores</h5>
+                <h5 class="modal-title fw-bold mb-0"><i class="fa-solid fa-users me-2"></i><span
+                        data-i18n="trips.modal.collaborators_title">Colaboradores</span></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="collabs-body"></div>
             <div class="modal-footer rounded-0 d-flex flex-column align-items-center position-relative">
-                <p class="small text-muted mb-2 text-center w-100">Escribe el nombre de usuario de tu amigo para
+                <p class="small text-muted mb-2 text-center w-100" data-i18n="trips.modal.invite_hint">Escribe el nombre
+                    de usuario de tu amigo para
                     añadirlo</p>
                 <div class="input-group rounded-0 position-relative" style="max-width:320px; width:100%;">
                     <input type="text" class="form-control rounded-0" id="collab-username"
-                        placeholder="Nombre de usuario..." autocomplete="off">
+                        data-i18n-placeholder="trips.modal.username_placeholder" placeholder="Nombre de usuario..."
+                        autocomplete="off">
                     <button class="btn btn-info rounded-0 fw-bold" id="collab-invite-btn" style="z-index:2"><i
-                            class="fa-solid fa-paper-plane me-1"></i>Invitar</button>
+                            class="fa-solid fa-paper-plane me-1"></i><span
+                            data-i18n="trips.modal.invite_btn">Invitar</span></button>
                     <div class="ac-dropdown w-100 position-absolute" id="collab-dropdown"
                         style="top:100%; left:0; z-index:1000; display:none;"></div>
                 </div>
@@ -172,17 +189,18 @@
         <div class="modal-content rounded-0">
             <div class="modal-header rounded-0" id="gcm-header" style="background:#dc3545">
                 <h6 class="modal-title fw-bold mb-0 text-white" id="gcm-title"><i
-                        class="fa-solid fa-triangle-exclamation me-2"></i>Confirmar</h6>
+                        class="fa-solid fa-triangle-exclamation me-2"></i><span
+                        data-i18n="trips.modal.confirm_title">Confirmar</span></h6>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body py-3">
-                <p class="mb-0" id="gcm-message">¿Estás seguro?</p>
+                <p class="mb-0" id="gcm-message" data-i18n="trips.modal.are_you_sure">¿Estás seguro?</p>
             </div>
             <div class="modal-footer rounded-0 py-2">
-                <button type="button" class="btn btn-outline-secondary btn-sm rounded-0 px-3"
-                    data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm rounded-0 px-3" data-bs-dismiss="modal"
+                    data-i18n="trips.modal.cancel">Cancelar</button>
                 <button type="button" class="btn btn-sm rounded-0 px-3 fw-bold" id="gcm-confirm-btn"
-                    style="background:#dc3545;color:#fff">Confirmar</button>
+                    style="background:#dc3545;color:#fff" data-i18n="trips.modal.confirm_btn">Confirmar</button>
             </div>
         </div>
     </div>
@@ -194,12 +212,14 @@
         <div class="modal-content rounded-0 text-center" style="background:var(--rcw-bg-card)">
             <div class="modal-body py-4">
                 <div style="font-size:3rem;line-height:1">🎢</div>
-                <h5 class="fw-bold mt-2 mb-1" style="color:var(--rcw-green-neon)">¡Nuevo Credit!</h5>
-                <p class="text-muted small mb-0">Primera vez en esta montaña rusa. ¡Añadida a tu colección!</p>
+                <h5 class="fw-bold mt-2 mb-1" style="color:var(--rcw-green-neon)"
+                    data-i18n="trips.modal.new_credit_title">¡Nuevo Credit!</h5>
+                <p class="text-muted small mb-0" data-i18n="trips.modal.new_credit_text">Primera vez en esta montaña
+                    rusa. ¡Añadida a tu colección!</p>
             </div>
             <div class="modal-footer justify-content-center py-2 border-0">
-                <button type="button" class="btn btn-success rounded-0 px-4 fw-bold"
-                    data-bs-dismiss="modal">¡Genial!</button>
+                <button type="button" class="btn btn-success rounded-0 px-4 fw-bold" data-bs-dismiss="modal"
+                    data-i18n="trips.modal.great_btn">¡Genial!</button>
             </div>
         </div>
     </div>
@@ -210,31 +230,38 @@
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content rounded-0">
             <div class="modal-header bg-success text-white rounded-0">
-                <h5 class="modal-title fw-bold mb-0"><i class="fa-solid fa-plus-circle me-2"></i>Nuevo Viaje</h5>
+                <h5 class="modal-title fw-bold mb-0"><i class="fa-solid fa-plus-circle me-2"></i><span
+                        data-i18n="trips.modal.new_trip_title">Nuevo Viaje</span></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p class="text-muted small mb-3"><span class="text-danger fw-bold">*</span> Campos obligatorios</p>
+                <p class="text-muted small mb-3"><span class="text-danger fw-bold">*</span> <span
+                        data-i18n="trips.modal.required_fields">Campos obligatorios</span></p>
                 <input type="hidden" id="ct-trip-id">
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Nombre del viaje <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control rounded-0" id="ct-title" placeholder="Ej: Verano Europa 2026"
+                    <label class="form-label fw-semibold"><span data-i18n="trips.modal.trip_name_label">Nombre del
+                            viaje</span> <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control rounded-0" id="ct-title"
+                        data-i18n-placeholder="trips.modal.trip_name_placeholder" placeholder="Ej: Verano Europa 2026"
                         maxlength="150">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Descripción</label>
+                    <label class="form-label fw-semibold" data-i18n="trips.modal.description_label">Descripción</label>
                     <textarea class="form-control rounded-0" id="ct-desc" rows="2"
+                        data-i18n-placeholder="trips.modal.description_placeholder"
                         placeholder="Describe tu viaje..."></textarea>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Países visitados</label>
+                    <label class="form-label fw-semibold" data-i18n="trips.modal.countries_label">Países
+                        visitados</label>
                     <input type="hidden" id="ct-countries">
                     <div id="ct-countries-container"
                         class="form-control rounded-0 d-flex flex-wrap gap-1 p-1 align-items-center"
                         style="min-height: 38px; cursor: text;">
                         <input type="text" id="ct-countries-input" class="border-0 bg-transparent flex-grow-1 px-1"
-                            style="outline: none; min-width: 120px;" placeholder="Escribe y pulsa Enter..."
-                            autocomplete="off">
+                            style="outline: none; min-width: 120px;"
+                            data-i18n-placeholder="trips.modal.countries_placeholder"
+                            placeholder="Escribe y pulsa Enter..." autocomplete="off">
                     </div>
                     <div class="position-relative">
                         <ul id="ct-countries-dropdown" class="dropdown-menu w-100 rounded-0 shadow-sm"
@@ -243,11 +270,13 @@
                 </div>
                 <div class="row g-3 mb-3">
                     <div class="col-6">
-                        <label class="form-label fw-semibold">Fecha inicio <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold"><span data-i18n="trips.modal.start_date_label">Fecha
+                                inicio</span> <span class="text-danger">*</span></label>
                         <input type="date" class="form-control rounded-0" id="ct-start" placeholder="dd/mm/aaaa">
                     </div>
                     <div class="col-6">
-                        <label class="form-label fw-semibold">Fecha fin <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold"><span data-i18n="trips.modal.end_date_label">Fecha
+                                fin</span> <span class="text-danger">*</span></label>
                         <input type="date" class="form-control rounded-0" id="ct-end" placeholder="dd/mm/aaaa">
                     </div>
                 </div>
@@ -255,16 +284,18 @@
                     style="background-color: #dc3545 !important; color: #ffffff !important;"></div>
                 <div id="ct-days-container" class="d-none">
                     <hr>
-                    <h6 class="fw-bold mb-3"><i class="fa-solid fa-map-location-dot text-success me-2"></i>Parques por
-                        día</h6>
+                    <h6 class="fw-bold mb-3"><i class="fa-solid fa-map-location-dot text-success me-2"></i><span
+                            data-i18n="trips.modal.parks_by_day">Parques por
+                            día</span></h6>
                     <div id="ct-days-list"></div>
                 </div>
             </div>
             <div class="modal-footer rounded-0">
-                <button type="button" class="btn btn-outline-secondary rounded-0 px-4"
-                    data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-outline-secondary rounded-0 px-4" data-bs-dismiss="modal"
+                    data-i18n="trips.modal.cancel">Cancelar</button>
                 <button type="button" class="btn btn-success rounded-0 px-4 fw-bold" id="ct-submit-btn"><i
-                        class="fa-solid fa-plus me-1"></i>Crear Viaje</button>
+                        class="fa-solid fa-plus me-1"></i><span data-i18n="trips.modal.create_trip_btn">Crear
+                        Viaje</span></button>
             </div>
         </div>
     </div>

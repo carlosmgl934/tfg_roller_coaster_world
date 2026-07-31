@@ -8,7 +8,7 @@
         <h5 class="text-uppercase fw-bold text-success mb-4 flex align-items-center">
           <i class="fa-solid fa-roller-coaster me-2"></i>RollerCoaster World
         </h5>
-        <p class="text-white-50 text-wrap" style="font-size: 0.9rem; line-height: 1.6;">
+        <p class="text-white-50 text-wrap" data-i18n="footer.tagline" style="font-size: 0.9rem; line-height: 1.6;">
           La base de datos hispanohablante definitiva. Explora montañas rusas, descubre parques temáticos y comparte tus
           tops con la comunidad.
         </p>
@@ -16,47 +16,53 @@
 
       <!-- Columna 2: Explora -->
       <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
-        <h6 class="text-uppercase fw-bold text-success mb-4">Explora</h6>
+        <h6 class="text-uppercase fw-bold text-success mb-4" data-i18n="footer.explore">Explora</h6>
         <p>
           <a href="<?= Router::url('coaster_search') ?>" class="text-white text-decoration-none hover-success"
             style="transition: color 0.3s;" onmouseover="this.style.color='#198754'"
-            onmouseout="this.style.color='white'">Montañas Rusas</a>
+            onmouseout="this.style.color='white'"><span data-i18n="footer.coasters">Montañas Rusas</span></a>
         </p>
         <p>
           <a href="<?= Router::url('park_search') ?>" class="text-white text-decoration-none hover-success"
             style="transition: color 0.3s;" onmouseover="this.style.color='#198754'"
-            onmouseout="this.style.color='white'">Parques Temáticos</a>
+            onmouseout="this.style.color='white'"><span data-i18n="footer.parks">Parques Temáticos</span></a>
         </p>
         <p>
           <a href="<?= Router::url('coaster_tops') ?>" class="text-white text-decoration-none hover-success"
             style="transition: color 0.3s;" onmouseover="this.style.color='#198754'"
-            onmouseout="this.style.color='white'">Tops de la Comunidad</a>
+            onmouseout="this.style.color='white'"><span data-i18n="footer.community_tops">Tops de la
+              Comunidad</span></a>
         </p>
         <p>
           <a href="<?= Router::url('forums') ?>" class="text-white text-decoration-none hover-success"
             style="transition: color 0.3s;" onmouseover="this.style.color='#198754'"
-            onmouseout="this.style.color='white'">Foros</a>
+            onmouseout="this.style.color='white'"><span data-i18n="footer.forums">Foros</span></a>
         </p>
       </div>
 
       <!-- Columna 3: Soporte / Legal -->
       <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
-        <h6 class="text-uppercase fw-bold text-success mb-4">Soporte</h6>
+        <h6 class="text-uppercase fw-bold text-success mb-4" data-i18n="footer.support">Soporte</h6>
         <p>
           <a href="<?= Router::url('contact') ?>" class="text-white text-decoration-none"
             style="transition: color 0.3s;" onmouseover="this.style.color='#198754'"
-            onmouseout="this.style.color='white'">Contacto</a>
+            onmouseout="this.style.color='white'"><span data-i18n="footer.contact">Contacto</span></a>
         </p>
         <p>
           <a href="<?= Router::url('privacy') ?>" class="text-white text-decoration-none"
             style="transition: color 0.3s;" onmouseover="this.style.color='#198754'"
-            onmouseout="this.style.color='white'">Privacidad</a>
+            onmouseout="this.style.color='white'"><span data-i18n="footer.privacy">Privacidad</span></a>
+        </p>
+        <p>
+          <a href="<?= Router::url('delete_data') ?>" class="text-white text-decoration-none"
+            style="transition: color 0.3s;" onmouseover="this.style.color='#198754'"
+            onmouseout="this.style.color='white'"><span data-i18n="footer.delete_data">Borrar Datos</span></a>
         </p>
       </div>
 
       <!-- Columna 4: Contacto & Redes Sociales -->
       <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
-        <h6 class="text-uppercase fw-bold text-success mb-4">Conecta</h6>
+        <h6 class="text-uppercase fw-bold text-success mb-4" data-i18n="footer.connect">Conecta</h6>
         <p class="mb-3">
           <a href="mailto:tfgrollercoaster@gmail.com"
             class="text-white text-decoration-none d-flex align-items-center justify-content-center justify-content-md-start"
@@ -91,7 +97,8 @@
       </div>
       <div class="col-md-5 col-lg-4">
         <p class="text-md-end text-center mb-0 text-white-50">
-          &copy; <?= date("Y") ?> RollerCoaster World&trade; &reg;.<br>Todos los derechos reservados.
+          &copy; <?= date("Y") ?> RollerCoaster World&trade; &reg;.<br><span data-i18n="footer.copyright">Todos los
+            derechos reservados.</span>
         </p>
       </div>
     </div>

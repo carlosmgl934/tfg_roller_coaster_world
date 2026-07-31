@@ -6,9 +6,11 @@ require_once __DIR__ . '/../../partials/header.php';
     <div class="row mb-5">
         <div class="col-12 text-center">
             <h1 class="display-6 fw-bold border-bottom border-light border-opacity-50 pb-2 text-success">
-                <i class="fa-solid fa-earth-europe me-2"></i> Ranking Global de Parques
+                <i class="fa-solid fa-earth-europe me-2"></i> <span data-i18n="parks.ranking.title">Ranking Global de
+                    Parques</span>
             </h1>
-            <p class="text-muted text-uppercase fw-bold mt-3" style="letter-spacing: 0.1em; font-size: 0.85rem;">
+            <p class="text-muted text-uppercase fw-bold mt-3" style="letter-spacing: 0.1em; font-size: 0.85rem;"
+                data-i18n="parks.ranking.subtitle">
                 Los mejores parques valorados por la comunidad
             </p>
         </div>
@@ -19,7 +21,7 @@ require_once __DIR__ . '/../../partials/header.php';
             <div class="list-group shadow-sm" id="park-list" style="border-radius: 0;">
                 <div class="text-center py-5">
                     <div class="spinner-border text-success mb-3" role="status"></div>
-                    <p class="text-muted">Cargando el ranking global...</p>
+                    <p class="text-muted" data-i18n="parks.ranking.loading">Cargando el ranking global...</p>
                 </div>
             </div>
             <div class="d-flex justify-content-center mt-4" id="pagination"></div>

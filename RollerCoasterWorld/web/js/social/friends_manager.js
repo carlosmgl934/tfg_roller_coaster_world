@@ -1,4 +1,52 @@
 $(document).ready(function () {
+  // Inject small generic error modal for friends manager
+  if (!$('#rcwFriendErrorModal').length) {
+    const errorModalHtml = `
+      <div class="modal fade" id="rcwFriendErrorModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+          <div class="modal-content bg-dark text-white border border-danger border-opacity-50 rounded-0 shadow">
+            <div class="modal-body text-center p-4">
+              <i class="fa-solid fa-triangle-exclamation text-danger fs-1 mb-3"></i>
+              <p class="mb-4" id="rcwFriendErrorModalMessage"></p>
+              <button type="button" class="btn btn-outline-light btn-sm px-4 rounded-0" data-bs-dismiss="modal">OK</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    $('body').append(errorModalHtml);
+  }
+
+  function showFriendError(message) {
+    $('#rcwFriendErrorModalMessage').text(message);
+    const modal = new bootstrap.Modal(document.getElementById('rcwFriendErrorModal'));
+    modal.show();
+  }
+
+  // Inject styles for hover effects
+  if (!$('#rcw-friend-card-styles').length) {
+    $('<style id="rcw-friend-card-styles">').text(`
+      .rcw-btn-remove-friend {
+        transition: background-color 0.2s ease, color 0.2s ease !important;
+      }
+      .rcw-btn-remove-friend:hover,
+      .rcw-btn-remove-friend:focus-visible {
+        background-color: var(--bs-danger, #dc3545) !important;
+      }
+      .rcw-btn-remove-friend:hover i,
+      .rcw-btn-remove-friend:focus-visible i {
+        color: #ffffff !important;
+      }
+      .rcw-btn-view-profile i {
+        transition: color 0.2s ease;
+      }
+      .rcw-btn-view-profile:hover i,
+      .rcw-btn-view-profile:focus-visible i {
+        color: var(--bs-success, #198754) !important;
+      }
+    `).appendTo('head');
+  }
+
   const container = $("#friends-container");
   const loading = $("#friends-loading");
 
@@ -141,7 +189,7 @@ $(document).ready(function () {
 
     if (totalCount === 0) {
       requestsList.html(
-        '<div class="p-4 text-center text-muted small"><i class="fa-solid fa-box-open d-block fs-3 mb-2 opacity-25"></i>No tienes solicitudes pendientes.</div>',
+        '<div class="p-4 text-center text-muted small"><i class="fa-solid fa-box-open d-block fs-3 mb-2 opacity-25"></i><span data-i18n="users.friends.no_pending_requests">' + window.t('users.friends.no_pending_requests') + '</span></div>',
       );
       return;
     }
@@ -306,92 +354,88 @@ $(document).ready(function () {
         "fff",
       );
 
-      let details = [];
+      // Pluralization
+      const creditAmount = friend.credits || 0;
+      const creditLabelKey = creditAmount === 1 ? 'users.friends.credit_label' : 'users.friends.credits_label';
+      const creditLabelFallback = creditAmount === 1 ? 'crédito' : 'créditos';
+
+      let metaHtml = "";
       if (friend.city || friend.country) {
         let loc = [friend.city, friend.country].filter(Boolean).join(", ");
-        details.push(
-          `<div class="d-flex align-items-center gap-1"><i class="fa-solid fa-location-dot text-success opacity-75" style="width:14px;"></i><span class="text-truncate">${loc}</span></div>`,
-        );
+        metaHtml += `<div class="d-flex align-items-center gap-2 mb-2"><i class="fa-solid fa-location-dot text-secondary" style="width: 16px; text-align: center;"></i><span class="text-muted small text-truncate">${loc}</span></div>`;
       }
       if (friend.joined_at) {
         const date = new Date(friend.joined_at);
-        const mes = new Intl.DateTimeFormat("es-ES", { month: "short" }).format(
-          date,
-        );
+        const mes = new Intl.DateTimeFormat("es-ES", { month: "short" }).format(date);
         const anio = date.getFullYear();
-        details.push(
-          `<div class="d-flex align-items-center gap-1"><i class="fa-regular fa-calendar text-info opacity-75" style="width:14px;"></i><span>Miembro desde ${mes} ${anio}</span></div>`,
-        );
+        metaHtml += `<div class="d-flex align-items-center gap-2 mb-2"><i class="fa-regular fa-calendar text-secondary" style="width: 16px; text-align: center;"></i><span class="text-muted small"><span data-i18n="users.friends.member_since">${window.t('users.friends.member_since')}</span> ${mes} ${anio}</span></div>`;
       }
       if (friend.since) {
         const dateSince = new Date(friend.since);
-        const mesSince = new Intl.DateTimeFormat("es-ES", {
-          month: "short",
-        }).format(dateSince);
+        const mesSince = new Intl.DateTimeFormat("es-ES", { month: "short" }).format(dateSince);
         const anioSince = dateSince.getFullYear();
-        details.push(
-          `<div class="d-flex align-items-center gap-1"><i class="fa-solid fa-handshake text-success opacity-75" style="width:14px;"></i><span>Amigos desde ${mesSince} ${anioSince}</span></div>`,
-        );
+        metaHtml += `<div class="d-flex align-items-center gap-2 mb-2"><i class="fa-regular fa-handshake text-secondary" style="width: 16px; text-align: center;"></i><span class="text-muted small"><span data-i18n="users.friends.friends_since">${window.t('users.friends.friends_since')}</span> ${mesSince} ${anioSince}</span></div>`;
       }
 
       html += `
-        <div class="col-12 col-xl-6 p-2">
-          <div class="rcw-friend-card h-100 d-flex flex-column flex-sm-row align-items-center gap-3 p-3"
-               style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; transition: all 0.3s; position: relative;"
-               onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(16,185,129,0.3)';"
-               onmouseout="this.style.background='rgba(255,255,255,0.02)'; this.style.borderColor='rgba(255,255,255,0.06)';">
+        <div class="col-12 col-md-6 col-xl-6 col-xxl-4 p-2">
+          <div class="rcw-friend-card h-100 rounded-0 shadow-sm d-flex flex-column"
+               style="background-color: var(--bs-dark, #212529); border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; position: relative;"
+               onmouseover="this.style.transform='translateY(-4px)'; this.style.borderColor='var(--bs-success, #198754)'; this.style.boxShadow='0 .5rem 1rem rgba(0,0,0,.25)';"
+               onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255,255,255,0.05)'; this.style.boxShadow='0 .125rem .25rem rgba(0,0,0,.075)';">
             
-            <!-- Avatar -->
-            <div class="flex-shrink-0 position-relative">
-              <img src="${avatarSrc}" alt="${friend.username}"
-                class="rounded-circle shadow-sm border border-success border-opacity-25 object-fit-cover"
-                style="width: 64px; height: 64px;"
-                onerror="this.onerror=null; this.src=window.BASE_URL+'/web/img/avatars/default_avatar.svg'">
-              <div class="position-absolute bottom-0 end-0 bg-success border border-dark rounded-circle" 
-                   style="width: 14px; height: 14px; border-width: 2px !important;" title="Conectado"></div>
-            </div>
-
-            <!-- Info -->
-            <div class="flex-grow-1 min-w-0 text-center text-sm-start">
-              <div class="d-flex align-items-center justify-content-center justify-content-sm-start gap-2 mb-1 flex-wrap">
-                <a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${friend.id}"
-                   class="text-white text-decoration-none fw-bold"
-                   style="font-size: 1.1rem; font-family: var(--rcw-font-title); letter-spacing: -0.01em;">
-                  ${friend.username}
-                </a>
-                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 py-1 px-2" style="font-size: 0.6rem; letter-spacing: 0.05em;">AMIGO</span>
-                <small class="text-muted opacity-50 font-monospace" style="font-size: 0.7rem;">#${String(friend.id).padStart(6, "0")}</small>
-              </div>
-
-              <div class="row g-2 mt-1">
-                <div class="col-12 col-sm-12 text-muted" style="font-size: 0.78rem; line-height: 1.5;">
-                  ${details.join("")}
+            <!-- Header: Avatar + Nombre -->
+            <div class="d-flex align-items-center gap-3 p-3" style="background-color: rgba(255,255,255,0.03);">
+              <!-- Avatar -->
+              <div class="position-relative flex-shrink-0">
+                <div class="rounded-circle p-1" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                  <img src="${avatarSrc}" alt="${friend.username}" class="rounded-circle object-fit-cover" style="width: 56px; height: 56px;" onerror="this.onerror=null; this.src=window.BASE_URL+'/web/img/avatars/default_avatar.svg'">
                 </div>
+                <div class="position-absolute bg-success border border-2 border-dark rounded-circle" style="width: 14px; height: 14px; bottom: 2px; right: 2px;" title="Conectado"></div>
               </div>
               
-              <div class="mt-2 d-flex align-items-center justify-content-center justify-content-sm-start gap-3">
-                 <div class="d-flex align-items-center gap-1">
-                   <i class="fa-solid fa-ticket text-warning" style="font-size: 0.8rem;"></i>
-                   <span class="fw-bold text-white" style="font-size: 0.9rem;">${friend.credits || 0}</span>
-                   <small class="text-muted small">credits</small>
-                 </div>
+              <div class="flex-grow-1 min-w-0">
+                <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                  <a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${friend.id}" class="text-white text-decoration-none fw-bold text-truncate" style="font-size: 1.15rem; font-family: var(--rcw-font-title); letter-spacing: -0.01em; max-width: 100%;">
+                    ${friend.username}
+                  </a>
+                  <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-0 px-2 py-1" style="font-size: 0.6rem; letter-spacing: 0.05em;" data-i18n="users.friends.friend_badge">${window.t('users.friends.friend_badge')}</span>
+                </div>
+                <div class="text-muted font-monospace small" style="font-size: 0.75rem;">#${String(friend.id).padStart(6, "0")}</div>
               </div>
             </div>
 
-            <!-- Acciones -->
-            <div class="d-flex flex-row flex-sm-column gap-2 ms-sm-auto mt-3 mt-sm-0">
-               <a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${friend.id}" 
-                  class="btn btn-dark btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm"
-                  style="width: 38px; height: 38px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);"
-                  title="Ver perfil">
-                 <i class="fa-solid fa-eye" style="font-size: 0.9rem;"></i>
-               </a>
-               <button class="btn btn-outline-danger btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm rcw-trigger-remove"
-                       style="width: 38px; height: 38px;"
-                       data-id="${friend.id}" data-name="${friend.username}"
-                       title="Eliminar amigo">
-                 <i class="fa-solid fa-user-xmark" style="font-size: 0.9rem; pointer-events: none;"></i>
-               </button>
+            <!-- Divisor grueso verde -->
+            <div style="height: 3px; background-color: var(--bs-success, #198754); opacity: 0.8;"></div>
+
+            <!-- Metadatos (Cuerpo) -->
+            <div class="d-flex flex-column flex-grow-1 p-3 pb-2" style="background-color: transparent;">
+              ${metaHtml}
+            </div>
+
+            <!-- Divisor grueso verde -->
+            <div style="height: 3px; background-color: var(--bs-success, #198754); opacity: 0.5;"></div>
+
+            <!-- Footer: Toolbar de créditos y botones rectos -->
+            <div class="p-0 d-flex align-items-stretch mt-auto" style="background-color: rgba(0,0,0,0.2);">
+              <div class="d-flex align-items-center gap-2 px-3 py-2 flex-grow-1">
+                <i class="fa-solid fa-ticket text-success opacity-75"></i>
+                <span class="fw-bold text-white" style="font-size: 1.05rem;">${creditAmount}</span>
+                <span class="text-muted small" data-i18n="${creditLabelKey}">${window.t(creditLabelKey) || creditLabelFallback}</span>
+              </div>
+              
+              <div class="d-flex border-start border-secondary border-opacity-25">
+                <a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${friend.id}" 
+                   class="btn btn-dark rounded-0 border-0 d-flex align-items-center justify-content-center rcw-btn-view-profile"
+                   style="width: 48px; background-color: transparent;" title="${window.t('users.friends.view_profile')}" data-i18n-attr="title">
+                  <i class="fa-solid fa-eye text-secondary" style="font-size: 0.95rem;"></i>
+                </a>
+                <div style="width: 1px; background-color: rgba(255,255,255,0.05);"></div>
+                <button class="btn btn-dark rounded-0 border-0 d-flex align-items-center justify-content-center rcw-trigger-remove rcw-btn-remove-friend"
+                        style="width: 48px; background-color: rgba(220,53,69,0.05);" data-id="${friend.id}" data-name="${friend.username}" title="${window.t('users.friends.remove_title')}" data-i18n-attr="title">
+                  <i class="fa-solid fa-user-xmark text-danger" style="font-size: 0.95rem; pointer-events: none;"></i>
+                </button>
+              </div>
             </div>
 
           </div>
@@ -407,7 +451,7 @@ $(document).ready(function () {
 
     if (sent.length === 0) {
       sentList.html(
-        '<li class="list-group-item bg-transparent text-muted border-0 small">No tienes invitaciones pendientes de aceptar por otros usuarios.</li>',
+        '<li class="list-group-item bg-transparent text-muted border-0 small" data-i18n="users.friends.no_pending_sent">' + window.t('users.friends.no_pending_sent') + '</li>',
       );
       return;
     }
@@ -425,9 +469,9 @@ $(document).ready(function () {
            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
               <div class="d-flex align-items-center">
                  <img src="${avatarSrc}" class="rounded-circle me-3 border border-secondary border-opacity-50" style="width: 40px; height: 40px; object-fit: cover;">
-                 <a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${req.id}" class="small fw-bold text-muted text-decoration-none">Invitación enviada a ${req.username}</a>
+                 <a href="${BASE_URL}/web/views/public/users/user_profile.php?id=${req.id}" class="small fw-bold text-muted text-decoration-none"><span data-i18n="users.friends.invite_sent_to">${window.t('users.friends.invite_sent_to')}</span> ${req.username}</a>
               </div>
-              <button class="btn btn-sm btn-outline-danger py-1 px-3 rcw-action-btn ms-auto" data-action="cancel" data-id="${req.id}" title="Cancelar envío"><i class="fa-solid fa-xmark me-1"></i> Cancelar</button>
+              <button class="btn btn-sm btn-outline-danger py-1 px-3 rcw-action-btn ms-auto" data-action="cancel" data-id="${req.id}" title="${window.t('users.friends.cancel_send')}" data-i18n-attr="title"><i class="fa-solid fa-xmark me-1"></i> <span data-i18n="common.cancel">${window.t('common.cancel')}</span></button>
            </div>
         </li>
       `;
@@ -672,10 +716,10 @@ $(document).ready(function () {
         ).hide();
         fetchFriendsData();
       } else {
-        alert("Error: " + (data.error || "Petición fallida"));
+        showFriendError(window.t('users.friends.error_request_failed') + (data.error ? ": " + data.error : ""));
       }
     } catch (err) {
-      alert("Error de conexión al eliminar amigo.");
+      showFriendError(window.t('users.friends.error_connection'));
     }
     btn.prop("disabled", false).text("Eliminar");
   });

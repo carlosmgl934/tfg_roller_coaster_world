@@ -33,6 +33,16 @@ $(document).ready(function () {
   // ── Carga inicial ─────────────────────────────────────────────────────────
   fetchUserTops();
 
+  // Al cambiar idioma (o en el init inicial), re-renderizar con las nuevas traducciones
+  window.addEventListener('rcw:langchanged', function () {
+    if (allTops.length > 0) {
+      renderUserTops(allTops);   // reconstruye el HTML con data-i18n
+      applyTopsTranslations();   // aplica el idioma actual a los nuevos elementos
+    } else {
+      applyTopsTranslations();   // si aún no hay tops, al menos traduce los estáticos
+    }
+  });
+
   // ── Eventos ───────────────────────────────────────────────────────────────
 
   // Cambio en el select de ordenación → nueva petición al servidor
@@ -157,7 +167,7 @@ $(document).ready(function () {
                      class="rounded-circle object-fit-cover shadow-sm me-3"
                      style="width:48px;height:48px;border:2px solid var(--bs-success);">
                 <div class="flex-grow-1 min-w-0">
-                  <h5 class="fw-bold text-white mb-0 text-truncate" style="font-size:1rem;">Top de ${user.username}</h5>
+                  <h5 class="fw-bold text-white mb-0 text-truncate" style="font-size:1rem;"><span data-i18n="coasters.tops.top_of_prefix">Top de</span> ${user.username}</h5>
                   <div class="d-flex align-items-baseline gap-2 mt-1" style="gap:0.4rem!important;">
                     <span style="font-size:1.25rem;font-weight:800;color:#39ff14;line-height:1;">${user.total_coasters}</span>
                     <span class="text-muted" style="font-size:0.72rem;">credits</span>
@@ -171,7 +181,7 @@ $(document).ready(function () {
               </div>
 
               <a href="${profileUrl}" class="rcw-top-card-footer">
-                <i class="fa-solid fa-eye me-1"></i> Ver top completo
+                <i class="fa-solid fa-eye me-1"></i> <span data-i18n="coasters.tops.view_full_top">Ver top completo</span>
               </a>
 
             </div>
@@ -181,6 +191,15 @@ $(document).ready(function () {
     });
 
     $grid.html(html);
+    applyTopsTranslations();
+  }
+
+  // Aplica las traducciones actuales a todos los [data-i18n] del grid de tops
+  function applyTopsTranslations() {
+    var grid = document.getElementById('tops-grid');
+    if (grid && window.rcwI18n && typeof window.rcwI18n.applyToContainer === 'function') {
+      window.rcwI18n.applyToContainer(grid);
+    }
   }
 
   // ── Helper: formato de fecha legible ───────────────────────────────────────

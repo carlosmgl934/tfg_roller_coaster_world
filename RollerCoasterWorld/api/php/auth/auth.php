@@ -1,5 +1,8 @@
 <?php
 require_once __DIR__ . '/../utils/SessionManager.php';
+// auth.php no necesita escribir en sesión. La cerramos inmediatamente para no
+// sobreescribir los datos que save_session.php guarda en paralelo.
+session_write_close();
 header('Content-Type: application/json');
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');

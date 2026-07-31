@@ -135,10 +135,11 @@ $(document).ready(function () {
             });
             html += `
             <a href="#" class="list-group-item list-group-item-action text-center text-primary fw-bold" id="view-all-results">
-              Ver todos los resultados para "${search}" <i class="fa-solid fa-arrow-right ms-1"></i>
+              ${(window.rcwI18n && window.rcwI18n.t('coasters.search.search_see_all') || 'Ver todos los resultados para "{q}"').replace('{q}', search)} <i class="fa-solid fa-arrow-right ms-1"></i>
             </a>`;
           } else {
-            html = `<div class="list-group-item text-muted text-center py-3">No se encontraron montañas rusas.</div>`;
+            const emptyMsg = (window.rcwI18n && window.rcwI18n.t('coasters.search.search_empty')) || 'No se encontraron montañas rusas.';
+            html = `<div class="list-group-item text-muted text-center py-3">${emptyMsg}</div>`;
           }
           $("#search-results").html(html).show();
         } catch (e) {
@@ -234,9 +235,10 @@ $(document).ready(function () {
           .then((data) => {
             if (data.success) {
               let totalMsg = data.total || 0;
-              $("#coaster-count").text(
-                `Mostrando ${totalMsg} montaña${totalMsg !== 1 ? "s" : ""} rusa${totalMsg !== 1 ? "s" : ""}`,
-              );
+              let tKey = totalMsg === 1 ? 'coasters.search.showing_one' : 'coasters.search.showing_many';
+              let tMsg = window.t(tKey) || tKey;
+              if (tMsg === tKey) tMsg = `Mostrando ${totalMsg} montaña${totalMsg !== 1 ? "s" : ""} rusa${totalMsg !== 1 ? "s" : ""}`;
+              $("#coaster-count").text(tMsg.replace('{total}', totalMsg));
               displayCoasters(data.coasters);
               displayPagination(data.total, page);
             } else {
@@ -261,9 +263,10 @@ $(document).ready(function () {
         .then((data) => {
           if (data.success) {
             let totalMsg = data.total || 0;
-            $("#coaster-count").text(
-              `Mostrando ${totalMsg} montaña${totalMsg !== 1 ? "s" : ""} rusa${totalMsg !== 1 ? "s" : ""}`,
-            );
+            let tKey = totalMsg === 1 ? 'coasters.search.showing_one' : 'coasters.search.showing_many';
+            let tMsg = window.t(tKey) || tKey;
+            if (tMsg === tKey) tMsg = `Mostrando ${totalMsg} montaña${totalMsg !== 1 ? "s" : ""} rusa${totalMsg !== 1 ? "s" : ""}`;
+            $("#coaster-count").text(tMsg.replace('{total}', totalMsg));
             displayCoasters(data.coasters);
             displayPagination(data.total, page);
           } else {
@@ -389,8 +392,9 @@ $(document).ready(function () {
           ? `<img src="${validImgUrl}" alt="${coaster.coaster_name}" class="rounded-0 shadow-sm" referrerpolicy="no-referrer" style="width: 110px; height: 110px; object-fit: cover; margin-right: 20px; flex-shrink:0;">`
           : `<img src="https://www.hussrides.com/fileadmin/_processed_/5/e/csm_giant-frisbee-cedarpoint-01_0697df513a.jpg" alt="Sin imagen" class="rounded-0 shadow-sm" style="width: 110px; height: 110px; object-fit: cover; margin-right: 20px; flex-shrink:0;">`;
 
-        const manufacter = coaster.manufacter || "Desconocido";
-        const modelo = coaster.modelo || "Desconocido";
+        const _unk = (window.rcwI18n && typeof window.rcwI18n.t === 'function') ? window.rcwI18n.t('coasters.detail.unknown') : 'Desconocido';
+        const manufacter = coaster.manufacter || _unk;
+        const modelo = coaster.modelo || _unk;
         const year = coaster.opening_year || "N/A";
 
         const scoreText = parseFloat(coaster.score || 0).toFixed(2) + " ★";
@@ -637,11 +641,13 @@ $(document).ready(function () {
             coasterInversions.textContent = coaster.inversions || "0";
 
           // Datos de fabricación
+          const _t = (key, fb) => (window.rcwI18n && typeof window.rcwI18n.t === 'function') ? window.rcwI18n.t(key) || fb : fb;
+          const _unk = _t('coasters.detail.unknown', 'Desconocido');
           if (coasterManufacter)
             coasterManufacter.textContent =
-              coaster.coaster_manufacter || "Desconocido";
+              coaster.coaster_manufacter || _unk;
           if (coasterModel)
-            coasterModel.textContent = coaster.coaster_model || "Desconocido";
+            coasterModel.textContent = coaster.coaster_model || _unk;
           if (coasterYear)
             coasterYear.textContent = coaster.opening_year || "N/A";
 
@@ -657,54 +663,36 @@ $(document).ready(function () {
               ? "#" + coaster.personal_ranking
               : "—";
 
-          if (currentState) {
-            let statusText = coaster.coaster_status || "Operativa";
-            $(currentState).removeClass(
-              "text-success text-danger text-warning text-info text-secondary",
-            );
-            if (statusText === "Operating" || statusText === "Operativa") {
-              currentState.textContent = "Operativa";
-              $(currentState).addClass("text-success");
-            } else if (
-              statusText === "Defunct" ||
-              statusText === "Closed" ||
-              statusText === "Cerrada"
-            ) {
-              currentState.textContent = "Cerrada";
-              $(currentState).addClass("text-danger");
-            } else if (statusText === "SBNO") {
-              currentState.textContent = "SBNO";
-              $(currentState).addClass("text-warning");
-            } else if (
-              statusText === "Construction" ||
-              statusText === "En Construcción" ||
-              statusText === "En construcción"
-            ) {
-              currentState.textContent = "En Construcción";
-              $(currentState).addClass("text-info");
-            } else {
-              currentState.textContent = statusText.toUpperCase();
-              $(currentState).addClass("text-info");
+          // Helper de estado i18n
+          const statusKeyMap = {
+            'Operating': 'status_operating', 'Operativa': 'status_operating',
+            'Defunct': 'status_closed', 'Closed': 'status_closed', 'Cerrada': 'status_closed',
+            'SBNO': 'status_sbno',
+            'Construction': 'status_construction', 'En Construcci\u00f3n': 'status_construction', 'En construcci\u00f3n': 'status_construction'
+          };
+          const colorMap = {
+            'status_operating': 'text-success',
+            'status_closed': 'text-danger',
+            'status_sbno': 'text-warning',
+            'status_construction': 'text-info'
+          };
+          function translateStatus(rawStatus) {
+            const key = statusKeyMap[rawStatus] || null;
+            if (key && window.rcwI18n && typeof window.rcwI18n.t === 'function') {
+              return { text: window.rcwI18n.t('coasters.detail.' + key) || rawStatus, colorClass: colorMap[key] || 'text-info' };
             }
+            return { text: rawStatus ? rawStatus.toUpperCase() : 'N/A', colorClass: 'text-info' };
+          }
+
+          if (currentState) {
+            const { text, colorClass } = translateStatus(coaster.coaster_status || 'Operating');
+            $(currentState).removeClass('text-success text-danger text-warning text-info text-secondary');
+            currentState.textContent = text;
+            $(currentState).addClass(colorClass);
           }
           if (currentStateTable) {
-            let statusText = coaster.coaster_status || "Operativa";
-            let finalStatus = statusText;
-            if (statusText === "Operating" || statusText === "Operativa")
-              finalStatus = "Operativa";
-            else if (
-              statusText === "Defunct" ||
-              statusText === "Closed" ||
-              statusText === "Cerrada"
-            )
-              finalStatus = "Cerrada";
-            else if (
-              statusText === "Construction" ||
-              statusText === "En Construcción" ||
-              statusText === "En construcción"
-            )
-              finalStatus = "En Construcción";
-            currentStateTable.textContent = finalStatus;
+            const { text } = translateStatus(coaster.coaster_status || 'Operating');
+            currentStateTable.textContent = text;
           }
 
           // --- Multimedia ---
@@ -726,7 +714,7 @@ $(document).ready(function () {
             $("#coaster-ridden")
               .removeClass("fa-regular fa-xmark text-success text-secondary")
               .addClass("fa-solid fa-circle-check text-white");
-            $("#btn-ridden span").text("Ya probada");
+            $("#btn-ridden span").text(window.t("coasters.detail.status_ridden"));
             $("#btn-ridden")
               .removeClass("btn-outline-secondary btn-outline-success")
               .addClass("btn-success text-white");
@@ -734,7 +722,7 @@ $(document).ready(function () {
             $("#coaster-ridden")
               .removeClass("fa-solid fa-circle-check text-success text-white")
               .addClass("fa-solid fa-xmark text-secondary");
-            $("#btn-ridden span").text("No probada todavía");
+            $("#btn-ridden span").text(window.t("coasters.detail.status_not_ridden_yet"));
             $("#btn-ridden")
               .removeClass(
                 "btn-success text-white btn-outline-success btn-ridden-active",
@@ -1315,6 +1303,11 @@ $(document).ready(function () {
 
       $("#reviews-order").on("change", function () {
         loadReviews($(this).val());
+      });
+
+      // Al cambiar idioma, re-renderizar la ficha con las nuevas traducciones
+      window.addEventListener('rcw:langchanged', function () {
+        loadCoastersData(coasterId);
       });
     }
   }

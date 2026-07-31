@@ -5,13 +5,21 @@ Escanea RCDB y compara con la base de datos.
 Detecta coasters nuevas y cualquier cambio de dato en las existentes.
 """
 
+import sys
+import io
+
+# Force UTF-8 output on Windows to avoid UnicodeEncodeError with emojis
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+if sys.stderr.encoding != 'utf-8':
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+
 import psycopg2
 import psycopg2.extras
 import requests
 from bs4 import BeautifulSoup
 import re
 import time
-import sys
 import os
 import json
 from datetime import datetime
@@ -24,8 +32,11 @@ CACHE_FILE = os.path.join(os.path.dirname(__file__), 'updater_cache.json')
 # ──────────────────────────────────────────────────────────────────────────────
 
 def load_env() -> Dict[str, str]:
-    """Lee el .env que está en RollerCoasterWorld/.env"""
+    """Lee el .env que está en RollerCoasterWorld/.env o un nivel superior"""
     env_path = os.path.join(os.path.dirname(__file__), '..', '..', '.env')
+    if not os.path.exists(env_path):
+        env_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', '.env')
+        
     config: Dict[str, str] = {}
     try:
         with open(env_path, 'r', encoding='utf-8') as f:
@@ -485,14 +496,19 @@ class RCDBUpdater:
 
         return str(scraped_val).strip() == str(bd_val).strip()
 
-    def compare_coaster(self, scraped: Dict, existing: Dict) -> List[str]:
-        """Devuelve lista de cadenas describiendo cada cambio detectado."""
+    def compare_coaster(self, scraped: Dict, existing: Dict) -> List[Dict]:
+        """Devuelve lista de diccionarios describiendo cada cambio detectado."""
         changes = []
         for field_s, field_bd, label in self.FIELD_MAP:
             new_val = scraped.get(field_s)
             old_val = existing.get(field_bd)
             if not self._vals_equal(new_val, old_val, field_s):
-                changes.append(f"{label}: {repr(old_val)} → {repr(new_val)}")
+                changes.append({
+                    "field": field_s,
+                    "label": label,
+                    "old": old_val,
+                    "new": new_val
+                })
         return changes
 
     # ──────────────────────────────────────────────────────────────────────────
@@ -568,33 +584,45 @@ class RCDBUpdater:
     # ──────────────────────────────────────────────────────────────────────────
 
     def find_last_id(self) -> int:
-        """Búsqueda binaria + refinado para encontrar el último ID válido de RCDB."""
+        """Encuentra el último ID consultando la portada de RCDB."""
         print("🔍 Buscando el último ID de RCDB...")
-        low, high = 10000, 40000
-        last_valid = low
+        try:
+            r = self.session.get(self.base_url, timeout=10)
+            if r.status_code == 200:
+                ids = [int(m) for m in re.findall(r'/(\d+)\.htm', r.text)]
+                if ids:
+                    last_valid = max(ids) + 50 # +50 de margen para IDs recien creados
+                    print(f"✅ Último ID RCDB detectado: {last_valid}")
+                    return last_valid
+        except Exception as e:
+            print(f"❌ Error al consultar la portada: {e}")
+            
+        # Fallback a sondeo desde el máximo local
+        print("   Usando fallback (sondeo manual)...")
+        if self.db:
+            self.cursor.execute("SELECT MAX(rcdb_id) as m FROM coasters")
+            row = self.cursor.fetchone()
+            local_max = int(row['m']) if row and row['m'] else 10000
+        else:
+            local_max = 10000
 
-        while low <= high:
-            mid = (low + high) // 2
-            print(f"   Probando ID {mid}...", end=" ", flush=True)
-            if self.scrape_coaster(mid):
-                print("✅")
-                last_valid = mid
-                low = mid + 1
-            else:
-                print("❌")
-                high = mid - 1
-            time.sleep(0.3)
+        current = local_max
+        consecutive_404 = 0
+        
+        while consecutive_404 < 5:
+            current += 50
+            url = f"{self.base_url}/{current}.htm"
+            try:
+                resp = self.session.head(url, timeout=5)
+                if resp.status_code == 404:
+                    consecutive_404 += 1
+                else:
+                    consecutive_404 = 0
+            except Exception:
+                pass
 
-        # Refinado exhaustivo desde last_valid en pasos de 10
-        print(f"   Refinando desde {last_valid}...")
-        test_id = last_valid + 10
-        while test_id <= last_valid + 2000:
-            if self.scrape_coaster(test_id):
-                last_valid = test_id
-            test_id += 10
-            time.sleep(0.2)
-
-        print(f"✅ Último ID RCDB: {last_valid}")
+        last_valid = current - (consecutive_404 * 50) + 100
+        print(f"✅ Último ID RCDB estimado: {last_valid}")
         return last_valid
 
     # ──────────────────────────────────────────────────────────────────────────
@@ -810,8 +838,127 @@ class RCDBUpdater:
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# MENÚ DE EJECUCIÓN
+# MENÚ DE EJECUCIÓN CLI / ARGPARSE
 # ──────────────────────────────────────────────────────────────────────────────
+import argparse
+
+def main():
+    parser = argparse.ArgumentParser(description="RCDB Updater")
+    parser.add_argument('--web-scan', action='store_true', help="Run quick scan for web (last 2000 IDs) without interaction")
+    parser.add_argument('--web-full', action='store_true', help="Run full scan for web without interaction")
+    parser.add_argument('--apply-ids', type=str, help="Comma separated list of RCDB IDs to apply changes (from cache)")
+    parser.add_argument('--discard-ids', type=str, help="Comma separated list of RCDB IDs to discard from cache without applying")
+    parser.add_argument('--overrides', type=str, help="Path to JSON file with field overrides for specific IDs")
+    
+    args = parser.parse_args()
+
+    if args.discard_ids:
+        try:
+            updater = RCDBUpdater.from_cache()
+        except Exception as e:
+            print(f"[ERROR] {e}")
+            return
+            
+        ids_to_discard = [int(x.strip()) for x in args.discard_ids.split(',')]
+        
+        updater.new_coasters = [c for c in updater.new_coasters if c['rcdb_id'] not in ids_to_discard]
+        updater.changed_coasters = [c for c in updater.changed_coasters if c['rcdb_id'] not in ids_to_discard]
+        updater._save_cache()
+        
+        print(f"✅ Descartados {len(ids_to_discard)} registros correctamente.")
+        return
+
+    if args.apply_ids:
+        try:
+            updater = RCDBUpdater.from_cache()
+        except Exception as e:
+            print(f"[ERROR] {e}")
+            return
+        if not updater.connect_db():
+            return
+        
+        ids_to_apply = [int(x.strip()) for x in args.apply_ids.split(',')]
+        
+        # Load overrides if provided
+        overrides = {}
+        if args.overrides and os.path.exists(args.overrides):
+            try:
+                with open(args.overrides, 'r', encoding='utf-8') as f:
+                    overrides = json.load(f)
+            except Exception as e:
+                print(f"[ERROR] No se pudo leer overrides JSON: {e}")
+        
+        # Apply new coasters
+        for c in updater.new_coasters:
+            if c['rcdb_id'] in ids_to_apply:
+                updater.insert_coaster(c)
+                print(f"✅ Insertada [{c['rcdb_id']}] {c.get('name','?')}")
+                
+        # Apply changed coasters
+        for item in updater.changed_coasters:
+            rcdb_id = item['rcdb_id']
+            if rcdb_id in ids_to_apply:
+                str_id = str(rcdb_id)
+                new_scraped = item['scraped']
+                
+                # Apply granular overrides if present
+                if str_id in overrides:
+                    # ONLY the fields present in overrides for this ID will be kept
+                    new_scraped = overrides[str_id]
+                    
+                updater.update_coaster(rcdb_id, new_scraped)
+                print(f"✅ Actualizada [{rcdb_id}] {item.get('name', '?')}")
+                
+        # Remove applied items from cache lists and save cache
+        updater.new_coasters = [c for c in updater.new_coasters if c['rcdb_id'] not in ids_to_apply]
+        updater.changed_coasters = [c for c in updater.changed_coasters if c['rcdb_id'] not in ids_to_apply]
+        updater._save_cache()
+                
+        updater.close_db()
+        return
+
+    if args.web_scan or args.web_full:
+        updater = RCDBUpdater()
+        if not updater.connect_db():
+            return
+        
+        last_id = updater.find_last_id()
+        start_id = 1 if args.web_full else max(1, last_id - 2000)
+        
+        print(f"\nEscaneando IDs #{start_id} → #{last_id}")
+        
+        # In web mode, we don't want interactive prompts at the end of run()
+        # To avoid modifying run(), we can just monkey-patch input() temporarily 
+        # or rely on the fact that we can just let it finish if we override it.
+        # Actually, RCDBUpdater.run calls self._show_results() which calls input().
+        # Let's override _show_results for the web run.
+        def web_show_results():
+            print("\n✅ Escaneo completado. Resultados guardados en cache.")
+            print(f"  Nuevas: {len(updater.new_coasters)} | Cambios: {len(updater.changed_coasters)}")
+        
+        updater._show_results = web_show_results
+        
+        # Also patch print to output newlines instead of \r for better SSE streaming
+        original_print = print
+        import builtins
+        def web_print(*args, **kwargs):
+            if kwargs.get('end') == "":
+                kwargs['end'] = "\n"
+                if args and isinstance(args[0], str) and args[0].startswith("\r"):
+                    args = (args[0].replace("\r", ""),) + args[1:]
+            original_print(*args, **kwargs)
+        
+        builtins.print = web_print
+        
+        try:
+            updater.run(start_id=start_id, end_id=last_id)
+        finally:
+            builtins.print = original_print
+            
+        return
+
+    # Si no hay argumentos, mostrar el menú interactivo clásico
+    menu()
 
 def menu():
     print("\n" + "=" * 70)
@@ -879,7 +1026,8 @@ def menu():
 
 if __name__ == "__main__":
     try:
-        menu()
+        main()
     except KeyboardInterrupt:
         print("\n\nInterrumpido por el usuario")
         sys.exit(0)
+

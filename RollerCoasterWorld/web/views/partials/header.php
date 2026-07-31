@@ -2,6 +2,8 @@
 // Gestión de sesión centralizada
 require_once __DIR__ . '/../../../api/php/utils/SessionManager.php';
 
+
+
 // ── Cabeceras de seguridad HTTP ───────────────────────────────────────────────
 if (!headers_sent()) {
   header("X-Content-Type-Options: nosniff");
@@ -88,6 +90,12 @@ $public_pages = [
 $is_logged = isset($_SESSION['firebase_uid']);
 $is_admin = $is_logged && isset($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
 
+// ── Idioma de la interfaz ─────────────────────────────────────────────────────
+$_allowed_langs = ['es', 'en', 'fr', 'de'];
+$_lang = $_COOKIE['rcw_lang'] ?? 'es';
+if (!in_array($_lang, $_allowed_langs))
+  $_lang = 'es';
+
 // Obtener iniciales del nombre de usuario para el avatar
 $user_display = '';
 $user_initials = '?';
@@ -126,7 +134,7 @@ header("Pragma: no-cache"); // HTTP 1.0
 header("Expires: 0"); // Proxies
 ?>
 <!doctype html>
-<html lang="es">
+<html lang="<?= $_lang ?>">
 
 <head>
   <meta charset="UTF-8" />
@@ -148,7 +156,7 @@ header("Expires: 0"); // Proxies
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script>window.BASE_URL = '<?= $base_url ?>';</script>
+  <script>window.BASE_URL = '<?= $base_url ?>'; window.APP_LANG = '<?= $_lang ?>';</script>
 
   <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -156,32 +164,114 @@ header("Expires: 0"); // Proxies
   <!-- Firebase auth init (global) -->
   <script src="<?= Router::asset('web/js/auth/auth.js') ?>"></script>
 
-  <!-- Interceptor CSRF para window.fetch -->
+  <!-- Pre-carga de traducciones + CSRF fetch interceptor -->
+  <!-- IMPORTANTE: Este bloque debe ir ANTES del motor i18n para que _RCW_LANG_CACHE esté disponible -->
   <script>
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-    if (csrfToken) {
-      const originalFetch = window.fetch;
-      window.fetch = async function () {
-        let [resource, config] = arguments;
-        if (config && (config.method === 'POST' || config.method === 'PUT' || config.method === 'DELETE')) {
-          config.headers = config.headers || {};
-          if (typeof resource === 'string' && (resource.startsWith('/') || resource.startsWith('.') || resource.includes(window.location.origin))) {
+    // 1) Inyectar todos los JSONs de idioma directamente desde PHP (sin fetch, sin red)
+    window._RCW_LANG_CACHE = {};
+    <?php
+    // __DIR__ = .../web/views/partials  →  ../../lang/ = .../web/lang/
+    $lang_dir = __DIR__ . '/../../lang/';
+
+    // Fallback: intentar resolver desde el DocumentRoot real
+    $lang_dir_alt = __DIR__ . '/../../../web/lang/';
+
+    // Tercer intento: desde el script actual del servidor (para producción con distinta estructura)
+    $script_base = dirname(dirname(dirname($_SERVER['SCRIPT_FILENAME'] ?? '')));
+    $lang_dir_alt2 = rtrim($script_base, '/') . '/web/lang/';
+
+    // Elegir la primera ruta que contenga archivos
+    $lang_dir_final = $lang_dir;
+    if (!file_exists($lang_dir . 'es.json')) {
+      if (file_exists($lang_dir_alt . 'es.json')) {
+        $lang_dir_final = $lang_dir_alt;
+      } elseif (file_exists($lang_dir_alt2 . 'es.json')) {
+        $lang_dir_final = $lang_dir_alt2;
+      }
+    }
+
+    $loaded = [];
+    foreach (['es', 'en', 'fr', 'de'] as $l) {
+      $file = $lang_dir_final . $l . '.json';
+      if (file_exists($file)) {
+        echo "window._RCW_LANG_CACHE['" . $l . "'] = " . file_get_contents($file) . ";\n  ";
+        $loaded[] = $l;
+      } else {
+        error_log("[i18n] Archivo de idioma no encontrado en ninguna ruta: " . $file);
+      }
+    }
+
+    // Log de diagnóstico para saber qué ve PHP en producción
+    $diag = [
+      'dir1' => $lang_dir,
+      'dir2' => $lang_dir_alt,
+      'dir3' => $lang_dir_alt2,
+      'used' => $lang_dir_final,
+      'es_found' => file_exists($lang_dir_final . 'es.json') ? 'YES' : 'NO',
+    ];
+    ?>
+    console.log('[i18n] Caché PHP inyectada para idiomas:', <?= json_encode(implode(', ', $loaded) ?: 'NINGUNO') ?>,
+      '| keys en _RCW_LANG_CACHE:', Object.keys(window._RCW_LANG_CACHE),
+      '| PHP diag:', <?= json_encode($diag) ?>);
+
+    // 2) Parchear el fetch: idiomas desde caché + CSRF para mutaciones
+    (function () {
+      var _origFetch = window.fetch;
+      var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+      window.fetch = function (resource, config) {
+        // --- Interceptor de idiomas: responder con JSON en caché ---
+        if (typeof resource === 'string' && resource.indexOf('/web/lang/') !== -1) {
+          var m = resource.match(/\/web\/lang\/([a-z]{2})\.json/);
+          if (m && window._RCW_LANG_CACHE[m[1]]) {
+            return Promise.resolve(new Response(JSON.stringify(window._RCW_LANG_CACHE[m[1]]), {
+              status: 200,
+              headers: { 'Content-Type': 'application/json' }
+            }));
+          }
+          // Si la caché no tiene el idioma, loguear para diagnóstico
+          console.warn('[i18n] Idioma no encontrado en caché, se hará fetch real:', resource);
+        }
+        // --- Interceptor CSRF: añadir cabecera en POST/PUT/DELETE ---
+        var token = csrfMeta ? csrfMeta.getAttribute('content') : null;
+        if (token && config && (config.method === 'POST' || config.method === 'PUT' || config.method === 'DELETE')) {
+          var origin = window.location.origin;
+          if (typeof resource === 'string' && (resource.startsWith('/') || resource.startsWith('.') || resource.indexOf(origin) === 0)) {
+            config.headers = config.headers || {};
             if (config.headers instanceof Headers) {
-              config.headers.append('X-CSRF-Token', csrfToken);
+              config.headers.append('X-CSRF-Token', token);
             } else {
-              config.headers['X-CSRF-Token'] = csrfToken;
+              config.headers['X-CSRF-Token'] = token;
             }
           }
         }
-        return originalFetch.apply(this, [resource, config]);
+        return _origFetch.apply(this, [resource, config]);
       };
-    }
+    })();
   </script>
+
+  <!-- i18n: motor de traducción multiidioma —— Va DESPUÉS de _RCW_LANG_CACHE -->
+  <script>
+    <?php
+    $i18n_path = __DIR__ . '/../../../web/js/shared/i18n.js';
+    if (file_exists($i18n_path)) {
+      readfile($i18n_path);
+    } else {
+      // Fallback mínimo si el archivo no existe
+      echo 'window.rcwI18n = null; window.t = function(k){ return k; };';
+    }
+    ?>
+  </script>
+
+
 
   <!-- Funciones Nav para búsqueda de comunidad -->
   <?php if ($is_logged): ?>
     <script src="<?= Router::asset('web/js/social/header_friends.js') ?>"></script>
-    <script src="<?= Router::asset('web/js/shop/cart.js') ?>?v=<?= time() ?>"></script>
+    <!-- HIDDEN-TFG-START — cart.js desactivado temporalmente -->
+    <?php if (false): ?>
+      <script src="<?= Router::asset('web/js/shop/cart.js') ?>?v=<?= time() ?>"></script>
+    <?php endif; ?>
+    <!-- HIDDEN-TFG-END -->
   <?php endif; ?>
 
 
@@ -252,56 +342,68 @@ header("Expires: 0"); // Proxies
           <!-- Home  -->
           <li class="nav-item">
             <a class="nav-link rcw-nav-pill" href="<?= Router::url('home') ?>">
-              <i class="fa-solid fa-house me-1"></i> Home
+              <i class="fa-solid fa-house me-1"></i> <span data-i18n="nav.home">Home</span>
             </a>
           </li>
 
           <!-- Coasters -->
           <li class="nav-item dropdown custom-dropdown">
             <a class="nav-link rcw-nav-pill dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-              Coasters
+              <span data-i18n="nav.coasters">Coasters</span>
             </a>
             <ul class="dropdown-menu shadow border-0">
               <li><a class="dropdown-item py-2" href="<?= Router::url('coaster_search') ?>"><i
-                    class="fa-solid fa-magnifying-glass w-20px text-center me-2 text-primary"></i> Buscar</a></li>
+                    class="fa-solid fa-magnifying-glass w-20px text-center me-2 text-primary"></i> <span
+                    data-i18n="nav.search">Buscar</span></a></li>
               <li><a class="dropdown-item py-2" href="<?= Router::url('ranking') ?>"><i
-                    class="fa-solid fa-earth-europe w-20px text-center me-2 text-success"></i> Ranking Global</a></li>
+                    class="fa-solid fa-earth-europe w-20px text-center me-2 text-success"></i> <span
+                    data-i18n="nav.global_ranking">Ranking Global</span></a></li>
               <li><a class="dropdown-item py-2" href="<?= Router::url('coaster_reviews') ?>"><i
-                    class="fa-solid fa-star w-20px text-center me-2 text-warning"></i> Reseñas Globales</a></li>
+                    class="fa-solid fa-star w-20px text-center me-2 text-warning"></i> <span
+                    data-i18n="nav.global_reviews">Reseñas Globales</span></a></li>
               <li><a class="dropdown-item py-2" href="<?= Router::url('coaster_tops') ?>"><i
-                    class="fa-solid fa-trophy w-20px text-center me-2 text-info"></i> Tops Usuarios</a></li>
+                    class="fa-solid fa-trophy w-20px text-center me-2 text-info"></i> <span
+                    data-i18n="nav.user_tops">Tops Usuarios</span></a></li>
             </ul>
           </li>
 
           <!-- Parques -->
           <li class="nav-item dropdown custom-dropdown">
             <a class="nav-link rcw-nav-pill dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-              Parques
+              <span data-i18n="nav.parks">Parques</span>
             </a>
             <ul class="dropdown-menu shadow border-0">
               <li><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('park_search') ?>"><i
-                    class="fa-solid fa-magnifying-glass w-20px text-center me-2 text-primary"></i> Buscar Parque</a>
+                    class="fa-solid fa-magnifying-glass w-20px text-center me-2 text-primary"></i> <span
+                    data-i18n="nav.search_park">Buscar Parque</span></a>
               </li>
               <li><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('park_ranking') ?>"><i
-                    class="fa-solid fa-earth-europe w-20px text-center me-2 text-success"></i> Ranking Global</a></li>
+                    class="fa-solid fa-earth-europe w-20px text-center me-2 text-success"></i> <span
+                    data-i18n="nav.global_ranking">Ranking Global</span></a></li>
               <li><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('park_tops') ?>?filter=users"><i
-                    class="fa-solid fa-trophy w-20px text-center me-2 text-info"></i> Tops Usuarios</a></li>
+                    class="fa-solid fa-trophy w-20px text-center me-2 text-info"></i> <span
+                    data-i18n="nav.user_tops">Tops Usuarios</span></a></li>
               <li>
                 <hr class="dropdown-divider">
               </li>
-              <li><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('tickets') ?>"><i
-                    class="fa-solid fa-ticket w-20px text-center me-2 text-warning"></i> Entradas</a></li>
+              <!-- HIDDEN-TFG-START: enlace Entradas en menú Parques -->
+              <?php if (false): ?>
+                <li class="hidden-tfg"><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('tickets') ?>"><i
+                      class="fa-solid fa-ticket w-20px text-center me-2 text-warning"></i> Entradas</a></li>
+              <?php endif; ?>
+              <!-- HIDDEN-TFG-END -->
             </ul>
           </li>
 
           <!-- Foros -->
           <li class="nav-item dropdown custom-dropdown">
             <a class="nav-link rcw-nav-pill dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-              <i class="fa-solid fa-comments me-1"></i> Foros
+              <i class="fa-solid fa-comments me-1"></i> <span data-i18n="nav.forums">Foros</span>
             </a>
             <ul class="dropdown-menu shadow border-0">
               <li><a class="dropdown-item py-2" href="<?= Router::url('forum_search') ?>"><i
-                    class="fa-solid fa-users w-20px text-center me-2 text-primary"></i> Todos los foros</a></li>
+                    class="fa-solid fa-users w-20px text-center me-2 text-primary"></i> <span
+                    data-i18n="nav.all_forums">Todos los foros</span></a></li>
             </ul>
           </li>
 
@@ -309,17 +411,23 @@ header("Expires: 0"); // Proxies
           <?php if ($is_logged): ?>
             <li class="nav-item dropdown custom-dropdown">
               <a class="nav-link rcw-nav-pill dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                <i class="fa-solid fa-suitcase-rolling me-1"></i> Viajes
+                <i class="fa-solid fa-suitcase-rolling me-1"></i> <span data-i18n="nav.trips">Viajes</span>
               </a>
               <ul class="dropdown-menu shadow border-0">
                 <li><a class="dropdown-item py-2" href="<?= Router::url('trips') ?>"><i
-                      class="fa-solid fa-calendar-days w-20px text-center me-2 text-success"></i> Mi Agenda</a></li>
-                <li>
-                  <hr class="dropdown-divider">
-                </li>
-                <li><a class="dropdown-item py-2" href="<?= Router::url('trip_generator') ?>"><i
-                      class="fa-solid fa-wand-magic-sparkles w-20px text-center me-2 text-danger"></i> Generador IA</a>
-                </li>
+                      class="fa-solid fa-calendar-days w-20px text-center me-2 text-success"></i> <span
+                      data-i18n="nav.my_agenda">Mi Agenda</span></a></li>
+                <!-- HIDDEN-TFG-START: Generador IA oculto para reforma -->
+                <?php if (false): ?>
+                  <li>
+                    <hr class="dropdown-divider">
+                  </li>
+                  <li><a class="dropdown-item py-2" href="<?= Router::url('trip_generator') ?>"><i
+                        class="fa-solid fa-wand-magic-sparkles w-20px text-center me-2 text-danger"></i> <span
+                        data-i18n="nav.ai_generator">Generador IA</span></a>
+                  </li>
+                <?php endif; ?>
+                <!-- HIDDEN-TFG-END -->
               </ul>
             </li>
           <?php endif; ?>
@@ -329,18 +437,20 @@ header("Expires: 0"); // Proxies
             <li class="nav-item dropdown custom-dropdown">
               <a class="nav-link rcw-nav-pill dropdown-toggle position-relative" href="#" role="button"
                 data-bs-toggle="dropdown">
-                <i class="fa-solid fa-users me-1"></i> Comunidad
+                <i class="fa-solid fa-users me-1"></i> <span data-i18n="nav.community">Comunidad</span>
                 <span id="nav-comm-badge"
                   class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
                   style="font-size: 0.65rem; padding: 0.35em 0.5em;">0</span>
               </a>
               <ul class="dropdown-menu shadow border-0">
                 <li><a class="dropdown-item py-2 fw-semibold" href="<?= Router::url('user_search') ?>"><i
-                      class="fa-solid fa-magnifying-glass w-20px text-center me-2 text-primary"></i> Buscar usuarios</a>
+                      class="fa-solid fa-magnifying-glass w-20px text-center me-2 text-primary"></i> <span
+                      data-i18n="nav.search_users">Buscar usuarios</span></a>
                 </li>
                 <li><a class="dropdown-item py-2 fw-semibold d-flex align-items-center justify-content-between"
                     href="<?= Router::url('friends') ?>">
-                    <span><i class="fa-solid fa-user-group w-20px text-center me-2 text-success"></i> Amistades</span>
+                    <span><i class="fa-solid fa-user-group w-20px text-center me-2 text-success"></i> <span
+                        data-i18n="nav.friendships">Amistades</span></span>
                     <span id="nav-comm-inner-badge" class="badge rounded-pill bg-danger d-none"
                       style="font-size: 0.65rem;">0</span>
                   </a>
@@ -354,8 +464,83 @@ header("Expires: 0"); // Proxies
         </ul>
         <!-- / Nav central -->
 
-        <!-- Zona derecha: Login/Registro o Avatar de perfil -->
+        <!-- Zona derecha: Idioma + Login/Registro o Avatar de perfil -->
         <div class="d-flex align-items-center gap-2 ms-xl-3">
+
+          <!-- ── Selector de idioma (siempre visible) ── -->
+          <div class="nav-item dropdown custom-dropdown" id="rcw-lang-dropdown-wrap">
+            <button type="button" class="btn btn-sm d-flex align-items-center gap-1 rcw-lang-toggle"
+              data-bs-toggle="dropdown" aria-expanded="false" aria-label="Seleccionar idioma"
+              title="<?= ['es' => 'Español', 'en' => 'English', 'fr' => 'Français', 'de' => 'Deutsch'][$_lang] ?>"
+              style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--rcw-text-primary,#e5e7eb);border-radius:8px;padding:0.3rem 0.55rem;transition:background .18s;">
+              <i class="fa-solid fa-globe" style="font-size:0.9rem;"></i>
+              <span class="rcw-lang-toggle-label fw-semibold" style="font-size:0.8rem;letter-spacing:0.04em;">
+                <?php
+                $flagMap = ['es' => '🇪🇸', 'en' => '🇬🇧', 'fr' => '🇫🇷', 'de' => '🇩🇪'];
+                echo $flagMap[$_lang] . ' ' . strtoupper($_lang);
+                ?>
+              </span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rcw-lang-menu" style="min-width:160px;">
+              <?php
+              $langs = [
+                'es' => ['flag' => '🇪🇸', 'name' => 'Español'],
+                'en' => ['flag' => '🇬🇧', 'name' => 'English'],
+                'fr' => ['flag' => '🇫🇷', 'name' => 'Français'],
+                'de' => ['flag' => '🇩🇪', 'name' => 'Deutsch'],
+              ];
+              foreach ($langs as $code => $info): ?>
+                <li>
+                  <button type="button"
+                    class="dropdown-item py-2 d-flex align-items-center gap-2 rcw-lang-option<?= $code === $_lang ? ' active fw-semibold' : '' ?>"
+                    data-lang-option="<?= $code ?>" onclick="rcwSetLang('<?= $code ?>');" style="font-size:0.9rem;">
+                    <span style="font-size:1.1rem;line-height:1;"><?= $info['flag'] ?></span>
+                    <span><?= $info['name'] ?></span>
+                    <?php if ($code === $_lang): ?>
+                      <i class="fa-solid fa-check ms-auto text-success" style="font-size:0.75rem;"></i>
+                    <?php endif; ?>
+                  </button>
+                </li>
+              <?php endforeach; ?>
+            </ul>
+          </div>
+          <!-- / Selector de idioma -->
+
+          <script>
+            function rcwSetLang(lang) {
+              var d = new Date();
+              d.setTime(d.getTime() + 365 * 24 * 60 * 60 * 1000);
+              document.cookie = 'rcw_lang=' + encodeURIComponent(lang) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
+              localStorage.setItem('rcw_lang', lang);
+
+              // Actualizar el botón toggle visualmente de inmediato
+              var flagMap = { es: '🇪🇸', en: '🇬🇧', fr: '🇫🇷', de: '🇩🇪' };
+              var label = document.querySelector('.rcw-lang-toggle-label');
+              if (label) label.textContent = (flagMap[lang] || '') + ' ' + lang.toUpperCase();
+
+              // Marcar opción activa en el dropdown
+              document.querySelectorAll('.rcw-lang-option').forEach(function (btn) {
+                var isActive = btn.getAttribute('data-lang-option') === lang;
+                btn.classList.toggle('active', isActive);
+                btn.classList.toggle('fw-semibold', isActive);
+                var check = btn.querySelector('.fa-check');
+                if (check) check.remove();
+                if (isActive) {
+                  var icon = document.createElement('i');
+                  icon.className = 'fa-solid fa-check ms-auto text-success';
+                  icon.style.fontSize = '0.75rem';
+                  btn.appendChild(icon);
+                }
+              });
+
+              // Traducir con i18n o recargar
+              if (window.rcwI18n && typeof window.rcwI18n.setLang === 'function') {
+                window.rcwI18n.setLang(lang);
+              } else {
+                window.location.href = window.location.href.split('#')[0];
+              }
+            }
+          </script>
 
           <?php if ($is_logged): ?>
 
@@ -367,6 +552,8 @@ header("Expires: 0"); // Proxies
                   <i class="fa-solid fa-gear me-1"></i> Admin
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                  <li><a class="dropdown-item py-2" href="<?= Router::url('admin_updater') ?>"><i
+                        class="fa-solid fa-cloud-arrow-down w-20px text-center me-2 text-danger"></i> Updater RCDB</a></li>
                   <li><a class="dropdown-item py-2" href="<?= Router::url('admin_dashboard') ?>"><i
                         class="fa-solid fa-chart-line w-20px text-center me-2 text-primary"></i> Dashboard</a></li>
                   <li><a class="dropdown-item py-2" href="<?= Router::url('admin_users') ?>"><i
@@ -413,10 +600,14 @@ header("Expires: 0"); // Proxies
                         class="fa-solid fa-image w-20px text-center me-2 text-info"></i> Fotos</a></li>
                   <li><a class="dropdown-item py-2" href="<?= Router::url('admin_comments') ?>"><i
                         class="fa-solid fa-comment w-20px text-center me-2 text-secondary"></i> Comentarios</a></li>
-                  <li><a class="dropdown-item py-2" href="<?= Router::url('admin_orders') ?>"><i
-                        class="fa-solid fa-box w-20px text-center me-2 text-info"></i> Pedidos</a></li>
-                  <li><a class="dropdown-item py-2" href="<?= Router::url('admin_coupons') ?>"><i
-                        class="fa-solid fa-ticket w-20px text-center me-2 text-warning"></i> Cupones</a></li>
+                  <!-- HIDDEN-TFG-START: admin Pedidos y Cupones -->
+                  <?php if (false): ?>
+                    <li class="hidden-tfg"><a class="dropdown-item py-2" href="<?= Router::url('admin_orders') ?>"><i
+                          class="fa-solid fa-box w-20px text-center me-2 text-info"></i> Pedidos</a></li>
+                    <li class="hidden-tfg"><a class="dropdown-item py-2" href="<?= Router::url('admin_coupons') ?>"><i
+                          class="fa-solid fa-ticket w-20px text-center me-2 text-warning"></i> Cupones</a></li>
+                  <?php endif; ?>
+                  <!-- HIDDEN-TFG-END -->
                 </ul>
               </div>
             <?php endif; ?>
@@ -453,13 +644,16 @@ header("Expires: 0"); // Proxies
                 </div>
                 <span class="rcw-user-name d-none d-xl-inline"
                   id="header-username-display"><?= htmlspecialchars(ucfirst($user_display)) ?></span>
-                <!-- Icono carrito con badge (solo visual, no es enlace) -->
-                <span class="position-relative d-none d-xl-inline-flex align-items-center ms-1" id="cart-nav-icon-wrap"
-                  style="display:none!important;">
-                  <i class="fa-solid fa-cart-shopping" style="font-size:.85rem;color:var(--rcw-text-muted);"></i>
-                  <span class="cart-nav-badge position-absolute badge rounded-pill bg-success d-none"
-                    style="font-size:.55rem;padding:.2em .45em;top:-6px;right:-8px;min-width:16px;line-height:1.2;">0</span>
-                </span>
+                <!-- HIDDEN-TFG-START: icono carrito flotante junto al avatar -->
+                <?php if (false): ?>
+                  <span class="position-relative d-none d-xl-inline-flex align-items-center ms-1 hidden-tfg"
+                    id="cart-nav-icon-wrap" style="display:none!important;">
+                    <i class="fa-solid fa-cart-shopping" style="font-size:.85rem;color:var(--rcw-text-muted);"></i>
+                    <span class="cart-nav-badge position-absolute badge rounded-pill bg-success d-none"
+                      style="font-size:.55rem;padding:.2em .45em;top:-6px;right:-8px;min-width:16px;line-height:1.2;">0</span>
+                  </span>
+                <?php endif; ?>
+                <!-- HIDDEN-TFG-END -->
               </a>
               <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                 <li>
@@ -478,31 +672,42 @@ header("Expires: 0"); // Proxies
                   <hr class="dropdown-divider">
                 </li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('profile') ?>"><i
-                      class="fa-solid fa-id-card w-20px text-center me-2 text-secondary"></i> Mi perfil</a></li>
+                      class="fa-solid fa-id-card w-20px text-center me-2 text-secondary"></i> <span
+                      data-i18n="nav.my_profile">Mi perfil</span></a></li>
                 <li><a class="dropdown-item py-2" href="<?= Router::url('profile') ?>#tops"><i
-                      class="fa-solid fa-list-ol w-20px text-center me-2 text-warning"></i> Mis tops</a></li>
-                <li><a class="dropdown-item py-2" href="<?= Router::url('carrito') ?>"><i
-                      class="fa-solid fa-cart-shopping w-20px text-center me-2 text-success"></i> Carrito
-                    <span class="cart-nav-badge badge rounded-pill bg-danger ms-auto d-none"
-                      style="font-size:.65rem;padding:.25em .5em;">0</span>
-                  </a></li>
-                <li><a class="dropdown-item py-2" href="<?= Router::url('orders') ?>"><i
-                      class="fa-solid fa-ticket w-20px text-center me-2 text-info"></i> Mis entradas</a></li>
+                      class="fa-solid fa-list-ol w-20px text-center me-2 text-warning"></i> <span
+                      data-i18n="nav.my_tops">Mis tops</span></a></li>
+                <!-- HIDDEN-TFG-START: Carrito y Mis entradas en dropdown usuario -->
+                <?php if (false): ?>
+                  <li class="hidden-tfg"><a class="dropdown-item py-2" href="<?= Router::url('carrito') ?>"><i
+                        class="fa-solid fa-cart-shopping w-20px text-center me-2 text-success"></i> Carrito
+                      <span class="cart-nav-badge badge rounded-pill bg-danger ms-auto d-none"
+                        style="font-size:.65rem;padding:.25em .5em;">0</span>
+                    </a></li>
+                  <li class="hidden-tfg"><a class="dropdown-item py-2" href="<?= Router::url('orders') ?>"><i
+                        class="fa-solid fa-ticket w-20px text-center me-2 text-info"></i> Mis entradas</a></li>
+                <?php endif; ?>
+                <!-- HIDDEN-TFG-END -->
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+
                 <li>
                   <hr class="dropdown-divider">
                 </li>
                 <li><a class="dropdown-item py-2 text-danger signOutBtn" href="#"><i
-                      class="fa-solid fa-arrow-right-from-bracket w-20px text-center me-2"></i> Cerrar sesión</a></li>
+                      class="fa-solid fa-arrow-right-from-bracket w-20px text-center me-2"></i> <span
+                      data-i18n="nav.logout">Cerrar sesión</span></a></li>
               </ul>
             </div>
 
           <?php else: ?>
             <!-- Login / Registro -->
             <a class="nav-link rcw-btn-login" href="<?= Router::url('login') ?>">
-              <i class="fa-solid fa-right-to-bracket me-1"></i> Login
+              <i class="fa-solid fa-right-to-bracket me-1"></i> <span data-i18n="nav.login">Login</span>
             </a>
             <a class="nav-link rcw-btn-register" href="<?= Router::url('register') ?>">
-              Registro
+              <span data-i18n="nav.register">Registro</span>
             </a>
 
           <?php endif; ?>

@@ -281,6 +281,13 @@
     window.loadRanking();
   };
 
+  // Re-renderizar contenido dinámico al cambiar idioma
+  window.addEventListener('rcw:langchanged', function () {
+    loadTodayDashboard();   // widget de hoy (Hoy no tienes eventos / Registrar Visita Hoy)
+    window.loadRanking();   // ranking (veces probadas / visitas)
+    window.loadTrips();     // tarjetas de viaje (Pasado / Activo / Próximo)
+  });
+
   document.addEventListener("DOMContentLoaded", () => {
     refreshAll();
     document.getElementById("ct-start").onchange = generateDays;
@@ -345,21 +352,23 @@
       html += `<div class="w-100 h-100 position-absolute top-0 start-0" style="background: ${bgImg} center/cover; opacity: 0.3; z-index: 0;"></div>`;
       html += `<div class="card-body position-relative d-flex align-items-center justify-content-between flex-wrap gap-3" style="z-index: 1;">`;
       html += `<div>`;
-      html += `<h4 class="fw-bold text-white mb-1" style="font-family: var(--rcw-font-title);"><i class="fa-solid fa-map-pin text-success me-2"></i>Hoy estás en ${esc(mainPark.park_name)}</h4>`;
+      const _t = window.t || function(k){return k;};
+      html += `<h4 class="fw-bold text-white mb-1" style="font-family: var(--rcw-font-title);"><i class="fa-solid fa-map-pin text-success me-2"></i>${_t('trips.today_in_park')} ${esc(mainPark.park_name)}</h4>`;
       html += `<p class="text-light mb-0 text-capitalize">${dw(todayIso)}</p>`;
       html += `</div>`;
-      html += `<button class="btn btn-success rounded-0 fw-bold px-4 py-2 shadow" onclick="openDay('${todayIso}')"><i class="fa-solid fa-clipboard-check me-2"></i>Ir a la Agenda de Hoy</button>`;
+      html += `<button class="btn btn-success rounded-0 fw-bold px-4 py-2 shadow" onclick="openDay('${todayIso}')"><i class="fa-solid fa-clipboard-check me-2"></i>${_t('trips.go_to_agenda')}</button>`;
       html += `</div></div>`;
 
       dash.innerHTML = html;
     } else {
+      const _t = window.t || function(k){return k;};
       let html = `<div class="card shadow-sm rounded-0 border-success" style="background:var(--rcw-bg-card-alt); border-width: 1px 1px 1px 4px;">`;
       html += `<div class="card-body d-flex align-items-center justify-content-between flex-wrap gap-3">`;
       html += `<div>`;
-      html += `<h5 class="fw-bold text-white mb-1"><i class="fa-solid fa-calendar-xmark text-muted me-2"></i>Hoy no tienes eventos</h5>`;
+      html += `<h5 class="fw-bold text-white mb-1"><i class="fa-solid fa-calendar-xmark text-muted me-2"></i>${_t('trips.no_events_today')}</h5>`;
       html += `<p class="text-muted mb-0 text-capitalize">${dw(todayIso)}</p>`;
       html += `</div>`;
-      html += `<button class="btn btn-outline-success rounded-0 fw-bold px-3" onclick="window.openAddVisit('${todayIso}')"><i class="fa-solid fa-plus me-2"></i>Registrar Visita Hoy</button>`;
+      html += `<button class="btn btn-outline-success rounded-0 fw-bold px-3" onclick="window.openAddVisit('${todayIso}')"><i class="fa-solid fa-plus me-2"></i>${_t('trips.register_visit_today')}</button>`;
       html += `</div></div>`;
       dash.innerHTML = html;
     }
@@ -662,9 +671,9 @@
     document
       .getElementById("create-trip-modal")
       .querySelector(".modal-title").innerHTML =
-      '<i class="fa-solid fa-plus-circle me-2"></i>Nuevo Viaje';
+      `<i class="fa-solid fa-plus-circle me-2"></i>${window.t ? window.t('trips.modal.new_trip_title') : 'Nuevo Viaje'}`;
     document.getElementById("ct-submit-btn").innerHTML =
-      '<i class="fa-solid fa-plus me-1"></i>Crear Viaje';
+      `<i class="fa-solid fa-plus me-1"></i>${window.t ? window.t('trips.modal.create_trip_btn') : 'Crear Viaje'}`;
 
     if (window.renderCountryTags) window.renderCountryTags();
     gm("create-trip-modal").show();
@@ -938,12 +947,13 @@
             : t_status === "active"
               ? "bg-success"
               : "bg-warning text-dark";
+        const _t2 = window.t || function(k){return k;};
         const statusText =
           t_status === "past"
-            ? "Pasado"
+            ? _t2('trips.status_past')
             : t_status === "active"
-              ? "Activo"
-              : "Próximo";
+              ? _t2('trips.status_active')
+              : _t2('trips.status_upcoming');
         let imgUrl =
           "https://st3.depositphotos.com/3436901/14792/i/450/depositphotos_147926787-stock-photo-plane-flying-over-blue-sky.jpg";
         if (t.cover_image) {
@@ -951,7 +961,7 @@
             ? t.cover_image
             : window.RCW_BASE_URL + t.cover_image;
         }
-        const pNames = t.park_names ? t.park_names : "Sin parques planificados";
+        const pNames = t.park_names ? t.park_names : _t2('trips.no_parks_planned');
         const startStr = start.toLocaleDateString("es-ES", {
           day: "numeric",
           month: "short",
@@ -1249,7 +1259,7 @@
                     <h6 class="fw-bold text-white mb-0 text-truncate">${esc(title)}</h6>
                     <small class="text-muted text-truncate d-block">${esc(sub)}</small>
                   </div>
-                  <div class="fw-bold text-success fs-6 fs-md-5 flex-shrink-0 text-end" style="min-width: 60px;">${count} <span class="d-block d-sm-inline text-muted fw-normal" style="font-family: 'Outfit', sans-serif; letter-spacing: 0.5px; font-size: 0.7em;">${isC ? (count === 1 ? "vez montada" : "veces montada") : count === 1 ? "visita" : "visitas"}</span></div>
+                  <div class="fw-bold text-success fs-6 fs-md-5 flex-shrink-0 text-end" style="min-width: 60px;">${count} <span class="d-block d-sm-inline text-muted fw-normal" style="font-family: 'Outfit', sans-serif; letter-spacing: 0.5px; font-size: 0.7em;">${isC ? (count === 1 ? (window.t ? window.t('trips.times_ridden_1') : 'vez probada') : (window.t ? window.t('trips.times_ridden_n') : 'veces probadas')) : count === 1 ? (window.t ? window.t('trips.visit_1') : 'visita') : (window.t ? window.t('trips.visit_n') : 'visitas')}</span></div>
                 </div>
                 <div class="progress rounded-pill bg-dark mt-2" style="height: 6px;">
                   <div class="progress-bar bg-success" role="progressbar" style="width: ${pct}%"></div>

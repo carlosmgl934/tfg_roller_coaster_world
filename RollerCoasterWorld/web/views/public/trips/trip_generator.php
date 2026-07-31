@@ -40,12 +40,13 @@ $returnStartDate = $_GET['start_date'] ?? '';
                 class="d-flex align-items-start align-items-sm-center justify-content-between flex-wrap gap-2 border-bottom pb-3">
                 <div>
                     <h1 class="display-6 fw-bold text-success mb-1">
-                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Generador de Viajes
+                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i><span
+                            data-i18n="trips.generator.title">Generador de Viajes</span>
                         <span class="tg-hero-badge ms-2">
-                            <span class="ai-dot"></span> Motor IA
+                            <span class="ai-dot"></span> <span data-i18n="trips.generator.ai_badge">Motor IA</span>
                         </span>
                     </h1>
-                    <p class="text-muted small mb-0">
+                    <p class="text-muted small mb-0" data-i18n="trips.generator.subtitle">
                         La IA analiza tu perfil para sugerirte los mejores destinos <strong class="text-secondary">sin
                             que tengas que rellenar nada</strong>.
                     </p>
@@ -74,7 +75,7 @@ $returnStartDate = $_GET['start_date'] ?? '';
                     <span class="text-muted small d-none d-md-inline">Basado en tu perfil · Caché 24h</span>
                     <button class="rcw-recs-refresh-btn" id="recs-refresh-btn" title="Regenerar recomendaciones">
                         <i class="fa-solid fa-rotate"></i>
-                        <span class="d-none d-sm-inline">Regenerar</span>
+                        <span class="d-none d-sm-inline" data-i18n="trips.generator.regenerate">Regenerar</span>
                     </button>
                 </div>
             </div>
@@ -90,7 +91,8 @@ $returnStartDate = $_GET['start_date'] ?? '';
             <div class="card rounded-0 shadow-sm mb-4">
                 <div class="card-header bg-success text-white rounded-0">
                     <h5 class="mb-0">
-                        <i class="fa-solid fa-circle-info me-2"></i>¿Cómo funciona la IA?
+                        <i class="fa-solid fa-circle-info me-2"></i><span data-i18n="trips.generator.how_title">¿Cómo
+                            funciona la IA?</span>
                     </h5>
                 </div>
                 <div class="card-body p-3">
@@ -102,8 +104,9 @@ $returnStartDate = $_GET['start_date'] ?? '';
                                     <div class="tg-how-icon" style="background:rgba(16,185,129,0.12);color:#10b981;">
                                         <i class="fa-solid fa-database"></i>
                                     </div>
-                                    <h6 class="fw-bold mb-0">1. Analiza tu perfil</h6>
-                                    <p class="small text-muted mb-0">
+                                    <h6 class="fw-bold mb-0" data-i18n="trips.generator.step1_title">1. Analiza tu
+                                        perfil</h6>
+                                    <p class="small text-muted mb-0" data-i18n="trips.generator.step1_desc">
                                         Lee tu historial de coasters, parques visitados, fabricante favorito
                                         y el gasto medio en tus reservas anteriores.
                                     </p>
@@ -117,8 +120,9 @@ $returnStartDate = $_GET['start_date'] ?? '';
                                     <div class="tg-how-icon" style="background:rgba(99,102,241,0.12);color:#818cf8;">
                                         <i class="fa-solid fa-brain"></i>
                                     </div>
-                                    <h6 class="fw-bold mb-0">2. Puntúa destinos</h6>
-                                    <p class="small text-muted mb-0">
+                                    <h6 class="fw-bold mb-0" data-i18n="trips.generator.step2_title">2. Puntúa destinos
+                                    </h6>
+                                    <p class="small text-muted mb-0" data-i18n="trips.generator.step2_desc">
                                         Compara tu perfil con todos los parques de la base de datos
                                         usando un algoritmo de afinidad multicriteria.
                                     </p>
@@ -132,8 +136,9 @@ $returnStartDate = $_GET['start_date'] ?? '';
                                     <div class="tg-how-icon" style="background:rgba(251,146,60,0.12);color:#fb923c;">
                                         <i class="fa-solid fa-compass"></i>
                                     </div>
-                                    <h6 class="fw-bold mb-0">3. Añade un comodín</h6>
-                                    <p class="small text-muted mb-0">
+                                    <h6 class="fw-bold mb-0" data-i18n="trips.generator.step3_title">3. Añade un comodín
+                                    </h6>
+                                    <p class="small text-muted mb-0" data-i18n="trips.generator.step3_desc">
                                         Incluye un destino "Descubrimiento" fuera de tu zona de confort
                                         para que explores parques que nunca habrías considerado.
                                     </p>
@@ -147,8 +152,9 @@ $returnStartDate = $_GET['start_date'] ?? '';
                                     <div class="tg-how-icon" style="background:rgba(34,211,238,0.12);color:#22d3ee;">
                                         <i class="fa-solid fa-calendar-check"></i>
                                     </div>
-                                    <h6 class="fw-bold mb-0">4. Reserva y agenda</h6>
-                                    <p class="small text-muted mb-0">
+                                    <h6 class="fw-bold mb-0" data-i18n="trips.generator.step4_title">4. Reserva y agenda
+                                    </h6>
+                                    <p class="small text-muted mb-0" data-i18n="trips.generator.step4_desc">
                                         Con un clic, el carrito se pre-configura con hotel y entradas.
                                         Al confirmar, el viaje se añade automáticamente a tu Agenda.
                                     </p>

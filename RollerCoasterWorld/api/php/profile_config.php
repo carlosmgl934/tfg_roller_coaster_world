@@ -343,6 +343,7 @@ function getTopCoasters()
         $stmt = $db->prepare("
             SELECT 
                 uc.rank_position, 
+                uc.created_at as added_date,
                 c.id AS coaster_id, 
                 c.coaster_name, 
                 c.imagen_url,
@@ -351,6 +352,7 @@ function getTopCoasters()
                 c.inversions,
                 c.coaster_length,
                 c.opening_year,
+                c.coaster_status,
                 c.coaster_manufacter AS manufacter,
                 c.coaster_model AS model,
                 p.park_name,

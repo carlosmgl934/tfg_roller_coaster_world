@@ -44,8 +44,38 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+// Cuando cambia el idioma, actualizar el carrusel y las noticias
+window.addEventListener('rcw:langchanged', function () {
+  const activeSlide = document.querySelector('.home-hero-slide.active');
+  // ─ Actualizar carrusel ─
+  if (activeSlide) {
+    const titleEl = document.getElementById('hero-title');
+    const subEl   = document.getElementById('hero-sub');
+    const tagEl   = document.getElementById('hero-tag-text');
+    const _t = (key, fallback) =>
+      (window.rcwI18n && typeof window.rcwI18n.t === 'function')
+        ? window.rcwI18n.t(key)
+        : fallback;
+
+    if (tagEl) tagEl.textContent = _t('home.personal_panel', tagEl.textContent);
+    if (subEl) subEl.textContent = _t('home.welcome_back', subEl.textContent);
+    if (titleEl) {
+      const welcome = _t('home.welcome', 'Bienvenido,');
+      const uEl = document.getElementById('hero-username');
+      const username = uEl ? uEl.textContent : _heroUsername;
+      titleEl.innerHTML = `<span data-i18n="home.welcome">${welcome}</span><br><span style="color:var(--rcw-green)" id="hero-username">${username}</span>`;
+    }
+  }
+  // ─ Re-renderizar noticias con las nuevas traducciones ─
+  if (_lastNews) {
+    renderNews(_lastNews);
+  }
+});
+
 // Nombre del usuario que se mantiene al rotar slides
-let _heroUsername = "";
+let _heroUsername = '';
+// Cache de noticias para poder re-renderizarlas al cambiar idioma
+let _lastNews = null;
 
 // ── Carrusel del hero ──────────────────────────────────────────────────────────
 function initCarousel() {
@@ -78,10 +108,18 @@ function initCarousel() {
     const btn1 = document.getElementById("hero-btn1");
     const btn2 = document.getElementById("hero-btn2");
 
-    if (tagEl) tagEl.textContent = slide.dataset.tag || "";
-    if (subEl) subEl.textContent = slide.dataset.sub || "";
+    // Usar i18n si está disponible; si no, usar el atributo data- como fallback
+    const _t = (key, fallback) =>
+      (window.rcwI18n && typeof window.rcwI18n.t === 'function')
+        ? window.rcwI18n.t(key)
+        : fallback;
+
+    if (tagEl) tagEl.textContent = _t('home.personal_panel', slide.dataset.tag || "");
+    if (subEl) subEl.textContent = _t('home.welcome_back', slide.dataset.sub || "");
     if (titleEl) {
-      titleEl.innerHTML = slide.dataset.title || "";
+      // El título tiene una parte fija ("Bienvenido,") + el nombre de usuario dinámico
+      const welcome = _t('home.welcome', 'Bienvenido,');
+      titleEl.innerHTML = `<span data-i18n="home.welcome">${welcome}</span><br><span style="color:var(--rcw-green)" id="hero-username"></span>`;
       const uEl = document.getElementById("hero-username");
       if (uEl && _heroUsername) uEl.textContent = _heroUsername;
     }
@@ -170,6 +208,7 @@ async function loadDashboard() {
     setEl("stat-photos", stats.photos);
 
     // Noticias
+    _lastNews = news;
     renderNews(news);
 
     // Imágenes del carrusel (BD → override de defaults)
@@ -252,25 +291,31 @@ async function loadLandingStats() {
 function timeAgo(dateString) {
   const date = new Date(dateString);
   const now = new Date();
-  // Restar horas para compensar desfases horarios si es necesario, o comparar directamente
   const diffMs = now - date;
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
+  // Helper: obtiene traducción con interpolación de {n}
+  const _t = (key, n, fallback) => {
+    if (!window.rcwI18n || typeof window.rcwI18n.t !== 'function') return fallback;
+    return window.rcwI18n.t(key).replace('{n}', n);
+  };
+
   if (diffDays === 0) {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    if (diffHours === 0) return "Hace un momento";
-    return `Hace ${diffHours} hora${diffHours > 1 ? "s" : ""}`;
+    if (diffHours === 0) return _t('home.time_moment', 0, 'Hace un momento');
+    if (diffHours === 1) return _t('home.time_hour', 1, 'Hace 1 hora');
+    return _t('home.time_hours', diffHours, `Hace ${diffHours} horas`);
   }
-  if (diffDays === 1) return "Hace 1 día";
-  if (diffDays < 30) return `Hace ${diffDays} días`;
+  if (diffDays === 1) return _t('home.time_day', 1, 'Hace 1 día');
+  if (diffDays < 30) return _t('home.time_days', diffDays, `Hace ${diffDays} días`);
 
   const diffMonths = Math.floor(diffDays / 30);
-  if (diffMonths === 1) return "Hace 1 mes";
-  if (diffMonths < 12) return `Hace ${diffMonths} meses`;
+  if (diffMonths === 1) return _t('home.time_month', 1, 'Hace 1 mes');
+  if (diffMonths < 12) return _t('home.time_months', diffMonths, `Hace ${diffMonths} meses`);
 
   const diffYears = Math.floor(diffDays / 365);
-  if (diffYears === 1) return "Hace 1 año";
-  return `Hace ${diffYears} años`;
+  if (diffYears === 1) return _t('home.time_year', 1, 'Hace 1 año');
+  return _t('home.time_years', diffYears, `Hace ${diffYears} años`);
 }
 
 function renderNews(news) {
@@ -304,6 +349,9 @@ function renderNews(news) {
 
     let bodyHtml = "";
     if (isBig) {
+      const readMoreText = (window.rcwI18n && typeof window.rcwI18n.t === 'function')
+        ? window.rcwI18n.t('home.read_more')
+        : 'Leer más';
       bodyHtml = `
                 <div class="home-news-tag">
                     <i class="fa-solid ${tagIcon(item.tag)} me-1"></i>${item.tag || "Novedad"}
@@ -311,7 +359,7 @@ function renderNews(news) {
                 <div class="home-news-title">${item.title}</div>
                 <div class="home-news-desc">${item.description}</div>
                 <span class="home-news-read-more">
-                    Leer más <i class="fa-solid fa-arrow-right" style="font-size:0.65rem;"></i>
+                    ${readMoreText} <i class="fa-solid fa-arrow-right" style="font-size:0.65rem;"></i>
                 </span>
                 <div class="home-news-date">
                     <i class="fa-regular fa-clock me-1"></i>${timeAgo(item.created_at)}

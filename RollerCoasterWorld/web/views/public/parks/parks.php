@@ -28,15 +28,15 @@ require_once __DIR__ . '/../../partials/header.php';
 
         <!-- Info principal -->
         <div class="col-12 col-lg-5">
-            <h1 class="fw-bold text-success mb-1" id="park-name" style="font-size:2rem;">Cargando...</h1>
+            <h1 class="fw-bold text-success mb-1" id="park-name" style="font-size:2rem;" data-i18n="coasters.detail.loading">Cargando...</h1>
 
             <div class="d-flex align-items-center gap-2 mb-3">
                 <span class="text-muted d-flex align-items-center gap-1">
                     <i class="fa-solid fa-map-pin text-success" style="font-size:.85rem;"></i>
-                    <span id="park-location-header" style="font-size:.95rem;">Cargando...</span>
+                    <span id="park-location-header" style="font-size:.95rem;" data-i18n="coasters.detail.loading">Cargando...</span>
                 </span>
                 <span class="text-muted">•</span>
-                <span id="park-country-header" class="fw-semibold text-dark" style="font-size:.95rem;">País</span>
+                <span id="park-country-header" class="fw-semibold text-dark" style="font-size:.95rem;" data-i18n="coasters.detail.country">País</span>
             </div>
 
             <hr class="my-3">
@@ -45,25 +45,25 @@ require_once __DIR__ . '/../../partials/header.php';
             <div class="row g-2 mb-3">
                 <div class="col-6">
                     <div class="stat-card card text-center p-2 h-100 d-flex flex-column justify-content-center">
-                        <div class="text-muted small mb-1">Ranking Parques</div>
+                        <div class="text-muted small mb-1" data-i18n="parks.detail.park_ranking">Ranking Parques</div>
                         <div class="ranking-num text-success" id="global-ranking">—</div>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="stat-card card text-center p-2 h-100 d-flex flex-column justify-content-center">
-                        <div class="text-muted small mb-1">Puntuación <span class="text-success opacity-75 ms-1" style="font-size: 0.65rem;">(<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>)</span></div>
+                        <div class="text-muted small mb-1"><span data-i18n="coasters.detail.score">Puntuación</span> <span class="text-success opacity-75 ms-1" style="font-size: 0.65rem;">(<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>)</span></div>
                         <div class="ranking-num text-success"><span id="park-score">—</span> <i class="fa-solid fa-star ms-1" style="font-size: 1.25rem; vertical-align: baseline;"></i></div>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="stat-card card text-center p-2 h-100 d-flex flex-column justify-content-center">
-                        <div class="text-muted small mb-1">Coasters Operativas</div>
+                        <div class="text-muted small mb-1" data-i18n="parks.detail.operating_coasters">Coasters Operativas</div>
                         <div class="ranking-num text-success" id="operating-coasters-val">—</div>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="stat-card card text-center p-2 h-100 d-flex flex-column justify-content-center">
-                        <div class="text-muted small mb-1">Estado</div>
+                        <div class="text-muted small mb-1" data-i18n="coasters.detail.status">Estado</div>
                         <div class="ranking-num text-success" id="current-state" style="font-size: 1.2rem;">Abierto</div>
                     </div>
                 </div>
@@ -74,19 +74,19 @@ require_once __DIR__ . '/../../partials/header.php';
                 <!-- Fila 1: Comprar (se inserta por JS) + Web Oficial -->
                 <a href="#" target="_blank" id="btn-website" class="btn btn-outline-success fw-bold flex-grow-1 d-flex align-items-center justify-content-center gap-2" style="border-radius:0; padding: 10px; min-width: 130px;">
                     <i class="fa-solid fa-globe fs-5"></i>
-                    <span>Web Oficial</span>
+                    <span data-i18n="parks.detail.official_website">Web Oficial</span>
                 </a>
                 <!-- Fila 2: iconos secundarios -->
                 <div class="d-flex gap-2 flex-shrink-0">
-                    <button id="btn-map" class="btn btn-outline-secondary" style="border-radius:0; padding:10px 14px;" title="Ver en mapa">
+                    <button id="btn-map" class="btn btn-outline-secondary" style="border-radius:0; padding:10px 14px;" title="Ver en mapa" data-i18n="parks.detail.view_map" data-i18n-attr="title">
                         <i class="fa-solid fa-location-arrow fs-5"></i>
                     </button>
-                    <button id="btn-share" class="btn btn-outline-secondary" style="border-radius:0; padding:10px 14px;" title="Compartir">
+                    <button id="btn-share" class="btn btn-outline-secondary" style="border-radius:0; padding:10px 14px;" title="Compartir" data-i18n="coasters.detail.share" data-i18n-attr="title">
                         <i class="fa-solid fa-share-nodes fs-5"></i>
                     </button>
                     <?php if (isset($is_admin) && $is_admin): ?>
                     <a href="<?= Router::url('admin_parks') ?>?edit_park=<?= $id ?>"
-                       class="btn btn-outline-primary" style="border-radius:0; padding:10px 14px;" title="Editar parque (Admin)">
+                       class="btn btn-outline-primary" style="border-radius:0; padding:10px 14px;" title="Editar parque (Admin)" data-i18n="parks.detail.edit_admin" data-i18n-attr="title">
                         <i class="fa-solid fa-pen-to-square fs-5"></i>
                     </a>
                     <?php endif; ?>
@@ -101,34 +101,36 @@ require_once __DIR__ . '/../../partials/header.php';
             <div class="section-card card h-100">
                 <div class="card-header bg-success text-white d-flex align-items-center gap-2">
                     <i class="fa-solid fa-chart-simple"></i>
-                    <span class="fw-semibold text-white">Estadísticas Rápidas</span>
+                    <span class="fw-semibold text-white" data-i18n="parks.detail.quick_stats">Estadísticas Rápidas</span>
                 </div>
                 <div class="card-body p-3">
                     <div class="row g-3 h-100">
                         <div class="col-6">
                             <div class="stat-block text-center border-bottom border-end">
-                                <span class="stat-label">Año Apertura</span>
+                                <span class="stat-label" data-i18n="parks.detail.opening_year">Épo de Apertura</span>
                                 <span class="stat-value text-success" id="opening-year-val">—</span>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="stat-block text-center border-bottom">
-                                <span class="stat-label">Nº Coasters</span>
+                                <span class="stat-label" data-i18n="parks.detail.num_coasters">Nº Coasters</span>
                                 <span class="stat-value text-success fw-bold" id="stat-num-coasters">—</span>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="stat-block text-center border-end">
-                                <span class="stat-label">Reseñas Totales</span>
+                                <span class="stat-label" data-i18n="parks.detail.total_reviews">Reseñas Totales</span>
                                 <span class="stat-value text-success" id="reviews-count-val">0</span>
                             </div>
                         </div>
-                        <div class="col-6">
+                        <!-- HIDDEN-TFG-START: stat precio -->
+                        <div class="col-6 hidden-tfg">
                             <div class="stat-block text-center">
                                 <span class="stat-label">Entrada (Desde)</span>
                                 <span class="stat-value text-success" id="entry-price-val">—</span>
                             </div>
                         </div>
+                        <!-- HIDDEN-TFG-END -->
                     </div>
                 </div>
             </div>
@@ -138,27 +140,29 @@ require_once __DIR__ . '/../../partials/header.php';
             <div class="section-card card h-100 border-0 ficha-card-bg">
                 <div class="card-header bg-success text-white d-flex align-items-center gap-2">
                     <i class="fa-solid fa-folder-open"></i>
-                    <span class="fw-semibold text-white">Ficha del Parque</span>
+                    <span class="fw-semibold text-white" data-i18n="parks.detail.park_sheet">Ficha del Parque</span>
                 </div>
                 <div class="card-body p-0">
                     <table class="table table-borderless mb-0 ficha-table-premium text-white">
                         <tbody>
                             <tr>
-                                <td class="text-uppercase align-middle ficha-table-label w-45"><i class="fa-solid fa-location-dot me-2 opacity-50"></i>Localización</td>
+                                <td class="text-uppercase align-middle ficha-table-label w-45"><i class="fa-solid fa-location-dot me-2 opacity-50"></i><span data-i18n="parks.detail.location">Localización</span></td>
                                 <td class="fw-semibold text-end align-middle text-white" id="park-location-table">—</td>
                             </tr>
                             <tr>
-                                <td class="text-uppercase align-middle ficha-table-label"><i class="fa-solid fa-flag me-2 opacity-50"></i>País</td>
+                                <td class="text-uppercase align-middle ficha-table-label"><i class="fa-solid fa-flag me-2 opacity-50"></i><span data-i18n="common.country">País</span></td>
                                 <td class="fw-semibold text-end align-middle text-white" id="park-country-table">—</td>
                             </tr>
                             <tr>
-                                <td class="text-uppercase align-middle ficha-table-label"><i class="fa-solid fa-calendar-check me-2 opacity-50"></i>Inaugurado en</td>
+                                <td class="text-uppercase align-middle ficha-table-label"><i class="fa-solid fa-calendar-check me-2 opacity-50"></i><span data-i18n="parks.detail.inaugurated">Inaugurado en</span></td>
                                 <td class="fw-semibold text-end align-middle text-white" id="park-year-table">—</td>
                             </tr>
-                            <tr>
+                            <!-- HIDDEN-TFG-START: fila precio orientativo -->
+                            <tr class="hidden-tfg">
                                 <td class="text-uppercase align-middle ficha-table-label"><i class="fa-solid fa-euro-sign me-2 opacity-50"></i>Precio orientativo</td>
                                 <td class="fw-semibold text-end align-middle text-white" id="park-price-table">—</td>
                             </tr>
+                            <!-- HIDDEN-TFG-END -->
 
                         </tbody>
                     </table>
@@ -174,7 +178,7 @@ require_once __DIR__ . '/../../partials/header.php';
                 <div class="card-header bg-success text-white d-flex align-items-center gap-3">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fa-solid fa-train-tram"></i>
-                        <span class="fw-semibold text-white">Montañas Rusas del Parque</span>
+                        <span class="fw-semibold text-white" data-i18n="parks.detail.park_coasters">Montañas Rusas del Parque</span>
                     </div>
                 </div>
                 <div class="card-body p-3 pt-4">
@@ -182,7 +186,7 @@ require_once __DIR__ . '/../../partials/header.php';
                         <!-- Se cargan aquí -->
                         <div class="col-12 text-center py-4 text-muted">
                             <div class="spinner-border spinner-border-sm text-success me-2"></div>
-                            Buscando atracciones operativas...
+                            <span data-i18n="parks.detail.loading_coasters">Buscando atracciones operativas...</span>
                         </div>
                     </div>
                 </div>
@@ -216,15 +220,15 @@ require_once __DIR__ . '/../../partials/header.php';
                     <div class="d-flex align-items-center gap-3">
                         <div class="d-flex align-items-center gap-2">
                             <i class="fa-solid fa-star"></i>
-                            <span class="fw-semibold text-white">Experiencias y Opiniones</span>
+                            <span class="fw-semibold text-white" data-i18n="parks.detail.experiences">Experiencias y Opiniones</span>
                         </div>
                         <span class="badge badge-dark-green rounded-pill px-2 py-1 shadow-sm fs-6" id="reviews-header-count">0</span>
                     </div>
                     <div class="d-flex gap-2 align-items-center">
                         <select class="form-select form-select-sm rounded-0 bg-dark text-white border-secondary" id="reviews-sort" style="width:auto;">
-                            <option value="newest">Más recientes</option>
-                            <option value="best">Mejor valorados</option>
-                            <option value="worst">Peor valorados</option>
+                            <option value="newest" data-i18n="coasters.detail.most_recent">Más recientes</option>
+                            <option value="best" data-i18n="coasters.detail.best_rated">Mejor valorados</option>
+                            <option value="worst" data-i18n="coasters.detail.worst_rated">Peor valorados</option>
                         </select>
                         <a class="btn btn-sm btn-outline-light rounded-0 px-3" id="btn-write-review"
                             <?php if ($is_logged): ?>
@@ -232,14 +236,14 @@ require_once __DIR__ . '/../../partials/header.php';
                             <?php else: ?>
                               href="#" data-bs-toggle="modal" data-bs-target="#loginModal"
                             <?php endif; ?>>
-                            <i class="fa-solid fa-pen me-1"></i>Escribir reseña
+                            <i class="fa-solid fa-pen me-1"></i><span data-i18n="coasters.detail.write_review">Escribir reseña</span>
                         </a>
                     </div>
                 </div>
                 <div class="card-body" id="reviews-list">
                     <div class="text-center text-muted py-5">
                         <i class="fa-regular fa-comment-dots fa-3x mb-3 d-block"></i>
-                        Aún no hay reseñas para este parque
+                        <span data-i18n="parks.detail.no_reviews">Aún no hay reseñas para este parque</span>
                     </div>
                 </div>
             </div>
@@ -252,7 +256,7 @@ require_once __DIR__ . '/../../partials/header.php';
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content bg-dark border-secondary text-white">
       <div class="modal-header bg-success">
-        <h5 class="modal-title fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i>Editar reseña</h5>
+        <h5 class="modal-title fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i><span data-i18n="coasters.detail.edit_review">Editar reseña</span></h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
@@ -310,9 +314,9 @@ require_once __DIR__ . '/../../partials/header.php';
         </div>
       </div>
       <div class="modal-footer border-secondary">
-        <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal" data-i18n="common.cancel">Cancelar</button>
         <button type="button" class="btn btn-success rounded-0 fw-bold px-4" id="save-edit-review-btn">
-          <i class="fa-solid fa-floppy-disk me-1"></i>Guardar cambios
+          <i class="fa-solid fa-floppy-disk me-1"></i><span data-i18n="coasters.detail.save_changes">Guardar cambios</span>
         </button>
       </div>
     </div>

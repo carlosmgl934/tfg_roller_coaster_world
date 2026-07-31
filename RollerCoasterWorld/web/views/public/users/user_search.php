@@ -11,9 +11,10 @@ if (!$is_logged) {
     <div class="row mb-4">
         <div class="col-12 text-center">
             <h1 class="display-6 fw-bold border-bottom border-light border-opacity-50 pb-2 text-success">
-                <i class="fa-solid fa-users me-2"></i> Buscar Usuarios
+                <i class="fa-solid fa-users me-2"></i> <span data-i18n="users.search.title">Buscar Usuarios</span>
             </h1>
-            <p class="text-muted text-uppercase fw-bold mt-3" style="letter-spacing: 0.1em; font-size: 0.85rem;">
+            <p class="text-muted text-uppercase fw-bold mt-3" style="letter-spacing: 0.1em; font-size: 0.85rem;"
+                data-i18n="users.search.subtitle">
                 Encuentra a otros enthusiasts para ver sus tops, viajes y convertirte en su amigo</p>
         </div>
     </div>
@@ -28,7 +29,8 @@ if (!$is_logged) {
                 </span>
                 <input type="text" id="page-user-search"
                     class="form-control text-white bg-transparent border-0 shadow-none ps-3 rounded-0"
-                    placeholder="Buscar por nombre de usuario..." autocomplete="off">
+                    data-i18n-placeholder="users.search.placeholder" placeholder="Buscar por nombre de usuario..."
+                    autocomplete="off">
             </div>
         </div>
     </div>
@@ -40,8 +42,8 @@ if (!$is_logged) {
                 style="background:var(--rcw-bg-card); border:1px solid #30363d; max-height: 480px; overflow-y: auto; overflow-x: hidden;">
                 <div class="text-center text-muted py-5 w-100">
                     <i class="fa-solid fa-magnifying-glass mb-3 d-block fa-3x opacity-25"></i>
-                    <h5>Empieza a escribir para buscar...</h5>
-                    <p class="small">Escribe al menos 2 letras</p>
+                    <h5 data-i18n="users.search.start_typing">Empieza a escribir para buscar...</h5>
+                    <p class="small" data-i18n="users.search.min_chars">Escribe al menos 2 letras</p>
                 </div>
             </div>
         </div>

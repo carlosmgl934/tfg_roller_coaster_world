@@ -12,19 +12,21 @@ $(document).ready(function () {
       if (query.length < 2) {
         if (query.length === 0) {
           resultsContainer.html(
-            '<div class="text-center text-muted py-5"><i class="fa-solid fa-magnifying-glass mb-3 d-block fa-3x opacity-25"></i><h5>Empieza a escribir para buscar...</h5><p class="small">Escribe al menos 2 letras</p></div>',
+            '<div class="text-center text-muted py-5"><i class="fa-solid fa-magnifying-glass mb-3 d-block fa-3x opacity-25"></i><h5><span data-i18n="user_search.start_typing">Empieza a escribir para buscar...</span></h5><p class="small"><span data-i18n="user_search.type_min_chars">Escribe al menos 2 letras</span></p></div>',
           );
         } else {
           resultsContainer.html(
-            '<div class="text-center text-muted py-5"><i class="fa-solid fa-keyboard mb-3 d-block fa-3x opacity-25"></i><h5>Escribe al menos 2 caracteres...</h5></div>',
+            '<div class="text-center text-muted py-5"><i class="fa-solid fa-keyboard mb-3 d-block fa-3x opacity-25"></i><h5><span data-i18n="user_search.type_min_chars_2">Escribe al menos 2 caracteres...</span></h5></div>',
           );
         }
+        if (window.rcwI18n) window.rcwI18n.applyToContainer(resultsContainer[0]);
         return;
       }
 
       resultsContainer.html(
-        '<div class="text-center text-success py-5"><div class="spinner-border mb-3" role="status"></div><h5>Buscando en la comunidad...</h5></div>',
+        '<div class="text-center text-success py-5"><div class="spinner-border mb-3" role="status"></div><h5><span data-i18n="user_search.searching">Buscando en la comunidad...</span></h5></div>',
       );
+      if (window.rcwI18n) window.rcwI18n.applyToContainer(resultsContainer[0]);
 
       searchTimeout = setTimeout(() => {
         fetchUsers(query);
@@ -45,16 +47,18 @@ $(document).ready(function () {
         resultsContainer.html(`
           <div class="text-center text-muted py-5">
             <i class="fa-solid fa-ghost mb-3 d-block fa-3x opacity-25"></i>
-            <h5>No se ha encontrado a nadie</h5>
-            <p class="small">Prueba con otro nombre o asegúrate de haberlo escrito bien.</p>
+            <h5><span data-i18n="user_search.no_results">No se ha encontrado a nadie</span></h5>
+            <p class="small"><span data-i18n="user_search.try_another">Prueba con otro nombre o asegúrate de haberlo escrito bien.</span></p>
           </div>
         `);
       }
+      if (window.rcwI18n) window.rcwI18n.applyToContainer(resultsContainer[0]);
     } catch (e) {
       console.error(e);
       resultsContainer.html(
-        '<div class="text-center text-danger py-5"><i class="fa-solid fa-triangle-exclamation mb-3 d-block fa-3x"></i><h5>Error al buscar</h5></div>',
+        '<div class="text-center text-danger py-5"><i class="fa-solid fa-triangle-exclamation mb-3 d-block fa-3x"></i><h5><span data-i18n="user_search.error">Error al buscar</span></h5></div>',
       );
+      if (window.rcwI18n) window.rcwI18n.applyToContainer(resultsContainer[0]);
     }
   }
 

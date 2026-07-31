@@ -116,9 +116,9 @@ $subpath = trim($_POST['path'] ?? '', '/');
 $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
 dbg('Parámetros resueltos', [
-    'bucket'       => $bucket,
-    'subpath'      => $subpath,
-    'ext'          => $ext,
+    'bucket' => $bucket,
+    'subpath' => $subpath,
+    'ext' => $ext,
     'mime_browser' => $file['type'],
 ]);
 
@@ -128,15 +128,15 @@ $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif'];
 // ── Validación real de MIME type con finfo (no confiar en el browser) ─────────
 $allowedMimes = [
     'image/jpeg' => ['jpg', 'jpeg'],
-    'image/png'  => ['png'],
-    'image/gif'  => ['gif'],
+    'image/png' => ['png'],
+    'image/gif' => ['gif'],
     'image/webp' => ['webp'],
     'image/heic' => ['heic', 'heif'],
     'image/heif' => ['heic', 'heif'],
 ];
 
 if (function_exists('finfo_open')) {
-    $finfo    = new finfo(FILEINFO_MIME_TYPE);
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
     $realMime = $finfo->file($file['tmp_name']);
     dbg('MIME real detectado', $realMime);
 
@@ -272,7 +272,6 @@ if ($supabaseUrl && $supabaseKey) {
         CURLOPT_HTTPHEADER => [
             "Authorization: Bearer {$supabaseKey}",
             "Content-Type: {$finalMime}",
-            "x-upsert: true",
         ],
     ]);
 

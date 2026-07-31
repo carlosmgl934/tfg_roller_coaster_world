@@ -46,7 +46,7 @@ $isAdmin = $userRole === 'admin';
         <div id="forum-header-sub" class="text-center mb-4" style="color: #888; font-size: 0.85rem; padding: 0 10px;">
         </div>
         <div class="forum-loading" id="forum-loading">
-            <span class="forum-spinner"></span> Cargando mensajes...
+            <span class="forum-spinner"></span> <span data-i18n="forums.thread.loading">Cargando mensajes...</span>
         </div>
         <div id="forum-messages-list"></div>
     </div>
@@ -54,7 +54,7 @@ $isAdmin = $userRole === 'admin';
     <!-- ── ESTADO: BANEADO / SIN PERMISO ──────────────────────── -->
     <div class="forum-banned-notice d-none" id="forum-banned-notice">
         <i class="fa-solid fa-ban fa-2x mb-2"></i>
-        <p class="mb-0">Estás baneado de este foro.</p>
+        <p class="mb-0" data-i18n="forums.thread.banned">Estás baneado de este foro.</p>
     </div>
 
     <!-- ── INPUT ÁREA ─────────────────────────────────────────── -->
@@ -210,10 +210,13 @@ $isAdmin = $userRole === 'admin';
             <div class="modal-body text-center p-4">
                 <i class="fa-solid fa-trash-can fa-2x text-danger mb-3"></i>
                 <p class="fw-bold mb-1">¿Eliminar este foro?</p>
-                <small class="text-muted d-block mb-3">Se borrarán permanentemente todos los mensajes, colaboradores y datos del foro. Esta acción no se puede deshacer.</small>
+                <small class="text-muted d-block mb-3">Se borrarán permanentemente todos los mensajes, colaboradores y
+                    datos del foro. Esta acción no se puede deshacer.</small>
                 <div class="d-flex gap-2 justify-content-center mt-3">
-                    <button class="btn btn-outline-secondary px-4 rounded-0 fw-bold border-1" data-bs-dismiss="modal">Cancelar</button>
-                    <button class="btn btn-danger px-4 rounded-0 fw-bold border-1" id="confirm-delete-forum-btn">Eliminar</button>
+                    <button class="btn btn-outline-secondary px-4 rounded-0 fw-bold border-1"
+                        data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-danger px-4 rounded-0 fw-bold border-1"
+                        id="confirm-delete-forum-btn">Eliminar</button>
                 </div>
             </div>
         </div>

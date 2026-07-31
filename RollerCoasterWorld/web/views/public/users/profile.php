@@ -1,6 +1,6 @@
 <?php
 $page_css = [
-  'web/css/profile.css',
+  'web/css/profile.css?v=' . time(),
   'web/css/coasters.css',
   'web/css/trips.css',
   'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css',
@@ -59,24 +59,33 @@ $user_uid = $_SESSION['firebase_uid'];
       <div class="card profile-card">
         <div class="list-group list-group-flush profile-menu" id="sidebar-menu">
           <a href="#" id="menu-profile" class="list-group-item list-group-item-action py-3 active fw-medium"><i
-              class="fa-solid fa-user me-2 w-20px text-center"></i> Mi Perfil</a>
+              class="fa-solid fa-user me-2 w-20px text-center"></i><span data-i18n="profile.menu.my_profile">Mi
+              Perfil</span></a>
           <a href="#" id="menu-config" class="list-group-item list-group-item-action py-3"><i
-              class="fa-solid fa-gear me-2 w-20px text-center"></i> Configuración</a>
+              class="fa-solid fa-gear me-2 w-20px text-center"></i><span
+              data-i18n="profile.menu.settings">Configuración</span></a>
           <a href="#" id="menu-tops" class="list-group-item list-group-item-action py-3"><i
-              class="fa-solid fa-list-ol me-2 w-20px text-center"></i> Mis tops</a>
+              class="fa-solid fa-list-ol me-2 w-20px text-center"></i><span data-i18n="profile.menu.my_tops">Mis
+              tops</span></a>
           <a href="#" id="menu-photos" class="list-group-item list-group-item-action py-3"><i
-              class="fa-solid fa-camera me-2 w-20px text-center"></i> Mis fotos</a>
+              class="fa-solid fa-camera me-2 w-20px text-center"></i><span data-i18n="profile.menu.my_photos">Mis
+              fotos</span></a>
           <a href="#" id="menu-reviews" class="list-group-item list-group-item-action py-3"><i
-              class="fa-solid fa-pen-to-square me-2 w-20px text-center"></i> Mis reseñas</a>
+              class="fa-solid fa-pen-to-square me-2 w-20px text-center"></i><span
+              data-i18n="profile.menu.my_reviews">Mis reseñas</span></a>
           <a href="#" id="menu-friends" class="list-group-item list-group-item-action py-3"><i
-              class="fa-solid fa-users me-2 w-20px text-center"></i> Mis amigos</a>
+              class="fa-solid fa-users me-2 w-20px text-center"></i><span data-i18n="profile.menu.my_friends">Mis
+              amigos</span></a>
           <a href="#" id="menu-trips" class="list-group-item list-group-item-action py-3"><i
-              class="fa-solid fa-suitcase-rolling me-2 w-20px text-center"></i> Mis viajes</a>
+              class="fa-solid fa-suitcase-rolling me-2 w-20px text-center"></i><span
+              data-i18n="profile.menu.my_trips">Mis viajes</span></a>
           <a href="#" id="menu-map" class="list-group-item list-group-item-action py-3"><i
-              class="fa-solid fa-map-pin me-2 w-20px text-center"></i> Mi mapa</a>
+              class="fa-solid fa-map-pin me-2 w-20px text-center"></i><span data-i18n="profile.menu.my_map">Mi
+              mapa</span></a>
 
           <a href="#" class="list-group-item list-group-item-action text-danger mt-1 py-3 border-top signOutBtn"><i
-              class="fa-solid fa-arrow-right-from-bracket me-2 w-20px text-center"></i> Cerrar sesión</a>
+              class="fa-solid fa-arrow-right-from-bracket me-2 w-20px text-center"></i><span
+              data-i18n="profile.menu.sign_out">Cerrar sesión</span></a>
         </div>
       </div>
     </div>
@@ -88,50 +97,57 @@ $user_uid = $_SESSION['firebase_uid'];
       <div class="card profile-card mb-4 content-section" id="section-info">
         <div class="card-header rounded-0 pt-3 pb-3 d-flex align-items-center gap-2">
           <i class="fa-regular fa-id-card fs-5"></i>
-          <h5 class="fw-bold mb-0">Datos Generales</h5>
+          <h5 class="fw-bold mb-0" data-i18n="profile.info.general_data">Datos Generales</h5>
         </div>
         <div class="card-body p-4">
           <div class="row g-4 mb-5">
             <div class="col-sm-6 col-md-4">
               <div class="data-box rounded-0">
-                <p class="data-label"><i class="fa-regular fa-id-badge"></i>Nombre Completo</p>
+                <p class="data-label"><i class="fa-regular fa-id-badge"></i><span
+                    data-i18n="profile.info.full_name">Nombre Completo</span></p>
                 <p class="data-value text-truncate" id="full-name">—</p>
               </div>
             </div>
             <div class="col-sm-6 col-md-4">
               <div class="data-box rounded-0">
-                <p class="data-label"><i class="fa-solid fa-at"></i>Nombre de usuario</p>
+                <p class="data-label"><i class="fa-solid fa-at"></i><span data-i18n="profile.info.username">Nombre de
+                    usuario</span></p>
                 <p class="data-value text-truncate" id="username">—</p>
               </div>
             </div>
             <div class="col-sm-6 col-md-4">
               <div class="data-box rounded-0">
-                <p class="data-label"><i class="fa-regular fa-envelope"></i>Correo electrónico</p>
+                <p class="data-label"><i class="fa-regular fa-envelope"></i><span data-i18n="profile.info.email">Correo
+                    electrónico</span></p>
                 <p class="data-value text-truncate" id="email" title="<?php echo htmlspecialchars($user_email); ?>">—
                 </p>
               </div>
             </div>
             <div class="col-sm-6 col-md-4">
               <div class="data-box rounded-0">
-                <p class="data-label"><i class="fa-regular fa-calendar"></i>Fecha de nacimiento</p>
+                <p class="data-label"><i class="fa-regular fa-calendar"></i><span
+                    data-i18n="profile.info.birth_date">Fecha de nacimiento</span></p>
                 <p class="data-value" id="birth-date">—</p>
               </div>
             </div>
             <div class="col-sm-6 col-md-4">
               <div class="data-box rounded-0">
-                <p class="data-label"><i class="fa-solid fa-venus-mars"></i>Género</p>
+                <p class="data-label"><i class="fa-solid fa-venus-mars"></i><span
+                    data-i18n="profile.info.gender">Género</span></p>
                 <p class="data-value" id="gender">—</p>
               </div>
             </div>
             <div class="col-sm-6 col-md-4">
               <div class="data-box rounded-0">
-                <p class="data-label"><i class="fa-solid fa-location-dot"></i>Ubicación</p>
+                <p class="data-label"><i class="fa-solid fa-location-dot"></i><span
+                    data-i18n="profile.info.location">Ubicación</span></p>
                 <p class="data-value text-truncate" id="location">—</p>
               </div>
             </div>
           </div>
 
-          <h5 class="fw-bold mb-3 border-bottom pb-2 text-success"><i class="fa-solid fa-heart me-2"></i>Favoritos</h5>
+          <h5 class="fw-bold mb-3 border-bottom pb-2 text-success"><i class="fa-solid fa-heart me-2"></i><span
+              data-i18n="profile.info.favorites">Favoritos</span></h5>
           <div class="row g-3">
             <div class="col-sm-4">
               <div class="p-3 fav-box text-center rounded-0">
@@ -167,36 +183,37 @@ $user_uid = $_SESSION['firebase_uid'];
           <div class="card profile-card h-100">
             <div class="card-header rounded-0 pt-3 pb-3 d-flex align-items-center gap-2">
               <i class="fa-solid fa-ticket scale-icon fs-5"></i>
-              <h5 class="fw-bold mb-0">Estadísticas Generales</h5>
+              <h5 class="fw-bold mb-0" data-i18n="profile.stats.general">Estadísticas Generales</h5>
             </div>
             <div class="card-body">
               <ul class="list-group list-group-flush">
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3">
-                  <span class="text-muted fw-medium"><i class="fa-solid fa-bolt me-2 text-success"></i>Montañas
-                    rusas</span>
+                  <span class="text-muted fw-medium"><i class="fa-solid fa-bolt me-2 text-success"></i><span
+                      data-i18n="profile.stats.coasters">Montañas rusas</span></span>
                   <span class="badge badge-profile fs-6" id="coasters-count">0</span>
                 </li>
                 <li
                   class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3 border-top">
-                  <span class="text-muted fw-medium"><i
-                      class="fa-solid fa-map-location-dot me-2 text-success"></i>Parques visitados</span>
+                  <span class="text-muted fw-medium"><i class="fa-solid fa-map-location-dot me-2 text-success"></i><span
+                      data-i18n="profile.stats.parks">Parques visitados</span></span>
                   <span class="badge badge-profile fs-6" id="parks-count">0</span>
                 </li>
                 <li
                   class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3 border-top">
-                  <span class="text-muted fw-medium"><i
-                      class="fa-solid fa-earth-americas me-2 text-success"></i>Países</span>
+                  <span class="text-muted fw-medium"><i class="fa-solid fa-earth-americas me-2 text-success"></i><span
+                      data-i18n="profile.stats.countries">Países</span></span>
                   <span class="badge badge-profile fs-6" id="countries-count">0</span>
                 </li>
                 <li
                   class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3 border-top">
-                  <span class="text-muted fw-medium"><i class="fa-solid fa-star me-2 text-warning"></i>Valoraciones
-                    totales</span>
+                  <span class="text-muted fw-medium"><i class="fa-solid fa-star me-2 text-warning"></i><span
+                      data-i18n="profile.stats.total_reviews">Valoraciones totales</span></span>
                   <span class="badge badge-profile fs-6" id="reviews-count">0</span>
                 </li>
                 <li
                   class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3 border-top">
-                  <span class="text-muted fw-medium"><i class="fa-solid fa-trophy me-2 text-warning"></i>Ranking</span>
+                  <span class="text-muted fw-medium"><i class="fa-solid fa-trophy me-2 text-warning"></i><span
+                      data-i18n="profile.stats.ranking">Ranking</span></span>
                   <span class="badge badge-profile fs-6" id="user-ranking">—</span>
                 </li>
               </ul>
@@ -208,42 +225,42 @@ $user_uid = $_SESSION['firebase_uid'];
           <div class="card profile-card h-100">
             <div class="card-header rounded-0 pt-3 pb-3 d-flex align-items-center gap-2">
               <i class="fa-solid fa-chart-pie fs-5"></i>
-              <h5 class="fw-bold mb-0">Estadísticas Técnicas</h5>
+              <h5 class="fw-bold mb-0" data-i18n="profile.stats.technical">Estadísticas Técnicas</h5>
             </div>
             <div class="card-body">
               <ul class="list-group list-group-flush">
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
-                  <span class="text-muted">País más visitado</span>
+                  <span class="text-muted" data-i18n="profile.stats.most_visited">País más visitado</span>
                   <span class="fw-bold text-end text-dark ms-3 text-wrap" id="main-country"
                     style="max-width: 60%;">—</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
-                  <span class="text-muted">Fabricante favorito</span>
+                  <span class="text-muted" data-i18n="profile.stats.fav_manufacturer">Fabricante favorito</span>
                   <span class="fw-bold text-end ms-3 text-dark text-wrap" id="main-manufacturer"
                     style="max-width: 60%;">—</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
-                  <span class="text-muted">Fabricantes totales</span>
+                  <span class="text-muted" data-i18n="profile.stats.total_manufacturers">Fabricantes totales</span>
                   <span class="fw-bold text-end ms-3 text-dark" id="total-manufacturers">0</span>
                 </li>
                 <li
                   class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 border-top mt-2 pt-3">
-                  <span class="text-muted">Altura total superada</span>
+                  <span class="text-muted" data-i18n="profile.stats.total_height">Altura total superada</span>
                   <span class="fw-bold text-end ms-3 text-dark fs-5"><span id="total-height">0</span><small
                       class="text-muted fs-6">
                       m</small></span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
-                  <span class="text-muted">Inversiones totales</span>
+                  <span class="text-muted" data-i18n="profile.stats.total_inversions">Inversiones totales</span>
                   <span class="fw-bold text-end ms-3 text-dark fs-5" id="total-investments">0</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
-                  <span class="text-muted">Más rápida</span>
+                  <span class="text-muted" data-i18n="profile.stats.fastest">Más rápida</span>
                   <span class="fw-bold text-end ms-3 text-dark text-wrap" id="fastest-coaster"
                     style="max-width: 60%;">—</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
-                  <span class="text-muted">Más larga</span>
+                  <span class="text-muted" data-i18n="profile.stats.longest">Más larga</span>
                   <span class="fw-bold text-end ms-3 text-dark text-wrap" id="longest-coaster"
                     style="max-width: 60%;">—</span>
                 </li>
@@ -262,11 +279,12 @@ $user_uid = $_SESSION['firebase_uid'];
         <div class="card-header rounded-0 pt-3 pb-3 d-flex flex-wrap justify-content-between align-items-center gap-3">
           <div class="d-flex align-items-center gap-2">
             <i class="fa-solid fa-user-pen fs-5"></i>
-            <h5 class="fw-bold mb-0">Datos Personales</h5>
+            <h5 class="fw-bold mb-0" data-i18n="profile.config.personal_data">Datos Personales</h5>
           </div>
           <div class="profile-photo">
             <button id="change-avatar-btn" class="btn btn-sm btn-outline-success rounded-0 px-3 fw-bold shadow-sm">
-              <i class="fa-solid fa-camera me-2"></i>Editar foto de perfil
+              <i class="fa-solid fa-camera me-2"></i><span data-i18n="profile.config.edit_photo">Editar foto de
+                perfil</span>
             </button>
             <input type="file" id="avatar-input" accept="image/*" class="d-none">
           </div>
@@ -274,24 +292,24 @@ $user_uid = $_SESSION['firebase_uid'];
         <div class="card-body p-4">
           <div class="row g-4">
             <div class="col-md-6">
-              <label for="config-user-name" class="form-label"><i class="fa-regular fa-id-badge me-2"></i>Nombre
-                completo</label>
+              <label for="config-user-name" class="form-label"><i class="fa-regular fa-id-badge me-2"></i><span
+                  data-i18n="profile.config.full_name">Nombre completo</span></label>
               <input type="text" id="config-user-name" class="form-control rounded-0">
             </div>
             <div class="col-md-6">
-              <label for="config-user-username" class="form-label"><i class="fa-solid fa-at me-2"></i>Nombre de
-                usuario</label>
+              <label for="config-user-username" class="form-label"><i class="fa-solid fa-at me-2"></i><span
+                  data-i18n="profile.config.username">Nombre de usuario</span></label>
               <input type="text" id="config-user-username" class="form-control rounded-0">
             </div>
             <div class="col-md-6">
-              <label for="config-user-email" class="form-label"><i class="fa-regular fa-envelope me-2"></i>Correo
-                Electrónico</label>
+              <label for="config-user-email" class="form-label"><i class="fa-regular fa-envelope me-2"></i><span
+                  data-i18n="profile.config.email">Correo Electrónico</span></label>
               <input type="email" id="config-user-email" class="form-control rounded-0"
                 value="<?= htmlspecialchars($user_email) ?>" disabled>
             </div>
             <div class="col-md-6">
-              <label for="config-user-birthdate" class="form-label"><i class="fa-regular fa-calendar me-2"></i>Fecha de
-                nacimiento</label>
+              <label for="config-user-birthdate" class="form-label"><i class="fa-regular fa-calendar me-2"></i><span
+                  data-i18n="profile.config.birth_date">Fecha de nacimiento</span></label>
               <div class="position-relative">
                 <input type="text" id="config-user-birthdate" class="form-control rounded-0" placeholder="DD/MM/AAAA"
                   autocomplete="off" readonly>
@@ -300,17 +318,18 @@ $user_uid = $_SESSION['firebase_uid'];
               </div>
             </div>
             <div class="col-md-4">
-              <label for="config-user-gender" class="form-label"><i
-                  class="fa-solid fa-venus-mars me-2"></i>Género</label>
+              <label for="config-user-gender" class="form-label"><i class="fa-solid fa-venus-mars me-2"></i><span
+                  data-i18n="profile.config.gender">Género</span></label>
               <select id="config-user-gender" class="form-select rounded-0">
-                <option value="">Seleccionar género</option>
-                <option value="Masculino">Masculino</option>
-                <option value="Femenino">Femenino</option>
-                <option value="Otro">Otro</option>
+                <option value="" data-i18n="profile.config.select_gender">Seleccionar género</option>
+                <option value="Masculino" data-i18n="profile.config.male">Masculino</option>
+                <option value="Femenino" data-i18n="profile.config.female">Femenino</option>
+                <option value="Otro" data-i18n="profile.config.other">Otro</option>
               </select>
             </div>
             <div class="col-md-4">
-              <label for="config-user-city" class="form-label"><i class="fa-solid fa-building me-2"></i>Ciudad</label>
+              <label for="config-user-city" class="form-label"><i class="fa-solid fa-building me-2"></i><span
+                  data-i18n="profile.config.city">Ciudad</span></label>
               <div class="position-relative">
                 <input type="text" id="config-user-city" class="form-control rounded-0" placeholder="Ej: Madrid">
                 <span id="city-loading"
@@ -321,8 +340,8 @@ $user_uid = $_SESSION['firebase_uid'];
               </div>
             </div>
             <div class="col-md-4">
-              <label for="config-user-country" class="form-label"><i
-                  class="fa-solid fa-earth-americas me-2"></i>País</label>
+              <label for="config-user-country" class="form-label"><i class="fa-solid fa-earth-americas me-2"></i><span
+                  data-i18n="profile.config.country">País</span></label>
               <input type="text" id="config-user-country" class="form-control rounded-0" placeholder="País" disabled>
             </div>
           </div>
@@ -333,13 +352,13 @@ $user_uid = $_SESSION['firebase_uid'];
       <div class="card profile-card mb-4 content-section" id="section-config-prefs">
         <div class="card-header rounded-0 pt-3 pb-3 d-flex align-items-center gap-2">
           <i class="fa-solid fa-heart fs-5 text-danger"></i>
-          <h5 class="fw-bold mb-0">Atracciones favoritas</h5>
+          <h5 class="fw-bold mb-0" data-i18n="profile.config.fav_attractions">Atracciones favoritas</h5>
         </div>
         <div class="card-body p-4">
           <div class="row g-4">
             <div class="col-md-6">
-              <label for="top-coaster-user" class="form-label"><i class="fa-solid fa-star text-warning me-2"></i>Coaster
-                Favorita</label>
+              <label for="top-coaster-user" class="form-label"><i class="fa-solid fa-star text-warning me-2"></i><span
+                  data-i18n="profile.config.fav_coaster">Coaster Favorita</span></label>
               <div class="position-relative">
                 <input type="text" id="top-coaster-user" class="form-control rounded-0" placeholder="Desconocida"
                   disabled>
@@ -349,8 +368,8 @@ $user_uid = $_SESSION['firebase_uid'];
                   <i class="fa-solid fa-spinner fa-spin"></i>
                 </span>
               </div>
-              <div class="form-text mt-2 ms-1 fw-medium text-muted"><i class="fa-solid fa-circle-info me-1"></i> Se
-                configura automáticamente desde tus tops</div>
+              <div class="form-text mt-2 ms-1 fw-medium text-muted"><i class="fa-solid fa-circle-info me-1"></i><span
+                  data-i18n="profile.config.fav_coaster_hint">Se configura automáticamente desde tus tops</span></div>
             </div>
             <div class="col-md-6">
               <label for="home-park-user" class="form-label"><i class="fa-solid fa-house text-success me-2"></i>Home
@@ -368,7 +387,8 @@ $user_uid = $_SESSION['firebase_uid'];
                 </ul>
               </div>
               <div class="form-text mt-2 ms-1 fw-medium text-muted"><i class="fa-solid fa-magnifying-glass me-1"></i>
-                Busca tu parque más cercano</div>
+                <span data-i18n="profile.config.home_park_hint">Busca tu parque más cercano</span>
+              </div>
             </div>
           </div>
         </div>
@@ -377,7 +397,7 @@ $user_uid = $_SESSION['firebase_uid'];
       <div class="guardar-config-btn d-flex justify-content-end align-items-center mt-4 mb-5">
         <h3 id="msg-guardar-config" class="text-success mb-0 me-4 d-none fw-bold" style="font-size: 1.1rem;"></h3>
         <button type="button" id="guardar-config-btn" class="btn btn-success btn-lg rounded-0 px-5 fw-bold shadow-sm">
-          <i class="fa-solid fa-floppy-disk me-2"></i>Guardar configuración
+          <i class="fa-solid fa-floppy-disk me-2"></i><span data-i18n="profile.config.save">Guardar configuración</span>
         </button>
       </div>
 
@@ -385,7 +405,7 @@ $user_uid = $_SESSION['firebase_uid'];
       <div class="card profile-card mb-4 content-section" id="section-security">
         <div class="card-header rounded-0 pt-3 pb-3 d-flex align-items-center gap-2">
           <i class="fa-solid fa-shield-halved fs-5"></i>
-          <h5 class="fw-bold mb-0">Seguridad de la cuenta</h5>
+          <h5 class="fw-bold mb-0" data-i18n="profile.security.title">Seguridad de la cuenta</h5>
         </div>
         <div class="card-body p-4">
           <div class="d-flex align-items-center mb-4">
@@ -400,39 +420,43 @@ $user_uid = $_SESSION['firebase_uid'];
           </div>
 
           <button id="toggleFormPassword" class="btn btn-outline-success rounded-0 mb-3 px-4 fw-medium">
-            <i class="fa-solid fa-key me-2"></i>Cambiar contraseña
+            <i class="fa-solid fa-key me-2"></i><span data-i18n="profile.security.change_password">Cambiar
+              contraseña</span>
           </button>
 
           <div id="form-password" class="bg-rcw-card p-4 rounded-0 border-0 mb-3 border-rcw"
             style="display: none; border-width: 2px;">
             <div class="row g-4 mt-1">
               <div class="col-12 mt-0">
-                <label for="old-password" class="form-label"><i class="fa-solid fa-key me-2"></i>Contraseña
-                  actual</label>
+                <label for="old-password" class="form-label"><i class="fa-solid fa-key me-2"></i><span
+                    data-i18n="profile.security.current_password">Contraseña actual</span></label>
                 <input type="password" id="old-password" class="form-control rounded-0"
                   placeholder="Tu contraseña actual">
               </div>
               <div class="col-md-6">
-                <label for="nueva-password" class="form-label"><i class="fa-solid fa-lock me-2"></i>Nueva
-                  contraseña</label>
+                <label for="nueva-password" class="form-label"><i class="fa-solid fa-lock me-2"></i><span
+                    data-i18n="profile.security.new_password">Nueva contraseña</span></label>
                 <input type="password" id="nueva-password" class="form-control rounded-0"
                   placeholder="Mínimo 6 caracteres">
                 <div class="form-text ms-1 mt-2 text-muted"><i class="fa-solid fa-circle-exclamation me-1"></i> Mínimo 6
                   caracteres</div>
               </div>
               <div class="col-md-6">
-                <label for="confirmar-password" class="form-label"><i class="fa-solid fa-lock-open me-2"></i>Confirmar
-                  contraseña</label>
+                <label for="confirmar-password" class="form-label"><i class="fa-solid fa-lock-open me-2"></i><span
+                    data-i18n="profile.security.confirm_password">Confirmar contraseña</span></label>
                 <input type="password" id="confirmar-password" class="form-control rounded-0"
                   placeholder="Repite la contraseña">
               </div>
               <div class="col-12 mt-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <div class="d-flex align-items-center"><button id="cambiarPassword"
                     class="btn btn-success me-2 px-4 fw-bold shadow-sm rounded-0"><i
-                      class="fa-solid fa-check me-2"></i>Guardar cambios</button><button id="btn-cancelar-password"
-                    class="btn btn-outline-secondary px-4 fw-bold rounded-0 border-rcw text-rcw">Cancelar</button></div>
+                      class="fa-solid fa-check me-2"></i><span data-i18n="profile.security.save_changes">Guardar
+                      cambios</span></button><button id="btn-cancelar-password"
+                    class="btn btn-outline-secondary px-4 fw-bold rounded-0 border-rcw text-rcw"
+                    data-i18n="common.cancel">Cancelar</button></div>
                 <a href="#" id="forgotPasswordBtn" class="text-success small fw-medium text-decoration-none"><i
-                    class="fa-solid fa-envelope me-1"></i>¿Has olvidado tu contraseña?</a>
+                    class="fa-solid fa-envelope me-1"></i><span data-i18n="profile.security.forgot_password">¿Has
+                    olvidado tu contraseña?</span></a>
               </div>
               <div class="col-12 mt-2">
                 <p id="msg-password" class="mb-0 fw-medium small"></p>
@@ -445,13 +469,14 @@ $user_uid = $_SESSION['firebase_uid'];
           <div
             class="d-flex flex-column flex-md-row justify-content-between align-items-md-center bg-danger bg-opacity-10 p-4 danger-zone-box border border-danger border-opacity-25">
             <div class="mb-3 mb-md-0">
-              <h5 class="text-danger fw-bold mb-1"><i class="fa-solid fa-triangle-exclamation me-2"></i>Zona de peligro
-              </h5>
-              <p class="text-danger opacity-75 mb-0 small fw-medium">Esta acción es irreversible y eliminará todos tus
-                datos permanentemente.</p>
+              <h5 class="text-danger fw-bold mb-1"><i class="fa-solid fa-triangle-exclamation me-2"></i><span
+                  data-i18n="profile.security.danger_zone">Zona de peligro</span></h5>
+              <p class="text-danger opacity-75 mb-0 small fw-medium" data-i18n="profile.security.danger_desc">Esta
+                acción es irreversible y eliminará todos tus datos permanentemente.</p>
             </div>
             <button id="borrarCuenta" class="btn btn-danger text-nowrap fw-bold shadow-sm px-4 rounded-0">
-              <i class="fa-solid fa-user-xmark me-2"></i>Eliminar cuenta
+              <i class="fa-solid fa-user-xmark me-2"></i><span data-i18n="profile.security.delete_account">Eliminar
+                cuenta</span>
             </button>
           </div>
 
@@ -470,19 +495,19 @@ $user_uid = $_SESSION['firebase_uid'];
         <div class="card-header rounded-0 pt-3 pb-3 d-flex flex-wrap justify-content-between align-items-center gap-3">
           <div class="d-flex align-items-center gap-2">
             <i class="fa-solid fa-list-ol fs-5"></i>
-            <h5 class="fw-bold mb-0">Mis Tops</h5>
+            <h5 class="fw-bold mb-0" data-i18n="profile.tops.title">Mis Tops</h5>
           </div>
           <div class="d-flex flex-wrap gap-2" id="tops-header-actions">
             <button id="btn-tops-full-view" class="btn btn-sm btn-outline-success rounded-0 px-3 fw-bold shadow-sm">
-              <i class="fa-solid fa-expand me-1"></i>Ver Top Completo
+              <i class="fa-solid fa-expand me-1"></i><span data-i18n="profile.tops.full_view">Ver Top Completo</span>
             </button>
             <button id="btn-tops-edit" class="btn btn-sm btn-outline-success rounded-0 px-3 fw-bold shadow-sm">
-              <i class="fa-solid fa-pen-to-square me-1"></i>Editar Top
+              <i class="fa-solid fa-pen-to-square me-1"></i><span data-i18n="profile.tops.edit">Editar Top</span>
             </button>
           </div>
           <div class="d-none" id="tops-back-btn-wrap">
             <button id="btn-tops-back" class="btn btn-sm btn-outline-success rounded-0 px-3 fw-bold shadow-sm">
-              <i class="fa-solid fa-arrow-left me-1"></i>Volver
+              <i class="fa-solid fa-arrow-left me-1"></i><span data-i18n="common.back">Volver</span>
             </button>
           </div>
         </div>
@@ -596,9 +621,8 @@ $user_uid = $_SESSION['firebase_uid'];
                       </svg><span id="coasters-full-count">0</span> <span id="coasters-full-label">coasters</span>
                     </span>
                     <div class="btn-group btn-group-sm ms-auto">
-                      <button id="coasters-view-mini" class="btn btn-outline-secondary rounded-0"
-                        title="Vista mini (solo móvil)" aria-label="Vista mini compacta"><i
-                          class="fa-solid fa-bars"></i></button>
+                      <button id="coasters-view-mini" class="btn btn-outline-secondary rounded-0" title="Vista compacta"
+                        aria-label="Vista mini compacta"><i class="fa-solid fa-bars"></i></button>
                       <button id="coasters-view-list" class="btn btn-success rounded-0" title="Lista"
                         aria-label="Vista lista"><i class="fa-solid fa-list"></i></button>
                       <button id="coasters-view-grid" class="btn btn-outline-secondary rounded-0" title="Cuadrícula"
@@ -615,12 +639,14 @@ $user_uid = $_SESSION['firebase_uid'];
               <div id="coasters-mode-edit" class="d-none">
                 <div class="d-flex justify-content-end mb-3">
                   <button class="btn btn-sm btn-success fw-bold rounded-0 shadow-sm" id="btn-save-coasters-top">
-                    <i class="fa-solid fa-floppy-disk me-2"></i>Guardar Cambios
+                    <i class="fa-solid fa-floppy-disk me-2"></i><span data-i18n="profile.tops.save_changes">Guardar
+                      Cambios</span>
                   </button>
                 </div>
                 <div class="mb-3">
                   <label for="top-coasters-search" class="form-label fw-medium text-uppercase small text-muted">
-                    <i class="fa-solid fa-magnifying-glass me-2"></i>Añadir montaña rusa
+                    <i class="fa-solid fa-magnifying-glass me-2"></i><span data-i18n="profile.tops.add_coaster">Añadir
+                      montaña rusa</span>
                   </label>
                   <div class="position-relative">
                     <input type="text" id="top-coasters-search"
@@ -688,9 +714,8 @@ $user_uid = $_SESSION['firebase_uid'];
                       <i class="fa-solid fa-map-location-dot me-1"></i><span id="parks-full-count">0</span> parques
                     </span>
                     <div class="btn-group btn-group-sm ms-auto">
-                      <button id="parks-view-mini" class="btn btn-outline-secondary rounded-0"
-                        title="Vista mini (solo móvil)" aria-label="Vista mini compacta"><i
-                          class="fa-solid fa-bars"></i></button>
+                      <button id="parks-view-mini" class="btn btn-outline-secondary rounded-0" title="Vista compacta"
+                        aria-label="Vista mini compacta"><i class="fa-solid fa-bars"></i></button>
                       <button id="parks-view-list" class="btn btn-success rounded-0" title="Lista"
                         aria-label="Vista lista"><i class="fa-solid fa-list"></i></button>
                       <button id="parks-view-grid" class="btn btn-outline-secondary rounded-0" title="Cuadrícula"
@@ -707,12 +732,14 @@ $user_uid = $_SESSION['firebase_uid'];
               <div id="parks-mode-edit" class="d-none">
                 <div class="d-flex justify-content-end mb-3">
                   <button class="btn btn-sm btn-success fw-bold rounded-0 shadow-sm" id="btn-save-parks-top">
-                    <i class="fa-solid fa-floppy-disk me-2"></i>Guardar Cambios
+                    <i class="fa-solid fa-floppy-disk me-2"></i><span data-i18n="profile.tops.save_changes">Guardar
+                      Cambios</span>
                   </button>
                 </div>
                 <div class="mb-3">
                   <label for="top-parks-search" class="form-label fw-medium text-uppercase small text-muted">
-                    <i class="fa-solid fa-magnifying-glass me-2"></i>Añadir parque
+                    <i class="fa-solid fa-magnifying-glass me-2"></i><span data-i18n="profile.tops.add_park">Añadir
+                      parque</span>
                   </label>
                   <div class="position-relative">
                     <input type="text" id="top-parks-search"
@@ -745,7 +772,7 @@ $user_uid = $_SESSION['firebase_uid'];
         onmouseout="this.style.transform='none'; this.style.boxShadow='none';">
         <div class="card-header rounded-0 pt-3 pb-3 d-flex align-items-center gap-2">
           <i class="fa-solid fa-chart-bar fs-5"></i>
-          <h5 class="fw-bold mb-0">Mis Estadísticas</h5>
+          <h5 class="fw-bold mb-0" data-i18n="profile.tops.my_stats">Mis Estadísticas</h5>
         </div>
         <div class="card-body p-3">
           <div class="row g-4">
@@ -753,7 +780,7 @@ $user_uid = $_SESSION['firebase_uid'];
             <div class="col-md-6">
               <div class="tops-legend-title">
                 <i class="fa-solid fa-earth-europe"></i>
-                Coasters por País
+                <span data-i18n="profile.tops.by_country">Coasters por País</span>
               </div>
               <div id="tops-legend-countries" class="tops-legend-list">
                 <div class="text-center text-muted small py-3"><i class="fa-solid fa-spinner fa-spin"></i></div>
@@ -763,7 +790,7 @@ $user_uid = $_SESSION['firebase_uid'];
             <div class="col-md-6">
               <div class="tops-legend-title">
                 <i class="fa-solid fa-industry"></i>
-                Coasters por Fabricante
+                <span data-i18n="profile.tops.by_manufacturer">Coasters por Fabricante</span>
               </div>
               <div id="tops-legend-manufacturers" class="tops-legend-list">
                 <div class="text-center text-muted small py-3"><i class="fa-solid fa-spinner fa-spin"></i></div>
@@ -780,7 +807,7 @@ $user_uid = $_SESSION['firebase_uid'];
         <div class="card-header rounded-0 pt-3 pb-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
           <div class="d-flex align-items-center gap-2">
             <i class="fa-solid fa-pen-to-square fs-5"></i>
-            <h5 class="fw-bold mb-0">Mis Reseñas</h5>
+            <h5 class="fw-bold mb-0" data-i18n="profile.reviews.title">Mis Reseñas</h5>
           </div>
           <span class="tops-counter-pill" id="reviews-total-pill" style="display:none;">
             <i class="fa-solid fa-pen-to-square me-1"></i>
@@ -821,20 +848,21 @@ $user_uid = $_SESSION['firebase_uid'];
         <div class="card-header rounded-0 pt-3 pb-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
           <div class="d-flex align-items-center gap-2">
             <i class="fa-solid fa-suitcase-rolling fs-5"></i>
-            <h5 class="fw-bold mb-0">Mis Viajes</h5>
+            <h5 class="fw-bold mb-0" data-i18n="profile.trips.title">Mis Viajes</h5>
           </div>
 
           <div class="btn-group" role="group">
             <input type="radio" class="btn-check" name="trips-view-toggle" id="tv-list" value="list" checked>
             <label class="btn btn-sm btn-outline-success rounded-0 px-3 fw-bold" for="tv-list"><i
-                class="fa-solid fa-list me-1"></i>Viajes</label>
+                class="fa-solid fa-list me-1"></i><span data-i18n="profile.trips.view_trips">Viajes</span></label>
             <input type="radio" class="btn-check" name="trips-view-toggle" id="tv-stats" value="stats">
             <label class="btn btn-sm btn-outline-success rounded-0 px-3 fw-bold" for="tv-stats"><i
-                class="fa-solid fa-chart-pie me-1"></i>Estadísticas</label>
+                class="fa-solid fa-chart-pie me-1"></i><span
+                data-i18n="profile.trips.view_stats">Estadísticas</span></label>
           </div>
 
           <a href="<?= Router::url('trips') ?>" class="btn btn-sm btn-success rounded-0 px-3 fw-bold shadow-sm">
-            <i class="fa-solid fa-calendar-days me-1"></i>Ir a Agenda
+            <i class="fa-solid fa-calendar-days me-1"></i><span data-i18n="profile.trips.go_agenda">Ir a Agenda</span>
           </a>
         </div>
         <div class="card-body p-4">
@@ -918,7 +946,7 @@ $user_uid = $_SESSION['firebase_uid'];
         <div class="card-header rounded-0 pt-3 pb-3 d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center gap-2">
             <i class="fa-solid fa-map-location-dot fs-5"></i>
-            <h5 class="fw-bold mb-0">Mi Mapa</h5>
+            <h5 class="fw-bold mb-0" data-i18n="profile.map.title">Mi Mapa</h5>
           </div>
           <span class="tops-counter-pill" id="map-parks-pill" style="display:none;">
             <i class="fa-solid fa-map-pin me-1"></i>
@@ -948,7 +976,8 @@ $user_uid = $_SESSION['firebase_uid'];
           <!-- Empty state si no hay parques -->
           <div id="map-empty-state" class="d-none text-center py-5">
             <i class="fa-solid fa-map-location-dot fs-1 mb-3 opacity-25 d-block"></i>
-            <p class="text-muted">Añade montañas rusas a tu top para ver los parques en el mapa.</p>
+            <p class="text-muted" data-i18n="profile.map.empty">Añade montañas rusas a tu top para ver los parques en el
+              mapa.</p>
           </div>
         </div>
       </div>
@@ -959,7 +988,7 @@ $user_uid = $_SESSION['firebase_uid'];
         <div class="card-header rounded-0 pt-3 pb-3 d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center gap-2">
             <i class="fa-solid fa-users fs-5"></i>
-            <h5 class="fw-bold mb-0">Mis Amigos</h5>
+            <h5 class="fw-bold mb-0" data-i18n="profile.friends.title">Mis Amigos</h5>
           </div>
           <span class="tops-counter-pill" id="friends-total-pill" style="display:none;">
             <i class="fa-solid fa-users me-1"></i>
@@ -996,7 +1025,7 @@ $user_uid = $_SESSION['firebase_uid'];
       <div class="card profile-card mb-4">
         <div class="card-header rounded-0 pt-3 pb-3 d-flex align-items-center gap-2">
           <i class="fa-solid fa-camera fs-5"></i>
-          <h5 class="fw-bold mb-0">Mi Galería de Fotos</h5>
+          <h5 class="fw-bold mb-0" data-i18n="profile.photos.title">Mi Galería de Fotos</h5>
         </div>
         <div class="card-body p-4">
           <div class="tops-preview-scroll">
@@ -1011,34 +1040,63 @@ $user_uid = $_SESSION['firebase_uid'];
     <!-- MODAL ESTADÍSTICAS AMPLIADAS -->
     <style>
       #statsExpandedModal .modal-content {
-        background: rgba(15, 20, 25, 0.85) !important;
+        background: rgba(13, 17, 23, 0.95) !important;
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 0 !important;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(16, 185, 129, 0.2) !important;
       }
 
       #statsExpandedModal .stat-card {
-        background: rgba(255, 255, 255, 0.03);
+        background: rgba(22, 27, 34, 0.8);
         border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 0;
+        border-radius: 0 !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       #statsExpandedModal .stat-card:hover {
-        background: rgba(255, 255, 255, 0.06);
+        background: rgba(30, 36, 44, 0.8);
         transform: translateY(-4px);
         box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.5);
       }
 
       #statsExpandedModal .metric-card {
-        border-radius: 0;
+        background: rgba(22, 27, 34, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 0 !important;
         transition: all 0.3s ease;
       }
 
       #statsExpandedModal .metric-card:hover {
+        background: rgba(30, 36, 44, 0.8);
         transform: scale(1.03);
         z-index: 10;
+        border-color: rgba(16, 185, 129, 0.4);
+      }
+
+      #statsExpandedModal .section-title {
+        color: #10b981 !important;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+        margin-bottom: 1.5rem;
+        display: block;
+      }
+
+      #statsExpandedModal .modal-section {
+        border-bottom: 3px solid #10b981;
+        padding-bottom: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      #statsExpandedModal .modal-section:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-bottom: 0;
+      }
+
+      #statsExpandedModal * {
+        border-radius: 0 !important;
       }
     </style>
     <div class="modal fade" id="statsExpandedModal" tabindex="-1" aria-hidden="true">
@@ -1046,17 +1104,16 @@ $user_uid = $_SESSION['firebase_uid'];
         <div class="modal-content rounded-0 overflow-hidden">
 
           <!-- HEADER -->
-          <div class="modal-header border-0 px-4 py-4"
-            style="background: linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(0,0,0,0) 100%); border-bottom: 1px solid rgba(255,255,255,0.05) !important;">
+          <div class="modal-header border-0 px-4 pt-4 pb-3"
+            style="background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(13,17,23,1) 100%); border-bottom: 3px solid var(--rcw-success) !important;">
             <div class="d-flex align-items-center gap-3">
               <div class="d-flex align-items-center justify-content-center rounded-0 shadow-sm"
-                style="width:48px;height:48px;background:linear-gradient(135deg, #059669, #10b981);border:1px solid rgba(255,255,255,0.2);">
+                style="width:48px;height:48px;background:var(--rcw-success);border:1px solid rgba(255,255,255,0.2);">
                 <i class="fa-solid fa-chart-pie text-white fs-5"></i>
               </div>
               <div>
                 <h5 class="modal-title fw-bolder text-white mb-0" style="letter-spacing:0.5px; font-size: 1.4rem;">
-                  Estadísticas
-                  Ampliadas
+                  Estadísticas Ampliadas
                 </h5>
                 <p class="text-white-50 mb-0" style="font-size:0.85rem;">Resumen completo de tu trayectoria</p>
               </div>
@@ -1065,217 +1122,289 @@ $user_uid = $_SESSION['firebase_uid'];
               aria-label="Close" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));"></button>
           </div>
 
-          <div class="modal-body p-0">
+          <div class="modal-body p-4" style="background-color: #0d1117;">
 
-            <!-- HERO STATS -->
-            <div class="row g-3 m-0 p-4" style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-              <div class="col-12 col-md-4">
-                <div class="stat-card text-center py-4 px-3 h-100 position-relative overflow-hidden">
-                  <div class="position-absolute top-0 start-50 translate-middle"
-                    style="width: 100px; height: 100px; background: rgba(16,185,129,0.2); filter: blur(40px);">
+            <!-- TOTALES Y ACUMULADOS -->
+            <div class="modal-section mb-4">
+              <h6 class="text-white fw-bold text-uppercase section-title"><i
+                  class="fa-solid fa-calculator text-success me-2"></i>Totales y Acumulados</h6>
+              <div class="row g-3">
+                <div class="col-6 col-md-3">
+                  <div class="stat-card text-center py-3 px-2 h-100">
+                    <div class="fw-black text-white" id="modal-stat-total-coasters"
+                      style="font-size:2rem;line-height:1;">0</div>
+                    <div class="text-uppercase fw-bold mt-1" style="font-size:0.65rem;color:rgba(255,255,255,0.5);">
+                      Coaster Credits</div>
                   </div>
-                  <div class="mb-3" style="font-size:2.2rem;line-height:1;">
-                    <i class="fa-solid fa-ticket text-success"
-                      style="filter:drop-shadow(0 0 12px rgba(16,185,129,0.6));"></i>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="stat-card text-center py-3 px-2 h-100">
+                    <div class="fw-black text-white" id="modal-stat-total-parks" style="font-size:2rem;line-height:1;">0
+                    </div>
+                    <div class="text-uppercase fw-bold mt-1" style="font-size:0.65rem;color:rgba(255,255,255,0.5);">
+                      Parques Visitados</div>
                   </div>
-                  <div class="fw-black text-white" id="modal-stat-total-coasters"
-                    style="font-size:3.2rem;line-height:1;font-weight:900;letter-spacing:-1px;">0</div>
-                  <div class="text-uppercase fw-bold mt-2"
-                    style="font-size:0.7rem;letter-spacing:2px;color:rgba(255,255,255,0.4);">Coaster Credits
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="stat-card text-center py-3 px-2 h-100">
+                    <div class="fw-black text-white" id="modal-stat-total-countries"
+                      style="font-size:2rem;line-height:1;">0</div>
+                    <div class="text-uppercase fw-bold mt-1" style="font-size:0.65rem;color:rgba(255,255,255,0.5);">
+                      Países Visitados</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="stat-card text-center py-3 px-2 h-100">
+                    <div class="fw-black text-white" id="modal-stat-total-continents"
+                      style="font-size:2rem;line-height:1;">0</div>
+                    <div class="text-uppercase fw-bold mt-1" style="font-size:0.65rem;color:rgba(255,255,255,0.5);">
+                      Continentes</div>
+                  </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                  <div class="stat-card text-center py-3 px-2 h-100">
+                    <div class="fw-black text-white" id="modal-stat-total-manufacturers-count"
+                      style="font-size:1.5rem;line-height:1;">0</div>
+                    <div class="text-uppercase fw-bold mt-1" style="font-size:0.65rem;color:rgba(255,255,255,0.5);">
+                      Fabricantes Distintos</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="stat-card text-center py-3 px-2 h-100">
+                    <div class="fw-black text-white" id="modal-stat-total-length"
+                      style="font-size:1.5rem;line-height:1;">0 <span class="fs-6">km</span></div>
+                    <div class="text-uppercase fw-bold mt-1" style="font-size:0.65rem;color:rgba(255,255,255,0.5);">
+                      Longitud Total</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="stat-card text-center py-3 px-2 h-100">
+                    <div class="fw-black text-white" id="modal-stat-total-inversions"
+                      style="font-size:1.5rem;line-height:1;">0</div>
+                    <div class="text-uppercase fw-bold mt-1" style="font-size:0.65rem;color:rgba(255,255,255,0.5);">
+                      Inversiones Totales</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="stat-card text-center py-3 px-2 h-100">
+                    <div class="fw-black text-white" id="modal-stat-extinct" style="font-size:1.5rem;line-height:1;">0
+                    </div>
+                    <div class="text-uppercase fw-bold mt-1" style="font-size:0.65rem;color:rgba(255,255,255,0.5);">
+                      Coasters Extintas</div>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="stat-card py-3 px-4 d-flex align-items-center justify-content-between">
+                    <div class="text-uppercase fw-bold" style="font-size:0.75rem;color:rgba(255,255,255,0.7);">Coasters
+                      con inversiones vs sin inversiones</div>
+                    <div class="d-flex align-items-center gap-3" style="width: 50%;">
+                      <div class="progress rounded-0 flex-grow-1"
+                        style="height: 10px; background-color: rgba(255,255,255,0.1);">
+                        <div id="modal-stat-inv-bar" class="progress-bar bg-success" role="progressbar"
+                          style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                      </div>
+                      <div class="fw-black text-white text-end" style="width: 60px;" id="modal-stat-inv-pct">0%</div>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="col-12 col-md-4">
-                <div class="stat-card text-center py-4 px-3 h-100 position-relative overflow-hidden">
-                  <div class="position-absolute top-0 start-50 translate-middle"
-                    style="width: 100px; height: 100px; background: rgba(16,185,129,0.2); filter: blur(40px);">
+            </div>
+
+
+            <!-- FAVORITOS Y TIPOLOGÍAS -->
+            <div class="modal-section mb-4">
+              <h6 class="text-white fw-bold text-uppercase section-title"><i
+                  class="fa-solid fa-star text-success me-2"></i>Favoritos y Tipologías</h6>
+              <div class="row g-3">
+                <div class="col-12 col-md-6">
+                  <div class="metric-card p-3 d-flex align-items-center gap-3 h-100">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-0 flex-shrink-0"
+                      style="width: 40px; height: 40px; background: rgba(16,185,129,0.15);"><i
+                        class="fa-solid fa-house text-success"></i></div>
+                    <div style="min-width: 0;">
+                      <div class="text-uppercase fw-bold mb-1" style="font-size:0.65rem;color:var(--rcw-success);">Tu
+                        parque con más credits</div>
+                      <div class="fw-bold text-white text-truncate" id="fav-home-park">...</div>
+                      <div class="small text-white-50" id="fav-home-park-count">0 credits</div>
+                    </div>
                   </div>
-                  <div class="mb-3" style="font-size:2.2rem;line-height:1;">
-                    <i class="fa-solid fa-map-location-dot text-success"
-                      style="filter:drop-shadow(0 0 12px rgba(16,185,129,0.6));"></i>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="metric-card p-3 d-flex align-items-center gap-3 h-100">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-0 flex-shrink-0"
+                      style="width: 40px; height: 40px; background: rgba(16,185,129,0.15);"><i
+                        class="fa-solid fa-industry text-success"></i></div>
+                    <div style="min-width: 0;">
+                      <div class="text-uppercase fw-bold mb-1" style="font-size:0.65rem;color:var(--rcw-success);">
+                        Fabricante Favorito</div>
+                      <div class="fw-bold text-white text-truncate" id="fav-manufacturer">...</div>
+                      <div class="small text-white-50" id="fav-manufacturer-count">0% de tus credits</div>
+                    </div>
                   </div>
-                  <div class="fw-black text-white" id="modal-stat-total-parks"
-                    style="font-size:3.2rem;line-height:1;font-weight:900;letter-spacing:-1px;">0</div>
-                  <div class="text-uppercase fw-bold mt-2"
-                    style="font-size:0.7rem;letter-spacing:2px;color:rgba(255,255,255,0.4);">Parques Visitados
+                </div>
+                <div class="col-12">
+                  <div class="stat-card py-3 px-4 d-flex align-items-center justify-content-between">
+                    <div class="text-uppercase fw-bold" style="font-size:0.75rem;color:rgba(255,255,255,0.7);"><i
+                        class="fa-solid fa-rocket text-success me-2"></i> Hyper / Giga Coasters (> 60m)</div>
+                    <div class="fw-black text-white fs-4" id="modal-stat-giga">0</div>
                   </div>
                 </div>
               </div>
-              <div class="col-12 col-md-4">
-                <div class="stat-card text-center py-4 px-3 h-100 position-relative overflow-hidden">
-                  <div class="position-absolute top-0 start-50 translate-middle"
-                    style="width: 100px; height: 100px; background: rgba(16,185,129,0.2); filter: blur(40px);">
+            </div>
+
+            <!-- RÉCORDS PERSONALES -->
+            <div class="modal-section mb-4">
+              <h6 class="text-white fw-bold text-uppercase section-title"><i
+                  class="fa-solid fa-trophy text-success me-2"></i>Récords Personales</h6>
+              <div class="row g-3">
+                <!-- Más alta -->
+                <div class="col-6 col-md-4">
+                  <div class="metric-card h-100 text-center p-3">
+                    <div class="mb-2">
+                      <div class="d-inline-flex align-items-center justify-content-center rounded-0"
+                        style="width: 36px; height: 36px; background: rgba(16,185,129,0.15);"><i
+                          class="fa-solid fa-arrow-up-long text-success"></i></div>
+                    </div>
+                    <div class="fw-black text-white mb-1" id="max-stat-height"
+                      style="font-size:1.5rem;line-height:1.1;">
+                      <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
+                    </div>
+                    <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-height-name"
+                      style="font-size:0.8rem;">...</div>
+                    <div class="text-uppercase mt-2 fw-bold"
+                      style="font-size:0.65rem;letter-spacing:1px;color:var(--rcw-success);">Más Alta</div>
                   </div>
-                  <div class="mb-3" style="font-size:2.2rem;line-height:1;">
-                    <i class="fa-solid fa-earth-americas text-success"
-                      style="filter:drop-shadow(0 0 12px rgba(16,185,129,0.6));"></i>
+                </div>
+                <!-- Más rápida -->
+                <div class="col-6 col-md-4">
+                  <div class="metric-card h-100 text-center p-3">
+                    <div class="mb-2">
+                      <div class="d-inline-flex align-items-center justify-content-center rounded-0"
+                        style="width: 36px; height: 36px; background: rgba(16,185,129,0.15);"><i
+                          class="fa-solid fa-gauge-high text-success"></i></div>
+                    </div>
+                    <div class="fw-black text-white mb-1" id="max-stat-speed" style="font-size:1.5rem;line-height:1.1;">
+                      <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
+                    </div>
+                    <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-speed-name"
+                      style="font-size:0.8rem;">...</div>
+                    <div class="text-uppercase mt-2 fw-bold"
+                      style="font-size:0.65rem;letter-spacing:1px;color:var(--rcw-success);">Más Rápida</div>
                   </div>
-                  <div class="fw-black text-white" id="modal-stat-total-countries"
-                    style="font-size:3.2rem;line-height:1;font-weight:900;letter-spacing:-1px;">0</div>
-                  <div class="text-uppercase fw-bold mt-2"
-                    style="font-size:0.7rem;letter-spacing:2px;color:rgba(255,255,255,0.4);">Países Visitados
+                </div>
+                <!-- Más larga -->
+                <div class="col-6 col-md-4">
+                  <div class="metric-card h-100 text-center p-3">
+                    <div class="mb-2">
+                      <div class="d-inline-flex align-items-center justify-content-center rounded-0"
+                        style="width: 36px; height: 36px; background: rgba(16,185,129,0.15);"><i
+                          class="fa-solid fa-ruler-horizontal text-success"></i></div>
+                    </div>
+                    <div class="fw-black text-white mb-1" id="max-stat-length"
+                      style="font-size:1.5rem;line-height:1.1;">
+                      <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
+                    </div>
+                    <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-length-name"
+                      style="font-size:0.8rem;">...</div>
+                    <div class="text-uppercase mt-2 fw-bold"
+                      style="font-size:0.65rem;letter-spacing:1px;color:var(--rcw-success);">Más Larga</div>
+                  </div>
+                </div>
+                <!-- Más inversiones -->
+                <div class="col-6 col-md-4">
+                  <div class="metric-card h-100 text-center p-3">
+                    <div class="mb-2">
+                      <div class="d-inline-flex align-items-center justify-content-center rounded-0"
+                        style="width: 36px; height: 36px; background: rgba(16,185,129,0.15);"><i
+                          class="fa-solid fa-rotate-right text-success"></i></div>
+                    </div>
+                    <div class="fw-black text-white mb-1" id="max-stat-inversions"
+                      style="font-size:1.5rem;line-height:1.1;">
+                      <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
+                    </div>
+                    <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-inversions-name"
+                      style="font-size:0.8rem;">...</div>
+                    <div class="text-uppercase mt-2 fw-bold"
+                      style="font-size:0.65rem;letter-spacing:1px;color:var(--rcw-success);">Más Inversiones</div>
+                  </div>
+                </div>
+                <!-- Más antigua -->
+                <div class="col-6 col-md-4">
+                  <div class="metric-card h-100 text-center p-3">
+                    <div class="mb-2">
+                      <div class="d-inline-flex align-items-center justify-content-center rounded-0"
+                        style="width: 36px; height: 36px; background: rgba(16,185,129,0.15);"><i
+                          class="fa-solid fa-hourglass-start text-success"></i></div>
+                    </div>
+                    <div class="fw-black text-white mb-1" id="max-stat-oldest"
+                      style="font-size:1.5rem;line-height:1.1;">
+                      <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
+                    </div>
+                    <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-oldest-name"
+                      style="font-size:0.8rem;">...</div>
+                    <div class="text-uppercase mt-2 fw-bold"
+                      style="font-size:0.65rem;letter-spacing:1px;color:var(--rcw-success);">Más Antigua</div>
+                  </div>
+                </div>
+                <!-- Más nueva -->
+                <div class="col-6 col-md-4">
+                  <div class="metric-card h-100 text-center p-3">
+                    <div class="mb-2">
+                      <div class="d-inline-flex align-items-center justify-content-center rounded-0"
+                        style="width: 36px; height: 36px; background: rgba(16,185,129,0.15);"><i
+                          class="fa-solid fa-wand-magic-sparkles text-success"></i></div>
+                    </div>
+                    <div class="fw-black text-white mb-1" id="max-stat-newest"
+                      style="font-size:1.5rem;line-height:1.1;">
+                      <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
+                    </div>
+                    <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-newest-name"
+                      style="font-size:0.8rem;">...</div>
+                    <div class="text-uppercase mt-2 fw-bold"
+                      style="font-size:0.65rem;letter-spacing:1px;color:var(--rcw-success);">Más Nueva</div>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- LISTAS PAÍS / FABRICANTE -->
-            <div class="row g-0 m-0"
-              style="border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.15);">
-
-              <!-- Países -->
-              <div class="col-lg-6" style="border-right: 1px solid rgba(255,255,255,0.05);">
-                <div class="px-4 pt-4 pb-3 d-flex align-items-center gap-2">
-                  <div class="d-flex align-items-center justify-content-center rounded-0"
-                    style="width: 28px; height: 28px; background: rgba(16,185,129,0.15);">
-                    <i class="fa-solid fa-earth-europe text-success" style="font-size:0.85rem;"></i>
+            <div class="modal-section mb-2">
+              <h6 class="text-white fw-bold text-uppercase section-title"><i
+                  class="fa-solid fa-list-ul text-success me-2"></i>Desgloses Totales</h6>
+              <div class="row g-3">
+                <!-- Países -->
+                <div class="col-lg-6">
+                  <div class="stat-card h-100 p-0">
+                    <div class="px-3 pt-3 pb-2 d-flex align-items-center gap-2"
+                      style="background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255,255,255,0.05);">
+                      <i class="fa-solid fa-earth-europe text-success" style="font-size:0.85rem;"></i>
+                      <span class="fw-bold text-white"
+                        style="font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;">Por País</span>
+                    </div>
+                    <div id="modal-list-countries" class="p-2" style="max-height:280px;overflow-y:auto;">
+                      <!-- Dinámico -->
+                    </div>
                   </div>
-                  <span class="fw-bold text-white"
-                    style="font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;">Coasters por
-                    País</span>
                 </div>
-                <div id="modal-list-countries" style="max-height:280px;overflow-y:auto;">
-                  <!-- Dinámico -->
+
+                <!-- Fabricantes -->
+                <div class="col-lg-6">
+                  <div class="stat-card h-100 p-0">
+                    <div class="px-3 pt-3 pb-2 d-flex align-items-center gap-2"
+                      style="background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255,255,255,0.05);">
+                      <i class="fa-solid fa-industry text-success" style="font-size:0.85rem;"></i>
+                      <span class="fw-bold text-white"
+                        style="font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;">Por Fabricante</span>
+                    </div>
+                    <div id="modal-list-manufacturers" class="p-2" style="max-height:280px;overflow-y:auto;">
+                      <!-- Dinámico -->
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              <!-- Fabricantes -->
-              <div class="col-lg-6">
-                <div class="px-4 pt-4 pb-3 d-flex align-items-center gap-2">
-                  <div class="d-flex align-items-center justify-content-center rounded-0"
-                    style="width: 28px; height: 28px; background: rgba(16,185,129,0.15);">
-                    <i class="fa-solid fa-industry text-success" style="font-size:0.85rem;"></i>
-                  </div>
-                  <span class="fw-bold text-white"
-                    style="font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;">Coasters por
-                    Fabricante</span>
-                </div>
-                <div id="modal-list-manufacturers" style="max-height:280px;overflow-y:auto;">
-                  <!-- Dinámico -->
-                </div>
-              </div>
-
             </div>
-
-            <!-- MÉTRICAS TOP COASTERS -->
-            <div class="px-4 pt-4 pb-3 d-flex align-items-center gap-2">
-              <div class="d-flex align-items-center justify-content-center rounded-0"
-                style="width: 32px; height: 32px; background: rgba(245,158,11,0.15);">
-                <i class="fa-solid fa-bolt text-warning" style="font-size:0.9rem;"></i>
-              </div>
-              <span class="fw-bold text-white"
-                style="font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;">Métricas de las Coasters
-                Top</span>
-            </div>
-            <div class="row g-3 m-0 px-4 pb-4">
-
-              <!-- Más alta -->
-              <div class="col-6 col-md">
-                <div class="metric-card h-100 text-center p-3"
-                  style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2); box-shadow: inset 0 0 20px rgba(16,185,129,0.02);">
-                  <div class="mb-2">
-                    <div class="d-inline-flex align-items-center justify-content-center rounded-0"
-                      style="width: 36px; height: 36px; background: rgba(16,185,129,0.2);"><i
-                        class="fa-solid fa-arrow-up-long text-success"></i></div>
-                  </div>
-                  <div class="fw-black text-white mb-1" id="max-stat-height" style="font-size:1.5rem;line-height:1.1;">
-                    <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
-                  </div>
-                  <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-height-name"
-                    style="font-size:0.8rem;">...
-                  </div>
-                  <div class="text-uppercase mt-2 fw-bold"
-                    style="font-size:0.65rem;letter-spacing:1.5px;color:rgba(16,185,129,0.8);">Más Alta</div>
-                </div>
-              </div>
-
-              <!-- Más rápida -->
-              <div class="col-6 col-md">
-                <div class="metric-card h-100 text-center p-3"
-                  style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2); box-shadow: inset 0 0 20px rgba(245,158,11,0.02);">
-                  <div class="mb-2">
-                    <div class="d-inline-flex align-items-center justify-content-center rounded-0"
-                      style="width: 36px; height: 36px; background: rgba(245,158,11,0.2);"><i
-                        class="fa-solid fa-gauge-high text-warning"></i></div>
-                  </div>
-                  <div class="fw-black text-white mb-1" id="max-stat-speed" style="font-size:1.5rem;line-height:1.1;">
-                    <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
-                  </div>
-                  <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-speed-name"
-                    style="font-size:0.8rem;">...
-                  </div>
-                  <div class="text-uppercase mt-2 fw-bold"
-                    style="font-size:0.65rem;letter-spacing:1.5px;color:rgba(245,158,11,0.8);">Más Rápida
-                  </div>
-                </div>
-              </div>
-
-              <!-- Más larga -->
-              <div class="col-6 col-md">
-                <div class="metric-card h-100 text-center p-3"
-                  style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2); box-shadow: inset 0 0 20px rgba(59,130,246,0.02);">
-                  <div class="mb-2">
-                    <div class="d-inline-flex align-items-center justify-content-center rounded-0"
-                      style="width: 36px; height: 36px; background: rgba(59,130,246,0.2);"><i
-                        class="fa-solid fa-ruler-horizontal text-primary"></i></div>
-                  </div>
-                  <div class="fw-black text-white mb-1" id="max-stat-length" style="font-size:1.5rem;line-height:1.1;">
-                    <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
-                  </div>
-                  <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-length-name"
-                    style="font-size:0.8rem;">...
-                  </div>
-                  <div class="text-uppercase mt-2 fw-bold"
-                    style="font-size:0.65rem;letter-spacing:1.5px;color:rgba(59,130,246,0.8);">Más Larga
-                  </div>
-                </div>
-              </div>
-
-              <!-- Más inversiones -->
-              <div class="col-6 col-md">
-                <div class="metric-card h-100 text-center p-3"
-                  style="background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.2); box-shadow: inset 0 0 20px rgba(168,85,247,0.02);">
-                  <div class="mb-2">
-                    <div class="d-inline-flex align-items-center justify-content-center rounded-0"
-                      style="width: 36px; height: 36px; background: rgba(168,85,247,0.2);"><i
-                        class="fa-solid fa-rotate-right" style="color:#a855f7;"></i></div>
-                  </div>
-                  <div class="fw-black text-white mb-1" id="max-stat-inversions"
-                    style="font-size:1.5rem;line-height:1.1;">
-                    <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
-                  </div>
-                  <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-inversions-name"
-                    style="font-size:0.8rem;">
-                    ...</div>
-                  <div class="text-uppercase mt-2 fw-bold"
-                    style="font-size:0.65rem;letter-spacing:1.5px;color:rgba(168,85,247,0.8);">Más Invers.
-                  </div>
-                </div>
-              </div>
-
-              <!-- Más antigua -->
-              <div class="col-6 col-md">
-                <div class="metric-card h-100 text-center p-3"
-                  style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2); box-shadow: inset 0 0 20px rgba(239,68,68,0.02);">
-                  <div class="mb-2">
-                    <div class="d-inline-flex align-items-center justify-content-center rounded-0"
-                      style="width: 36px; height: 36px; background: rgba(239,68,68,0.2);"><i
-                        class="fa-solid fa-hourglass-start text-danger"></i></div>
-                  </div>
-                  <div class="fw-black text-white mb-1" id="max-stat-year" style="font-size:1.5rem;line-height:1.1;">
-                    <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
-                  </div>
-                  <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-year-name"
-                    style="font-size:0.8rem;">...
-                  </div>
-                  <div class="text-uppercase mt-2 fw-bold"
-                    style="font-size:0.65rem;letter-spacing:1.5px;color:rgba(239,68,68,0.8);">Más Antigua
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
 
           </div><!-- /modal-body -->
         </div>

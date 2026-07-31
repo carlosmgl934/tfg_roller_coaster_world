@@ -13,8 +13,9 @@ $is_logged = isset($_SESSION['user_id']);
     <!-- Cabecera centrada -->
     <div class="text-center mb-4">
         <span class="forum-page-icon"><i class="fa-solid fa-comments"></i></span>
-        <h2 class="fw-800 mt-3 mb-1">Configuración del Foro</h2>
-        <p class="text-muted small">Define el nombre, descripción y privacidad de tu nuevo foro.</p>
+        <h2 class="fw-800 mt-3 mb-1" data-i18n="forums.config.create_title">Configuración del Foro</h2>
+        <p class="text-muted small" data-i18n="forums.config.subtitle">Define el nombre, descripción y privacidad de tu
+            nuevo foro.</p>
     </div>
 
     <div class="forum-form-card card">
@@ -28,15 +29,18 @@ $is_logged = isset($_SESSION['user_id']);
                 <p class="form-section-title">Personaliza tu foro</p>
 
                 <div class="mb-4">
-                    <label for="title" class="form-label">Nombre del foro</label>
+                    <label for="title" class="form-label" data-i18n="forums.config.forum_title">Nombre del foro</label>
                     <input type="text" name="title" id="title" class="form-control form-control-lg"
+                        data-i18n-placeholder="forums.config.title_placeholder"
                         placeholder="Ej: Mejores montañas rusas 2026" required>
                     <div id="title-error" class="invalid-feedback">El título debe tener al menos 5 caracteres.</div>
                 </div>
 
                 <div class="mb-5">
-                    <label for="form_subject" class="form-label">Descripción</label>
+                    <label for="form_subject" class="form-label"
+                        data-i18n="forums.config.description">Descripción</label>
                     <textarea name="form_subject" id="form_subject" class="form-control" rows="4" maxlength="255"
+                        data-i18n-placeholder="forums.config.description_placeholder"
                         placeholder="Describe brevemente de qué trata tu foro..." required></textarea>
                 </div>
 
@@ -48,13 +52,14 @@ $is_logged = isset($_SESSION['user_id']);
                         <input type="radio" name="privacy" value="public" id="privacy-public" class="privacy-radio"
                             <?= $privacy !== 'private' ? 'checked' : '' ?>>
                         <label for="privacy-public" class="privacy-btn">
-                            <i class="fa-solid fa-earth-europe me-2"></i>Público
+                            <i class="fa-solid fa-earth-europe me-2"></i><span
+                                data-i18n="forums.config.public">Público</span>
                         </label>
 
                         <input type="radio" name="privacy" value="private" id="privacy-private" class="privacy-radio"
                             <?= $privacy === 'private' ? 'checked' : '' ?>>
                         <label for="privacy-private" class="privacy-btn">
-                            <i class="fa-solid fa-lock me-2"></i>Privado
+                            <i class="fa-solid fa-lock me-2"></i><span data-i18n="forums.config.private">Privado</span>
                         </label>
                     </div>
                     <p class="privacy-hint" id="privacy-hint">
@@ -72,7 +77,8 @@ $is_logged = isset($_SESSION['user_id']);
 
                     <div class="mb-5">
                         <label class="form-label">
-                            Selecciona colaboradores entre tus amigos
+                            <span data-i18n="forums.config.collaborators_label">Selecciona colaboradores entre tus
+                                amigos</span>
                             <span class="text-muted fw-normal ms-1">(opcional)</span>
                         </label>
 
@@ -111,7 +117,8 @@ $is_logged = isset($_SESSION['user_id']);
                         <p id="error-success-message-text" class="mb-0"></p>
                     </div>
                     <button type="button" id="forum-submit-btn" class="btn btn-forum-submit">
-                        <i class="fa-solid fa-plus me-2"></i>Crear foro
+                        <i class="fa-solid fa-plus me-2"></i><span data-i18n="forums.config.btn_create">Crear
+                            foro</span>
                     </button>
                 </div>
 
@@ -126,9 +133,10 @@ $is_logged = isset($_SESSION['user_id']);
                 <div class="modal-body text-center p-4">
                     <p class="mb-4" style="font-size:1rem;">Para crear un foro necesitas estar registrado</p>
                     <div class="d-flex gap-2 justify-content-center">
-                        <button class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                        <button class="btn btn-outline-secondary px-4" data-bs-dismiss="modal"
+                            data-i18n="common.cancel">Cancelar</button>
                         <a href="<?= $base_url ?>/web/views/auth/login.php?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>"
-                            class="btn btn-success px-4">Ir al Login</a>
+                            class="btn btn-success px-4" data-i18n="forums.config.go_login">Ir al Login</a>
                     </div>
                 </div>
             </div>

@@ -25,12 +25,21 @@ console.log(
 );
 
 // Helper global para avatares (importante al tener nombres de archivo locales sueltos)
-window.rcwGetAvatarPath = function(imgSrc, username = 'Usuario', color1 = '198754', textCol = 'fff') {
-    if (!imgSrc) return window.BASE_URL + '/web/img/avatars/default_avatar.svg';
-    if (imgSrc.startsWith("http://") || imgSrc.startsWith("https://")) return imgSrc;
-    if (imgSrc.startsWith("/")) return window.BASE_URL + imgSrc;
-    // Si solo hay un nombre pelado ("1774886670_xxxx.webp"), está en Supabase Storage
-    return "https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/" + imgSrc;
+window.rcwGetAvatarPath = function (
+  imgSrc,
+  username = "Usuario",
+  color1 = "198754",
+  textCol = "fff",
+) {
+  if (!imgSrc) return window.BASE_URL + "/web/img/avatars/default_avatar.svg";
+  if (imgSrc.startsWith("http://") || imgSrc.startsWith("https://"))
+    return imgSrc;
+  if (imgSrc.startsWith("/")) return window.BASE_URL + imgSrc;
+  // Si solo hay un nombre pelado ("1774886670_xxxx.webp"), está en Supabase Storage
+  return (
+    "https://ubtoaaawqdneblyvbelr.supabase.co/storage/v1/object/public/avatars/" +
+    imgSrc
+  );
 };
 
 // ── Helpers de modal ──────────────────────────────────────────────────────────
@@ -107,14 +116,15 @@ $(document).ready(function () {
   if (togglePsw) togglePsw.addEventListener("click", toggleFormPassword);
   if (eliminar) eliminar.addEventListener("click", borrarCuenta);
   if (cancelar) cancelar.addEventListener("click", cancelarPassword);
-  if (forgotPasswordBtn) forgotPasswordBtn.addEventListener("click", resetPassword);
+  if (forgotPasswordBtn)
+    forgotPasswordBtn.addEventListener("click", resetPassword);
 
   let usernameAvailable = false;
   let passwordValid = false;
 
   const usernameInput = document.getElementById("username");
   if (usernameInput) {
-    usernameInput.addEventListener("blur", function() {
+    usernameInput.addEventListener("blur", function () {
       const val = this.value.trim();
       const feedback = document.getElementById("username-feedback");
       if (!val) {
@@ -122,20 +132,29 @@ $(document).ready(function () {
         usernameAvailable = false;
         return;
       }
-      fetch(BASE + "/api/php/auth/check_username.php?username=" + encodeURIComponent(val))
-        .then(r => r.json())
-        .then(data => {
+      fetch(
+        BASE +
+          "/api/php/auth/check_username.php?username=" +
+          encodeURIComponent(val),
+      )
+        .then((r) => r.json())
+        .then((data) => {
           feedback.style.display = "block";
           if (data.available) {
-            feedback.innerHTML = '<i class="fa-solid fa-check text-success me-1"></i><span class="text-success">Usuario disponible</span>';
+            feedback.innerHTML =
+              '<i class="fa-solid fa-check text-success me-1"></i><span class="text-success">Usuario disponible</span>';
             usernameAvailable = true;
           } else {
-            const errorMsg = data.error || 'Este nombre de usuario ya está en uso';
-            feedback.innerHTML = '<i class="fa-solid fa-xmark text-danger me-1"></i><span class="text-danger">' + errorMsg + '</span>';
+            const errorMsg =
+              data.error || "Este nombre de usuario ya está en uso";
+            feedback.innerHTML =
+              '<i class="fa-solid fa-xmark text-danger me-1"></i><span class="text-danger">' +
+              errorMsg +
+              "</span>";
             usernameAvailable = false;
           }
         })
-        .catch(err => console.error(err));
+        .catch((err) => console.error(err));
     });
   }
 
@@ -146,13 +165,19 @@ $(document).ready(function () {
   const reqNumber = document.getElementById("req-number");
 
   if (registerPasswordInput && reqLength) {
-    registerPasswordInput.addEventListener("input", function() {
+    registerPasswordInput.addEventListener("input", function () {
       const val = this.value;
       const setValid = (el, valid, text) => {
         if (valid) {
-          el.innerHTML = '<i class="fa-solid fa-check text-success me-2"></i><span class="text-success">' + text + '</span>';
+          el.innerHTML =
+            '<i class="fa-solid fa-check text-success me-2"></i><span class="text-success">' +
+            text +
+            "</span>";
         } else {
-          el.innerHTML = '<i class="fa-solid fa-xmark text-danger me-2"></i><span class="text-muted">' + text + '</span>';
+          el.innerHTML =
+            '<i class="fa-solid fa-xmark text-danger me-2"></i><span class="text-muted">' +
+            text +
+            "</span>";
         }
       };
 
@@ -191,12 +216,27 @@ $(document).ready(function () {
     btn.addEventListener("click", function (e) {
       e.preventDefault();
       // Vaciar carrito + destruir sesión PHP + cerrar sesión Firebase
-      fetch(BASE + "/api/php/tickets.php?action=clear_cart", { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST", credentials: "include" } )
+      fetch(BASE + "/api/php/tickets.php?action=clear_cart", {
+        headers: {
+          "X-CSRF-Token":
+            document
+              .querySelector('meta[name="csrf-token"]')
+              ?.getAttribute("content") ?? "",
+        },
+        method: "POST",
+        credentials: "include",
+      })
         .catch(() => {})
         .finally(() => {
-          fetch(BASE + "/api/php/auth/logout.php", { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST" } ).finally(() => {
+          fetch(BASE + "/api/php/auth/logout.php", {
+            headers: {
+              "X-CSRF-Token":
+                document
+                  .querySelector('meta[name="csrf-token"]')
+                  ?.getAttribute("content") ?? "",
+            },
+            method: "POST",
+          }).finally(() => {
             window.auth.signOut().then(() => {
               window.location.href = BASE + "/web/views/auth/login.php";
             });
@@ -206,14 +246,16 @@ $(document).ready(function () {
   });
 
   // ── Funciones de Verificación ─────────────────────────────────────────────────
-  window.cancelVerification = function() {
-    if(window.verificationInterval) clearInterval(window.verificationInterval);
-    const modal = bootstrap.Modal.getInstance(document.getElementById("verification-modal"));
-    if(modal) modal.hide();
+  window.cancelVerification = function () {
+    if (window.verificationInterval) clearInterval(window.verificationInterval);
+    const modal = bootstrap.Modal.getInstance(
+      document.getElementById("verification-modal"),
+    );
+    if (modal) modal.hide();
     window.auth.signOut().then(() => {
-        window.location.href = BASE + "/web/views/auth/login.php";
+      window.location.href = BASE + "/web/views/auth/login.php";
     });
-  }
+  };
 
   function showVerificationModal(user) {
     const existing = document.getElementById("verification-modal");
@@ -244,18 +286,23 @@ $(document).ready(function () {
       </div>
     </div>`;
     document.body.insertAdjacentHTML("beforeend", html);
-    const modal = new bootstrap.Modal(document.getElementById("verification-modal"));
+    const modal = new bootstrap.Modal(
+      document.getElementById("verification-modal"),
+    );
     modal.show();
 
     // Polling Verification
     window.verificationInterval = setInterval(() => {
-      user.reload().then(() => {
-        if (user.emailVerified) {
-          clearInterval(window.verificationInterval);
-          modal.hide();
-          setupSessionAndRedirect(user);
-        }
-      }).catch(console.error);
+      user
+        .reload()
+        .then(() => {
+          if (user.emailVerified) {
+            clearInterval(window.verificationInterval);
+            modal.hide();
+            setupSessionAndRedirect(user);
+          }
+        })
+        .catch(console.error);
     }, 3000);
   }
 
@@ -265,7 +312,12 @@ $(document).ready(function () {
       fetch(BASE + "/api/php/auth/auth.php", {
         method: "POST",
         headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
+          "X-CSRF-Token":
+            document
+              .querySelector('meta[name="csrf-token"]')
+              ?.getAttribute("content") ?? "",
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           id_token: idToken,
           username: user.displayName || user.email.split("@")[0],
@@ -277,23 +329,34 @@ $(document).ready(function () {
 
       // Guardar sesión PHP y redirigir
       const params = new URLSearchParams(window.location.search);
-      const redirectUrl = params.get("redirect") || BASE + "/web/views/public/index.php";
+      const redirectUrl =
+        params.get("redirect") || BASE + "/web/views/public/index.php";
 
       fetch(BASE + "/api/php/auth/save_session.php", {
         method: "POST",
+        credentials: "include",
         headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
+          "X-CSRF-Token":
+            document
+              .querySelector('meta[name="csrf-token"]')
+              ?.getAttribute("content") ?? "",
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ firebase_uid: user.uid, email: user.email }),
       })
         .then((r) => r.json())
         .then((d) => {
           console.log("Sesión PHP:", d);
           showAlert("¡Verificación completada! Bienvenido.");
-          setTimeout(() => { window.location.href = redirectUrl; }, 1200);
+          setTimeout(() => {
+            window.location.href = redirectUrl;
+          }, 1200);
         })
         .catch(() => {
           showAlert("¡Verificación completada! Bienvenido.");
-          setTimeout(() => { window.location.href = redirectUrl; }, 1200);
+          setTimeout(() => {
+            window.location.href = redirectUrl;
+          }, 1200);
         });
     });
   }
@@ -335,10 +398,17 @@ $(document).ready(function () {
           fetch(BASE + "/api/php/auth/auth.php", {
             method: "POST",
             headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
+              "X-CSRF-Token":
+                document
+                  .querySelector('meta[name="csrf-token"]')
+                  ?.getAttribute("content") ?? "",
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({
               id_token: idToken,
-              username: document.getElementById("username") ? document.getElementById("username").value.trim() : (user.displayName || user.email.split("@")[0]),
+              username: document.getElementById("username")
+                ? document.getElementById("username").value.trim()
+                : user.displayName || user.email.split("@")[0],
             }),
           })
             .then((r) => r.json())
@@ -383,9 +453,9 @@ $(document).ready(function () {
 
         // 1. Verificar si el email está confirmado
         if (!user.emailVerified) {
-            user.sendEmailVerification().catch(console.error);
-            showVerificationModal(user);
-            return;
+          user.sendEmailVerification().catch(console.error);
+          showVerificationModal(user);
+          return;
         }
 
         console.log("Login exitoso y verificado! UID:", user.uid);
@@ -398,7 +468,12 @@ $(document).ready(function () {
               fetch(BASE + "/api/php/auth/delete_user.php", {
                 method: "POST",
                 headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
+                  "X-CSRF-Token":
+                    document
+                      .querySelector('meta[name="csrf-token"]')
+                      ?.getAttribute("content") ?? "",
+                  "Content-Type": "application/json",
+                },
                 body: JSON.stringify({ firebase_uid: user.uid }),
               }).catch((e) => console.error("Error borrando de Supabase:", e));
               showAlert("Cuenta eliminada correctamente.");
@@ -460,18 +535,27 @@ $(document).ready(function () {
     }
 
     if (!email) {
-      showAlert("Por favor, introduce tu correo electrónico en el campo superior primero antes de hacer clic en recuperar contraseña.");
+      showAlert(
+        "Por favor, introduce tu correo electrónico en el campo superior primero antes de hacer clic en recuperar contraseña.",
+      );
       return;
     }
 
-    window.auth.sendPasswordResetEmail(email)
+    window.auth
+      .sendPasswordResetEmail(email)
       .then(() => {
-        showAlert("¡Listo! Hemos enviado un enlace a " + email + " para que puedas restablecer tu contraseña. Revisa también la carpeta de SPAM.");
+        showAlert(
+          "¡Listo! Hemos enviado un enlace a " +
+            email +
+            " para que puedas restablecer tu contraseña. Revisa también la carpeta de SPAM.",
+        );
       })
       .catch((error) => {
         let msg = "Error al restablecer contraseña: ";
-        if (error.code === 'auth/user-not-found') msg = "No hay ninguna cuenta registrada con este correo.";
-        else if (error.code === 'auth/invalid-email') msg = "El correo electrónico no es válido.";
+        if (error.code === "auth/user-not-found")
+          msg = "No hay ninguna cuenta registrada con este correo.";
+        else if (error.code === "auth/invalid-email")
+          msg = "El correo electrónico no es válido.";
         else msg += error.message;
         showAlert(msg);
       });
@@ -494,7 +578,12 @@ $(document).ready(function () {
               fetch(BASE + "/api/php/auth/delete_user.php", {
                 method: "POST",
                 headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
+                  "X-CSRF-Token":
+                    document
+                      .querySelector('meta[name="csrf-token"]')
+                      ?.getAttribute("content") ?? "",
+                  "Content-Type": "application/json",
+                },
                 body: JSON.stringify({ firebase_uid: user.uid }),
               }).catch((e) => console.error("Error borrando de Supabase:", e));
               showAlert("Cuenta eliminada correctamente.");
@@ -510,7 +599,12 @@ $(document).ready(function () {
           fetch(BASE + "/api/php/auth/auth.php", {
             method: "POST",
             headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
+              "X-CSRF-Token":
+                document
+                  .querySelector('meta[name="csrf-token"]')
+                  ?.getAttribute("content") ?? "",
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({
               id_token: idToken,
               username: user.displayName || user.email.split("@")[0],
@@ -525,8 +619,14 @@ $(document).ready(function () {
 
           fetch(BASE + "/api/php/auth/save_session.php", {
             method: "POST",
+            credentials: "include",
             headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
+              "X-CSRF-Token":
+                document
+                  .querySelector('meta[name="csrf-token"]')
+                  ?.getAttribute("content") ?? "",
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({ firebase_uid: user.uid, email: user.email }),
           })
             .then((r) => r.json())
@@ -562,7 +662,12 @@ $(document).ready(function () {
           fetch(BASE + "/api/php/auth/auth.php", {
             method: "POST",
             headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
+              "X-CSRF-Token":
+                document
+                  .querySelector('meta[name="csrf-token"]')
+                  ?.getAttribute("content") ?? "",
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({
               id_token: idToken,
               username: user.displayName || user.email.split("@")[0],
@@ -577,8 +682,14 @@ $(document).ready(function () {
 
           fetch(BASE + "/api/php/auth/save_session.php", {
             method: "POST",
+            credentials: "include",
             headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
+              "X-CSRF-Token":
+                document
+                  .querySelector('meta[name="csrf-token"]')
+                  ?.getAttribute("content") ?? "",
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({ firebase_uid: user.uid, email: user.email }),
           })
             .then((r) => r.json())
@@ -612,7 +723,8 @@ $(document).ready(function () {
     const form = document.getElementById("form-password");
     if (!form) return;
     form.style.display = form.style.display === "none" ? "block" : "none";
-    if (document.getElementById("old-password")) document.getElementById("old-password").value = "";
+    if (document.getElementById("old-password"))
+      document.getElementById("old-password").value = "";
     document.getElementById("nueva-password").value = "";
     document.getElementById("confirmar-password").value = "";
     document.getElementById("msg-password").textContent = "";
@@ -630,7 +742,8 @@ $(document).ready(function () {
       return;
     }
     if (nueva.length < 6) {
-      msg.textContent = "La nueva contraseña debe tener un mínimo de 6 caracteres";
+      msg.textContent =
+        "La nueva contraseña debe tener un mínimo de 6 caracteres";
       msg.style.color = "red";
       return;
     }
@@ -642,11 +755,15 @@ $(document).ready(function () {
 
     const user = window.auth.currentUser;
     if (!user) return;
-    
-    // Configurar credencial y re-autenticar
-    const credential = firebase.auth.EmailAuthProvider.credential(user.email, antigua);
 
-    user.reauthenticateWithCredential(credential)
+    // Configurar credencial y re-autenticar
+    const credential = firebase.auth.EmailAuthProvider.credential(
+      user.email,
+      antigua,
+    );
+
+    user
+      .reauthenticateWithCredential(credential)
       .then(() => {
         // Una vez re-autenticado, actualizamos la contraseña
         return user.updatePassword(nueva);
@@ -658,11 +775,12 @@ $(document).ready(function () {
       })
       .catch((err) => {
         if (err.code === "auth/wrong-password") {
-            msg.textContent = "La contraseña actual es incorrecta.";
+          msg.textContent = "La contraseña actual es incorrecta.";
         } else if (err.code === "auth/too-many-requests") {
-            msg.textContent = "Demasiados intentos. Por favor, inténtalo más tarde.";
+          msg.textContent =
+            "Demasiados intentos. Por favor, inténtalo más tarde.";
         } else {
-            msg.textContent = "Error: " + err.message;
+          msg.textContent = "Error: " + err.message;
         }
         msg.style.color = "red";
       });
@@ -689,7 +807,12 @@ $(document).ready(function () {
             fetch(BASE + "/api/php/auth/delete_user.php", {
               method: "POST",
               headers: {
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '', "Content-Type": "application/json" },
+                "X-CSRF-Token":
+                  document
+                    .querySelector('meta[name="csrf-token"]')
+                    ?.getAttribute("content") ?? "",
+                "Content-Type": "application/json",
+              },
               body: JSON.stringify({ firebase_uid: user.uid }),
             })
               .then((r) => r.json())
@@ -705,14 +828,19 @@ $(document).ready(function () {
               showAlert(
                 "Por seguridad, necesitas volver a iniciar sesión antes de eliminar tu cuenta. Inicia sesión y la cuenta se eliminará automáticamente.",
               );
-              fetch(BASE + "/api/php/auth/logout.php", { 
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '' }, method: "POST" } ).finally(
-                () => {
-                  window.auth.signOut().then(() => {
-                    window.location.href = BASE + "/web/views/auth/login.php";
-                  });
+              fetch(BASE + "/api/php/auth/logout.php", {
+                headers: {
+                  "X-CSRF-Token":
+                    document
+                      .querySelector('meta[name="csrf-token"]')
+                      ?.getAttribute("content") ?? "",
                 },
-              );
+                method: "POST",
+              }).finally(() => {
+                window.auth.signOut().then(() => {
+                  window.location.href = BASE + "/web/views/auth/login.php";
+                });
+              });
             } else {
               showAlert("Error al eliminar la cuenta: " + error.message);
             }

@@ -15,9 +15,10 @@ if (!$is_logged) {
   <div class="row mb-4">
     <div class="col-12 text-center">
       <h1 class="display-6 fw-bold border-bottom pb-2 text-success">
-        <i class="fa-solid fa-user-group me-2"></i> Gestionar Amistades
+        <i class="fa-solid fa-user-group me-2"></i> <span data-i18n="users.friends.title">Gestionar Amistades</span>
       </h1>
-      <p class="text-muted text-uppercase fw-bold mt-3" style="letter-spacing: 0.1em; font-size: 0.85rem;">
+      <p class="text-muted text-uppercase fw-bold mt-3" style="letter-spacing: 0.1em; font-size: 0.85rem;"
+        data-i18n="users.friends.subtitle">
         Gestiona tus peticiones y descubre los tops de tus amigos
       </p>
     </div>
@@ -32,7 +33,7 @@ if (!$is_logged) {
         <div class="card-header d-flex justify-content-between align-items-center py-3">
           <div class="d-flex align-items-center gap-2">
             <i class="fa-solid fa-bell text-warning"></i>
-            <h5 class="mb-0 fw-bold">Solicitudes</h5>
+            <h5 class="mb-0 fw-bold" data-i18n="users.friends.requests">Solicitudes</h5>
           </div>
           <span class="badge badge-profile-gray" id="requests-count">0</span>
         </div>
@@ -52,7 +53,7 @@ if (!$is_logged) {
           class="card-header d-flex justify-content-between align-items-center py-3 border-success border-opacity-25">
           <div class="d-flex align-items-center gap-2">
             <i class="fa-solid fa-users text-success"></i>
-            <h5 class="mb-0 fw-bold">Lista de Amigos</h5>
+            <h5 class="mb-0 fw-bold" data-i18n="users.friends.friend_list">Lista de Amigos</h5>
           </div>
           <span class="badge badge-profile" id="friends-count">0</span>
         </div>
@@ -61,7 +62,7 @@ if (!$is_logged) {
             <div class="col-12 col-md-7 mb-3 mb-md-0">
               <div class="input-group shadow-sm">
                 <input type="text" class="form-control border-success text-white" id="search-friends-input"
-                  placeholder="Buscar amigo..."
+                  data-i18n-placeholder="users.friends.search_placeholder" placeholder="Buscar amigo..."
                   style="background-color: var(--rcw-bg-input); border-radius: 4px 0 0 4px;">
                 <span class="input-group-text bg-success text-white border-success px-3"
                   style="border-radius: 0 4px 4px 0;"><i class="fa-solid fa-magnifying-glass"></i></span>
@@ -70,11 +71,11 @@ if (!$is_logged) {
             <div class="col-12 col-md-5 text-md-end">
               <select class="form-select border-success text-white" id="sort-friends-select"
                 style="background-color: var(--rcw-bg-input); border-radius: 4px;">
-                <option value="antiguedad_desc">Más recientes</option>
-                <option value="antiguedad_asc">Más antiguos</option>
-                <option value="alfabetico_asc">Alfabéticamente (A-Z)</option>
-                <option value="alfabetico_desc">Alfabéticamente (Z-A)</option>
-                <option value="credits_desc">Número de credits</option>
+                <option value="antiguedad_desc" data-i18n="users.friends.sort_newest">Más recientes</option>
+                <option value="antiguedad_asc" data-i18n="users.friends.sort_oldest">Más antiguos</option>
+                <option value="alfabetico_asc" data-i18n="users.friends.sort_az">Alfabéticamente (A-Z)</option>
+                <option value="alfabetico_desc" data-i18n="users.friends.sort_za">Alfabéticamente (Z-A)</option>
+                <option value="credits_desc" data-i18n="users.friends.sort_credits">Número de credits</option>
               </select>
             </div>
           </div>
@@ -99,7 +100,8 @@ if (!$is_logged) {
               <button class="accordion-button collapsed bg-transparent text-white shadow-none px-4 py-3 fw-bold"
                 type="button" data-bs-toggle="collapse" data-bs-target="#collapseSent">
                 <i class="fa-solid fa-paper-plane text-muted me-2"></i>
-                Solicitudes enviadas pendientes (<span id="sent-count" class="text-success ms-1">0</span>)
+                <span data-i18n="users.friends.sent_requests">Solicitudes enviadas pendientes</span> (<span
+                  id="sent-count" class="text-success ms-1">0</span>)
               </button>
             </h2>
             <div id="collapseSent" class="accordion-collapse collapse" data-bs-parent="#accordionSent">
@@ -119,7 +121,8 @@ if (!$is_logged) {
   <div class="row" id="friends-loading">
     <div class="col-12 text-center py-5">
       <div class="spinner-border text-success" role="status" style="width: 3rem; height: 3rem;"></div>
-      <p class="mt-3 text-muted fw-bold text-uppercase" style="letter-spacing: 0.05em;">Cargando red de
+      <p class="mt-3 text-muted fw-bold text-uppercase" style="letter-spacing: 0.05em;"
+        data-i18n="users.friends.loading_network">Cargando red de
         aventureros...</p>
     </div>
   </div>
@@ -131,17 +134,21 @@ if (!$is_logged) {
       <div class="modal-content">
         <div class="modal-header border-bottom border-secondary border-opacity-25 pb-3">
           <h5 class="modal-title fw-bold text-danger" id="removeFriendModalLabel"><i
-              class="fa-solid fa-triangle-exclamation me-2"></i>Eliminar Amigo</h5>
+              class="fa-solid fa-triangle-exclamation me-2"></i><span data-i18n="users.friends.remove_title">Eliminar
+              Amigo</span></h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body py-4">
-          ¿Estás seguro de que deseas eliminar de tus amigos a <strong id="removeFriendName"
-            class="text-white"></strong>?<br>
-          <span class="text-muted small">Esta acción no se puede deshacer.</span>
+          <span data-i18n="users.friends.remove_confirm_1">¿Estás seguro de que deseas eliminar de tus amigos a</span>
+          <strong id="removeFriendName" class="text-white"></strong><span
+            data-i18n="users.friends.remove_confirm_2">?</span><br>
+          <span class="text-muted small" data-i18n="users.friends.remove_warning">Esta acción no se puede
+            deshacer.</span>
         </div>
         <div class="modal-footer border-top border-secondary border-opacity-25 pt-3">
-          <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-danger px-4 fw-bold" id="confirmRemoveFriendBtn">Eliminar</button>
+          <button type="button" class="btn btn-dark" data-bs-dismiss="modal" data-i18n="common.cancel">Cancelar</button>
+          <button type="button" class="btn btn-danger px-4 fw-bold" id="confirmRemoveFriendBtn"
+            data-i18n="users.friends.remove_btn">Eliminar</button>
         </div>
       </div>
     </div>
@@ -161,7 +168,8 @@ if (!$is_logged) {
               <i class="fa-solid fa-comments" style="color:#a78bfa; font-size:1.1rem;"></i>
             </div>
             <div class="flex-grow-1 min-w-0">
-              <h5 class="modal-title fw-bold mb-0 text-white" id="forumInviteInfoModalLabel">
+              <h5 class="modal-title fw-bold mb-0 text-white" id="forumInviteInfoModalLabel"
+                data-i18n="users.friends.invite_collab">
                 Invitación a colaborar
               </h5>
               <small style="color:#a78bfa;" id="forumInviteModalSender"></small>
@@ -175,7 +183,8 @@ if (!$is_logged) {
           <!-- Título del foro -->
           <div class="mb-3">
             <label class="text-muted text-uppercase fw-bold mb-1" style="font-size:0.7rem; letter-spacing:0.06em;">
-              <i class="fa-solid fa-lock me-1" style="color:#a78bfa;"></i> Foro privado
+              <i class="fa-solid fa-lock me-1" style="color:#a78bfa;"></i> <span
+                data-i18n="users.friends.private_forum">Foro privado</span>
             </label>
             <div class="fw-bold text-white" id="forumInviteModalTitle"
               style="font-size:1.05rem; word-break:break-word;"></div>
@@ -184,7 +193,8 @@ if (!$is_logged) {
           <!-- Descripción -->
           <div class="mb-3" id="forumInviteModalDescWrap">
             <label class="text-muted text-uppercase fw-bold mb-1" style="font-size:0.7rem; letter-spacing:0.06em;">
-              <i class="fa-solid fa-align-left me-1" style="color:#a78bfa;"></i> Descripción
+              <i class="fa-solid fa-align-left me-1" style="color:#a78bfa;"></i> <span
+                data-i18n="users.friends.description">Descripción</span>
             </label>
             <p class="text-secondary mb-0 small" id="forumInviteModalDesc"></p>
           </div>
@@ -193,11 +203,11 @@ if (!$is_logged) {
           <div class="d-flex gap-3 mt-2 pt-2" style="border-top:1px solid rgba(255,255,255,0.06);">
             <div class="text-center flex-fill">
               <div class="fw-bold text-white" id="forumInviteModalMembers">—</div>
-              <small class="text-muted" style="font-size:0.7rem;">Miembros</small>
+              <small class="text-muted" style="font-size:0.7rem;" data-i18n="users.friends.members">Miembros</small>
             </div>
             <div class="text-center flex-fill">
               <div class="fw-bold text-white" id="forumInviteModalCreated">—</div>
-              <small class="text-muted" style="font-size:0.7rem;">Creación</small>
+              <small class="text-muted" style="font-size:0.7rem;" data-i18n="users.friends.creation">Creación</small>
             </div>
           </div>
         </div>
@@ -205,14 +215,15 @@ if (!$is_logged) {
         <!-- Footer con acciones -->
         <div class="modal-footer border-0 px-4 pb-4 pt-2 gap-2"
           style="border-top:1px solid rgba(167,139,250,0.15) !important;">
-          <button type="button" class="btn btn-outline-secondary flex-fill" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-outline-secondary flex-fill" data-bs-dismiss="modal"
+            data-i18n="common.cancel">Cancelar</button>
           <button type="button" class="btn px-4 fw-bold flex-fill rcw-forum-invite-modal-action"
             style="background:#7c3aed; color:#fff; border:none;" data-action="decline" id="forumInviteModalDeclineBtn">
-            <i class="fa-solid fa-xmark me-1"></i> Rechazar
+            <i class="fa-solid fa-xmark me-1"></i><span data-i18n="users.friends.decline"> Rechazar</span>
           </button>
           <button type="button" class="btn px-4 fw-bold flex-fill rcw-forum-invite-modal-action"
             style="background:#16a34a; color:#fff; border:none;" data-action="accept" id="forumInviteModalAcceptBtn">
-            <i class="fa-solid fa-check me-1"></i> Aceptar
+            <i class="fa-solid fa-check me-1"></i><span data-i18n="users.friends.accept"> Aceptar</span>
           </button>
         </div>
       </div>

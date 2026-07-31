@@ -27,23 +27,26 @@ require_once __DIR__ . '/../partials/header.php';
   <div class="login-form-panel">
     <div class="login-card">
 
-      <h2 class="login-title">Crea tu cuenta</h2>
+      <h2 class="login-title" data-i18n="auth.register_title">Crea tu cuenta</h2>
       <p class="login-subtitle">Regístrate gratis para acceder a todas las posibilidades que te ofrece RollerCoaster
         World</p>
 
       <!-- Formulario -->
       <form id="register-form" autocomplete="on">
         <div class="form-group mb-3">
-          <label for="username"><i class="fa-solid fa-user me-2"></i>Nombre de usuario</label>
+          <label for="username"><i class="fa-solid fa-user me-2"></i><span data-i18n="auth.username">Nombre de
+              usuario</span></label>
           <input type="text" id="username" placeholder="Tu usuario (ej. coasterfan02)" required autocomplete="username">
           <div id="username-feedback" class="mt-1 small fw-medium" style="display:none;"></div>
         </div>
         <div class="form-group mb-3">
-          <label for="email"><i class="fa-regular fa-envelope me-2"></i>Correo electrónico</label>
+          <label for="email"><i class="fa-regular fa-envelope me-2"></i><span data-i18n="auth.email">Correo
+              electrónico</span></label>
           <input type="email" id="email" placeholder="tu@email.com" required autocomplete="email">
         </div>
         <div class="form-group mb-4">
-          <label for="password"><i class="fa-solid fa-lock me-2"></i>Contraseña</label>
+          <label for="password"><i class="fa-solid fa-lock me-2"></i><span
+              data-i18n="auth.password">Contraseña</span></label>
           <div class="password-wrapper">
             <input type="password" id="password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password">
             <button type="button" class="toggle-password" onclick="togglePass()">
@@ -67,11 +70,11 @@ require_once __DIR__ . '/../partials/header.php';
           </div>
         </div>
         <button type="button" id="signUpWithEmail" class="btn-login">
-          <i class="fa-solid fa-user-plus me-2"></i>Crear cuenta
+          <i class="fa-solid fa-user-plus me-2"></i><span data-i18n="auth.register_btn">Crear cuenta</span>
         </button>
       </form>
 
-      <div class="divider"><span>o regístrate con</span></div>
+      <div class="divider"><span data-i18n="auth.or">o regístrate con</span></div>
 
       <!-- Proveedores sociales -->
       <div class="social-btns">
@@ -86,7 +89,7 @@ require_once __DIR__ . '/../partials/header.php';
             <path fill="#1976D2"
               d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z" />
           </svg>
-          Google
+          <span data-i18n="auth.google_login">Google</span>
         </button>
         <button id="signInWithFacebook" class="btn-social btn-facebook">
           <i class="fa-brands fa-facebook me-2"></i>Facebook
@@ -94,14 +97,14 @@ require_once __DIR__ . '/../partials/header.php';
       </div>
 
       <p class="register-link">
-        ¿Ya tienes cuenta?
+        <span data-i18n="auth.have_account">¿Ya tienes cuenta?</span>
         <?php
         $loginUrl = $base_url . '/web/views/auth/login.php';
         if (isset($_GET['redirect'])) {
           $loginUrl .= '?redirect=' . urlencode($_GET['redirect']);
         }
         ?>
-        <a href="<?= $loginUrl ?>">Inicia sesión</a>
+        <a href="<?= $loginUrl ?>" data-i18n="auth.login_btn">Inicia sesión</a>
       </p>
 
     </div>

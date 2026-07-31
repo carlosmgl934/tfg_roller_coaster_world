@@ -2,6 +2,14 @@
    globals.css — Design System · RollerCoaster World
    ============================================================ */
 
+/* ── HIDDEN-TFG — Ocultar funcionalidad de venta/pagos ─────────
+   Para reactivar: eliminar esta regla y quitar las clases
+   .hidden-tfg de los elementos HTML correspondientes.
+   ─────────────────────────────────────────────────────────── */
+.hidden-tfg {
+  display: none !important;
+}
+
 /* ── GOOGLE FONTS ───────────────────────────────────────────── */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700;800;900&display=swap");
 

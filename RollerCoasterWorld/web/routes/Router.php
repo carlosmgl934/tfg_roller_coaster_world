@@ -55,6 +55,7 @@ class Router
             // Públicas - Legal/Info
             'contact' => '/web/views/public/contact.php',
             'privacy' => '/web/views/public/privacy.php',
+            'delete_data' => '/web/views/public/delete-data.php',
             'notice' => '/web/views/public/notice.php',
 
             // Usuarios / Social
@@ -64,11 +65,14 @@ class Router
             'user_profile' => '/web/views/public/users/user_profile.php',
             'user_search' => '/web/views/public/users/user_search.php',
 
-            // Tienda / Entradas
+            // HIDDEN-TFG-START: Tienda / Entradas (Rutas desactivadas)
+            /*
             'tickets' => '/web/views/public/shop/tickets.php',
             'carrito' => '/web/views/public/shop/carrito.php',
             'checkout' => '/web/views/public/shop/checkout.php',
             'orders' => '/web/views/public/shop/orders.php',
+            */
+            // HIDDEN-TFG-END
 
             // Viajes
             'trips' => '/web/views/public/trips/trips.php',
@@ -82,6 +86,11 @@ class Router
             // Admin
             'admin' => '/web/views/admin/admin.php',
             'admin_dashboard' => '/web/views/admin/dashboard.php',
+            'admin_updater' => '/web/views/admin/updater.php',
+            'api_updater_scan' => '/api/php/updater/scan.php',
+            'api_updater_apply' => '/api/php/updater/apply.php',
+            'api_updater_discard' => '/api/php/updater/discard.php',
+            'api_updater_cache' => '/api/php/updater/cache.php',
             'admin_coasters' => '/web/views/admin/coasters.php',
             'admin_parks' => '/web/views/admin/parks.php',
             'admin_users' => '/web/views/admin/users.php',
@@ -90,8 +99,12 @@ class Router
             'admin_messages' => '/web/views/admin/messages.php',
             'admin_photos' => '/web/views/admin/photos.php',
             'admin_comments' => '/web/views/admin/comments.php',
+            // HIDDEN-TFG-START: Admin Tienda (Rutas desactivadas)
+            /*
             'admin_orders' => '/web/views/admin/orders.php',
             'admin_coupons' => '/web/views/admin/coupons.php',
+            */
+            // HIDDEN-TFG-END
         ];
     }
 

@@ -717,7 +717,8 @@ $(document).ready(function () {
   function renderCoastersPreview(data) {
     const el = $("#top-coasters-preview-list").empty();
     if (!data.length) {
-      el.html(emptyState("Todavía no tienes montañas rusas en tu top."));
+      el.html(emptyState('<span data-i18n="profile.empty_coasters">Todavía no tienes montañas rusas en tu top.</span>'));
+      if (window.rcwI18n) window.rcwI18n.applyToContainer(el[0]);
       return;
     }
     data.slice(0, 10).forEach((item, i) => {
@@ -741,7 +742,8 @@ $(document).ready(function () {
   function renderParksPreview(data) {
     const el = $("#top-parks-preview-list").empty();
     if (!data.length) {
-      el.html(emptyState("Todavía no tienes parques en tu top."));
+      el.html(emptyState('<span data-i18n="profile.empty_parks">Todavía no tienes parques en tu top.</span>'));
+      if (window.rcwI18n) window.rcwI18n.applyToContainer(el[0]);
       return;
     }
     data.slice(0, 10).forEach((item, i) => {
@@ -840,7 +842,8 @@ $(document).ready(function () {
     $("#coasters-full-label").text(count === 1 ? "coaster" : "coasters");
 
     if (!data.length) {
-      container.html(emptyState("Ningún elemento coincide con los filtros."));
+      container.html(emptyState('<span data-i18n="profile.empty_filter">Ningún elemento coincide con los filtros.</span>'));
+      if (window.rcwI18n) window.rcwI18n.applyToContainer(container[0]);
       return;
     }
 
@@ -1053,7 +1056,8 @@ $(document).ready(function () {
     $("#coasters-full-label").text(count === 1 ? "coaster" : "coasters");
 
     if (!data.length) {
-      container.html(emptyState("Ningún elemento coincide con los filtros."));
+      container.html(emptyState('<span data-i18n="profile.empty_filter">Ningún elemento coincide con los filtros.</span>'));
+      if (window.rcwI18n) window.rcwI18n.applyToContainer(container[0]);
       return;
     }
 
@@ -1150,7 +1154,8 @@ $(document).ready(function () {
     $("#parks-full-count").text(data.length);
 
     if (!data.length) {
-      container.html(emptyState("Ningún elemento coincide con los filtros."));
+      container.html(emptyState('<span data-i18n="profile.empty_filter">Ningún elemento coincide con los filtros.</span>'));
+      if (window.rcwI18n) window.rcwI18n.applyToContainer(container[0]);
       return;
     }
 
@@ -1250,7 +1255,8 @@ $(document).ready(function () {
     $("#parks-full-count").text(data.length);
 
     if (!data.length) {
-      container.html(emptyState("Ningún elemento coincide con los filtros."));
+      container.html(emptyState('<span data-i18n="profile.empty_filter">Ningún elemento coincide con los filtros.</span>'));
+      if (window.rcwI18n) window.rcwI18n.applyToContainer(container[0]);
       return;
     }
 
@@ -1347,7 +1353,8 @@ $(document).ready(function () {
   function renderCoastersEdit() {
     const el = $("#top-coasters-list-edit").empty();
     if (!topsData.coasters.length) {
-      el.html(emptyState("Añade montañas rusas desde el buscador de arriba."));
+      el.html(emptyState('<span data-i18n="profile.add_coasters_hint">Añade montañas rusas desde el buscador de arriba.</span>'));
+      if (window.rcwI18n) window.rcwI18n.applyToContainer(el[0]);
       return;
     }
     topsData.coasters.forEach((item, i) => {
@@ -1426,7 +1433,8 @@ $(document).ready(function () {
   function renderParksEdit() {
     const el = $("#top-parks-list-edit").empty();
     if (!topsData.parks.length) {
-      el.html(emptyState("Añade parques desde el buscador de arriba."));
+      el.html(emptyState('<span data-i18n="profile.add_parks_hint">Añade parques desde el buscador de arriba.</span>'));
+      if (window.rcwI18n) window.rcwI18n.applyToContainer(el[0]);
       return;
     }
     topsData.parks.forEach((item, i) => {
@@ -1607,24 +1615,154 @@ $(document).ready(function () {
     const coasters = topsData.coasters || [];
     const parks = topsData.parks || [];
 
-    // 1. Contadores Globales
+    const continentMap = {
+      "España": "Europa", "Francia": "Europa", "Alemania": "Europa", "Reino Unido": "Europa",
+      "Italia": "Europa", "Bélgica": "Europa", "Países Bajos": "Europa", "Suecia": "Europa",
+      "Polonia": "Europa", "Dinamarca": "Europa", "Finlandia": "Europa", "Noruega": "Europa",
+      "Suiza": "Europa", "Austria": "Europa", "Irlanda": "Europa", "Portugal": "Europa",
+      "Estados Unidos": "América del Norte", "Canadá": "América del Norte", "México": "América del Norte",
+      "Japón": "Asia", "China": "Asia", "Corea del Sur": "Asia", "Emiratos Árabes Unidos": "Asia",
+      "Singapur": "Asia", "Vietnam": "Asia", "Malasia": "Asia", "Taiwán": "Asia", "India": "Asia",
+      "Australia": "Oceanía", "Nueva Zelanda": "Oceanía",
+      "Brasil": "América del Sur", "Argentina": "América del Sur", "Colombia": "América del Sur",
+      "Sudáfrica": "África", "Egipto": "África"
+    };
+
+    // 1. Totales y Acumulados
     $("#modal-stat-total-coasters").text(coasters.length);
     $("#modal-stat-total-parks").text(parks.length);
 
     const allCountries = new Set();
-    coasters.forEach((c) => c.country_name && allCountries.add(c.country_name));
-    parks.forEach((p) => p.country_name && allCountries.add(p.country_name));
-    $("#modal-stat-total-countries").text(allCountries.size);
+    const allContinents = new Set();
+    const parkVisits = {};
+    const mfrCounts = {};
 
-    // 2. Coasters por País (Completo)
+    let totalLength = 0;
+    let totalInversions = 0;
+    let extinctCount = 0;
+    let gigaCount = 0;
+    let withInversions = 0;
+
+    let maxHeight = 0, maxHeightCoaster = null;
+    let maxSpeed = 0, maxSpeedCoaster = null;
+    let maxLength = 0, maxLengthCoaster = null;
+    let maxInvers = 0, maxInversCoaster = null;
+    let minYear = Infinity, minYearCoaster = null;
+    let maxYear = 0, maxYearCoaster = null; // for newest
+
+    coasters.forEach((c) => {
+      // Countries & Continents
+      if (c.country_name) {
+        allCountries.add(c.country_name);
+        allContinents.add(continentMap[c.country_name] || "Otro");
+      }
+      // Parks
+      if (c.park_name) {
+        parkVisits[c.park_name] = (parkVisits[c.park_name] || 0) + 1;
+      }
+      // Manufacturers
+      const mfr = c.manufacter || "Desconocido";
+      mfrCounts[mfr] = (mfrCounts[mfr] || 0) + 1;
+
+      // Stats
+      const h = parseFloat(c.height) || 0;
+      const s = parseFloat(c.speed) || 0;
+      const l = parseFloat(c.coaster_length) || 0;
+      const inv = parseInt(c.inversions) || 0;
+      const y = parseInt(c.opening_year) || 0;
+
+      totalLength += l;
+      totalInversions += inv;
+      if (inv > 0) withInversions++;
+
+      const status = c.coaster_status || "Operating";
+      if (!status.includes("Operating")) extinctCount++;
+
+      if (h >= 60) gigaCount++;
+
+      // Records
+      if (h > maxHeight) { maxHeight = h; maxHeightCoaster = c.coaster_name; }
+      if (s > maxSpeed) { maxSpeed = s; maxSpeedCoaster = c.coaster_name; }
+      if (l > maxLength) { maxLength = l; maxLengthCoaster = c.coaster_name; }
+      if (inv > maxInvers) { maxInvers = inv; maxInversCoaster = c.coaster_name; }
+      if (y > 0 && y < minYear) { minYear = y; minYearCoaster = c.coaster_name; }
+      if (y > maxYear) { maxYear = y; maxYearCoaster = c.coaster_name; }
+    });
+
+    parks.forEach((p) => {
+      if (p.country_name) {
+        allCountries.add(p.country_name);
+        allContinents.add(continentMap[p.country_name] || "Otro");
+      }
+    });
+
+    // Populate Top Totals
+    $("#modal-stat-total-countries").text(allCountries.size);
+    $("#modal-stat-total-continents").text(allContinents.size);
+    $("#modal-stat-total-manufacturers-count").text(Object.keys(mfrCounts).length);
+    $("#modal-stat-total-length").html(`${(totalLength / 1000).toFixed(1)} <span class="fs-6">km</span>`);
+    $("#modal-stat-total-inversions").text(totalInversions);
+    $("#modal-stat-extinct").text(extinctCount);
+
+    // Populate Inversions Bar
+    let invPct = coasters.length > 0 ? Math.round((withInversions / coasters.length) * 100) : 0;
+    $("#modal-stat-inv-bar").css("width", `${invPct}%`);
+    $("#modal-stat-inv-pct").text(`${invPct}%`);
+
+    // Populate Favoritos y Tipologías
+    let homePark = "—";
+    let maxVisits = 0;
+    for (const [park, visits] of Object.entries(parkVisits)) {
+      if (visits > maxVisits) {
+        maxVisits = visits;
+        homePark = park;
+      }
+    }
+    $("#fav-home-park").text(maxVisits > 0 ? homePark : "—").attr("title", homePark);
+    $("#fav-home-park-count").text(`${maxVisits} credits`);
+
+    const sortedMfrs = Object.entries(mfrCounts).sort((a, b) => b[1] - a[1]);
+    if (sortedMfrs.length > 0) {
+      let favMfr = sortedMfrs[0][0];
+      let favMfrCount = sortedMfrs[0][1];
+      let favMfrPct = Math.round((favMfrCount / coasters.length) * 100);
+      $("#fav-manufacturer").text(favMfr).attr("title", favMfr);
+      $("#fav-manufacturer-count").text(`${favMfrPct}% de tus credits`);
+    } else {
+      $("#fav-manufacturer").text("...");
+      $("#fav-manufacturer-count").text("0% de tus credits");
+    }
+
+    $("#modal-stat-giga").text(gigaCount);
+
+    // Populate Records
+    $("#max-stat-height").text(maxHeight > 0 ? `${maxHeight} m` : "—");
+    $("#max-stat-height-name").text(maxHeightCoaster || "—").attr("title", maxHeightCoaster || "");
+
+    $("#max-stat-speed").text(maxSpeed > 0 ? `${maxSpeed} km/h` : "—");
+    $("#max-stat-speed-name").text(maxSpeedCoaster || "—").attr("title", maxSpeedCoaster || "");
+
+    $("#max-stat-length").text(maxLength > 0 ? `${maxLength} m` : "—");
+    $("#max-stat-length-name").text(maxLengthCoaster || "—").attr("title", maxLengthCoaster || "");
+
+    $("#max-stat-inversions").text(maxInvers > 0 ? maxInvers : "—");
+    $("#max-stat-inversions-name").text(maxInversCoaster || "—").attr("title", maxInversCoaster || "");
+
+    $("#max-stat-oldest").text(minYear !== Infinity ? minYear : "—");
+    $("#max-stat-oldest-name").text(minYearCoaster || "—").attr("title", minYearCoaster || "");
+
+    $("#max-stat-newest").text(maxYear > 0 ? maxYear : "—");
+    $("#max-stat-newest-name").text(maxYearCoaster || "—").attr("title", maxYearCoaster || "");
+
+
+    // Populate Listas (Countries)
     const countryCounts = {};
     coasters.forEach((c) => {
-      const country = c.country_name || "Desconocido";
-      countryCounts[country] = (countryCounts[country] || 0) + 1;
+      if (c.country_name) {
+        countryCounts[c.country_name] = (countryCounts[c.country_name] || 0) + 1;
+      }
     });
-    const sortedCountries = Object.entries(countryCounts).sort(
-      (a, b) => b[1] - a[1],
-    );
+    const sortedCountries = Object.entries(countryCounts).sort((a, b) => b[1] - a[1]);
     const maxCountry = sortedCountries.length ? sortedCountries[0][1] : 1;
 
     const $modalCountries = $("#modal-list-countries").empty();
@@ -1632,124 +1770,45 @@ $(document).ready(function () {
       const pct = Math.round((count / maxCountry) * 100);
       $modalCountries.append(`
         <div class="px-4 py-3 d-flex align-items-center" style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background='transparent'">
-          <div class="flex-shrink-0 d-flex align-items-center justify-content-center fw-bold me-3 rounded-0 shadow-sm" style="width:32px;height:32px;background:linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05));color:#10b981;font-size:0.8rem;border:1px solid rgba(16,185,129,0.3);">${idx + 1}</div>
+          <div class="flex-shrink-0 d-flex align-items-center justify-content-center fw-bold me-3 rounded-0 shadow-sm" style="width:32px;height:32px;background:rgba(16,185,129,0.1);color:#10b981;font-size:0.8rem;border:1px solid rgba(16,185,129,0.3);">${idx + 1}</div>
           <div class="flex-grow-1 pe-2" style="min-width:0;">
             <div class="d-flex align-items-end mb-2 gap-2" style="min-width:0;">
               <span class="fw-bold text-white small text-truncate flex-grow-1" style="min-width:0;" title="${name}">${name}</span>
               <span class="fw-black text-white flex-shrink-0 text-end" style="font-size:0.9rem; min-width:30px;">${count}</span>
             </div>
-            <div style="height:6px;background:rgba(0,0,0,0.3);border-radius:3px;overflow:hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);">
-              <div style="height:100%;width:${pct}%;background:linear-gradient(90deg, #059669, #10b981);border-radius:3px;box-shadow:0 0 8px rgba(16,185,129,0.6);"></div>
+            <div style="height:6px;background:rgba(0,0,0,0.3);overflow:hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);">
+              <div style="height:100%;width:${pct}%;background:#10b981;"></div>
             </div>
           </div>
         </div>
       `);
     });
-    if (!sortedCountries.length)
-      $modalCountries.append(
-        '<div class="p-4 text-center text-muted" style="font-size:0.8rem;">No hay datos</div>',
-      );
+    if (!sortedCountries.length) {
+      $modalCountries.append('<div class="p-4 text-center text-muted" style="font-size:0.8rem;"><span>No hay datos</span></div>');
+    }
 
-    // 3. Coasters por Fabricante (Completo)
-    const mfrCounts = {};
-    coasters.forEach((c) => {
-      const mfr = c.manufacter || "Desconocido";
-      mfrCounts[mfr] = (mfrCounts[mfr] || 0) + 1;
-    });
-    const sortedMfrs = Object.entries(mfrCounts).sort((a, b) => b[1] - a[1]);
-    const maxMfr = sortedMfrs.length ? sortedMfrs[0][1] : 1;
-
+    // Populate Listas (Manufacturers)
     const $modalMfrs = $("#modal-list-manufacturers").empty();
     sortedMfrs.forEach(([name, count], idx) => {
-      const pct = Math.round((count / maxMfr) * 100);
+      const pct = Math.round((count / sortedMfrs[0][1]) * 100);
       $modalMfrs.append(`
         <div class="px-4 py-3 d-flex align-items-center" style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background='transparent'">
-          <div class="flex-shrink-0 d-flex align-items-center justify-content-center fw-bold me-3 rounded-0 shadow-sm" style="width:32px;height:32px;background:linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05));color:#10b981;font-size:0.8rem;border:1px solid rgba(16,185,129,0.3);">${idx + 1}</div>
+          <div class="flex-shrink-0 d-flex align-items-center justify-content-center fw-bold me-3 rounded-0 shadow-sm" style="width:32px;height:32px;background:rgba(16,185,129,0.1);color:#10b981;font-size:0.8rem;border:1px solid rgba(16,185,129,0.3);">${idx + 1}</div>
           <div class="flex-grow-1 pe-2" style="min-width:0;">
             <div class="d-flex align-items-end mb-2 gap-2" style="min-width:0;">
               <span class="fw-bold text-white small text-truncate flex-grow-1" style="min-width:0;" title="${name}">${name}</span>
               <span class="fw-black text-white flex-shrink-0 text-end" style="font-size:0.9rem; min-width:30px;">${count}</span>
             </div>
-            <div style="height:6px;background:rgba(0,0,0,0.3);border-radius:3px;overflow:hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);">
-              <div style="height:100%;width:${pct}%;background:linear-gradient(90deg, #059669, #10b981);border-radius:3px;box-shadow:0 0 8px rgba(16,185,129,0.6);"></div>
+            <div style="height:6px;background:rgba(0,0,0,0.3);overflow:hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);">
+              <div style="height:100%;width:${pct}%;background:#10b981;"></div>
             </div>
           </div>
         </div>
       `);
     });
-    if (!sortedMfrs.length)
-      $modalMfrs.append(
-        '<div class="p-4 text-center text-muted" style="font-size:0.8rem;">No hay datos</div>',
-      );
-
-    // 4. TOP RECORDS PERSONALES
-    let maxHeight = 0;
-    let maxHeightCoaster = null;
-    let maxSpeed = 0;
-    let maxSpeedCoaster = null;
-    let maxLength = 0;
-    let maxLengthCoaster = null;
-    let maxInvers = 0;
-    let maxInversCoaster = null;
-    let minYear = Infinity;
-    let minYearCoaster = null;
-
-    coasters.forEach((c) => {
-      const h = parseFloat(c.height);
-      if (h > maxHeight) {
-        maxHeight = h;
-        maxHeightCoaster = c.coaster_name;
-      }
-
-      const s = parseFloat(c.speed);
-      if (s > maxSpeed) {
-        maxSpeed = s;
-        maxSpeedCoaster = c.coaster_name;
-      }
-
-      const l = parseFloat(c.coaster_length);
-      if (l > maxLength) {
-        maxLength = l;
-        maxLengthCoaster = c.coaster_name;
-      }
-
-      const inv = parseInt(c.inversions);
-      if (inv > maxInvers) {
-        maxInvers = inv;
-        maxInversCoaster = c.coaster_name;
-      }
-
-      const y = parseInt(c.opening_year);
-      if (y > 0 && y < minYear) {
-        minYear = y;
-        minYearCoaster = c.coaster_name;
-      }
-    });
-
-    $("#max-stat-height").text(maxHeight > 0 ? `${maxHeight} m` : "—");
-    $("#max-stat-height-name")
-      .text(maxHeightCoaster || "—")
-      .attr("title", maxHeightCoaster || "");
-
-    $("#max-stat-speed").text(maxSpeed > 0 ? `${maxSpeed} km/h` : "—");
-    $("#max-stat-speed-name")
-      .text(maxSpeedCoaster || "—")
-      .attr("title", maxSpeedCoaster || "");
-
-    $("#max-stat-length").text(maxLength > 0 ? `${maxLength} m` : "—");
-    $("#max-stat-length-name")
-      .text(maxLengthCoaster || "—")
-      .attr("title", maxLengthCoaster || "");
-
-    $("#max-stat-inversions").text(maxInvers > 0 ? maxInvers : "—");
-    $("#max-stat-inversions-name")
-      .text(maxInversCoaster || "—")
-      .attr("title", maxInversCoaster || "");
-
-    $("#max-stat-year").text(minYear !== Infinity ? minYear : "—");
-    $("#max-stat-year-name")
-      .text(minYearCoaster || "—")
-      .attr("title", minYearCoaster || "");
+    if (!sortedMfrs.length) {
+      $modalMfrs.append('<div class="p-4 text-center text-muted" style="font-size:0.8rem;"><span>No hay datos</span></div>');
+    }
 
     // Mostrar modal
     const modalEl = document.getElementById("statsExpandedModal");
@@ -1961,8 +2020,6 @@ $(document).ready(function () {
     renderCoastersFull();
   });
   $("#coasters-view-mini").on("click", function () {
-    // En escritorio: no aplicar (botón deshabilitado visualmente)
-    if (window.innerWidth >= 769) return;
     coastersViewType = "mini";
     localStorage.setItem("tops-coasters-view", "mini");
     syncCoastersViewButtons();
@@ -1981,7 +2038,6 @@ $(document).ready(function () {
     renderParksFull();
   });
   $("#parks-view-mini").on("click", function () {
-    if (window.innerWidth >= 769) return;
     parksViewType = "mini";
     localStorage.setItem("tops-parks-view", "mini");
     syncParksViewButtons();
@@ -2790,8 +2846,9 @@ $(document).ready(function () {
       $list.html(`
         <div class="text-center text-muted py-5">
           <i class="fa-solid fa-ghost fs-1 mb-3 opacity-50 d-block"></i>
-          <p>Todavía no has dejado ninguna reseña.</p>
+          <p><span data-i18n="profile.empty_reviews">Todavía no has dejado ninguna reseña.</span></p>
         </div>`);
+      if (window.rcwI18n) window.rcwI18n.applyToContainer($list[0]);
       return;
     }
 
@@ -3244,9 +3301,10 @@ $(document).ready(function () {
       $list.html(
         '<div class="text-center text-muted py-5">' +
           '<i class="fa-solid fa-ghost fs-1 mb-3 opacity-50 d-block"></i>' +
-          "<p>Todavía no tienes amigos agregados.</p>" +
+          "<p><span data-i18n=\"profile.empty_friends\">Todavía no tienes amigos agregados.</span></p>" +
           "</div>",
       );
+      if (window.rcwI18n) window.rcwI18n.applyToContainer($list[0]);
       return;
     }
 
@@ -3426,8 +3484,9 @@ $(document).ready(function () {
       const d = j.data || [];
       if (!d.length) {
         container.html(
-          '<div class="text-center py-4 text-muted"><i class="fa-solid fa-suitcase fa-2x mb-2 opacity-50"></i><br>Aún no tienes viajes registrados.</div>',
+          '<div class="text-center py-4 text-muted"><i class="fa-solid fa-suitcase fa-2x mb-2 opacity-50"></i><br><span data-i18n="profile.empty_trips">Aún no tienes viajes registrados.</span></div>',
         );
+        if (window.rcwI18n) window.rcwI18n.applyToContainer(container[0]);
         return;
       }
       let html = "";
@@ -3552,7 +3611,7 @@ $(document).ready(function () {
           fp.set("onYearChange", () => {
             yearSelect.value = fp.currentYear;
           });
-          yearInput.parentNode.replaceChild(yearSelect, yearInput);
+          fp.Input.parentNode.replaceChild(yearSelect, yearInput);
         }
       },
     };
@@ -3709,7 +3768,8 @@ $(document).ready(function () {
     function renderRanking() {
       if (!cachedData || !cachedData.length) {
         container.innerHTML =
-          '<div class="text-center py-5 text-muted"><i class="fa-solid fa-chart-line fa-2x mb-3 opacity-50"></i><br>No hay datos en este periodo.</div>';
+          '<div class="text-center py-5 text-muted"><i class="fa-solid fa-chart-line fa-2x mb-3 opacity-50"></i><br><span data-i18n="profile.empty_period_data">No hay datos en este periodo.</span></div>';
+        if (window.rcwI18n) window.rcwI18n.applyToContainer(container[0]);
         return;
       }
 

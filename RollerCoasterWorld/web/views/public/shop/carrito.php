@@ -1,6 +1,9 @@
 <?php
 $page_css = ['web/css/coasters.css', 'web/css/tickets.css'];
 require_once __DIR__ . '/../../partials/header.php';
+// HIDDEN-TFG-START: Bloquear acceso directo a la vista de tienda
+Router::redirect('home');
+// HIDDEN-TFG-END
 if (!$is_logged)
   Router::redirect('login');
 ?>

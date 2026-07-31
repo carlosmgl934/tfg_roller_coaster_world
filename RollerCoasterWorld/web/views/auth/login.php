@@ -28,7 +28,7 @@ require_once __DIR__ . '/../partials/header.php';
   <div class="login-form-panel">
     <div class="login-card">
 
-      <h2 class="login-title">Bienvenido de nuevo</h2>
+      <h2 class="login-title" data-i18n="auth.login_title">Bienvenido de nuevo</h2>
       <p class="login-subtitle">Inicia sesión para continuar</p>
 
       <?php if (isset($_GET['msg']) && $_GET['msg'] === 'review'): ?>
@@ -48,13 +48,16 @@ require_once __DIR__ . '/../partials/header.php';
       <!-- Formulario -->
       <form id="login-form" autocomplete="on">
         <div class="form-group">
-          <label for="email"><i class="fa-regular fa-envelope me-2"></i>Correo electrónico</label>
+          <label for="email"><i class="fa-regular fa-envelope me-2"></i><span data-i18n="auth.email">Correo
+              electrónico</span></label>
           <input type="email" id="email" placeholder="tu@email.com" required autocomplete="email">
         </div>
         <div class="form-group mb-4">
           <div class="d-flex justify-content-between align-items-center mb-1">
-            <label for="password" class="mb-0"><i class="fa-solid fa-lock me-2"></i>Contraseña</label>
-            <a href="#" id="forgotPasswordBtn" class="text-success small fw-medium text-decoration-none">¿Olvidaste tu
+            <label for="password" class="mb-0"><i class="fa-solid fa-lock me-2"></i><span
+                data-i18n="auth.password">Contraseña</span></label>
+            <a href="#" id="forgotPasswordBtn" class="text-success small fw-medium text-decoration-none"
+              data-i18n="auth.forgot_password">¿Olvidaste tu
               contraseña?</a>
           </div>
           <div class="password-wrapper">
@@ -65,11 +68,11 @@ require_once __DIR__ . '/../partials/header.php';
           </div>
         </div>
         <button type="button" id="signInWithEmail" class="btn-login">
-          <i class="fa-solid fa-right-to-bracket me-2"></i>Iniciar sesión
+          <i class="fa-solid fa-right-to-bracket me-2"></i><span data-i18n="auth.login_btn">Iniciar sesión</span>
         </button>
       </form>
 
-      <div class="divider"><span>o continúa con</span></div>
+      <div class="divider"><span data-i18n="auth.or">o continúa con</span></div>
 
       <!-- Proveedores sociales -->
       <div class="social-btns">
@@ -84,7 +87,7 @@ require_once __DIR__ . '/../partials/header.php';
             <path fill="#1976D2"
               d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z" />
           </svg>
-          Google
+          <span data-i18n="auth.google_login">Google</span>
         </button>
         <button id="signInWithFacebook" class="btn-social btn-facebook">
           <i class="fa-brands fa-facebook me-2"></i>Facebook
@@ -92,14 +95,14 @@ require_once __DIR__ . '/../partials/header.php';
       </div>
 
       <p class="register-link">
-        ¿No tienes cuenta?
+        <span data-i18n="auth.no_account">¿No tienes cuenta?</span>
         <?php
         $registerUrl = $base_url . '/web/views/auth/register.php';
         if (isset($_GET['redirect'])) {
           $registerUrl .= '?redirect=' . urlencode($_GET['redirect']);
         }
         ?>
-        <a href="<?= $registerUrl ?>">Regístrate gratis</a>
+        <a href="<?= $registerUrl ?>" data-i18n="auth.register_btn">Regístrate gratis</a>
       </p>
 
     </div>

@@ -6,7 +6,8 @@ require_once __DIR__ . '/../../partials/header.php';
 <main class="container-fluid px-lg-5 my-5">
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="display-6 fw-bold border-bottom pb-2 text-success text-center">Base de Datos de Montañas Rusas
+            <h1 class="display-6 fw-bold border-bottom pb-2 text-success text-center" data-i18n="coasters.search.title">
+                Base de Datos de Montañas Rusas
             </h1>
         </div>
     </div>
@@ -15,61 +16,69 @@ require_once __DIR__ . '/../../partials/header.php';
         <aside class="col-12 col-lg-3 sidebar-filter order-1 order-lg-1" id="sidebar-filter">
             <div class="card shadow-sm border-0 sticky-top rounded-0" style="top: 90px; z-index: 1;">
                 <div class="card-header bg-success text-white rounded-0">
-                    <h5 class="mb-0"><i class="fa-solid fa-filter me-2"></i>Filtros</h5>
+                    <h5 class="mb-0"><i class="fa-solid fa-filter me-2"></i><span
+                            data-i18n="common.filters">Filtros</span></h5>
                 </div>
                 <div class="card-body">
                     <div class="form-check form-switch mb-2">
                         <input class="form-check-input" type="checkbox" id="status-filter">
-                        <label class="form-check-label" for="status-filter">Sólo Abiertas</label>
+                        <label class="form-check-label" for="status-filter" data-i18n="coasters.search.only_open">Sólo
+                            Abiertas</label>
                     </div>
                     <div class="form-check form-switch mb-4">
                         <input class="form-check-input" type="checkbox" id="ridden-filter">
-                        <label class="form-check-label" for="ridden-filter">Ya probadas</label>
+                        <label class="form-check-label" for="ridden-filter"
+                            data-i18n="coasters.search.already_ridden">Ya probadas</label>
                     </div>
                     <div class="mb-3">
                         <label for="height-filter" class="form-label d-flex justify-content-between">
-                            Altura mínima <span class="badge bg-success" id="height-val">0m</span>
+                            <span data-i18n="coasters.search.min_height">Altura mínima</span> <span
+                                class="badge bg-success" id="height-val">0m</span>
                         </label>
                         <input type="range" class="form-range" id="height-filter" min="0" max="200" value="0">
                     </div>
                     <div class="mb-3">
                         <label for="speed-filter" class="form-label d-flex justify-content-between">
-                            Velocidad mínima <span class="badge bg-success" id="speed-val">0km/h</span>
+                            <span data-i18n="coasters.search.min_speed">Velocidad mínima</span> <span
+                                class="badge bg-success" id="speed-val">0km/h</span>
                         </label>
                         <input type="range" class="form-range" id="speed-filter" min="0" max="300" value="0">
                     </div>
                     <div class="mb-3">
                         <label for="length-filter" class="form-label d-flex justify-content-between">
-                            Longitud mínima <span class="badge bg-success" id="length-val">0m</span>
+                            <span data-i18n="coasters.search.min_length">Longitud mínima</span> <span
+                                class="badge bg-success" id="length-val">0m</span>
                         </label>
                         <input type="range" class="form-range" id="length-filter" min="0" max="5000" value="0">
                     </div>
                     <div class="mb-4">
                         <label for="inversions-filter" class="form-label d-flex justify-content-between">
-                            Inversiones mínimas <span class="badge bg-success" id="inversions-val">0</span>
+                            <span data-i18n="coasters.search.min_inversions">Inversiones mínimas</span> <span
+                                class="badge bg-success" id="inversions-val">0</span>
                         </label>
                         <input type="range" class="form-range" id="inversions-filter" min="0" max="20" value="0">
                     </div>
                     <div class="mb-3 position-relative">
                         <input type="text" id="filter-park-search"
-                            class="form-control shadow-sm rounded-0 border-success ac-input-select" placeholder="Parque"
+                            class="form-control shadow-sm rounded-0 border-success ac-input-select"
+                            data-i18n-placeholder="coasters.search.park_placeholder" placeholder="Parque"
                             style="border-width: 1px; box-shadow: none; background-color: var(--rcw-bg-card-alt); color: var(--rcw-text-primary);">
                         <input type="hidden" id="park-filter" name="park_id" value="">
                         <div id="filter-park-results" class="ac-dropdown d-none"></div>
                     </div>
                     <div class="mb-3">
                         <select class="form-select shadow-sm rounded-0" id="manufacter-filter">
-                            <option value="">Fabricante</option>
+                            <option value="" data-i18n="coasters.search.manufacturer">Fabricante</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <select class="form-select shadow-sm rounded-0" id="country-filter">
-                            <option value="">País</option>
+                            <option value="" data-i18n="common.country">País</option>
                         </select>
                     </div>
                     <div class="mb-4">
                         <select class="form-select shadow-sm rounded-0" name="year-select" id="year-select">
-                            <option value="">Fecha de Apertura</option>
+                            <option value="" data-i18n="coasters.search.opening_date">Fecha de Apertura</option>
                             <?php for ($i = date('Y') + 3; $i >= 1870; $i--) { ?>
                                 <option value="<?= $i ?>">
                                     <?= $i ?>
@@ -79,10 +88,11 @@ require_once __DIR__ . '/../../partials/header.php';
                     </div>
                     <div class="d-grid gap-2">
                         <button type="button" class="btn btn-success fw-bold shadow-sm rounded-0" id="btn-filtrar">
-                            <i class="fa-solid fa-filter me-2"></i>Filtrar
+                            <i class="fa-solid fa-filter me-2"></i><span data-i18n="common.filter">Filtrar</span>
                         </button>
                         <button type="button" class="btn btn-outline-secondary shadow-sm rounded-0" id="btn-borrar">
-                            <i class="fa-solid fa-eraser me-2"></i>Limpiar filtros
+                            <i class="fa-solid fa-eraser me-2"></i><span data-i18n="common.clear_filters">Limpiar
+                                filtros</span>
                         </button>
                     </div>
                 </div>
@@ -94,14 +104,14 @@ require_once __DIR__ . '/../../partials/header.php';
             <div class="d-flex justify-content-end align-items-center mb-2">
                 <select class="form-select shadow-sm rounded-0 w-auto border-success me-2" id="sort-filter"
                     style="cursor: pointer; font-weight: 500;">
-                    <option value="id" selected>Por defecto</option>
-                    <option value="name">Nombre</option>
-                    <option value="height">Altura</option>
-                    <option value="speed">Velocidad</option>
-                    <option value="year">Año de apertura</option>
+                    <option value="id" selected data-i18n="common.sort_default">Por defecto</option>
+                    <option value="name" data-i18n="common.sort_name">Nombre</option>
+                    <option value="height" data-i18n="coasters.search.sort_height">Altura</option>
+                    <option value="speed" data-i18n="coasters.search.sort_speed">Velocidad</option>
+                    <option value="year" data-i18n="coasters.search.sort_year">Año de apertura</option>
                 </select>
                 <button id="sort-direction-btn" class="btn btn-outline-success shadow-sm rounded-0 flex-shrink-0"
-                    type="button" title="Cambiar orden">
+                    type="button" data-i18n-attr="title" data-i18n="common.change_order" title="Cambiar orden">
                     <i class="fa-solid fa-arrow-down-wide-short"></i>
                 </button>
                 <input type="hidden" id="sort-direction" value="DESC">
@@ -116,7 +126,8 @@ require_once __DIR__ . '/../../partials/header.php';
             <div class="sticky-top" style="top: 90px; z-index: 100;">
                 <div class="position-relative">
                     <input type="text" id="coaster-search" name="coaster-search"
-                        class="form-control shadow-sm pe-5 border-success rounded-0" placeholder="Buscar por nombre..."
+                        class="form-control shadow-sm pe-5 border-success rounded-0"
+                        data-i18n-placeholder="common.search_by_name" placeholder="Buscar por nombre..."
                         style="border-width: 2px;">
                     <i id="search-icon" class="fa-solid fa-magnifying-glass text-muted position-absolute"
                         style="right: 15px; top: 50%; transform: translateY(-50%); cursor: text;"></i>

@@ -1,0 +1,25 @@
+# Garantizar que los archivos JSON de idioma se sirven SIEMPRE directamente
+
+# Segunda línea de defensa por si el .htaccess raíz no se aplica por configuración del servidor
+
+Options -Indexes -ExecCGI
+
+# Desactivar cualquier rewrite en este directorio (importante para servidores con catch-all)
+
+<IfModule mod_rewrite.c>
+    RewriteEngine Off
+</IfModule>
+
+# Forzar Content-Type correcto para JSON
+
+<IfModule mod_mime.c>
+    AddType application/json .json
+</IfModule>
+
+# CORS: permitir que el JS del mismo dominio pueda leer estos archivos
+
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Content-Type "application/json; charset=utf-8"
+    Header set Cache-Control "public, max-age=3600"
+</IfModule>

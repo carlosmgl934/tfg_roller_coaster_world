@@ -154,10 +154,12 @@
                         <span><i class="fa-solid fa-hotel me-1"></i>${escHtml(rec.hotel_name || "Hotel sugerido")}</span>
                         <span class="rcw-rec-stars">${hotelStarsHtml}</span>
                     </div>
-                    <div class="rcw-rec-detail-row">
+                    <!-- HIDDEN-TFG-START -->
+                    <div class="rcw-rec-detail-row hidden-tfg">
                         <span><i class="fa-solid fa-ticket me-1"></i>Entrada</span>
                         <strong>${priceText}</strong>
                     </div>
+                    <!-- HIDDEN-TFG-END -->
                     <div class="rcw-rec-detail-row">
                         <span><i class="fa-solid fa-calendar-days me-1"></i>Duración sugerida</span>
                         <strong>${rec.duration_days} días</strong>
@@ -165,13 +167,6 @@
                 </div>
             </div>
 
-            <!-- CTA -->
-            <div class="rcw-rec-footer">
-                <button class="rcw-rec-cta">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    Ver y reservar
-                </button>
-            </div>
         </div>`;
   }
 

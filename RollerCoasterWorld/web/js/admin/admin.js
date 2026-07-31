@@ -3134,6 +3134,7 @@ if (_confirmEditCoaster) {
                 ?.getAttribute("content") ?? "",
           },
           body: uploadForm,
+          credentials: "include",
         });
         const uploadData = await uploadRes.json();
         if (uploadData.success) {
@@ -3154,6 +3155,7 @@ if (_confirmEditCoaster) {
           },
           method: "POST",
           body: formData,
+          credentials: "include",
         },
       );
 
@@ -3176,6 +3178,8 @@ if (_confirmEditCoaster) {
 
       if (data.success) {
         showEditModalSuccess("Coaster actualizada correctamente.");
+        document.getElementById("edit-coaster-image").value = "";
+        
         if (typeof window.loadAdminCoasters === "function")
           window.loadAdminCoasters(1);
         setTimeout(() => {
@@ -4105,6 +4109,7 @@ if ($("#admin-news-list").length) {
           document
             .getElementById("edit-park-success")
             .querySelector("span").textContent = "Cambios guardados.";
+          document.getElementById("edit-park-image").value = "";
           setTimeout(() => {
             bootstrap.Modal.getInstance(
               document.getElementById("modal-edit-park"),

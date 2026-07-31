@@ -9,7 +9,7 @@ require_once __DIR__ . '/../partials/header.php';
     <div class="privacy-hero">
         <div class="container">
             <span class="privacy-hero-icon"><i class="fa-solid fa-shield-halved"></i></span>
-            <h1 class="privacy-hero-title">Política de Privacidad</h1>
+            <h1 class="privacy-hero-title" data-i18n="legal.privacy_title">Política de Privacidad</h1>
             <p class="privacy-hero-sub">Última actualización: Diciembre 2025</p>
         </div>
     </div>

@@ -419,6 +419,10 @@
       const d = j.data;
       const cbp = d.coasters_by_park || {};
       const nbp = d.notes_by_park || {};
+      const _td = window.t || function(k){return k;};
+      
+      const modalEl = document.getElementById("day-detail-modal");
+      if (modalEl) modalEl.dataset.currentDate = ds;
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -483,11 +487,11 @@
               ? p1.operating_coasters
               : (cbp[+p1.park_id] || []).length;
           if (p1CoasterCount > 0) {
-            h += `<div class="day-tech-item"><i class="fa-solid fa-roller-coaster text-success"></i><span><strong>${p1CoasterCount}</strong> ${p1CoasterCount === 1 ? "coaster operativa" : "coasters operativas"}</span></div>`;
+            h += `<div class="day-tech-item"><i class="fa-solid fa-roller-coaster text-success"></i><span><strong>${p1CoasterCount}</strong> ${p1CoasterCount === 1 ? _td('trips.day.coaster_singular') : _td('trips.day.coaster_plural')}</span></div>`;
             h += `<span class="opacity-25">·</span>`;
           }
           if (p1.opening_year) {
-            h += `<div class="day-tech-item"><i class="fa-solid fa-calendar-check text-info"></i><span>Est. <strong>${p1.opening_year}</strong></span></div>`;
+            h += `<div class="day-tech-item"><i class="fa-solid fa-calendar-check text-info"></i><span>${_td('trips.day.est_label')} <strong>${p1.opening_year}</strong></span></div>`;
             h += `<span class="opacity-25">·</span>`;
           }
           if (p1.stars > 0) {
@@ -513,10 +517,10 @@
                 ? p.operating_coasters
                 : (cbp[+p.park_id] || []).length;
             if (pCoasterCount > 0) {
-              h += `<div class="day-tech-item"><i class="fa-solid fa-roller-coaster text-success"></i><span><strong>${pCoasterCount}</strong> ${pCoasterCount === 1 ? "coaster" : "coasters"}</span></div>`;
+              h += `<div class="day-tech-item"><i class="fa-solid fa-roller-coaster text-success"></i><span><strong>${pCoasterCount}</strong> ${pCoasterCount === 1 ? _td('trips.day.coaster_singular') : _td('trips.day.coaster_plural')}</span></div>`;
             }
             if (p.opening_year) {
-              h += `<div class="day-tech-item"><i class="fa-solid fa-calendar-check text-info"></i><span>Est. <strong>${p.opening_year}</strong></span></div>`;
+              h += `<div class="day-tech-item"><i class="fa-solid fa-calendar-check text-info"></i><span>${_td('trips.day.est_label')} <strong>${p.opening_year}</strong></span></div>`;
             }
             if (p.stars > 0) {
               h += `<div class="day-tech-item"><i class="fa-solid fa-star text-warning"></i><span><strong>${parseFloat(p.stars).toFixed(1)}</strong></span></div>`;
@@ -555,7 +559,7 @@
           if (!isFuture && d.can_edit) {
             if (coasters.length) {
               h += `<div class="day-coaster-section">
-                <div class="px-0 pt-2 pb-2 text-muted fw-bold small text-uppercase" style="letter-spacing:0.1em; font-size:0.65rem;"><i class="fa-solid fa-bolt text-warning me-2"></i>Quick Log</div>
+                <div class="px-0 pt-2 pb-2 text-muted fw-bold small text-uppercase" style="letter-spacing:0.1em; font-size:0.65rem;"><i class="fa-solid fa-bolt text-warning me-2"></i>${_td('trips.day.quick_log')}</div>
                 <div class="day-coaster-list">`;
               coasters.forEach((c) => {
                 const count = riddenCountMap[+c.id] || 0;
@@ -582,7 +586,7 @@
             // Notas del día
             const notes = nbp[pid] || [];
             h += `<div class="day-notes-section mt-3 mb-4">
-              <div class="px-0 pt-2 pb-2 text-muted fw-bold small text-uppercase" style="letter-spacing:0.1em; font-size:0.65rem;"><i class="fa-solid fa-note-sticky text-info me-2"></i>Notas del día</div>
+              <div class="px-0 pt-2 pb-2 text-muted fw-bold small text-uppercase" style="letter-spacing:0.1em; font-size:0.65rem;"><i class="fa-solid fa-note-sticky text-info me-2"></i>${_td('trips.day.notes_title')}</div>
               <div class="day-notes-list d-flex flex-column gap-2" id="notes-list-${pid}">`;
 
             notes.forEach((n) => {
@@ -596,22 +600,22 @@
 
             h += `</div>
               <div class="mt-2 d-flex gap-2">
-                <input type="text" class="form-control form-control-sm rounded-3" id="new-note-input-${pid}" placeholder="Añadir nota..." style="background:rgba(255,255,255,0.06)!important; border:1px solid rgba(255,255,255,0.15)!important; color:var(--rcw-text-primary)!important;">
+                <input type="text" class="form-control form-control-sm rounded-3" id="new-note-input-${pid}" placeholder="${_td('trips.day.add_note_placeholder')}" style="background:rgba(255,255,255,0.06)!important; border:1px solid rgba(255,255,255,0.15)!important; color:var(--rcw-text-primary)!important;">
                 <button class="btn btn-info btn-sm rounded-3 fw-bold px-3" onclick="addDailyNote(${pid},'${ds}','new-note-input-${pid}')"><i class="fa-solid fa-plus"></i></button>
               </div>
             </div>`;
           }
         });
       } else {
-        h +=
-          '<div class="text-center py-5 text-muted"><i class="fa-solid fa-bed d-block mb-3" style="font-size:2.5rem;opacity:.3"></i>No hay parques asignados a este día</div>';
+          h +=
+          `<div class="text-center py-5 text-muted"><i class="fa-solid fa-bed d-block mb-3" style="font-size:2.5rem;opacity:.3"></i>${_td('trips.day.no_parks_assigned')}</div>`;
       }
 
       if (d.can_edit) {
         const btnText =
           allParks.length > 0
-            ? "Añadir otro parque visitado hoy"
-            : "Añadir un parque visitado hoy";
+            ? _td('trips.day.add_another_park')
+            : _td('trips.day.add_first_park');
         h += `<div class="mt-3"><button class="btn btn-outline-secondary w-100 py-2 fw-bold" style="border-radius:6px; font-size:0.85rem; letter-spacing:0.04em;" onclick="openAddVisit('${ds}')"><i class="fa-solid fa-location-dot me-2 text-success"></i>${btnText}</button></div>`;
       }
       h += `</div>`;
@@ -621,20 +625,20 @@
       if (visitDate > today) {
         h += `<div class="text-center py-5 text-muted mt-4">
                 <i class="fa-solid fa-clock-rotate-left mb-3 d-block" style="font-size:3rem;opacity:.2"></i>
-                <h5 class="fw-bold text-light">Aún falta para esto</h5>
-                <p class="small opacity-75">Tendrás que esperar todavía para disfrutar de este parque 😉</p>
+                <h5 class="fw-bold text-light">${_td('trips.day.future_title')}</h5>
+                <p class="small opacity-75">${_td('trips.day.future_text')}</p>
               </div>`;
       } else {
         // Leyenda para la agenda
         h += `<div class="timeline-legend rounded-2">
-                <div class="legend-item"><span class="legend-bullet" style="background:var(--rcw-green-neon)"></span>Visitado</div>
-                <div class="legend-item"><span class="legend-bullet" style="background:#f59e0b; box-shadow:0 0 5px #f59e0b"></span>First Time</div>
+                <div class="legend-item"><span class="legend-bullet" style="background:var(--rcw-green-neon)"></span>${_td('trips.day.legend_visited')}</div>
+                <div class="legend-item"><span class="legend-bullet" style="background:#f59e0b; box-shadow:0 0 5px #f59e0b"></span>${_td('trips.day.legend_first_time')}</div>
               </div>`;
 
         if (d.rides?.length) {
           h += `<h6 class="fw-bold text-warning mb-2 d-flex align-items-center gap-2" style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:.5rem; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.1em;">
             <i class="fa-solid fa-list-check"></i>
-            Agenda de hoy (${d.rides.length})</h6>
+            ${_td('trips.day.agenda_today')} (${d.rides.length})</h6>
             <div class="ride-timeline custom-scrollbar" style="max-height: calc(100dvh - 150px); overflow-y: auto; padding-right: 8px; overscroll-behavior: contain;">`;
 
           let lastTime = null;
@@ -686,12 +690,12 @@
           });
           h += `<div class="text-center mt-4 mb-5 pb-3 text-muted small d-flex align-items-center opacity-50">
                   <hr class="flex-grow-1 border-secondary">
-                  <span class="text-uppercase fw-bold px-3" style="letter-spacing:2px;font-size:0.65rem">Fin del día</span>
+                  <span class="text-uppercase fw-bold px-3" style="letter-spacing:2px;font-size:0.65rem">${_td('trips.day.end_of_day')}</span>
                   <hr class="flex-grow-1 border-secondary">
                 </div>`;
           h += "</div>";
         } else {
-          h += `<div class="text-center py-5 text-muted"><i class="fa-regular fa-clock mb-3 d-block" style="font-size:2.5rem;opacity:.2"></i>Aún no has montado en nada</div>`;
+          h += `<div class="text-center py-5 text-muted"><i class="fa-regular fa-clock mb-3 d-block" style="font-size:2.5rem;opacity:.2"></i>${_td('trips.day.nothing_ridden')}</div>`;
         }
       }
       h += `</div></div></div>`;
@@ -699,8 +703,22 @@
       if (typeof window.initFlatpickr === "function") window.initFlatpickr();
     } catch (e) {
       body.innerHTML =
-        '<div class="p-4 text-danger text-center">Error cargando datos del día</div>';
+        `<div class="p-4 text-danger text-center">${(window.t ? window.t('trips.day.error_loading') : 'Error cargando datos del día')}</div>`;
     }
+  };
+
+  // Re-renderizar el modal del día si se cambia el idioma mientras está abierto
+  window.addEventListener('rcw:langchanged', function () {
+    const modalEl = document.getElementById("day-detail-modal");
+    if (modalEl && modalEl.classList.contains("show")) {
+      const ds = modalEl.dataset.currentDate;
+      if (ds) window.openDay(ds);
+    }
+  });
+
+  window.closeDayAndRefresh = () => {
+    gm("day-detail-modal").hide();
+    callReloads();
   };
 
   window.quickLogRide = async (
@@ -1715,12 +1733,16 @@
     document.getElementById("ct-countries").value = allCountries.join(", ");
     if (window.renderCountryTags) window.renderCountryTags();
 
-    document
-      .getElementById("create-trip-modal")
-      .querySelector(".modal-title").innerHTML =
-      '<i class="fa-solid fa-pen me-2"></i>Editar Viaje';
-    document.getElementById("ct-submit-btn").innerHTML =
-      '<i class="fa-solid fa-save me-1"></i>Guardar Cambios';
+    const titleSpan = document.getElementById("create-trip-modal").querySelector(".modal-title span");
+    if (titleSpan) {
+      titleSpan.setAttribute('data-i18n', 'trips.modal.edit_trip_title');
+      if (window.t) titleSpan.textContent = window.t('trips.modal.edit_trip_title');
+    }
+    const btnSpan = document.getElementById("ct-submit-btn").querySelector("span");
+    if (btnSpan) {
+      btnSpan.setAttribute('data-i18n', 'trips.modal.save_changes_btn');
+      if (window.t) btnSpan.textContent = window.t('trips.modal.save_changes_btn');
+    }
 
     document.getElementById("ct-trip-id").value = id;
     document.getElementById("ct-days-container").classList.add("d-none");

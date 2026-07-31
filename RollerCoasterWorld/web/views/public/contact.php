@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $page_css = ['web/css/contact.css'];
 require_once __DIR__ . '/../partials/header.php';
 ?>
@@ -8,8 +8,9 @@ require_once __DIR__ . '/../partials/header.php';
     <div class="contact-hero">
         <div class="container">
             <span class="contact-hero-icon"><i class="fa-solid fa-envelope"></i></span>
-            <h1 class="contact-hero-title">Contacta con nosotros</h1>
-            <p class="contact-hero-sub">¿Tienes una sugerencia, error o simplemente quieres decir hola? Escríbenos.</p>
+            <h1 class="contact-hero-title" data-i18n="contact.title">Contacta con nosotros</h1>
+            <p class="contact-hero-sub" data-i18n="contact.subtitle">¿Tienes una sugerencia, error o simplemente quieres
+                decir hola? Escríbenos.</p>
         </div>
     </div>
 
@@ -21,53 +22,59 @@ require_once __DIR__ . '/../partials/header.php';
 
                         <div class="mb-4">
                             <label for="name" class="contact-label">
-                                <i class="fa-solid fa-user me-2 text-success"></i>Nombre de usuario
+                                <i class="fa-solid fa-user me-2 text-success"></i><span
+                                    data-i18n="contact.field_name">Nombre de usuario</span>
                             </label>
-                            <input type="text" name="name" id="name"
-                                   class="form-control contact-input"
-                                   placeholder="Tu nombre" required>
+                            <input type="text" name="name" id="name" class="form-control contact-input"
+                                data-i18n-placeholder="contact.placeholder_name" placeholder="Tu nombre" required>
                         </div>
 
                         <div class="mb-4">
                             <label for="email" class="contact-label">
-                                <i class="fa-solid fa-at me-2 text-success"></i>Correo electrónico
+                                <i class="fa-solid fa-at me-2 text-success"></i><span
+                                    data-i18n="contact.field_email">Correo electrónico</span>
                             </label>
-                            <input type="email" name="email" id="email"
-                                   class="form-control contact-input"
-                                   placeholder="tu@correo.com" required>
+                            <input type="email" name="email" id="email" class="form-control contact-input"
+                                data-i18n-placeholder="contact.placeholder_email" placeholder="tu@correo.com" required>
                             <span id="email-error" class="contact-field-error"></span>
                         </div>
 
                         <div class="mb-4">
                             <label for="reason" class="contact-label">
-                                <i class="fa-solid fa-tag me-2 text-success"></i>Motivo de contacto
+                                <i class="fa-solid fa-tag me-2 text-success"></i><span
+                                    data-i18n="contact.field_reason">Motivo de contacto</span>
                             </label>
                             <select name="reason" id="reason" class="form-select contact-input" required>
-                                <option value="" selected disabled hidden>Selecciona una opción</option>
-                                <option value="error">Reportar un error</option>
-                                <option value="suggestion">Enviar una sugerencia</option>
-                                <option value="report">Denunciar a un usuario</option>
-                                <option value="info">Aportar información sobre una coaster o parque</option>
-                                <option value="other">Otro</option>
+                                <option value="" selected disabled hidden data-i18n="contact.select_option">Selecciona
+                                    una opción</option>
+                                <option value="error" data-i18n="contact.reason_error">Reportar un error</option>
+                                <option value="suggestion" data-i18n="contact.reason_suggestion">Enviar una sugerencia
+                                </option>
+                                <option value="report" data-i18n="contact.reason_report">Denunciar a un usuario</option>
+                                <option value="info" data-i18n="contact.reason_info">Aportar información sobre una
+                                    coaster o parque</option>
+                                <option value="other" data-i18n="contact.reason_other">Otro</option>
                             </select>
                         </div>
 
                         <div class="mb-4">
                             <label for="subject" class="contact-label">
-                                <i class="fa-solid fa-heading me-2 text-success"></i>Asunto
+                                <i class="fa-solid fa-heading me-2 text-success"></i><span
+                                    data-i18n="contact.field_subject">Asunto</span>
                             </label>
-                            <input type="text" name="subject" id="subject"
-                                   class="form-control contact-input"
-                                   placeholder="Breve descripción del asunto" required>
+                            <input type="text" name="subject" id="subject" class="form-control contact-input"
+                                data-i18n-placeholder="contact.placeholder_subject"
+                                placeholder="Breve descripción del asunto" required>
                         </div>
 
                         <div class="mb-4">
                             <label for="message" class="contact-label">
-                                <i class="fa-solid fa-message me-2 text-success"></i>Mensaje
+                                <i class="fa-solid fa-message me-2 text-success"></i><span
+                                    data-i18n="contact.field_message">Mensaje</span>
                             </label>
-                            <textarea name="message" id="message" rows="5"
-                                      class="form-control contact-input"
-                                      placeholder="Desarrolla aquí tu mensaje..." required></textarea>
+                            <textarea name="message" id="message" rows="5" class="form-control contact-input"
+                                data-i18n-placeholder="contact.placeholder_message"
+                                placeholder="Desarrolla aquí tu mensaje..." required></textarea>
                             <div class="d-flex justify-content-between mt-1">
                                 <span id="message-error" class="contact-field-error"></span>
                                 <span class="contact-char-count">Caracteres: <strong id="char-count">0</strong></span>
@@ -76,20 +83,21 @@ require_once __DIR__ . '/../partials/header.php';
 
                         <div class="mb-4">
                             <p class="contact-label mb-2">
-                                <i class="fa-solid fa-clock me-2 text-success"></i>¿Con qué frecuencia usas la web?
+                                <i class="fa-solid fa-clock me-2 text-success"></i><span
+                                    data-i18n="contact.frequency_question">¿Con qué frecuencia usas la web?</span>
                             </p>
                             <div class="contact-radio-group">
                                 <label class="contact-radio">
                                     <input type="radio" name="frecuency" value="daily" required>
-                                    <span>A diario</span>
+                                    <span data-i18n="contact.freq_daily">A diario</span>
                                 </label>
                                 <label class="contact-radio">
                                     <input type="radio" name="frecuency" value="ocasional">
-                                    <span>Ocasionalmente</span>
+                                    <span data-i18n="contact.freq_occasional">Ocasionalmente</span>
                                 </label>
                                 <label class="contact-radio">
                                     <input type="radio" name="frecuency" value="rarely">
-                                    <span>Raramente</span>
+                                    <span data-i18n="contact.freq_rarely">Raramente</span>
                                 </label>
                             </div>
                         </div>
@@ -97,17 +105,19 @@ require_once __DIR__ . '/../partials/header.php';
                         <div class="mb-4">
                             <label class="contact-checkbox">
                                 <input type="checkbox" name="contact" value="contact">
-                                <span>Quiero recibir respuesta al correo proporcionado</span>
+                                <span data-i18n="contact.receive_reply">Quiero recibir respuesta al correo
+                                    proporcionado</span>
                             </label>
                         </div>
 
                         <div class="d-grid">
                             <button type="submit" id="submit" class="btn contact-btn-submit">
-                                <i class="fa-solid fa-paper-plane me-2"></i>Enviar mensaje
+                                <i class="fa-solid fa-paper-plane me-2"></i><span data-i18n="contact.send">Enviar
+                                    mensaje</span>
                             </button>
                         </div>
 
-                        <p id="error"   class="contact-feedback contact-feedback--error mt-3"></p>
+                        <p id="error" class="contact-feedback contact-feedback--error mt-3"></p>
                         <p id="success" class="contact-feedback contact-feedback--success mt-3"></p>
 
                         <?php if (isset($_GET['error'])): ?>

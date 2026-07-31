@@ -13,7 +13,7 @@ $user_id = $_GET['id'] ?? null;
     <div class="row mb-4">
         <div class="col-12 text-center">
             <h1 class="display-6 fw-bold border-bottom pb-2 text-success">
-                <i class="fa-solid fa-user me-2"></i> Perfil de Viajero
+                <i class="fa-solid fa-user me-2"></i> <span data-i18n="user_profile.title">Perfil de Viajero</span>
             </h1>
         </div>
     </div>
@@ -52,23 +52,32 @@ $user_id = $_GET['id'] ?? null;
                 <div class="list-group list-group-flush profile-menu" id="sidebar-menu">
                     <a href="#" id="menu-profile"
                         class="list-group-item list-group-item-action py-3 active fw-medium"><i
-                            class="fa-solid fa-user me-2 w-20px text-center"></i> Perfil</a>
+                            class="fa-solid fa-user me-2 w-20px text-center"></i> <span
+                            data-i18n="user_profile.menu.profile">Perfil</span></a>
                     <a href="#" id="menu-tops" class="list-group-item list-group-item-action py-3"><i
-                            class="fa-solid fa-list-ol me-2 w-20px text-center"></i> Sus tops</a>
+                            class="fa-solid fa-list-ol me-2 w-20px text-center"></i> <span
+                            data-i18n="user_profile.menu.tops">Sus tops</span></a>
                     <a href="#" id="menu-photos" class="list-group-item list-group-item-action py-3"><i
-                            class="fa-solid fa-images me-2 w-20px text-center"></i> Sus fotos</a>
+                            class="fa-solid fa-images me-2 w-20px text-center"></i> <span
+                            data-i18n="user_profile.menu.photos">Sus fotos</span></a>
                     <a href="#" id="menu-reviews" class="list-group-item list-group-item-action py-3"><i
-                            class="fa-solid fa-star-half-stroke me-2 w-20px text-center"></i> Sus Reseñas</a>
+                            class="fa-solid fa-star-half-stroke me-2 w-20px text-center"></i> <span
+                            data-i18n="user_profile.menu.reviews">Sus Reseñas</span></a>
                     <a href="#" id="menu-friends" class="list-group-item list-group-item-action py-3"><i
-                            class="fa-solid fa-user-group me-2 w-20px text-center"></i> Sus Amigos</a>
+                            class="fa-solid fa-user-group me-2 w-20px text-center"></i> <span
+                            data-i18n="user_profile.menu.friends">Sus Amigos</span></a>
                     <a href="#" id="menu-trips" class="list-group-item list-group-item-action py-3"><i
-                            class="fa-solid fa-suitcase-rolling me-2 w-20px text-center"></i> Sus Viajes</a>
+                            class="fa-solid fa-suitcase-rolling me-2 w-20px text-center"></i> <span
+                            data-i18n="user_profile.menu.trips">Sus Viajes</span></a>
                     <a href="#" id="menu-ranking" class="list-group-item list-group-item-action py-3"><i
-                            class="fa-solid fa-chart-line me-2 w-20px text-center"></i> Sus Estadísticas</a>
-                    <a href="<?= Router::url('trip_generator') ?>"
-                        class="list-group-item list-group-item-action text-success mt-1 py-3 border-top fw-bold"><i
-                            class="fa-solid fa-wand-magic-sparkles me-2 w-20px text-center"></i> Organizar un viaje
-                        juntos</a>
+                            class="fa-solid fa-chart-line me-2 w-20px text-center"></i> <span
+                            data-i18n="user_profile.menu.stats">Sus Estadísticas</span></a>
+                    <a href="#" onclick="return false;" tabindex="-1" aria-disabled="true"
+                        class="list-group-item list-group-item-action text-success mt-1 py-3 border-top fw-bold disabled"
+                        style="opacity: 0.5; pointer-events: none;"><i
+                            class="fa-solid fa-wand-magic-sparkles me-2 w-20px text-center"></i> <span
+                            data-i18n="user_profile.menu.plan_trip">Organizar un viaje
+                            juntos</span></a>
                 </div>
             </div>
         </div>
@@ -82,7 +91,7 @@ $user_id = $_GET['id'] ?? null;
                 <div class="card profile-card mb-4">
                     <div class="card-header pt-3 pb-3 d-flex align-items-center gap-2">
                         <i class="fa-solid fa-heart fs-5 text-success"></i>
-                        <h5 class="fw-bold mb-0">Favoritos</h5>
+                        <h5 class="fw-bold mb-0" data-i18n="user_profile.favorites">Favoritos</h5>
                     </div>
                     <div class="card-body p-4">
                         <div class="row g-3">
@@ -90,7 +99,8 @@ $user_id = $_GET['id'] ?? null;
                                 <div class="p-3 fav-box text-center square-box h-100">
                                     <div class="fav-icon text-success mb-2"><i class="fa-solid fa-star fs-3"></i></div>
                                     <p class="text-muted mb-1 small fw-bold text-uppercase"
-                                        style="letter-spacing: 0.5px; font-size: 0.75rem;">Coaster Favorita</p>
+                                        style="letter-spacing: 0.5px; font-size: 0.75rem;"
+                                        data-i18n="user_profile.fav_coaster">Coaster Favorita</p>
                                     <p class="fw-bold mb-0 text-truncate text-light fs-5" id="user-fav-coaster">—</p>
                                 </div>
                             </div>
@@ -99,7 +109,8 @@ $user_id = $_GET['id'] ?? null;
                                     <div class="fav-icon text-success mb-2"><i class="fa-solid fa-map-pin fs-3"></i>
                                     </div>
                                     <p class="text-muted mb-1 small fw-bold text-uppercase"
-                                        style="letter-spacing: 0.5px; font-size: 0.75rem;">Parque Favorito</p>
+                                        style="letter-spacing: 0.5px; font-size: 0.75rem;"
+                                        data-i18n="user_profile.fav_park">Parque Favorito</p>
                                     <p class="fw-bold mb-0 text-truncate text-light fs-5" id="user-top-park">—</p>
                                 </div>
                             </div>
@@ -107,7 +118,8 @@ $user_id = $_GET['id'] ?? null;
                                 <div class="p-3 fav-box text-center square-box h-100">
                                     <div class="fav-icon text-success mb-2"><i class="fa-solid fa-house fs-3"></i></div>
                                     <p class="text-muted mb-1 small fw-bold text-uppercase"
-                                        style="letter-spacing: 0.5px; font-size: 0.75rem;">Home Park</p>
+                                        style="letter-spacing: 0.5px; font-size: 0.75rem;"
+                                        data-i18n="user_profile.home_park">Home Park</p>
                                     <p class="fw-bold mb-0 text-truncate text-light fs-5" id="user-home-park">—</p>
                                 </div>
                             </div>
@@ -121,40 +133,46 @@ $user_id = $_GET['id'] ?? null;
                         <div class="card profile-card h-100">
                             <div class="card-header pt-3 pb-3 d-flex align-items-center gap-2">
                                 <i class="fa-solid fa-ticket fs-5 text-warning"></i>
-                                <h5 class="fw-bold mb-0">Estadísticas Generales</h5>
+                                <h5 class="fw-bold mb-0" data-i18n="user_profile.stats_general">Estadísticas Generales
+                                </h5>
                             </div>
                             <div class="card-body">
                                 <ul class="list-group list-group-flush bg-transparent">
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3 bg-transparent">
                                         <span class="text-muted fw-medium"><i
-                                                class="fa-solid fa-bolt me-2 text-success"></i>Montañas rusas</span>
+                                                class="fa-solid fa-bolt me-2 text-success"></i><span
+                                                data-i18n="user_profile.stat_coasters">Montañas rusas</span></span>
                                         <span class="badge badge-profile fs-6 bg-success" id="stat-coasters">0</span>
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3 border-top border-secondary border-opacity-25 bg-transparent">
                                         <span class="text-muted fw-medium"><i
-                                                class="fa-solid fa-map-location-dot me-2 text-success"></i>Parques
-                                            visitados</span>
+                                                class="fa-solid fa-map-location-dot me-2 text-success"></i><span
+                                                data-i18n="user_profile.stat_parks">Parques
+                                                visitados</span></span>
                                         <span class="badge badge-profile fs-6 bg-success" id="stat-parks">0</span>
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3 border-top border-secondary border-opacity-25 bg-transparent">
                                         <span class="text-muted fw-medium"><i
-                                                class="fa-solid fa-earth-americas me-2 text-success"></i>Países</span>
+                                                class="fa-solid fa-earth-americas me-2 text-success"></i><span
+                                                data-i18n="user_profile.stat_countries">Países</span></span>
                                         <span class="badge badge-profile fs-6 bg-success" id="stat-countries">0</span>
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3 border-top border-secondary border-opacity-25 bg-transparent">
                                         <span class="text-muted fw-medium"><i
-                                                class="fa-solid fa-user-group me-2 text-info"></i>Amigos</span>
+                                                class="fa-solid fa-user-group me-2 text-info"></i><span
+                                                data-i18n="user_profile.stat_friends">Amigos</span></span>
                                         <span class="badge badge-profile fs-6 bg-success" id="stat-friends">0</span>
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3 border-top border-secondary border-opacity-25 bg-transparent">
                                         <span class="text-muted fw-medium"><i
-                                                class="fa-solid fa-camera-retro me-2 text-primary"></i>Fotos
-                                            compartidas</span>
+                                                class="fa-solid fa-camera-retro me-2 text-primary"></i><span
+                                                data-i18n="user_profile.stat_photos">Fotos
+                                                compartidas</span></span>
                                         <span class="badge badge-profile fs-6 bg-success" id="stat-photos">0</span>
                                     </li>
                                 </ul>
@@ -167,47 +185,52 @@ $user_id = $_GET['id'] ?? null;
                         <div class="card profile-card h-100">
                             <div class="card-header pt-3 pb-3 d-flex align-items-center gap-2">
                                 <i class="fa-solid fa-chart-pie fs-5 text-info"></i>
-                                <h5 class="fw-bold mb-0">Estadísticas Técnicas</h5>
+                                <h5 class="fw-bold mb-0" data-i18n="user_profile.stats_tech">Estadísticas Técnicas</h5>
                             </div>
                             <div class="card-body">
                                 <ul class="list-group list-group-flush bg-transparent">
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 bg-transparent">
-                                        <span class="text-muted">País más visitado</span>
+                                        <span class="text-muted" data-i18n="user_profile.stat_most_visited">País más
+                                            visitado</span>
                                         <span class="fw-bold text-end text-wrap ms-3" id="stat-tech-country"
                                             style="max-width: 60%;">—</span>
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 bg-transparent">
-                                        <span class="text-muted">Fabricante favorito</span>
+                                        <span class="text-muted"
+                                            data-i18n="user_profile.stat_fav_manufacturer">Fabricante favorito</span>
                                         <span class="fw-bold text-end text-wrap ms-3" id="stat-tech-manufacturer"
                                             style="max-width: 60%;">—</span>
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 border-bottom border-secondary border-opacity-25 bg-transparent mb-2">
-                                        <span class="text-muted">Fabricantes totales</span>
+                                        <span class="text-muted"
+                                            data-i18n="user_profile.stat_total_manufacturers">Fabricantes totales</span>
                                         <span class="fw-bold text-end ms-3" id="stat-tech-total-manu">0</span>
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 bg-transparent mt-2">
-                                        <span class="text-muted">Altura total superada</span>
+                                        <span class="text-muted" data-i18n="user_profile.stat_total_height">Altura total
+                                            superada</span>
                                         <span class="fw-bold text-end ms-3"><span id="stat-tech-height">0</span>
                                             m</span>
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 bg-transparent">
-                                        <span class="text-muted">Inversiones totales</span>
+                                        <span class="text-muted"
+                                            data-i18n="user_profile.stat_total_inversions">Inversiones totales</span>
                                         <span class="fw-bold text-end ms-3" id="stat-tech-inversions">0</span>
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 bg-transparent">
-                                        <span class="text-muted">Más rápida</span>
+                                        <span class="text-muted" data-i18n="user_profile.stat_fastest">Más rápida</span>
                                         <span class="fw-bold text-end text-wrap ms-3" id="stat-tech-speed"
                                             style="max-width: 60%;">—</span>
                                     </li>
                                     <li
                                         class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 bg-transparent">
-                                        <span class="text-muted">Más larga</span>
+                                        <span class="text-muted" data-i18n="user_profile.stat_longest">Más larga</span>
                                         <span class="fw-bold text-end text-wrap ms-3" id="stat-tech-length"
                                             style="max-width: 60%;">—</span>
                                     </li>
@@ -224,11 +247,11 @@ $user_id = $_GET['id'] ?? null;
                     <div class="card-header pt-3 pb-3 d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center gap-2">
                             <i class="fa-solid fa-ranking-star fs-5 text-warning"></i>
-                            <h5 class="fw-bold mb-0">Ranking Personal</h5>
+                            <h5 class="fw-bold mb-0" data-i18n="user_profile.personal_ranking">Ranking Personal</h5>
                         </div>
                         <select id="tops-type-selector" class="form-select w-auto fw-bold rcw-stats-select">
-                            <option value="coasters">Tops Coasters</option>
-                            <option value="parks">Tops Parques</option>
+                            <option value="coasters" data-i18n="user_profile.tops_coasters">Tops Coasters</option>
+                            <option value="parks" data-i18n="user_profile.tops_parks">Tops Parques</option>
                         </select>
                     </div>
                     <div class="card-body p-0">
@@ -245,7 +268,7 @@ $user_id = $_GET['id'] ?? null;
                 <div class="card profile-card mb-4">
                     <div class="card-header pt-3 pb-3 d-flex align-items-center gap-2">
                         <i class="fa-solid fa-camera fs-5 text-primary"></i>
-                        <h5 class="fw-bold mb-0">Galería de Fotos</h5>
+                        <h5 class="fw-bold mb-0" data-i18n="user_profile.photo_gallery">Galería de Fotos</h5>
                     </div>
                     <div class="card-body p-4">
                         <div class="tops-preview-scroll">
@@ -262,7 +285,8 @@ $user_id = $_GET['id'] ?? null;
                 <div class="card profile-card mb-4">
                     <div class="card-header pt-3 pb-3 d-flex align-items-center gap-2">
                         <i class="fa-solid fa-user-group fs-5 text-success"></i>
-                        <h5 class="fw-bold mb-0">Amigos de <span id="friends-section-username">este usuario</span></h5>
+                        <h5 class="fw-bold mb-0"><span data-i18n="user_profile.friends_of">Amigos de</span> <span
+                                id="friends-section-username">este usuario</span></h5>
                         <span class="badge badge-profile ms-auto" id="friends-section-count">0</span>
                     </div>
                     <div class="card-body p-0">

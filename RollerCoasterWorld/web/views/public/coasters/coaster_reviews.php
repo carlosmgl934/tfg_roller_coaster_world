@@ -7,7 +7,7 @@ require_once __DIR__ . '/../../partials/header.php';
     <!-- HERO HEADER -->
     <div class="row mb-4">
         <div class="col-12 d-flex justify-content-center align-items-center border-bottom pb-3">
-            <h1 class="display-6 fw-bold text-success mb-0">
+            <h1 class="display-6 fw-bold text-success mb-0" data-i18n="coasters.reviews.title">
                 Reseñas de la Comunidad
             </h1>
         </div>
@@ -21,7 +21,8 @@ require_once __DIR__ . '/../../partials/header.php';
                 <div class="col-12 col-lg-6">
                     <div class="search-container h-100">
                         <label for="review_search" class="form-label fw-bold d-flex align-items-center gap-2 mb-2">
-                            <i class="fa-solid fa-magnifying-glass"></i> Búsqueda de reseñas
+                            <i class="fa-solid fa-magnifying-glass"></i> <span
+                                data-i18n="coasters.reviews.search_label">Búsqueda de reseñas</span>
                         </label>
                         <div class="input-group shadow-sm">
                             <span class="input-group-text bg-success border-success text-white rounded-0"
@@ -30,6 +31,7 @@ require_once __DIR__ . '/../../partials/header.php';
                             </span>
                             <input type="text" name="review_search" id="review_search"
                                 class="form-control border-success rounded-0"
+                                data-i18n-placeholder="coasters.reviews.search_placeholder"
                                 placeholder="Busca reseñas por Usuario o por Montaña Rusa..." autocomplete="off"
                                 style="border-width: 2px;">
                         </div>
@@ -41,7 +43,8 @@ require_once __DIR__ . '/../../partials/header.php';
                 <div class="col-12 col-lg-6">
                     <div class="search-container h-100">
                         <label for="review_sort" class="form-label fw-bold d-flex align-items-center gap-2 mb-2">
-                            <i class="fa-solid fa-filter"></i> Ordenación y filtros
+                            <i class="fa-solid fa-filter"></i> <span data-i18n="coasters.reviews.sort_label">Ordenación
+                                y filtros</span>
                         </label>
                         <div class="input-group shadow-sm">
                             <span class="input-group-text bg-success border-success text-white rounded-0"
@@ -51,8 +54,9 @@ require_once __DIR__ . '/../../partials/header.php';
 
                             <select class="form-select border-success rounded-0" id="review_sort"
                                 style="border-width: 2px; cursor: pointer;">
-                                <option value="date" selected>Antigüedad</option>
-                                <option value="rating">Valoración (Nota)</option>
+                                <option value="date" selected data-i18n="coasters.reviews.sort_date">Antigüedad</option>
+                                <option value="rating" data-i18n="coasters.reviews.sort_rating">Valoración (Nota)
+                                </option>
                             </select>
 
                             <button class="btn btn-outline-success border-success rounded-0" type="button"
@@ -63,7 +67,8 @@ require_once __DIR__ . '/../../partials/header.php';
                             <input type="checkbox" class="btn-check" id="btn_friends_only" autocomplete="off">
                             <label class="btn btn-outline-success border-success rounded-0" for="btn_friends_only"
                                 style="border-width: 2px;">
-                                <i class="fa-solid fa-user-group"></i> Solo amigos
+                                <i class="fa-solid fa-user-group"></i> <span
+                                    data-i18n="coasters.reviews.friends_only">Solo amigos</span>
                             </label>
                         </div>
                     </div>
@@ -85,9 +90,9 @@ require_once __DIR__ . '/../../partials/header.php';
     <div class="pagination mt-5 justify-content-center" id="pagination"></div>
 </main>
 
-<?php 
+<?php
 require_once __DIR__ . '/../../partials/login_modal.php';
-require_once __DIR__ . '/../../partials/footer.php'; 
+require_once __DIR__ . '/../../partials/footer.php';
 ?>
 <script>
     window.BASE_URL = '<?= $base_url ?>';

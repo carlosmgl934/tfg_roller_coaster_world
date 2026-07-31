@@ -6,6 +6,9 @@ $page_css = [
   'https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css'
 ];
 require_once __DIR__ . '/../../partials/header.php';
+// HIDDEN-TFG-START: Bloquear acceso directo a la vista de tienda
+Router::redirect('home');
+// HIDDEN-TFG-END
 $base_url = Router::getBaseUrl();
 ?>
 
