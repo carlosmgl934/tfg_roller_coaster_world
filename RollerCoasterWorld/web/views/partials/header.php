@@ -17,7 +17,7 @@ if (!headers_sent()) {
     "script-src 'self' 'unsafe-inline' https://www.gstatic.com https://code.jquery.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://js.stripe.com https://unpkg.com https://apis.google.com; " .
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; " .
     "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; " .
-    "img-src 'self' data: blob: https: https://*.openstreetmap.org https://*.supabase.co; " .
+    "img-src 'self' data: blob: https: https://*.openstreetmap.org https://*.supabase.co https://tiles.stadiamaps.com; " .
     "connect-src 'self' https://*.supabase.co https://*.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://nominatim.openstreetmap.org https://firebaseapp.com https://www.gstatic.com https://unpkg.com https://cdn.jsdelivr.net; " .
     "frame-src https://js.stripe.com https://tfg-roller-coaster-world-auth.firebaseapp.com https://accounts.google.com; " .
     "frame-ancestors 'none';"
@@ -84,6 +84,11 @@ $public_pages = [
 
   // Tienda — catálogo público
   Router::getRoutePath('tickets'),
+
+  // Torneo Euro Cup — acceso público (login solo para votar)
+  Router::getRoutePath('tournament'),
+  '/web/views/public/tournament.php',
+  '/tournament.php',
 ];
 
 // Determina si el usuario está logueado
@@ -150,6 +155,10 @@ header("Expires: 0"); // Proxies
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <title>RollerCoaster World</title>
+  <!-- Favicon inline SVG (no requiere subir archivo) -->
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%230a0a0a'/%3E%3Ctext x='32' y='46' font-family='Arial,sans-serif' font-weight='900' font-size='40' text-anchor='middle' fill='%2300c853'%3ER%3C/text%3E%3Crect x='10' y='54' width='44' height='3' rx='1.5' fill='%2300c853' opacity='0.6'/%3E%3C/svg%3E">
+  <link rel="shortcut icon" href="data:image/x-icon," type="image/x-icon">
 
   <!-- Firebase SDK - versión COMPAT -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -355,6 +364,10 @@ header("Expires: 0"); // Proxies
               <li><a class="dropdown-item py-2" href="<?= Router::url('coaster_search') ?>"><i
                     class="fa-solid fa-magnifying-glass w-20px text-center me-2 text-primary"></i> <span
                     data-i18n="nav.search">Buscar</span></a></li>
+              <li><a class="dropdown-item py-2" href="<?= Router::url('models') ?>"><i
+                    class="fa-solid fa-puzzle-piece w-20px text-center me-2 text-primary"></i> <span
+                    data-i18n="nav.explore_models">Explorar Modelos</span></a>
+              </li>
               <li><a class="dropdown-item py-2" href="<?= Router::url('ranking') ?>"><i
                     class="fa-solid fa-earth-europe w-20px text-center me-2 text-success"></i> <span
                     data-i18n="nav.global_ranking">Ranking Global</span></a></li>
@@ -594,6 +607,12 @@ header("Expires: 0"); // Proxies
                   <li>
                     <hr class="dropdown-divider">
                   </li>
+                  <li><a class="dropdown-item py-2 fw-semibold" href="<?= $base_url ?>/web/views/public/tournament.php"
+                      style="color:#ffd700 !important;"><i class="fa-solid fa-trophy w-20px text-center me-2"
+                        style="color:#ffd700;"></i> 🏆 Euro Cup</a></li>
+                  <li>
+                    <hr class="dropdown-divider">
+                  </li>
                   <li><a class="dropdown-item py-2" href="<?= Router::url('admin_messages') ?>"><i
                         class="fa-solid fa-envelope w-20px text-center me-2 text-warning"></i> Mensajes</a></li>
                   <li><a class="dropdown-item py-2" href="<?= Router::url('admin_photos') ?>"><i
@@ -674,7 +693,7 @@ header("Expires: 0"); // Proxies
                 <li><a class="dropdown-item py-2" href="<?= Router::url('profile') ?>"><i
                       class="fa-solid fa-id-card w-20px text-center me-2 text-secondary"></i> <span
                       data-i18n="nav.my_profile">Mi perfil</span></a></li>
-                <li><a class="dropdown-item py-2" href="<?= Router::url('profile') ?>#tops"><i
+                <li><a class="dropdown-item py-2" href="<?= Router::url('top_personal') ?>"><i
                       class="fa-solid fa-list-ol w-20px text-center me-2 text-warning"></i> <span
                       data-i18n="nav.my_tops">Mis tops</span></a></li>
                 <!-- HIDDEN-TFG-START: Carrito y Mis entradas en dropdown usuario -->

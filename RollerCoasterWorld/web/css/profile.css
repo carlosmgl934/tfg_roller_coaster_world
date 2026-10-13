@@ -963,7 +963,7 @@ span.flatpickr-weekday {
   }
 
   .tops-filters-collapsible.is-open {
-    max-height: 600px; /* suficiente para todos los filtros */
+    max-height: 1200px; /* suficiente para todos los filtros */
   }
 }
 

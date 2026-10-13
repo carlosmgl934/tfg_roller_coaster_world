@@ -31,6 +31,7 @@ class Router
             // Públicas - Coasters
             'coasters' => '/web/views/public/coasters/coasters.php',
             'coaster_search' => '/web/views/public/coasters/coaster_search.php',
+            'models' => '/web/views/public/coasters/models.php',
             'coaster_detail' => '/web/views/public/coasters/coasters.php',
             'coaster_reviews' => '/web/views/public/coasters/coaster_reviews.php',
             'coaster_tops' => '/web/views/public/coasters/coaster_tops.php',
@@ -61,6 +62,8 @@ class Router
             // Usuarios / Social
             'ranking' => '/web/views/public/coasters/ranking.php',
             'profile' => '/web/views/public/users/profile.php',
+            'top_personal' => '/web/views/public/users/top_personal.php',
+            'edit_top' => '/web/views/public/users/edit_top.php',
             'friends' => '/web/views/public/users/friends.php',
             'user_profile' => '/web/views/public/users/user_profile.php',
             'user_search' => '/web/views/public/users/user_search.php',
@@ -77,6 +80,10 @@ class Router
             // Viajes
             'trips' => '/web/views/public/trips/trips.php',
             'trip_generator' => '/web/views/public/trips/trip_generator.php',
+
+            // HIDDEN-TFG-START: Torneo Euro Cup (Oculto hasta lanzamiento)
+            'tournament' => '/web/views/public/tournament.php',
+            // HIDDEN-TFG-END
 
             // Auth
             'login' => '/web/views/auth/login.php',

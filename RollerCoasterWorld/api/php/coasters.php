@@ -40,6 +40,7 @@ $router->register('update_review', 'updateReview', 'POST');
 $router->register('user_tops', 'getUserCoasterTops');
 $router->register('ranking', 'getRanking');
 $router->register('all_reviews', 'getAllReviews');
+$router->register('models_list', 'getModelsList');
 
 
 $router->dispatch();
@@ -69,6 +70,29 @@ function getCountries()
         Response::success(['countries' => $countries]);
     } catch (PDOException $e) {
         Response::error('Error obteniendo países');
+    }
+}
+
+function getModelsList()
+{
+    try {
+        global $db;
+        $sql = "
+            SELECT 
+                coaster_model AS model, 
+                MAX(coaster_manufacter) AS manufacter, 
+                COUNT(id) AS coasters_count 
+            FROM coasters 
+            WHERE coaster_model IS NOT NULL AND TRIM(coaster_model) != ''
+            GROUP BY coaster_model 
+            ORDER BY coaster_model ASC
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+        $models = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        Response::success(['models' => $models]);
+    } catch (PDOException $e) {
+        Response::error('Error obteniendo lista de modelos');
     }
 }
 
@@ -111,10 +135,11 @@ function searchCoasters()
         }
 
         $sql = "SELECT 
-    coasters.id, coasters.coaster_name, coasters.coaster_status, parks.park_name, parks.park_country
+    coasters.id, coasters.coaster_name, coasters.imagen_url, coasters.coaster_status, parks.park_name, parks.park_country
     FROM coasters
     INNER JOIN parks ON coasters.park_id = parks.id
-    WHERE unaccent(coasters.coaster_name) ILIKE unaccent(:name) " . $limitClause;
+    WHERE (unaccent(coasters.coaster_name) ILIKE unaccent(:name)
+        OR unaccent(parks.park_name) ILIKE unaccent(:name)) " . $limitClause;
 
         $stmt = $db->prepare($sql);
 
@@ -291,6 +316,11 @@ function applyFilters()
     if (!empty($_GET['park_id'])) {
         $conditions[] = "coasters.park_id = :park_id";
         $params[':park_id'] = intval($_GET['park_id']);
+    }
+
+    if (!empty($_GET['model'])) {
+        $conditions[] = "coasters.coaster_model = :model";
+        $params[':model'] = $_GET['model'];
     }
 
     $sort = $_GET['sort'] ?? 'id';

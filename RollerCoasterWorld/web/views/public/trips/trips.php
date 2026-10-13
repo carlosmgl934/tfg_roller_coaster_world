@@ -64,7 +64,7 @@ if (!isset($_SESSION['firebase_uid'])) {
                     Viajes</span></h5>
             <small class="opacity-75" data-i18n="trips.my_trips_hint">Tus viajes planificados y pasados</small>
         </div>
-        <div class="card-body p-4">
+        <div class="card-body p-3 p-md-4">
             <div id="trips-grid" class="trips-grid">
                 <div class="text-center py-4 text-muted small" data-i18n="common.loading">Cargando viajes...</div>
             </div>
@@ -162,8 +162,12 @@ if (!isset($_SESSION['firebase_uid'])) {
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
 
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
 <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.11/locales/es.global.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.11/locales/fr.global.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.11/locales/de.global.min.js'></script>
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
 <script src="<?= Router::asset('web/js/trips/trips.js') ?>?v=<?= time() ?>"></script>

@@ -85,8 +85,19 @@ if (empty($_FILES['file'])) {
 }
 
 if ($_FILES['file']['error'] !== UPLOAD_ERR_OK) {
-    dbg('ABORT: error de subida PHP', $_FILES['file']['error']);
-    echo json_encode(['success' => false, 'error' => 'Error de subida PHP: ' . $_FILES['file']['error']]);
+    $uploadErrors = [
+        UPLOAD_ERR_INI_SIZE => 'El archivo supera el límite permitido por el servidor (upload_max_filesize). Prueba a reducir el tamaño o comprime la imagen.',
+        UPLOAD_ERR_FORM_SIZE => 'El archivo supera el límite indicado en el formulario.',
+        UPLOAD_ERR_PARTIAL => 'El archivo se subió de forma incompleta. Inténtalo de nuevo.',
+        UPLOAD_ERR_NO_FILE => 'No se seleccionó ningún archivo.',
+        UPLOAD_ERR_NO_TMP_DIR => 'Error interno: no hay carpeta temporal disponible.',
+        UPLOAD_ERR_CANT_WRITE => 'Error interno: no se pudo escribir en disco.',
+        UPLOAD_ERR_EXTENSION => 'La subida fue bloqueada por una extensión de PHP.',
+    ];
+    $errCode = $_FILES['file']['error'];
+    $errMsg = $uploadErrors[$errCode] ?? "Error de subida desconocido (código $errCode).";
+    dbg('ABORT: error de subida PHP', $errCode);
+    echo json_encode(['success' => false, 'error' => $errMsg]);
     exit;
 }
 

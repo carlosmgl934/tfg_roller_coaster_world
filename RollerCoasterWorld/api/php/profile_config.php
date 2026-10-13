@@ -18,6 +18,7 @@ $router->register('save_top_coasters', 'saveTopCoasters', 'POST');
 $router->register('save_top_parks', 'saveTopParks', 'POST');
 $router->register('get_my_reviews', 'getMyReviews');
 $router->register('get_map_parks', 'getMapParks');
+$router->register('save_park_coords', 'saveParkCoords');
 $router->register('get_my_photos', 'getMyPhotos');
 $router->dispatch();
 
@@ -53,7 +54,7 @@ function searchParks()
     }
 
     try {
-        $stmt = $db->prepare("SELECT id AS park_id, park_name, park_country AS country_name FROM parks WHERE unaccent(park_name) ILIKE unaccent(:search) AND park_name NOT IN ('Desconocido', 'Unknown') LIMIT 10");
+        $stmt = $db->prepare("SELECT id AS park_id, park_name, park_country AS country_name, imagen_url FROM parks WHERE unaccent(park_name) ILIKE unaccent(:search) AND park_name NOT IN ('Desconocido', 'Unknown') LIMIT 25");
         $stmt->execute([':search' => '%' . $search . '%']);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         exit;
@@ -515,6 +516,8 @@ function getMapParks()
                 p.park_location,
                 p.park_country,
                 p.imagen_url,
+                p.latitude,
+                p.longitude,
                 COALESCE(cc.coaster_count, 0) AS coaster_count
             FROM (
                 SELECT c.park_id
@@ -546,6 +549,38 @@ function getMapParks()
     } catch (PDOException $e) {
         error_log($e->getMessage());
         Response::error('Error interno del servidor. Por favor, inténtalo de nuevo.', 500);
+    }
+}
+
+
+// ── Guardar coordenadas geocodificadas en la tabla parks ─────────────────────
+function saveParkCoords()
+{
+    global $db;
+    $data = json_decode(file_get_contents('php://input'), true);
+    $park_id = isset($data['park_id']) ? (int) $data['park_id'] : 0;
+    $lat = isset($data['lat']) ? (float) $data['lat'] : null;
+    $lng = isset($data['lng']) ? (float) $data['lng'] : null;
+
+    if (!$park_id || $lat === null || $lng === null) {
+        Response::error('Datos incompletos', 400);
+    }
+
+    try {
+        $stmt = $db->prepare("
+            UPDATE parks
+            SET latitude = :lat, longitude = :lng
+            WHERE id = :id
+              AND (latitude IS NULL OR longitude IS NULL)
+        ");
+        $stmt->bindValue(':lat', $lat);
+        $stmt->bindValue(':lng', $lng);
+        $stmt->bindValue(':id', $park_id, PDO::PARAM_INT);
+        $stmt->execute();
+        Response::success(['updated' => $stmt->rowCount() > 0]);
+    } catch (PDOException $e) {
+        error_log($e->getMessage());
+        Response::error('Error interno', 500);
     }
 }
 

@@ -474,7 +474,6 @@ function updateCoaster(): void
     requireAdmin();
 
     $data = $_POST;
-    file_put_contents(__DIR__ . '/debug_updateCoaster.txt', "POST: " . print_r($_POST, true) . "\nFILES: " . print_r($_FILES, true), FILE_APPEND);
 
     $id = isset($data['id']) ? intval($data['id']) : 0;
     if ($id <= 0) {
@@ -503,24 +502,8 @@ function updateCoaster(): void
     $inversions = (isset($data['inversions']) && $data['inversions'] !== '') ? intval($data['inversions']) : null;
     $rcdbId = (isset($data['rcdbId']) && $data['rcdbId'] !== '') ? intval($data['rcdbId']) : null;
 
-    $imagenUrl = $_POST['imagenUrl'] ?? null;
-    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $uploadDir = __DIR__ . '/../../../web/img/';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
-        }
-        $fileName = uniqid('coaster_') . '-' . pathinfo($_FILES['image']['name'], PATHINFO_FILENAME) . '.webp';
-        $optimized = ImageHelper::optimizeAndConvertToWebP($_FILES['image']['tmp_name'], 1920, 80);
-        if ($optimized && rename($optimized, $uploadDir . $fileName)) {
-            $imagenUrl = '/web/img/' . $fileName;
-        } else {
-            // Fallback
-            $fileNameFallback = uniqid('coaster_') . '-' . basename($_FILES['image']['name']);
-            if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $fileNameFallback)) {
-                $imagenUrl = '/web/img/' . $fileNameFallback;
-            }
-        }
-    }
+    // La URL de imagen llega ya subida a Supabase desde upload.php
+    $imagenUrl = isset($_POST['imagenUrl']) && $_POST['imagenUrl'] !== '' ? trim($_POST['imagenUrl']) : null;
 
     if ($name === '') {
         Response::error('El nombre es obligatorio.');
@@ -568,8 +551,6 @@ function updateCoaster(): void
                 WHERE id = :id";
 
         $stmt = $db->prepare($sql);
-        error_log("UPDATE COASTER SQL: " . $sql);
-        error_log("UPDATE COASTER PARAMS: " . print_r($params, true));
         $stmt->execute($params);
 
         // Devolver la coaster actualizada

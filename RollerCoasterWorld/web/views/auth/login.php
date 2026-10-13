@@ -15,11 +15,15 @@ require_once __DIR__ . '/../partials/header.php';
         <i class="fa-solid fa-train-tram"></i>
       </div>
       <h1 class="brand-title">RollerCoaster<br><span>World</span></h1>
-      <p class="brand-sub">Descubre, colecciona y comparte<br>tus experiencias en montañas rusas.</p>
+      <p class="brand-sub" data-i18n="auth.hero_desc_login">Descubre, colecciona y comparte<br>tus experiencias en
+        montañas rusas.</p>
       <div class="brand-stats">
-        <div class="stat-pill"><i class="fa-solid fa-bolt"></i> +13.000 coasters</div>
-        <div class="stat-pill"><i class="fa-solid fa-tree-city"></i> +5000 parques</div>
-        <div class="stat-pill"><i class="fa-solid fa-earth-europe"></i> 70+ países</div>
+        <div class="stat-pill"><i class="fa-solid fa-bolt"></i> <span data-i18n="auth.hero_coasters">+13.000
+            coasters</span></div>
+        <div class="stat-pill"><i class="fa-solid fa-tree-city"></i> <span data-i18n="auth.hero_parks">+5000
+            parques</span></div>
+        <div class="stat-pill"><i class="fa-solid fa-earth-europe"></i> <span data-i18n="auth.hero_countries">70+
+            países</span></div>
       </div>
     </div>
   </div>
@@ -29,19 +33,20 @@ require_once __DIR__ . '/../partials/header.php';
     <div class="login-card">
 
       <h2 class="login-title" data-i18n="auth.login_title">Bienvenido de nuevo</h2>
-      <p class="login-subtitle">Inicia sesión para continuar</p>
+      <p class="login-subtitle" data-i18n="auth.login_subtitle">Inicia sesión para continuar</p>
 
       <?php if (isset($_GET['msg']) && $_GET['msg'] === 'review'): ?>
         <div class="login-alert login-alert-warning">
           <i class="fa-solid fa-triangle-exclamation me-2"></i>
-          Necesitas iniciar sesión para escribir una reseña
+          <span data-i18n="auth.msg_review">Necesitas iniciar sesión para escribir una reseña</span>
         </div>
       <?php endif; ?>
 
       <?php if (isset($_GET['msg']) && $_GET['msg'] === 'registered'): ?>
         <div class="login-alert login-alert-success">
           <i class="fa-solid fa-circle-check me-2"></i>
-          <strong>¡Cuenta creada!</strong> Ahora inicia sesión para continuar
+          <strong data-i18n="auth.msg_registered_title">¡Cuenta creada!</strong> <span
+            data-i18n="auth.msg_registered_desc">Ahora inicia sesión para continuar</span>
         </div>
       <?php endif; ?>
 
@@ -50,7 +55,8 @@ require_once __DIR__ . '/../partials/header.php';
         <div class="form-group">
           <label for="email"><i class="fa-regular fa-envelope me-2"></i><span data-i18n="auth.email">Correo
               electrónico</span></label>
-          <input type="email" id="email" placeholder="tu@email.com" required autocomplete="email">
+          <input type="email" id="email" placeholder="tu@email.com" data-i18n-placeholder="auth.email_placeholder"
+            required autocomplete="email">
         </div>
         <div class="form-group mb-4">
           <div class="d-flex justify-content-between align-items-center mb-1">
@@ -89,8 +95,9 @@ require_once __DIR__ . '/../partials/header.php';
           </svg>
           <span data-i18n="auth.google_login">Google</span>
         </button>
-        <button id="signInWithFacebook" class="btn-social btn-facebook">
-          <i class="fa-brands fa-facebook me-2"></i>Facebook
+        <!-- TODO: reactivar cuando Facebook OAuth esté operativo -->
+        <button id="signInWithFacebook" class="btn-social btn-facebook" disabled title="Próximamente disponible">
+          <i class="fa-brands fa-facebook me-2"></i><span data-i18n="auth.facebook_login">Facebook</span>
         </button>
       </div>
 

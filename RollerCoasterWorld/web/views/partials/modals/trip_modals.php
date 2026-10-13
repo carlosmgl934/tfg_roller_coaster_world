@@ -157,27 +157,31 @@
 <!-- ══ MODAL: Colaboradores ══════════════════════════════════════ -->
 <div class="modal fade" id="collabs-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-0">
+        <div class="modal-content rounded-0 overflow-visible position-relative"
+            style="background:var(--rcw-bg-card); border: 1px solid var(--rcw-border-strong);">
             <div class="modal-header bg-info text-dark rounded-0">
                 <h5 class="modal-title fw-bold mb-0"><i class="fa-solid fa-users me-2"></i><span
                         data-i18n="trips.modal.collaborators_title">Colaboradores</span></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" id="collabs-body"></div>
-            <div class="modal-footer rounded-0 d-flex flex-column align-items-center position-relative">
-                <p class="small text-muted mb-2 text-center w-100" data-i18n="trips.modal.invite_hint">Escribe el nombre
-                    de usuario de tu amigo para
-                    añadirlo</p>
-                <div class="input-group rounded-0 position-relative" style="max-width:320px; width:100%;">
-                    <input type="text" class="form-control rounded-0" id="collab-username"
-                        data-i18n-placeholder="trips.modal.username_placeholder" placeholder="Nombre de usuario..."
-                        autocomplete="off">
-                    <button class="btn btn-info rounded-0 fw-bold" id="collab-invite-btn" style="z-index:2"><i
-                            class="fa-solid fa-paper-plane me-1"></i><span
-                            data-i18n="trips.modal.invite_btn">Invitar</span></button>
-                    <div class="ac-dropdown w-100 position-absolute" id="collab-dropdown"
-                        style="top:100%; left:0; z-index:1000; display:none;"></div>
+            <div class="modal-body d-flex flex-column gap-3 overflow-visible position-relative">
+                <div class="d-flex flex-column align-items-center w-100 position-relative" style="z-index: 1050;">
+                    <p class="small text-muted mb-2 text-center w-100" data-i18n="trips.modal.invite_hint">Escribe el
+                        nombre
+                        de usuario de tu amigo para
+                        añadirlo</p>
+                    <div class="input-group rounded-0 position-relative" style="max-width:320px; width:100%;">
+                        <input type="text" class="form-control rounded-0" id="collab-username"
+                            data-i18n-placeholder="trips.modal.username_placeholder" placeholder="Nombre de usuario..."
+                            autocomplete="off">
+                        <button class="btn btn-info rounded-0 fw-bold" id="collab-invite-btn" style="z-index:2"><i
+                                class="fa-solid fa-paper-plane me-1"></i><span
+                                data-i18n="trips.modal.invite_btn">Invitar</span></button>
+                        <div class="ac-dropdown w-100 position-absolute" id="collab-dropdown"></div>
+                    </div>
                 </div>
+                <hr class="m-0 border-secondary opacity-25">
+                <div id="collabs-body" class="w-100"></div>
             </div>
         </div>
     </div>
@@ -227,14 +231,14 @@
 
 <!-- ══ MODAL: Crear/Editar Viaje ══════════════════════════════════════ -->
 <div class="modal fade" id="create-trip-modal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content rounded-0">
             <div class="modal-header bg-success text-white rounded-0">
                 <h5 class="modal-title fw-bold mb-0"><i class="fa-solid fa-plus-circle me-2"></i><span
                         data-i18n="trips.modal.new_trip_title">Nuevo Viaje</span></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="max-height: 70vh; max-height: 70dvh; overflow-y: auto;">
                 <p class="text-muted small mb-3"><span class="text-danger fw-bold">*</span> <span
                         data-i18n="trips.modal.required_fields">Campos obligatorios</span></p>
                 <input type="hidden" id="ct-trip-id">

@@ -14,11 +14,15 @@ require_once __DIR__ . '/../partials/header.php';
         <i class="fa-solid fa-train-tram"></i>
       </div>
       <h1 class="brand-title">RollerCoaster<br><span>World</span></h1>
-      <p class="brand-sub">Únete a la mayor comunidad<br>de entusiastas de las montañas rusas.</p>
+      <p class="brand-sub" data-i18n="auth.hero_desc_register">Únete a la mayor comunidad<br>de entusiastas de las
+        montañas rusas.</p>
       <div class="brand-stats">
-        <div class="stat-pill"><i class="fa-solid fa-bolt"></i> +13.000 coasters</div>
-        <div class="stat-pill"><i class="fa-solid fa-tree-city"></i> +5000 parques</div>
-        <div class="stat-pill"><i class="fa-solid fa-users"></i> Comunidad activa</div>
+        <div class="stat-pill"><i class="fa-solid fa-bolt"></i> <span data-i18n="auth.hero_coasters">+13.000
+            coasters</span></div>
+        <div class="stat-pill"><i class="fa-solid fa-tree-city"></i> <span data-i18n="auth.hero_parks">+5000
+            parques</span></div>
+        <div class="stat-pill"><i class="fa-solid fa-users"></i> <span data-i18n="auth.hero_community">Comunidad
+            activa</span></div>
       </div>
     </div>
   </div>
@@ -28,7 +32,8 @@ require_once __DIR__ . '/../partials/header.php';
     <div class="login-card">
 
       <h2 class="login-title" data-i18n="auth.register_title">Crea tu cuenta</h2>
-      <p class="login-subtitle">Regístrate gratis para acceder a todas las posibilidades que te ofrece RollerCoaster
+      <p class="login-subtitle" data-i18n="auth.register_subtitle">Regístrate gratis para acceder a todas las
+        posibilidades que te ofrece RollerCoaster
         World</p>
 
       <!-- Formulario -->
@@ -36,19 +41,22 @@ require_once __DIR__ . '/../partials/header.php';
         <div class="form-group mb-3">
           <label for="username"><i class="fa-solid fa-user me-2"></i><span data-i18n="auth.username">Nombre de
               usuario</span></label>
-          <input type="text" id="username" placeholder="Tu usuario (ej. coasterfan02)" required autocomplete="username">
+          <input type="text" id="username" placeholder="Tu usuario (ej. coasterfan02)"
+            data-i18n-placeholder="auth.username_placeholder" required autocomplete="username">
           <div id="username-feedback" class="mt-1 small fw-medium" style="display:none;"></div>
         </div>
         <div class="form-group mb-3">
           <label for="email"><i class="fa-regular fa-envelope me-2"></i><span data-i18n="auth.email">Correo
               electrónico</span></label>
-          <input type="email" id="email" placeholder="tu@email.com" required autocomplete="email">
+          <input type="email" id="email" placeholder="tu@email.com" data-i18n-placeholder="auth.email_placeholder"
+            required autocomplete="email">
         </div>
         <div class="form-group mb-4">
           <label for="password"><i class="fa-solid fa-lock me-2"></i><span
               data-i18n="auth.password">Contraseña</span></label>
           <div class="password-wrapper">
-            <input type="password" id="password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password">
+            <input type="password" id="password" placeholder="Mínimo 6 caracteres"
+              data-i18n-placeholder="auth.password_placeholder" required autocomplete="new-password">
             <button type="button" class="toggle-password" onclick="togglePass()">
               <i class="fa-regular fa-eye" id="eye-icon"></i>
             </button>
@@ -56,15 +64,18 @@ require_once __DIR__ . '/../partials/header.php';
           <div class="password-requirements-box mt-3 p-3 rounded"
             style="background-color: #f8f9fa; border: 1px solid #e9ecef;">
             <p class="mb-2 fw-bold text-secondary" style="font-size: 0.85rem;"><i
-                class="fa-solid fa-shield-halved me-2"></i>Requisitos de seguridad:</p>
+                class="fa-solid fa-shield-halved me-2"></i><span data-i18n="auth.security_reqs">Requisitos de
+                seguridad:</span></p>
             <ul id="password-reqs" class="list-unstyled small text-muted mb-0" style="margin-left: 5px;">
-              <li id="req-length" class="mb-2"><i class="fa-solid fa-xmark text-danger me-2"></i>Mínimo 6 caracteres
+              <li id="req-length" class="mb-2"><i class="fa-solid fa-xmark text-danger me-2"></i><span
+                  data-i18n="auth.req_length">Mínimo 6 caracteres</span>
               </li>
-              <li id="req-upper" class="mb-2"><i class="fa-solid fa-xmark text-danger me-2"></i>Al menos 1 mayúscula
-                (A-Z)</li>
-              <li id="req-lower" class="mb-2"><i class="fa-solid fa-xmark text-danger me-2"></i>Al menos 1 minúscula
-                (a-z)</li>
-              <li id="req-number" class="mb-0"><i class="fa-solid fa-xmark text-danger me-2"></i>Al menos 1 número (0-9)
+              <li id="req-upper" class="mb-2"><i class="fa-solid fa-xmark text-danger me-2"></i><span
+                  data-i18n="auth.req_upper">Al menos 1 mayúscula (A-Z)</span></li>
+              <li id="req-lower" class="mb-2"><i class="fa-solid fa-xmark text-danger me-2"></i><span
+                  data-i18n="auth.req_lower">Al menos 1 minúscula (a-z)</span></li>
+              <li id="req-number" class="mb-0"><i class="fa-solid fa-xmark text-danger me-2"></i><span
+                  data-i18n="auth.req_number">Al menos 1 número (0-9)</span>
               </li>
             </ul>
           </div>
@@ -91,8 +102,9 @@ require_once __DIR__ . '/../partials/header.php';
           </svg>
           <span data-i18n="auth.google_login">Google</span>
         </button>
-        <button id="signInWithFacebook" class="btn-social btn-facebook">
-          <i class="fa-brands fa-facebook me-2"></i>Facebook
+        <!-- TODO: reactivar cuando Facebook OAuth esté operativo -->
+        <button id="signInWithFacebook" class="btn-social btn-facebook" disabled title="Próximamente disponible">
+          <i class="fa-brands fa-facebook me-2"></i><span data-i18n="auth.facebook_login">Facebook</span>
         </button>
       </div>
 

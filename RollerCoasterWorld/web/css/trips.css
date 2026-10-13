@@ -64,6 +64,25 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
+  max-height: 680px;
+  overflow-y: auto;
+  padding-right: 8px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+.trips-grid::-webkit-scrollbar {
+  width: 6px;
+}
+.trips-grid::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+.trips-grid::-webkit-scrollbar-thumb {
+  background: var(--rcw-green-neon, #10b981);
+  border-radius: 10px;
+}
+.trips-grid::-webkit-scrollbar-thumb:hover {
+  background: var(--rcw-green-bright, #34d399);
 }
 .trips-grid-scrollable {
   display: grid;
@@ -86,6 +105,11 @@
   }
 }
 @media (max-width: 768px) {
+  .trips-grid {
+    grid-template-columns: 1fr;
+    max-height: 580px;
+    padding-right: 4px;
+  }
   .trips-grid-scrollable {
     grid-template-columns: 1fr;
     max-height: 600px;
@@ -435,6 +459,101 @@
 }
 .ac-dropdown.show {
   display: block;
+}
+.ac-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+.ac-dropdown::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.25);
+}
+.ac-dropdown::-webkit-scrollbar-thumb {
+  background: var(--rcw-green-neon, #10b981);
+  border-radius: 4px;
+}
+
+/* Dropdown sobresaliente específico de Colaboradores */
+#collab-dropdown {
+  top: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  margin-top: 4px !important;
+  max-height: 215px !important; /* Aproximadamente 5 nombres de altura */
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch;
+  background: #1e293b !important;
+  border: 1px solid var(--rcw-green-neon, #10b981) !important;
+  border-radius: 4px !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85), 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+  z-index: 1100 !important;
+}
+
+/* ── CENTRADO DE MODALES DE VIAJES (MÓVIL Y ESCRITORIO) ────── */
+#collabs-modal.modal,
+#create-trip-modal.modal,
+#day-detail-modal.modal,
+#trip-detail-modal.modal,
+#log-ride-modal.modal,
+#add-visit-modal.modal,
+#delete-confirm-modal.modal,
+#generic-confirm-modal.modal,
+#new-credit-modal.modal {
+  padding: 0.75rem !important;
+}
+
+#collabs-modal.show,
+#create-trip-modal.show,
+#day-detail-modal.show,
+#trip-detail-modal.show,
+#log-ride-modal.show,
+#add-visit-modal.show,
+#delete-confirm-modal.show,
+#generic-confirm-modal.show,
+#new-credit-modal.show {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#collabs-modal .modal-dialog,
+#create-trip-modal .modal-dialog,
+#day-detail-modal .modal-dialog,
+#trip-detail-modal .modal-dialog,
+#log-ride-modal .modal-dialog,
+#add-visit-modal .modal-dialog,
+#delete-confirm-modal .modal-dialog,
+#generic-confirm-modal .modal-dialog,
+#new-credit-modal .modal-dialog {
+  margin: auto !important;
+  width: 100% !important;
+  min-height: unset !important;
+}
+
+#collabs-modal .modal-dialog::before,
+#create-trip-modal .modal-dialog::before,
+#day-detail-modal .modal-dialog::before,
+#trip-detail-modal .modal-dialog::before,
+#log-ride-modal .modal-dialog::before,
+#add-visit-modal .modal-dialog::before,
+#delete-confirm-modal .modal-dialog::before,
+#generic-confirm-modal .modal-dialog::before,
+#new-credit-modal .modal-dialog::before {
+  display: none !important;
+}
+
+#collabs-modal .modal-dialog {
+  max-width: 440px !important;
+}
+
+#create-trip-modal .modal-dialog {
+  max-width: 650px !important;
+}
+
+/* Permitir que el dropdown de colaboradores sobresalga fuera del modal */
+#collabs-modal .modal-content,
+#collabs-modal .modal-body {
+  overflow: visible !important;
 }
 .ac-item {
   padding: 0.55rem 0.75rem;
@@ -1748,4 +1867,19 @@
 .cur-year-select,
 .flatpickr-monthDropdown-months {
   color-scheme: dark;
+}
+
+
+/* Ocultar fotos de eventos en días de otros meses */
+.fc-day-other .fc-daygrid-day-frame {
+    background-image: none !important;
+    background-color: transparent !important;
+}
+.fc-day-other .fc-cell-dual,
+.fc-day-other .fc-cell-overlay {
+    display: none !important;
+}
+.fc-day-other .fc-daygrid-day-number.has-photo-bg {
+    background: transparent !important;
+    color: var(--rcw-text-muted) !important;
 }

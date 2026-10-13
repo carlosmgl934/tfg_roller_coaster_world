@@ -23,7 +23,7 @@
   const escJS = (s) => String(s ?? "").replace(/'/g, "\\'");
   const fd = (s) =>
     s
-      ? new Date(s).toLocaleDateString("es-ES", {
+      ? new Date(s).toLocaleDateString(window.APP_LANG || "es", {
           day: "2-digit",
           month: "short",
           year: "numeric",
@@ -31,7 +31,7 @@
       : "—";
   const dw = (s) =>
     s
-      ? new Date(s).toLocaleDateString("es-ES", {
+      ? new Date(s).toLocaleDateString(window.APP_LANG || "es", {
           weekday: "long",
           day: "numeric",
           month: "long",
@@ -71,7 +71,7 @@
   let countdownInterval = null;
 
   const flatpickrConfig = {
-    locale: "es",
+    locale: window.APP_LANG || "es",
     dateFormat: "Y-m-d",
     altInput: true,
     altFormat: "d/m/Y",
@@ -138,7 +138,7 @@
     // Calendarios de estadísticas — sólo notifican al módulo de ranking,
     // que gestiona el estado interno (currentPeriod, customStart/End…)
     const statsConfig = {
-      locale: "es",
+      locale: window.APP_LANG || "es",
       dateFormat: "Y-m-d",
       altInput: true,
       altFormat: "d/m/Y",
@@ -282,7 +282,23 @@
   };
 
   // Re-renderizar contenido dinámico al cambiar idioma
-  window.addEventListener('rcw:langchanged', function () {
+  window.addEventListener('rcw:langchanged', function (e) {
+    if (e && e.detail && e.detail.lang) {
+      window.APP_LANG = e.detail.lang;
+    }
+    
+    // Update FullCalendar locale
+    if (typeof calendar !== 'undefined' && calendar) {
+      calendar.setOption('locale', window.APP_LANG);
+    }
+    
+    // Update Flatpickr locales if initialized
+    document.querySelectorAll('.flatpickr-input').forEach(el => {
+      if (el._flatpickr) {
+        el._flatpickr.set('locale', window.APP_LANG);
+      }
+    });
+
     loadTodayDashboard();   // widget de hoy (Hoy no tienes eventos / Registrar Visita Hoy)
     window.loadRanking();   // ranking (veces probadas / visitas)
     window.loadTrips();     // tarjetas de viaje (Pasado / Activo / Próximo)
@@ -426,7 +442,7 @@
         document.getElementById("calendar"),
         {
           initialView: "dayGridMonth",
-          locale: "es",
+          locale: window.APP_LANG || "es",
           height: "auto",
           contentHeight: window.innerWidth < 768 ? 500 : "auto",
           aspectRatio: window.innerWidth < 768 ? 0.8 : 1.35,
@@ -556,7 +572,7 @@
     let n = 1;
     while (cur <= end) {
       const ds = cur.toISOString().split("T")[0];
-      const lbl = cur.toLocaleDateString("es-ES", {
+      const lbl = cur.toLocaleDateString(window.APP_LANG || 'es', {
         weekday: "short",
         day: "numeric",
         month: "short",
@@ -638,7 +654,7 @@
             dr.classList.remove("show");
 
             if (el.dataset.country && window.addCountryTag) {
-              window.addCountryTag(el.dataset.country);
+              window.addCountryTag(el.dataset.country, false);
             }
           };
         });
@@ -742,7 +758,7 @@
       window.renderCountryTags();
     };
 
-    window.addCountryTag = (tagToAdd) => {
+    window.addCountryTag = (tagToAdd, shouldFocus = false) => {
       tagToAdd = tagToAdd.trim();
       if (tagToAdd && !tags.includes(tagToAdd)) {
         tags.push(tagToAdd);
@@ -751,7 +767,9 @@
       visualInput.value = "";
       dropdown.style.display = "none";
       window.renderCountryTags();
-      visualInput.focus();
+      if (shouldFocus) {
+        visualInput.focus({ preventScroll: true });
+      }
     };
 
     visualInput.addEventListener("input", (e) => {
@@ -768,14 +786,14 @@
         dropdown.innerHTML = matches
           .map(
             (c) => `
-                  <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); window.addCountryTag('${escJS(c)}')">${c}</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); window.addCountryTag('${escJS(c)}', true)">${c}</a></li>
               `,
           )
           .join("");
         dropdown.style.display = "block";
       } else {
         // Permitir añadir lo que escriban aunque no esté en la lista popular
-        dropdown.innerHTML = `<li><a class="dropdown-item text-success" href="#" onclick="event.preventDefault(); window.addCountryTag('${escJS(q)}')"><i class="fa-solid fa-plus me-2"></i>Añadir "${esc(q)}"</a></li>`;
+        dropdown.innerHTML = `<li><a class="dropdown-item text-success" href="#" onclick="event.preventDefault(); window.addCountryTag('${escJS(q)}', true)"><i class="fa-solid fa-plus me-2"></i>Añadir "${esc(q)}"</a></li>`;
         dropdown.style.display = "block";
       }
     });
@@ -784,7 +802,7 @@
       if (e.key === "Enter" || e.key === ",") {
         e.preventDefault();
         if (visualInput.value.trim()) {
-          window.addCountryTag(visualInput.value);
+          window.addCountryTag(visualInput.value, true);
         }
       } else if (
         e.key === "Backspace" &&
@@ -878,6 +896,10 @@
     const dr = document.getElementById("collab-dropdown");
     if (!inp || !dr) return;
 
+    dr.addEventListener("touchmove", (e) => {
+      e.stopPropagation();
+    }, { passive: true });
+
     inp.addEventListener("input", () => {
       const q = inp.value.toLowerCase().trim();
       if (!q) {
@@ -890,14 +912,14 @@
       );
       if (!filtered.length) {
         dr.innerHTML =
-          '<div class="ac-item text-muted" style="padding:0.5rem;">No tienes amigos con ese nombre</div>';
+          '<div class="ac-item text-muted" style="padding:0.55rem 0.75rem;">No tienes amigos con ese nombre</div>';
       } else {
         dr.innerHTML = filtered
           .map(
             (f) => `
-          <div class="ac-item d-flex align-items-center gap-2" style="cursor:pointer; padding:0.5rem;" onclick="document.getElementById('collab-username').value='${esc(f.username)}'; document.getElementById('collab-dropdown').style.display='none';">
-            <img src="${f.profile_image ? esc(f.profile_image) : window.BASE_URL + "/web/img/avatars/default_avatar.svg"}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;">
-            <strong>${esc(f.username)}</strong>
+          <div class="ac-item d-flex align-items-center gap-2" style="cursor:pointer; padding:0.55rem 0.75rem;" onclick="document.getElementById('collab-username').value='${esc(f.username)}'; document.getElementById('collab-dropdown').style.display='none';">
+            <img src="${f.profile_image ? esc(f.profile_image) : window.BASE_URL + "/web/img/avatars/default_avatar.svg"}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0;">
+            <strong style="font-size:0.9rem;">${esc(f.username)}</strong>
           </div>
         `,
           )
@@ -906,11 +928,13 @@
       dr.style.display = "block";
     });
 
-    document.addEventListener("click", (e) => {
+    const closeCollabDr = (e) => {
       if (!dr.contains(e.target) && e.target !== inp) {
         dr.style.display = "none";
       }
-    });
+    };
+    document.addEventListener("click", closeCollabDr);
+    document.addEventListener("touchstart", closeCollabDr, { passive: true });
   }
 
   // ─── VIAJES ──────────────────────────────────────────────────
@@ -933,7 +957,7 @@
         start.setHours(0, 0, 0, 0);
         const end = new Date(t.end_date);
         end.setHours(0, 0, 0, 0);
-        const mon = start.toLocaleString("es-ES", { month: "short" });
+        const mon = start.toLocaleString(window.APP_LANG || 'es', { month: "short" });
         const y = start.getFullYear();
         const diff = Math.max(1, Math.round((end - start) / 86400000) + 1);
         const today = new Date();
@@ -962,11 +986,11 @@
             : window.RCW_BASE_URL + t.cover_image;
         }
         const pNames = t.park_names ? t.park_names : _t2('trips.no_parks_planned');
-        const startStr = start.toLocaleDateString("es-ES", {
+        const startStr = start.toLocaleDateString(window.APP_LANG || 'es', {
           day: "numeric",
           month: "short",
         });
-        const endStr = end.toLocaleDateString("es-ES", {
+        const endStr = end.toLocaleDateString(window.APP_LANG || 'es', {
           day: "numeric",
           month: "short",
           year: "numeric",
@@ -1129,7 +1153,7 @@
         if (currentPeriod === "year")
           navLabel.textContent = baseDate.getFullYear();
         else if (currentPeriod === "month") {
-          let s = baseDate.toLocaleString("es-ES", {
+          let s = baseDate.toLocaleString(window.APP_LANG || 'es', {
             month: "long",
             year: "numeric",
           });
@@ -1139,7 +1163,7 @@
           wStart.setDate(wStart.getDate() - wStart.getDay() + 1);
           navLabel.textContent =
             "Semana " +
-            wStart.toLocaleDateString("es-ES", {
+            wStart.toLocaleDateString(window.APP_LANG || 'es', {
               day: "numeric",
               month: "short",
             });
@@ -1245,7 +1269,7 @@
         html += `
           <div class="list-group-item bg-transparent border-bottom border-secondary border-opacity-25 px-4 py-3">
             <div class="d-flex align-items-center gap-3">
-              <div class="fw-bold text-success fs-5" style="min-width:30px;">#${idx + 1}</div>
+              <div class="fw-bold text-success fs-5" style="min-width:36px; white-space:nowrap; flex-shrink:0;">#${idx + 1}</div>
               <div style="width: 48px; height: 48px; flex-shrink: 0; border-radius: 4px; border: 1px solid var(--rcw-border); overflow:hidden; background:rgba(255,255,255,0.03); display:flex; align-items:center; justify-content:center;">
                 ${
                   img
@@ -1254,15 +1278,13 @@
                 }
               </div>
               <div class="flex-grow-1 min-w-0">
-                <div class="d-flex justify-content-between align-items-end mb-1 gap-2">
-                  <div class="min-w-0">
-                    <h6 class="fw-bold text-white mb-0 text-truncate">${esc(title)}</h6>
-                    <small class="text-muted text-truncate d-block">${esc(sub)}</small>
+                <h6 class="fw-bold text-white mb-0 text-truncate">${esc(title)}</h6>
+                <small class="text-muted text-truncate d-block">${esc(sub)}</small>
+                <div class="d-flex align-items-center gap-2 mt-2">
+                  <div class="progress rounded-pill bg-dark flex-grow-1" style="height: 6px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: ${pct}%"></div>
                   </div>
-                  <div class="fw-bold text-success fs-6 fs-md-5 flex-shrink-0 text-end" style="min-width: 60px;">${count} <span class="d-block d-sm-inline text-muted fw-normal" style="font-family: 'Outfit', sans-serif; letter-spacing: 0.5px; font-size: 0.7em;">${isC ? (count === 1 ? (window.t ? window.t('trips.times_ridden_1') : 'vez probada') : (window.t ? window.t('trips.times_ridden_n') : 'veces probadas')) : count === 1 ? (window.t ? window.t('trips.visit_1') : 'visita') : (window.t ? window.t('trips.visit_n') : 'visitas')}</span></div>
-                </div>
-                <div class="progress rounded-pill bg-dark mt-2" style="height: 6px;">
-                  <div class="progress-bar bg-success" role="progressbar" style="width: ${pct}%"></div>
+                  <div class="fw-bold text-success flex-shrink-0" style="font-size:1.15rem; white-space:nowrap;">${count} <span class="text-muted fw-normal" style="font-size: 0.85rem; letter-spacing: 0.3px;">${isC ? (count === 1 ? (window.t ? window.t('trips.times_ridden_1') : 'vez probada') : (window.t ? window.t('trips.times_ridden_n') : 'veces probadas')) : count === 1 ? (window.t ? window.t('trips.visit_1') : 'visita') : (window.t ? window.t('trips.visit_n') : 'visitas')}</span></div>
                 </div>
               </div>
             </div>

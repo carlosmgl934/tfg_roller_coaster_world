@@ -22,6 +22,19 @@
     return m;
   };
 
+  // Limpiar el reloj en vivo al cerrar el modal por cualquier vía
+  document.addEventListener("DOMContentLoaded", () => {
+    const dayModal = document.getElementById("day-detail-modal");
+    if (dayModal) {
+      dayModal.addEventListener("hidden.bs.modal", () => {
+        if (window._dayClockInterval) {
+          clearInterval(window._dayClockInterval);
+          window._dayClockInterval = null;
+        }
+      });
+    }
+  });
+
   const esc = (s) =>
     String(s ?? "")
       .replace(/&/g, "&amp;")
@@ -701,6 +714,20 @@
       h += `</div></div></div>`;
       body.innerHTML = h;
       if (typeof window.initFlatpickr === "function") window.initFlatpickr();
+
+      // — Reloj en vivo: actualiza los inputs de hora cada 30s si el usuario no los tocó —
+      if (window._dayClockInterval) clearInterval(window._dayClockInterval);
+      // Marcar como "tocado" cuando el usuario edita manualmente
+      body.querySelectorAll(".day-coaster-time").forEach((inp) => {
+        inp.addEventListener("change", () => { inp.dataset.userModified = "1"; }, { once: true });
+      });
+      window._dayClockInterval = setInterval(() => {
+        const nowStr = new Date().toTimeString().slice(0, 5);
+        body.querySelectorAll(".day-coaster-time").forEach((inp) => {
+          if (!inp.dataset.userModified) inp.value = nowStr;
+        });
+      }, 30000);
+
     } catch (e) {
       body.innerHTML =
         `<div class="p-4 text-danger text-center">${(window.t ? window.t('trips.day.error_loading') : 'Error cargando datos del día')}</div>`;
@@ -717,9 +744,11 @@
   });
 
   window.closeDayAndRefresh = () => {
+    if (window._dayClockInterval) { clearInterval(window._dayClockInterval); window._dayClockInterval = null; }
     gm("day-detail-modal").hide();
     callReloads();
   };
+
 
   window.quickLogRide = async (
     cid,
@@ -1534,6 +1563,10 @@
     const dr = document.getElementById("collab-dropdown");
     if (!inp || !dr) return;
 
+    dr.addEventListener("touchmove", (e) => {
+      e.stopPropagation();
+    }, { passive: true });
+
     inp.addEventListener("input", () => {
       const q = inp.value.toLowerCase().trim();
       if (!q) {
@@ -1546,14 +1579,14 @@
       );
       if (!filtered.length) {
         dr.innerHTML =
-          '<div class="ac-item text-muted" style="padding:0.5rem;">No tienes amigos con ese nombre</div>';
+          '<div class="ac-item text-muted" style="padding:0.55rem 0.75rem;">No tienes amigos con ese nombre</div>';
       } else {
         dr.innerHTML = filtered
           .map(
             (f) => `
-          <div class="ac-item d-flex align-items-center gap-2" style="cursor:pointer; padding:0.5rem;" onclick="document.getElementById('collab-username').value='${esc(f.username)}'; document.getElementById('collab-dropdown').style.display='none';">
-            <img src="${f.profile_image ? esc(f.profile_image) : window.BASE_URL + "/web/img/avatars/default_avatar.svg"}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;">
-            <strong>${esc(f.username)}</strong>
+          <div class="ac-item d-flex align-items-center gap-2" style="cursor:pointer; padding:0.55rem 0.75rem;" onclick="document.getElementById('collab-username').value='${esc(f.username)}'; document.getElementById('collab-dropdown').style.display='none';">
+            <img src="${f.profile_image ? esc(f.profile_image) : window.BASE_URL + "/web/img/avatars/default_avatar.svg"}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0;">
+            <strong style="font-size:0.9rem;">${esc(f.username)}</strong>
           </div>
         `,
           )
@@ -1562,9 +1595,13 @@
       dr.style.display = "block";
     });
 
-    document.addEventListener("click", (e) => {
-      if (!dr.contains(e.target) && e.target !== inp) dr.style.display = "none";
-    });
+    const closeCollabDr = (e) => {
+      if (!dr.contains(e.target) && e.target !== inp) {
+        dr.style.display = "none";
+      }
+    };
+    document.addEventListener("click", closeCollabDr);
+    document.addEventListener("touchstart", closeCollabDr, { passive: true });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -1624,7 +1661,7 @@
       window.renderCountryTags();
     };
 
-    window.addCountryTag = (tagToAdd) => {
+    window.addCountryTag = (tagToAdd, shouldFocus = false) => {
       tagToAdd = tagToAdd.trim();
       if (tagToAdd && !tags.includes(tagToAdd)) {
         tags.push(tagToAdd);
@@ -1633,7 +1670,9 @@
       visualInput.value = "";
       dropdown.style.display = "none";
       window.renderCountryTags();
-      visualInput.focus();
+      if (shouldFocus) {
+        visualInput.focus({ preventScroll: true });
+      }
     };
 
     visualInput.addEventListener("input", (e) => {
@@ -1649,12 +1688,12 @@
         dropdown.innerHTML = matches
           .map(
             (c) =>
-              `<li><a class="dropdown-item" href="#" onclick="event.preventDefault(); window.addCountryTag('${escJS(c)}')">${c}</a></li>`,
+              `<li><a class="dropdown-item" href="#" onclick="event.preventDefault(); window.addCountryTag('${escJS(c)}', true)">${c}</a></li>`,
           )
           .join("");
         dropdown.style.display = "block";
       } else {
-        dropdown.innerHTML = `<li><a class="dropdown-item text-success" href="#" onclick="event.preventDefault(); window.addCountryTag('${escJS(q)}')"><i class="fa-solid fa-plus me-2"></i>Añadir "${esc(q)}"</a></li>`;
+        dropdown.innerHTML = `<li><a class="dropdown-item text-success" href="#" onclick="event.preventDefault(); window.addCountryTag('${escJS(q)}', true)"><i class="fa-solid fa-plus me-2"></i>Añadir "${esc(q)}"</a></li>`;
         dropdown.style.display = "block";
       }
     });
@@ -1663,7 +1702,7 @@
       if (e.key === "Enter" || e.key === ",") {
         e.preventDefault();
         if (visualInput.value.trim()) {
-          window.addCountryTag(visualInput.value);
+          window.addCountryTag(visualInput.value, true);
         }
       } else if (
         e.key === "Backspace" &&

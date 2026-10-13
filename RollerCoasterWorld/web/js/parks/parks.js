@@ -70,6 +70,16 @@ $(document).ready(function () {
     const sortDirectionBtn = document.getElementById("sort-direction-btn");
     const sortDirectionInput = document.getElementById("sort-direction");
 
+    // Restaurar último orden guardado
+    if (sortFilter && sortDirectionInput) {
+      const savedSort = localStorage.getItem("parks_sort");
+      const savedDir = localStorage.getItem("parks_sort_dir") || "DESC";
+
+      if (savedSort) sortFilter.value = savedSort;
+      sortDirectionInput.value = savedDir;
+      if (sortDirectionBtn) updateSortIcon(savedDir);
+    }
+
     if (sortFilter) {
       sortFilter.addEventListener("change", function () {
         const val = this.value;
@@ -78,6 +88,10 @@ $(document).ready(function () {
 
         sortDirectionInput.value = defaultDir;
         updateSortIcon(defaultDir);
+
+        localStorage.setItem("parks_sort", val);
+        localStorage.setItem("parks_sort_dir", defaultDir);
+
         loadParks(getFilters(), 1);
       });
     }
@@ -88,6 +102,9 @@ $(document).ready(function () {
         const newDir = currentDir === "ASC" ? "DESC" : "ASC";
         sortDirectionInput.value = newDir;
         updateSortIcon(newDir);
+
+        localStorage.setItem("parks_sort_dir", newDir);
+
         loadParks(getFilters(), 1);
       });
     }
@@ -162,7 +179,7 @@ $(document).ready(function () {
           let html = "";
           parks.forEach((park) => {
             const fallbackImg =
-              "https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png";
+              "https://www.themeparkexperts.com/wp-content/uploads/2019/07/themepark_cedarpoint_montanarusa.jpg";
             const imgSrc = park.imagen_url
               ? park.imagen_url.startsWith("/")
                 ? (window.BASE_URL || "") + park.imagen_url
@@ -491,12 +508,8 @@ $(document).ready(function () {
               ? (window.BASE_URL || "") + park.imagen_url
               : park.imagen_url;
             $("#park-hero-img").attr("src", heroUrl);
-          } else {
-            $("#park-hero-img").attr(
-              "src",
-              "https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png",
-            );
           }
+          // Sin imagen: se mantiene el placeholder SVG definido en el HTML
 
           // 2x2 Stats (Coaster style)
           $("#global-ranking").text(park.ranking ? "#" + park.ranking : "—");

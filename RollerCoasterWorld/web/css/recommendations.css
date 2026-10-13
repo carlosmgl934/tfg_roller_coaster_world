@@ -1,4 +1,4 @@
-/* ================================================================
+﻿/* ================================================================
    recommendations.css — Sección "Especialmente para ti"
    RollerCoaster World · Design System Dark
    ================================================================ */
@@ -100,7 +100,7 @@
   flex-direction: column;
   cursor: pointer;
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-  animation: recCardIn 0.5s ease both;
+  animation: recCardIn 0.5s ease backwards;
 }
 
 .rcw-rec-card:hover {
@@ -407,3 +407,7 @@
   color: #94a3b8;
   margin-bottom: 0.2rem;
 }
+
+/* ================================================================
+   SPOTLIGHT GRID — estilos movidos a spotlight-cards.css
+   ================================================================ */

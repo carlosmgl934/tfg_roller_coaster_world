@@ -440,6 +440,7 @@
     z-index: 1050;
     max-height: calc(100dvh - 75px); /* Mejorado para móviles modernos */
     overflow-y: auto;
+    overflow-x: hidden !important;
     scrollbar-width: thin;
   }
 
@@ -460,6 +461,30 @@
     right: auto !important;
     left: auto !important;
     margin-top: 0;
+  }
+  /* Reducir longitud y padding del desplegable del perfil para que no sobresalga hacia el lado */
+  .custom-navbar .rcw-user-trigger ~ .dropdown-menu {
+    min-width: unset !important;
+    width: auto !important;
+    max-width: 175px !important;
+    padding-left: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .custom-navbar .rcw-user-trigger ~ .dropdown-menu .rcw-dropdown-header {
+    padding: 0.4rem 0.25rem 0.2rem 0.25rem !important;
+  }
+  .custom-navbar .rcw-user-trigger ~ .dropdown-menu .rcw-dropdown-header .fw-semibold,
+  .custom-navbar .rcw-user-trigger ~ .dropdown-menu .rcw-dropdown-header .small {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    max-width: 100% !important;
+    display: block !important;
+  }
+  .custom-navbar .rcw-user-trigger ~ .dropdown-menu .dropdown-item {
+    padding: 0.45rem 0.25rem !important;
+    white-space: nowrap !important;
+    font-size: 0.88rem !important;
   }
   .custom-navbar .nav-link,
   .custom-navbar .rcw-nav-pill {

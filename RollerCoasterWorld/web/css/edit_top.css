@@ -1,0 +1,515 @@
+/* web/css/edit_top.css - RollerCoasterWorld */
+
+:root {
+  --rcw-card-bg: #161c22;
+  --rcw-card-border: rgba(255, 255, 255, 0.08);
+  --rcw-green-neon: #0da048;
+  --rcw-green-hover: #0b8a3e;
+  --rcw-item-hover: rgba(255, 255, 255, 0.04);
+}
+
+.edit-top-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── Barra de acciones superior fija/adhesiva ────────────────────────────── */
+.edit-top-sticky-header {
+  position: sticky;
+  top: 70px;
+  z-index: 1015;
+  background: rgba(18, 24, 30, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--rcw-card-border);
+  border-top: 3px solid var(--rcw-green-neon);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+/* Indicador de cambios sin guardar */
+.unsaved-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #f87171;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.3s ease;
+}
+
+.unsaved-badge .pulse-dot {
+  width: 7px;
+  height: 7px;
+  background-color: #ef4444;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  animation: pulse-red 1.6s infinite;
+}
+
+@keyframes pulse-red {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+/* ── Pestañas Coasters / Parques ─────────────────────────────────────────── */
+.edit-top-tabs .nav-link {
+  background: rgba(255, 255, 255, 0.02);
+  color: #adb5bd;
+  border: 1px solid var(--rcw-card-border);
+  border-radius: 0;
+  padding: 0.85rem 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  box-shadow: none !important;
+}
+
+.edit-top-tabs .nav-link:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.edit-top-tabs .nav-link.active {
+  background: var(--rcw-green-neon) !important;
+  border-color: var(--rcw-green-neon) !important;
+  color: #000 !important;
+  box-shadow: none !important;
+}
+
+.edit-top-tabs .badge {
+  border-radius: 0 !important;
+  font-weight: 800;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.55rem;
+  letter-spacing: 0.02em;
+  vertical-align: 1px;
+}
+
+.edit-top-tabs .nav-link.active .badge {
+  background: #0a4f2e !important;
+  color: #fff !important;
+  border-radius: 0 !important;
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
+}
+
+.edit-top-tabs .nav-link:not(.active) .badge {
+  background: #0a4f2e !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 0 !important;
+}
+
+/* ── Barra de herramientas (Búsqueda y añadir) ────────────────────────────── */
+.edit-top-toolbar {
+  background: var(--rcw-card-bg);
+  border: 1px solid var(--rcw-card-border);
+  padding: 1.25rem;
+}
+
+.search-input-group .form-control {
+  background-color: #0f1418 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #fff !important;
+  border-radius: 0;
+  padding: 0.65rem 0.9rem;
+}
+
+#search-add-input {
+  padding-right: 4.8rem !important;
+}
+
+.search-input-group .form-control:focus {
+  border-color: var(--rcw-green-neon) !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 200, 83, 0.15) !important;
+}
+
+/* Acciones internas del buscador (botón restaurar última búsqueda y lupa/limpiar) */
+.search-input-actions {
+  z-index: 5;
+  pointer-events: none;
+}
+
+.btn-restore-search {
+  background: transparent;
+  border: none;
+  padding: 4px 6px;
+  color: #adb5bd;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  line-height: 1;
+  transition: all 0.2s ease;
+  pointer-events: auto;
+  border-radius: 4px;
+}
+
+.btn-restore-search:hover:not(.disabled) {
+  color: var(--rcw-green-neon, #0da048);
+  transform: scale(1.18);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.btn-restore-search:active:not(.disabled) {
+  transform: scale(0.92);
+}
+
+.btn-restore-search.disabled {
+  opacity: 0.25 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+.search-input-actions #search-add-icon {
+  pointer-events: auto;
+  font-size: 0.95rem;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.search-input-actions #search-add-icon.fa-xmark:hover {
+  color: #ff5252 !important;
+  transform: scale(1.15);
+}
+
+.autocomplete-dropdown {
+  max-height: 320px;
+  overflow-y: auto;
+  z-index: 1060;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65);
+  background: #11161b;
+}
+
+.autocomplete-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.active {
+  background: rgba(0, 200, 83, 0.12);
+}
+
+.autocomplete-thumb {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  object-fit: cover;
+  background: #080b0e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ── Lista de edición Drag & Drop ────────────────────────────────────────── */
+.edit-top-list {
+  position: relative;
+  min-height: 120px;
+}
+
+.edit-top-item {
+  display: flex;
+  align-items: center;
+  background: var(--rcw-card-bg);
+  border: 1px solid var(--rcw-card-border);
+  padding: 0.6rem 0.9rem;
+  margin-bottom: 0.5rem;
+  gap: 0.75rem;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.edit-top-item img {
+  pointer-events: none;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.edit-top-item:hover {
+  background: var(--rcw-item-hover);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* Handle de arrastre */
+.drag-handle {
+  cursor: grab;
+  color: #6c757d;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.drag-handle:hover {
+  color: var(--rcw-green-neon);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* Badges de ranking estilo podio */
+.rank-badge-editor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 32px;
+  font-family: var(--rcw-font-title, sans-serif);
+  font-weight: 900;
+  font-size: 0.85rem;
+  border-radius: 0;
+  flex-shrink: 0;
+}
+
+.rank-badge-editor.rank-1 {
+  background: #ffd700;
+  color: #000;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.35);
+}
+
+.rank-badge-editor.rank-2 {
+  background: #c0c0c0;
+  color: #000;
+  box-shadow: 0 0 8px rgba(192, 192, 192, 0.25);
+}
+
+.rank-badge-editor.rank-3 {
+  background: #cd7f32;
+  color: #000;
+  box-shadow: 0 0 8px rgba(205, 127, 50, 0.25);
+}
+
+.rank-badge-editor.rank-normal {
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Miniatura en el elemento */
+.edit-item-thumb {
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  background: #080b0e;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.edit-item-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Título e información */
+.edit-item-info {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.edit-item-title {
+  font-family: var(--rcw-font-title, sans-serif);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.edit-item-sub {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+/* Acciones del elemento */
+.edit-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.btn-action-icon {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  color: #adb5bd;
+  transition: all 0.15s ease;
+}
+
+.btn-action-icon:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.btn-action-icon.btn-delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+/* ── Badges de estado de Coaster ────────────────────────────────────────── */
+.coaster-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  line-height: 1.15;
+}
+
+.coaster-status-badge i {
+  font-size: 0.55rem;
+}
+
+.coaster-status-badge.badge-status-operating {
+  background: rgba(0, 200, 83, 0.15);
+  color: #00e676;
+  border: 1px solid rgba(0, 200, 83, 0.35);
+}
+
+.coaster-status-badge.badge-status-closed {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.coaster-status-badge.badge-status-sbno {
+  background: rgba(255, 213, 79, 0.14);
+  color: #ffd54f;
+  border: 1px solid rgba(255, 213, 79, 0.35);
+}
+
+.coaster-status-badge.badge-status-construction {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.coaster-status-badge.badge-status-relocated {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.coaster-status-badge.badge-status-other {
+  background: rgba(156, 163, 175, 0.15);
+  color: #d1d5db;
+  border: 1px solid rgba(156, 163, 175, 0.35);
+}
+
+/* ── SortableJS estados de arrastre ──────────────────────────────────────── */
+.sortable-ghost {
+  opacity: 0.25 !important;
+  background: rgba(0, 200, 83, 0.05) !important;
+  border: 2px dashed var(--rcw-green-neon) !important;
+}
+
+.sortable-chosen {
+  background: #1e2630 !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.sortable-drag {
+  cursor: grabbing !important;
+  opacity: 0.95;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.8) !important;
+  border-color: var(--rcw-green-neon) !important;
+}
+
+/* Elemento clonado que sigue el cursor */
+.sortable-fallback-item {
+  position: fixed !important;
+  z-index: 999999 !important;
+  pointer-events: none !important;
+  background: #192128 !important;
+  border: 2px solid var(--rcw-green-neon) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9) !important;
+  opacity: 0.98 !important;
+  transition: none !important;
+  box-sizing: border-box !important;
+}
+
+body.is-dragging * {
+  cursor: grabbing !important;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .edit-top-sticky-header {
+    top: 56px;
+    z-index: 1015;
+    padding: 0.75rem !important;
+  }
+
+  .edit-item-thumb {
+    width: 46px;
+    height: 46px;
+  }
+
+  .rank-badge-editor {
+    min-width: 34px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+
+  .edit-item-title {
+    font-size: 0.9rem;
+  }
+
+  .edit-top-item {
+    padding: 0.5rem 0.6rem;
+    gap: 0.5rem;
+  }
+}
+
+/* ── Botones de posicionamiento rápido en modal ───────────────────────────── */
+.btn-modal-quick-pos {
+  transition: all 0.2s ease;
+  border-width: 1px;
+}
+
+.btn-modal-quick-pos:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+.btn-modal-quick-pos:active {
+  transform: translateY(0);
+}

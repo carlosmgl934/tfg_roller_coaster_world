@@ -480,8 +480,22 @@ function dayDetail(DBConexion $db, int $userId): void
     $tripParks = $s2->fetchAll(PDO::FETCH_ASSOC);
 
     // Rides ese día (del usuario logueado)
-    $s3 = $db->prepare("SELECT rl.*,c.coaster_name,p.park_name FROM ride_log rl
-        JOIN coasters c ON c.id=rl.coaster_id JOIN parks p ON p.id=rl.park_id WHERE rl.user_id=? AND rl.visit_date=? ORDER BY rl.ridden_at");
+    // first_time: usa el valor almacenado en el INSERT (calculado correctamente por addRide).
+    // Solo se muestra como true en el primer ride del día para esa coaster.
+    $s3 = $db->prepare("SELECT rl.*,c.coaster_name,p.park_name,
+        (
+            rl.first_time = true
+            AND rl.id = (
+                SELECT MIN(rl3.id) FROM ride_log rl3
+                WHERE rl3.user_id = rl.user_id
+                  AND rl3.coaster_id = rl.coaster_id
+                  AND rl3.visit_date = rl.visit_date
+            )
+        ) AS first_time
+        FROM ride_log rl
+        JOIN coasters c ON c.id=rl.coaster_id
+        JOIN parks p ON p.id=rl.park_id
+        WHERE rl.user_id=? AND rl.visit_date=? ORDER BY rl.ridden_at");
     $s3->execute([$userId, $date]);
     $rides = $s3->fetchAll(PDO::FETCH_ASSOC);
 
@@ -736,11 +750,19 @@ function logRide(DBConexion $db, int $userId, array $body): void
         return;
     }
 
-    // Auto-detect first_time
-    $chk = $db->prepare("SELECT COUNT(*) FROM ride_log WHERE user_id=? AND coaster_id=?");
-    $chk->execute([$userId, $coasterId]);
-    if ((int) $chk->fetchColumn() > 0)
+    // Auto-detect first_time:
+    // 1. Comprobar si ya existe en user_credits (fuente definitiva de "ya probé esta coaster")
+    $chkCred2 = $db->prepare("SELECT COUNT(*) FROM user_credits WHERE user_id=? AND coaster_id=?");
+    $chkCred2->execute([$userId, $coasterId]);
+    if ((int) $chkCred2->fetchColumn() > 0) {
         $firstTime = false;
+    } else {
+        // 2. Si no está en user_credits, comprobar si hay rides en fechas anteriores a hoy
+        $chk = $db->prepare("SELECT COUNT(*) FROM ride_log WHERE user_id=? AND coaster_id=? AND visit_date < ?");
+        $chk->execute([$userId, $coasterId, $date]);
+        if ((int) $chk->fetchColumn() > 0)
+            $firstTime = false;
+    }
 
     if ($riddenAt) {
         $s = $db->prepare("INSERT INTO ride_log(trip_id,park_id,coaster_id,user_id,visit_date,ridden_at,seat_row,first_time,notes) VALUES(?,?,?,?,?,?,?,?,?) RETURNING id");

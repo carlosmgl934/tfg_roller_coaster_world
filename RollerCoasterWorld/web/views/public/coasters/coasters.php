@@ -22,7 +22,7 @@ require_once __DIR__ . '/../../partials/header.php';
         <!-- Imagen -->
         <div class="col-12 col-lg-7">
             <div class="hero-img-wrapper">
-                <img src="https://placehold.co/900x500" alt="Coaster" id="coaster-hero-img" referrerpolicy="no-referrer">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='500' viewBox='0 0 900 500'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23161b22'/%3E%3Cstop offset='1' stop-color='%230a0f14'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='900' height='500' fill='url(%23bg)'/%3E%3Crect x='370' y='168' width='160' height='120' rx='6' fill='none' stroke='%2300c853' stroke-width='2' opacity='0.35'/%3E%3Ccircle cx='405' cy='200' r='14' fill='none' stroke='%2300c853' stroke-width='2' opacity='0.35'/%3E%3Cline x1='370' y1='268' x2='430' y2='218' stroke='%2300c853' stroke-width='2' opacity='0.35'/%3E%3Cline x1='430' y1='218' x2='480' y2='248' stroke='%2300c853' stroke-width='2' opacity='0.35'/%3E%3Cline x1='480' y1='248' x2='530' y2='200' stroke='%2300c853' stroke-width='2' opacity='0.35'/%3E%3Cline x1='530' y1='200' x2='530' y2='288' stroke='%2300c853' stroke-width='2' opacity='0.35'/%3E%3Ctext x='450' y='330' font-family='Arial%2C sans-serif' font-size='13' font-weight='600' text-anchor='middle' fill='%2300c853' opacity='0.45' letter-spacing='4'%3ESIN IMAGEN%3C/text%3E%3Cline x1='350' y1='342' x2='400' y2='342' stroke='%2300c853' stroke-width='1' opacity='0.2'/%3E%3Cline x1='500' y1='342' x2='550' y2='342' stroke='%2300c853' stroke-width='1' opacity='0.2'/%3E%3C/svg%3E" alt="Coaster" id="coaster-hero-img" referrerpolicy="no-referrer">
                 <div class="img-overlay"></div>
             </div>
         </div>
@@ -308,7 +308,7 @@ require_once __DIR__ . '/../../partials/header.php';
                         </select>
                         <a class="btn btn-sm btn-outline-light rounded-0 px-3" id="btn-write-review"
                             <?php if ($is_logged): ?>
-                              href="<?= $base_url ?>/web/views/public/coasters/form_rating.php?id=<?= $id ?>"
+                                href="<?= $base_url ?>/web/views/public/coasters/form_rating.php?id=<?= $id ?>"
                             <?php else: ?>
                               href="#" data-bs-toggle="modal" data-bs-target="#loginModal"
                             <?php endif; ?>>
@@ -425,4 +425,4 @@ require_once __DIR__ . '/../../partials/login_modal.php';
 <script src="<?= Router::asset('web/js/coasters/coasters.js') ?>?v=<?= time() ?>"></script>
 
 <!-- CropperJS para recortar imágenes al subir fotos -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>

@@ -405,7 +405,7 @@ $(document).ready(function () {
 
     const search = $searchInput.val().trim();
     const filters = getFilters();
-    const useSearch = search.length >= 3;
+    const useSearch = search.length >= 2;
     const useFilters = hasActiveFilters(filters);
 
     if (!useSearch && !useFilters) {
@@ -1562,17 +1562,32 @@ $(document).ready(function () {
         el.dataset.selected = "true";
       });
 
-      const imageUrl = button.getAttribute("data-image");
+      let imageUrl = button.getAttribute("data-image");
+      if (imageUrl === "null" || imageUrl === "undefined" || !imageUrl || imageUrl.trim() === "") {
+        imageUrl = null;
+      }
+      
       const preview = document.getElementById("edit-coaster-preview");
+      const emptyStateHtml = `<div class="text-center text-muted"><i class="fa-regular fa-image fa-3x d-block mb-3" style="opacity:0.2;"></i><span style="font-size:0.85rem; letter-spacing:1px; text-transform:uppercase;">Vista previa original / nueva</span></div>`;
+      
       if (preview) {
-        let validImgUrl = imageUrl;
-        if (validImgUrl && !validImgUrl.startsWith("http")) {
-          validImgUrl =
-            BASE_URL + (validImgUrl.startsWith("/") ? "" : "/") + validImgUrl;
+        if (!imageUrl) {
+          preview.innerHTML = emptyStateHtml;
+        } else {
+          let validImgUrl = imageUrl;
+          if (validImgUrl && !validImgUrl.startsWith("http")) {
+            validImgUrl = BASE_URL + (validImgUrl.startsWith("/") ? "" : "/") + validImgUrl;
+          }
+          // Solo añadimos cache-busting a imágenes locales, no a URLs externas que pueden fallar (como RCDB)
+          const bust = (validImgUrl && !validImgUrl.startsWith("http")) ? "?v=" + Date.now() : "";
+          
+          preview.innerHTML = `
+            <img src="${validImgUrl}${bust}" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="empty-state-fallback" style="display:none; width:100%; height:100%; flex-direction:column; align-items:center; justify-content:center;">
+               ${emptyStateHtml}
+            </div>
+          `;
         }
-        preview.innerHTML = validImgUrl
-          ? `<img src="${validImgUrl}" style="width:100%;height:100%;object-fit:cover;">`
-          : "";
       }
     });
 
@@ -1812,7 +1827,7 @@ $(document).ready(function () {
 
       const search = $parkSearchInput.val().trim();
       const filters = getParkFilters();
-      const useSearch = search.length >= 3;
+      const useSearch = search.length >= 2;
       const useFilters = hasActiveParkFilters(filters);
 
       if (!useSearch && !useFilters) {
@@ -3125,22 +3140,34 @@ if (_confirmEditCoaster) {
         uploadForm.append("bucket", "coasters");
         uploadForm.append("path", "admin_uploads");
 
-        const uploadRes = await fetch(`${BASE_URL}/api/php/upload.php`, {
-          method: "POST",
-          headers: {
-            "X-CSRF-Token":
-              document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute("content") ?? "",
-          },
-          body: uploadForm,
-          credentials: "include",
-        });
-        const uploadData = await uploadRes.json();
-        if (uploadData.success) {
+        let uploadData;
+        try {
+          const uploadRes = await fetch(`${BASE_URL}/api/php/upload.php`, {
+            method: "POST",
+            headers: {
+              "X-CSRF-Token":
+                document
+                  .querySelector('meta[name="csrf-token"]')
+                  ?.getAttribute("content") ?? "",
+            },
+            body: uploadForm,
+            credentials: "include",
+          });
+          uploadData = await uploadRes.json();
+        } catch (uploadErr) {
+          console.error("[Upload imagen] Error de red:", uploadErr);
+          showEditModalError("Error de red al subir la imagen. Comprueba tu conexión.");
+          return;
+        }
+
+        if (uploadData.success && uploadData.url) {
           formData.append("imagenUrl", uploadData.url);
         } else {
-          formData.append("image", image);
+          // Mostrar el error real en lugar de continuar silenciosamente
+          const errorMsg = uploadData.error || "Error desconocido al subir la imagen a Supabase.";
+          console.error("[Upload imagen] Falló:", errorMsg);
+          showEditModalError(`No se pudo subir la imagen: ${errorMsg}`);
+          return;
         }
       }
 
@@ -3179,7 +3206,21 @@ if (_confirmEditCoaster) {
       if (data.success) {
         showEditModalSuccess("Coaster actualizada correctamente.");
         document.getElementById("edit-coaster-image").value = "";
-        
+
+        // Actualizar preview del modal con cache-busting para ver el cambio al instante
+        if (data.coaster && data.coaster.imagen_url) {
+          const newUrl = data.coaster.imagen_url;
+          const bust = "?v=" + Date.now();
+          const fullUrl = newUrl.startsWith("http") ? newUrl : BASE_URL + (newUrl.startsWith("/") ? "" : "/") + newUrl;
+          const preview = document.getElementById("edit-coaster-preview");
+          if (preview) {
+            preview.innerHTML = `<img src="${fullUrl}${bust}" style="width:100%;height:100%;object-fit:cover;">`;
+          }
+          // Actualizar también el botón que abrió el modal, por si se vuelve a abrir
+          const editBtn = document.querySelector(`[data-id="${id}"][data-bs-target="#modal-edit-coaster"]`);
+          if (editBtn) editBtn.setAttribute("data-image", newUrl);
+        }
+
         if (typeof window.loadAdminCoasters === "function")
           window.loadAdminCoasters(1);
         setTimeout(() => {

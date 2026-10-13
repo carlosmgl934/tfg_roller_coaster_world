@@ -498,12 +498,14 @@ $user_uid = $_SESSION['firebase_uid'];
             <h5 class="fw-bold mb-0" data-i18n="profile.tops.title">Mis Tops</h5>
           </div>
           <div class="d-flex flex-wrap gap-2" id="tops-header-actions">
-            <button id="btn-tops-full-view" class="btn btn-sm btn-outline-success rounded-0 px-3 fw-bold shadow-sm">
+            <a href="<?= Router::url('top_personal') ?>" id="btn-tops-full-view"
+              class="btn btn-sm btn-outline-success rounded-0 px-3 fw-bold shadow-sm">
               <i class="fa-solid fa-expand me-1"></i><span data-i18n="profile.tops.full_view">Ver Top Completo</span>
-            </button>
-            <button id="btn-tops-edit" class="btn btn-sm btn-outline-success rounded-0 px-3 fw-bold shadow-sm">
+            </a>
+            <a href="<?= Router::url('edit_top') ?>" id="btn-tops-edit"
+              class="btn btn-sm btn-outline-success rounded-0 px-3 fw-bold shadow-sm">
               <i class="fa-solid fa-pen-to-square me-1"></i><span data-i18n="profile.tops.edit">Editar Top</span>
-            </button>
+            </a>
           </div>
           <div class="d-none" id="tops-back-btn-wrap">
             <button id="btn-tops-back" class="btn btn-sm btn-outline-success rounded-0 px-3 fw-bold shadow-sm">
@@ -541,7 +543,8 @@ $user_uid = $_SESSION['firebase_uid'];
 
               <!-- MODO PREVIEW -->
               <div id="coasters-mode-preview">
-                <div id="top-coasters-preview-list" class="tops-preview-scroll">
+                <div id="top-coasters-preview-list"
+                  class="list-group list-group-flush bg-transparent tops-preview-scroll">
                   <div class="text-center text-muted py-4"><i class="fa-solid fa-spinner fa-spin fs-4"></i></div>
                 </div>
               </div>
@@ -673,7 +676,7 @@ $user_uid = $_SESSION['firebase_uid'];
 
               <!-- MODO PREVIEW -->
               <div id="parks-mode-preview">
-                <div id="top-parks-preview-list" class="tops-preview-scroll">
+                <div id="top-parks-preview-list" class="list-group list-group-flush bg-transparent tops-preview-scroll">
                   <div class="text-center text-muted py-4"><i class="fa-solid fa-spinner fa-spin fs-4"></i></div>
                 </div>
               </div>
@@ -921,13 +924,13 @@ $user_uid = $_SESSION['firebase_uid'];
               <div class="d-flex flex-column gap-1" id="rank-dates-container">
                 <div class="d-flex align-items-center gap-2">
                   <small class="text-muted" style="width: 40px; white-space: nowrap;">Desde:</small>
-                  <input type="date" class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white"
-                    id="rank-start-date" style="flex: 1;">
+                  <input type="text" class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white"
+                    id="rank-start-date" style="flex: 1;" placeholder="dd/mm/aaaa" readonly>
                 </div>
                 <div class="d-flex align-items-center gap-2">
                   <small class="text-muted" style="width: 40px; white-space: nowrap;">Hasta:</small>
-                  <input type="date" class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white"
-                    id="rank-end-date" style="flex: 1;">
+                  <input type="text" class="form-control form-control-sm rounded-0 bg-dark border-secondary text-white"
+                    id="rank-end-date" style="flex: 1;" placeholder="dd/mm/aaaa" readonly>
                 </div>
               </div>
             </div>
@@ -1014,7 +1017,7 @@ $user_uid = $_SESSION['firebase_uid'];
             </div>
           </div>
           <!-- Lista y paginación -->
-          <div id="friends-list"></div>
+          <div id="friends-list" style="max-height: 520px; overflow-y: auto; padding-right: 4px;"></div>
           <div id="friends-pagination" class="d-flex justify-content-center gap-2 mt-3"></div>
         </div>
       </div>
@@ -1039,368 +1042,512 @@ $user_uid = $_SESSION['firebase_uid'];
 
     <!-- MODAL ESTADÍSTICAS AMPLIADAS -->
     <style>
+      /* ── Modal base ─────────────────────────────────────────────────── */
       #statsExpandedModal .modal-content {
-        background: rgba(13, 17, 23, 0.95) !important;
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        background: #0d1117 !important;
+        border: 1px solid rgba(16, 185, 129, 0.18) !important;
         border-radius: 0 !important;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(16, 185, 129, 0.2) !important;
-      }
-
-      #statsExpandedModal .stat-card {
-        background: rgba(22, 27, 34, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 0 !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      #statsExpandedModal .stat-card:hover {
-        background: rgba(30, 36, 44, 0.8);
-        transform: translateY(-4px);
-        box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.5);
-      }
-
-      #statsExpandedModal .metric-card {
-        background: rgba(22, 27, 34, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 0 !important;
-        transition: all 0.3s ease;
-      }
-
-      #statsExpandedModal .metric-card:hover {
-        background: rgba(30, 36, 44, 0.8);
-        transform: scale(1.03);
-        z-index: 10;
-        border-color: rgba(16, 185, 129, 0.4);
-      }
-
-      #statsExpandedModal .section-title {
-        color: #10b981 !important;
-        font-size: 0.9rem;
-        letter-spacing: 1px;
-        margin-bottom: 1.5rem;
-        display: block;
-      }
-
-      #statsExpandedModal .modal-section {
-        border-bottom: 3px solid #10b981;
-        padding-bottom: 2rem;
-        margin-bottom: 2rem;
-      }
-
-      #statsExpandedModal .modal-section:last-child {
-        border-bottom: none;
-        padding-bottom: 0;
-        margin-bottom: 0;
+        box-shadow: 0 32px 80px -12px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(16, 185, 129, 0.12) !important;
       }
 
       #statsExpandedModal * {
         border-radius: 0 !important;
       }
+
+      /* ── Header ─────────────────────────────────────────────────────── */
+      #statsExpandedModal .sm-header {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(13, 17, 23, 0) 60%);
+        border-bottom: 1px solid rgba(16, 185, 129, 0.25) !important;
+        padding: 1.5rem 1.75rem 1.25rem;
+      }
+
+      #statsExpandedModal .sm-icon-box {
+        width: 52px;
+        height: 52px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+      }
+
+      /* ── Body ───────────────────────────────────────────────────────── */
+      #statsExpandedModal .modal-body {
+        background: #0d1117;
+        padding: 1.75rem;
+      }
+
+      /* ── Section separators ─────────────────────────────────────────── */
+      #statsExpandedModal .sm-section {
+        margin-bottom: 2.25rem;
+      }
+
+      #statsExpandedModal .sm-section-title {
+        font-size: 0.7rem;
+        letter-spacing: 2px;
+        font-weight: 800;
+        color: #10b981;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-bottom: 1.1rem;
+        padding-bottom: 0.6rem;
+        border-bottom: 1px solid rgba(16, 185, 129, 0.15);
+      }
+
+      #statsExpandedModal .sm-section-title i {
+        font-size: 0.85rem;
+      }
+
+      /* ── Big stat cards ─────────────────────────────────────────────── */
+      #statsExpandedModal .sm-big-card {
+        background: rgba(22, 27, 34, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 1.25rem 0.75rem;
+        text-align: center;
+        transition: transform .2s, border-color .2s, box-shadow .2s;
+        position: relative;
+        overflow: hidden;
+      }
+
+      #statsExpandedModal .sm-big-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.04), transparent 60%);
+        pointer-events: none;
+      }
+
+      #statsExpandedModal .sm-big-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(16, 185, 129, 0.3);
+        box-shadow: 0 8px 24px -8px rgba(16, 185, 129, 0.2);
+      }
+
+      #statsExpandedModal .sm-big-card .sm-val {
+        font-size: 2.2rem;
+        font-weight: 900;
+        color: #fff;
+        line-height: 1;
+        letter-spacing: -1px;
+      }
+
+      #statsExpandedModal .sm-big-card .sm-val.sm-val-md {
+        font-size: 1.6rem;
+      }
+
+      #statsExpandedModal .sm-big-card .sm-label {
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        color: rgba(255, 255, 255, 0.4);
+        text-transform: uppercase;
+        margin-top: 0.4rem;
+      }
+
+      #statsExpandedModal .sm-big-card .sm-accent-dot {
+        width: 28px;
+        height: 3px;
+        background: #10b981;
+        margin: 0.55rem auto 0;
+        opacity: 0.6;
+      }
+
+      /* ── Wide bar card ──────────────────────────────────────────────── */
+      #statsExpandedModal .sm-bar-card {
+        background: rgba(22, 27, 34, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+      }
+
+      #statsExpandedModal .sm-bar-card .sm-bar-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+        color: rgba(255, 255, 255, 0.65);
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      #statsExpandedModal .sm-bar-card .sm-bar-track {
+        flex: 1;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.07);
+        position: relative;
+        overflow: hidden;
+      }
+
+      #statsExpandedModal .sm-bar-card .sm-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #059669, #10b981, #34d399);
+        background-size: 200% 100%;
+        animation: sm-bar-shimmer 2.5s linear infinite;
+        transition: width 0.9s cubic-bezier(.4, 0, .2, 1);
+      }
+
+      @keyframes sm-bar-shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      #statsExpandedModal .sm-bar-card .sm-bar-pct {
+        font-size: 1.1rem;
+        font-weight: 900;
+        color: #10b981;
+        min-width: 44px;
+        text-align: right;
+      }
+
+      /* ── Favorite metric cards ──────────────────────────────────────── */
+      #statsExpandedModal .sm-fav-card {
+        background: rgba(22, 27, 34, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 1.1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: border-color .2s, box-shadow .2s;
+      }
+
+      #statsExpandedModal .sm-fav-card:hover {
+        border-color: rgba(16, 185, 129, 0.3);
+        box-shadow: 0 4px 16px -6px rgba(16, 185, 129, 0.2);
+      }
+
+      #statsExpandedModal .sm-fav-icon {
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+        background: rgba(16, 185, 129, 0.12);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        color: #10b981;
+      }
+
+      #statsExpandedModal .sm-fav-tag {
+        font-size: 0.6rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        color: #10b981;
+        text-transform: uppercase;
+        margin-bottom: 0.2rem;
+      }
+
+      #statsExpandedModal .sm-fav-name {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #fff;
+      }
+
+      #statsExpandedModal .sm-fav-sub {
+        font-size: 0.78rem;
+        color: rgba(255, 255, 255, 0.45);
+      }
+
+      /* ── Record cards ───────────────────────────────────────────────── */
+      #statsExpandedModal .sm-rec-card {
+        background: rgba(22, 27, 34, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 1.1rem 0.75rem;
+        text-align: center;
+        transition: transform .2s, border-color .2s;
+        position: relative;
+      }
+
+      #statsExpandedModal .sm-rec-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(16, 185, 129, 0.25);
+      }
+
+      #statsExpandedModal .sm-rec-icon {
+        width: 38px;
+        height: 38px;
+        background: rgba(16, 185, 129, 0.12);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #10b981;
+        font-size: 0.95rem;
+        margin-bottom: 0.75rem;
+      }
+
+      #statsExpandedModal .sm-rec-val {
+        font-size: 1.45rem;
+        font-weight: 900;
+        color: #fff;
+        line-height: 1.1;
+      }
+
+      #statsExpandedModal .sm-rec-name {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.4);
+        margin-top: 0.25rem;
+      }
+
+      #statsExpandedModal .sm-rec-label {
+        font-size: 0.6rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        color: #10b981;
+        text-transform: uppercase;
+        margin-top: 0.6rem;
+      }
+
+      /* ── List rows ──────────────────────────────────────────────────── */
+      #statsExpandedModal .sm-list-wrap {
+        background: rgba(22, 27, 34, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      #statsExpandedModal .sm-list-head {
+        padding: 0.75rem 1rem;
+        background: rgba(0, 0, 0, 0.25);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        color: rgba(255, 255, 255, 0.6);
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
     </style>
+
     <div class="modal fade" id="statsExpandedModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
-        <div class="modal-content rounded-0 overflow-hidden">
+        <div class="modal-content overflow-hidden">
 
           <!-- HEADER -->
-          <div class="modal-header border-0 px-4 pt-4 pb-3"
-            style="background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(13,17,23,1) 100%); border-bottom: 3px solid var(--rcw-success) !important;">
+          <div class="modal-header border-0 sm-header">
             <div class="d-flex align-items-center gap-3">
-              <div class="d-flex align-items-center justify-content-center rounded-0 shadow-sm"
-                style="width:48px;height:48px;background:var(--rcw-success);border:1px solid rgba(255,255,255,0.2);">
+              <div class="sm-icon-box">
                 <i class="fa-solid fa-chart-pie text-white fs-5"></i>
               </div>
               <div>
-                <h5 class="modal-title fw-bolder text-white mb-0" style="letter-spacing:0.5px; font-size: 1.4rem;">
+                <h5 class="modal-title fw-bolder text-white mb-0" style="font-size:1.35rem;letter-spacing:0.3px;">
                   Estadísticas Ampliadas
                 </h5>
-                <p class="text-white-50 mb-0" style="font-size:0.85rem;">Resumen completo de tu trayectoria</p>
+                <p class="mb-0" style="font-size:0.82rem;color:rgba(255,255,255,0.45);">
+                  Resumen completo de tu trayectoria
+                </p>
               </div>
             </div>
-            <button type="button" class="btn-close btn-close-white opacity-75" data-bs-dismiss="modal"
-              aria-label="Close" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));"></button>
+            <button type="button" class="btn-close btn-close-white opacity-50 ms-auto" data-bs-dismiss="modal"
+              aria-label="Cerrar"></button>
           </div>
 
-          <div class="modal-body p-4" style="background-color: #0d1117;">
+          <div class="modal-body">
 
-            <!-- TOTALES Y ACUMULADOS -->
-            <div class="modal-section mb-4">
-              <h6 class="text-white fw-bold text-uppercase section-title"><i
-                  class="fa-solid fa-calculator text-success me-2"></i>Totales y Acumulados</h6>
-              <div class="row g-3">
-                <div class="col-6 col-md-3">
-                  <div class="stat-card text-center py-3 px-2 h-100">
-                    <div class="fw-black text-white" id="modal-stat-total-coasters"
-                      style="font-size:2rem;line-height:1;">0</div>
-                    <div class="text-uppercase fw-bold mt-1" style="font-size:0.65rem;color:rgba(255,255,255,0.5);">
-                      Coaster Credits</div>
-                  </div>
-                </div>
-                <div class="col-6 col-md-3">
-                  <div class="stat-card text-center py-3 px-2 h-100">
-                    <div class="fw-black text-white" id="modal-stat-total-parks" style="font-size:2rem;line-height:1;">0
-                    </div>
-                    <div class="text-uppercase fw-bold mt-1" style="font-size:0.65rem;color:rgba(255,255,255,0.5);">
-                      Parques Visitados</div>
-                  </div>
-                </div>
-                <div class="col-6 col-md-3">
-                  <div class="stat-card text-center py-3 px-2 h-100">
-                    <div class="fw-black text-white" id="modal-stat-total-countries"
-                      style="font-size:2rem;line-height:1;">0</div>
-                    <div class="text-uppercase fw-bold mt-1" style="font-size:0.65rem;color:rgba(255,255,255,0.5);">
-                      Países Visitados</div>
-                  </div>
-                </div>
-                <div class="col-6 col-md-3">
-                  <div class="stat-card text-center py-3 px-2 h-100">
-                    <div class="fw-black text-white" id="modal-stat-total-continents"
-                      style="font-size:2rem;line-height:1;">0</div>
-                    <div class="text-uppercase fw-bold mt-1" style="font-size:0.65rem;color:rgba(255,255,255,0.5);">
-                      Continentes</div>
-                  </div>
-                </div>
+            <!-- ① TOTALES Y ACUMULADOS -->
+            <div class="sm-section">
+              <div class="sm-section-title">
+                <i class="fa-solid fa-calculator"></i>Totales y Acumulados
+              </div>
 
+              <!-- Fila principal: 4 grandes -->
+              <div class="row g-2 mb-2">
                 <div class="col-6 col-md-3">
-                  <div class="stat-card text-center py-3 px-2 h-100">
-                    <div class="fw-black text-white" id="modal-stat-total-manufacturers-count"
-                      style="font-size:1.5rem;line-height:1;">0</div>
-                    <div class="text-uppercase fw-bold mt-1" style="font-size:0.65rem;color:rgba(255,255,255,0.5);">
-                      Fabricantes Distintos</div>
+                  <div class="sm-big-card h-100">
+                    <div class="sm-val" id="modal-stat-total-coasters">0</div>
+                    <div class="sm-accent-dot"></div>
+                    <div class="sm-label">Coaster Credits</div>
                   </div>
                 </div>
                 <div class="col-6 col-md-3">
-                  <div class="stat-card text-center py-3 px-2 h-100">
-                    <div class="fw-black text-white" id="modal-stat-total-length"
-                      style="font-size:1.5rem;line-height:1;">0 <span class="fs-6">km</span></div>
-                    <div class="text-uppercase fw-bold mt-1" style="font-size:0.65rem;color:rgba(255,255,255,0.5);">
-                      Longitud Total</div>
+                  <div class="sm-big-card h-100">
+                    <div class="sm-val" id="modal-stat-total-parks">0</div>
+                    <div class="sm-accent-dot"></div>
+                    <div class="sm-label">Parques Visitados</div>
                   </div>
                 </div>
                 <div class="col-6 col-md-3">
-                  <div class="stat-card text-center py-3 px-2 h-100">
-                    <div class="fw-black text-white" id="modal-stat-total-inversions"
-                      style="font-size:1.5rem;line-height:1;">0</div>
-                    <div class="text-uppercase fw-bold mt-1" style="font-size:0.65rem;color:rgba(255,255,255,0.5);">
-                      Inversiones Totales</div>
+                  <div class="sm-big-card h-100">
+                    <div class="sm-val" id="modal-stat-total-countries">0</div>
+                    <div class="sm-accent-dot"></div>
+                    <div class="sm-label">Países Visitados</div>
                   </div>
                 </div>
                 <div class="col-6 col-md-3">
-                  <div class="stat-card text-center py-3 px-2 h-100">
-                    <div class="fw-black text-white" id="modal-stat-extinct" style="font-size:1.5rem;line-height:1;">0
-                    </div>
-                    <div class="text-uppercase fw-bold mt-1" style="font-size:0.65rem;color:rgba(255,255,255,0.5);">
-                      Coasters Extintas</div>
-                  </div>
-                </div>
-
-                <div class="col-12">
-                  <div class="stat-card py-3 px-4 d-flex align-items-center justify-content-between">
-                    <div class="text-uppercase fw-bold" style="font-size:0.75rem;color:rgba(255,255,255,0.7);">Coasters
-                      con inversiones vs sin inversiones</div>
-                    <div class="d-flex align-items-center gap-3" style="width: 50%;">
-                      <div class="progress rounded-0 flex-grow-1"
-                        style="height: 10px; background-color: rgba(255,255,255,0.1);">
-                        <div id="modal-stat-inv-bar" class="progress-bar bg-success" role="progressbar"
-                          style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                      </div>
-                      <div class="fw-black text-white text-end" style="width: 60px;" id="modal-stat-inv-pct">0%</div>
-                    </div>
+                  <div class="sm-big-card h-100">
+                    <div class="sm-val" id="modal-stat-total-continents">0</div>
+                    <div class="sm-accent-dot"></div>
+                    <div class="sm-label">Continentes</div>
                   </div>
                 </div>
               </div>
+
+              <!-- Fila secundaria: 4 medianas -->
+              <div class="row g-2 mb-2">
+                <div class="col-6 col-md-3">
+                  <div class="sm-big-card h-100">
+                    <div class="sm-val sm-val-md" id="modal-stat-total-manufacturers-count">0</div>
+                    <div class="sm-accent-dot"></div>
+                    <div class="sm-label">Fabricantes Distintos</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="sm-big-card h-100">
+                    <div class="sm-val sm-val-md" id="modal-stat-total-length">0 <span
+                        style="font-size:1rem;font-weight:600;color:rgba(255,255,255,0.5);">km</span></div>
+                    <div class="sm-accent-dot"></div>
+                    <div class="sm-label">Longitud Total</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="sm-big-card h-100">
+                    <div class="sm-val sm-val-md" id="modal-stat-total-inversions">0</div>
+                    <div class="sm-accent-dot"></div>
+                    <div class="sm-label">Inversiones Totales</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="sm-big-card h-100">
+                    <div class="sm-val sm-val-md" id="modal-stat-extinct">0</div>
+                    <div class="sm-accent-dot"></div>
+                    <div class="sm-label">Coasters Extintas</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Barra inversiones -->
+              <div class="sm-bar-card">
+                <div class="sm-bar-label"><i class="fa-solid fa-rotate-right me-2" style="color:#10b981;"></i>Con
+                  inversiones vs sin inversiones</div>
+                <div class="sm-bar-track">
+                  <div id="modal-stat-inv-bar" class="sm-bar-fill" style="width:0%;"></div>
+                </div>
+                <div class="sm-bar-pct" id="modal-stat-inv-pct">0%</div>
+              </div>
             </div>
 
-
-            <!-- FAVORITOS Y TIPOLOGÍAS -->
-            <div class="modal-section mb-4">
-              <h6 class="text-white fw-bold text-uppercase section-title"><i
-                  class="fa-solid fa-star text-success me-2"></i>Favoritos y Tipologías</h6>
-              <div class="row g-3">
+            <!-- ② FAVORITOS Y TIPOLOGÍAS -->
+            <div class="sm-section">
+              <div class="sm-section-title">
+                <i class="fa-solid fa-star"></i>Favoritos y Tipologías
+              </div>
+              <div class="row g-2">
                 <div class="col-12 col-md-6">
-                  <div class="metric-card p-3 d-flex align-items-center gap-3 h-100">
-                    <div class="d-inline-flex align-items-center justify-content-center rounded-0 flex-shrink-0"
-                      style="width: 40px; height: 40px; background: rgba(16,185,129,0.15);"><i
-                        class="fa-solid fa-house text-success"></i></div>
-                    <div style="min-width: 0;">
-                      <div class="text-uppercase fw-bold mb-1" style="font-size:0.65rem;color:var(--rcw-success);">Tu
-                        parque con más credits</div>
-                      <div class="fw-bold text-white text-truncate" id="fav-home-park">...</div>
-                      <div class="small text-white-50" id="fav-home-park-count">0 credits</div>
+                  <div class="sm-fav-card h-100">
+                    <div class="sm-fav-icon"><i class="fa-solid fa-house"></i></div>
+                    <div style="min-width:0;">
+                      <div class="sm-fav-tag">Tu parque con más credits</div>
+                      <div class="sm-fav-name text-truncate" id="fav-home-park">...</div>
+                      <div class="sm-fav-sub" id="fav-home-park-count">0 credits</div>
                     </div>
                   </div>
                 </div>
                 <div class="col-12 col-md-6">
-                  <div class="metric-card p-3 d-flex align-items-center gap-3 h-100">
-                    <div class="d-inline-flex align-items-center justify-content-center rounded-0 flex-shrink-0"
-                      style="width: 40px; height: 40px; background: rgba(16,185,129,0.15);"><i
-                        class="fa-solid fa-industry text-success"></i></div>
-                    <div style="min-width: 0;">
-                      <div class="text-uppercase fw-bold mb-1" style="font-size:0.65rem;color:var(--rcw-success);">
-                        Fabricante Favorito</div>
-                      <div class="fw-bold text-white text-truncate" id="fav-manufacturer">...</div>
-                      <div class="small text-white-50" id="fav-manufacturer-count">0% de tus credits</div>
+                  <div class="sm-fav-card h-100">
+                    <div class="sm-fav-icon"><i class="fa-solid fa-industry"></i></div>
+                    <div style="min-width:0;">
+                      <div class="sm-fav-tag">Fabricante Favorito</div>
+                      <div class="sm-fav-name text-truncate" id="fav-manufacturer">...</div>
+                      <div class="sm-fav-sub" id="fav-manufacturer-count">0% de tus credits</div>
                     </div>
-                  </div>
-                </div>
-                <div class="col-12">
-                  <div class="stat-card py-3 px-4 d-flex align-items-center justify-content-between">
-                    <div class="text-uppercase fw-bold" style="font-size:0.75rem;color:rgba(255,255,255,0.7);"><i
-                        class="fa-solid fa-rocket text-success me-2"></i> Hyper / Giga Coasters (> 60m)</div>
-                    <div class="fw-black text-white fs-4" id="modal-stat-giga">0</div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- RÉCORDS PERSONALES -->
-            <div class="modal-section mb-4">
-              <h6 class="text-white fw-bold text-uppercase section-title"><i
-                  class="fa-solid fa-trophy text-success me-2"></i>Récords Personales</h6>
-              <div class="row g-3">
-                <!-- Más alta -->
+            <!-- ③ RÉCORDS PERSONALES -->
+            <div class="sm-section">
+              <div class="sm-section-title">
+                <i class="fa-solid fa-trophy"></i>Récords Personales
+              </div>
+              <div class="row g-2">
                 <div class="col-6 col-md-4">
-                  <div class="metric-card h-100 text-center p-3">
-                    <div class="mb-2">
-                      <div class="d-inline-flex align-items-center justify-content-center rounded-0"
-                        style="width: 36px; height: 36px; background: rgba(16,185,129,0.15);"><i
-                          class="fa-solid fa-arrow-up-long text-success"></i></div>
-                    </div>
-                    <div class="fw-black text-white mb-1" id="max-stat-height"
-                      style="font-size:1.5rem;line-height:1.1;">
-                      <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
-                    </div>
-                    <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-height-name"
-                      style="font-size:0.8rem;">...</div>
-                    <div class="text-uppercase mt-2 fw-bold"
-                      style="font-size:0.65rem;letter-spacing:1px;color:var(--rcw-success);">Más Alta</div>
+                  <div class="sm-rec-card h-100">
+                    <div class="sm-rec-icon"><i class="fa-solid fa-arrow-up-long"></i></div>
+                    <div class="sm-rec-val" id="max-stat-height"><i
+                        class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i></div>
+                    <div class="sm-rec-name text-truncate" id="max-stat-height-name">...</div>
+                    <div class="sm-rec-label">Más Alta</div>
                   </div>
                 </div>
-                <!-- Más rápida -->
                 <div class="col-6 col-md-4">
-                  <div class="metric-card h-100 text-center p-3">
-                    <div class="mb-2">
-                      <div class="d-inline-flex align-items-center justify-content-center rounded-0"
-                        style="width: 36px; height: 36px; background: rgba(16,185,129,0.15);"><i
-                          class="fa-solid fa-gauge-high text-success"></i></div>
-                    </div>
-                    <div class="fw-black text-white mb-1" id="max-stat-speed" style="font-size:1.5rem;line-height:1.1;">
-                      <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
-                    </div>
-                    <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-speed-name"
-                      style="font-size:0.8rem;">...</div>
-                    <div class="text-uppercase mt-2 fw-bold"
-                      style="font-size:0.65rem;letter-spacing:1px;color:var(--rcw-success);">Más Rápida</div>
+                  <div class="sm-rec-card h-100">
+                    <div class="sm-rec-icon"><i class="fa-solid fa-gauge-high"></i></div>
+                    <div class="sm-rec-val" id="max-stat-speed"><i
+                        class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i></div>
+                    <div class="sm-rec-name text-truncate" id="max-stat-speed-name">...</div>
+                    <div class="sm-rec-label">Más Rápida</div>
                   </div>
                 </div>
-                <!-- Más larga -->
                 <div class="col-6 col-md-4">
-                  <div class="metric-card h-100 text-center p-3">
-                    <div class="mb-2">
-                      <div class="d-inline-flex align-items-center justify-content-center rounded-0"
-                        style="width: 36px; height: 36px; background: rgba(16,185,129,0.15);"><i
-                          class="fa-solid fa-ruler-horizontal text-success"></i></div>
-                    </div>
-                    <div class="fw-black text-white mb-1" id="max-stat-length"
-                      style="font-size:1.5rem;line-height:1.1;">
-                      <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
-                    </div>
-                    <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-length-name"
-                      style="font-size:0.8rem;">...</div>
-                    <div class="text-uppercase mt-2 fw-bold"
-                      style="font-size:0.65rem;letter-spacing:1px;color:var(--rcw-success);">Más Larga</div>
+                  <div class="sm-rec-card h-100">
+                    <div class="sm-rec-icon"><i class="fa-solid fa-ruler-horizontal"></i></div>
+                    <div class="sm-rec-val" id="max-stat-length"><i
+                        class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i></div>
+                    <div class="sm-rec-name text-truncate" id="max-stat-length-name">...</div>
+                    <div class="sm-rec-label">Más Larga</div>
                   </div>
                 </div>
-                <!-- Más inversiones -->
                 <div class="col-6 col-md-4">
-                  <div class="metric-card h-100 text-center p-3">
-                    <div class="mb-2">
-                      <div class="d-inline-flex align-items-center justify-content-center rounded-0"
-                        style="width: 36px; height: 36px; background: rgba(16,185,129,0.15);"><i
-                          class="fa-solid fa-rotate-right text-success"></i></div>
-                    </div>
-                    <div class="fw-black text-white mb-1" id="max-stat-inversions"
-                      style="font-size:1.5rem;line-height:1.1;">
-                      <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
-                    </div>
-                    <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-inversions-name"
-                      style="font-size:0.8rem;">...</div>
-                    <div class="text-uppercase mt-2 fw-bold"
-                      style="font-size:0.65rem;letter-spacing:1px;color:var(--rcw-success);">Más Inversiones</div>
+                  <div class="sm-rec-card h-100">
+                    <div class="sm-rec-icon"><i class="fa-solid fa-rotate-right"></i></div>
+                    <div class="sm-rec-val" id="max-stat-inversions"><i
+                        class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i></div>
+                    <div class="sm-rec-name text-truncate" id="max-stat-inversions-name">...</div>
+                    <div class="sm-rec-label">Más Inversiones</div>
                   </div>
                 </div>
-                <!-- Más antigua -->
                 <div class="col-6 col-md-4">
-                  <div class="metric-card h-100 text-center p-3">
-                    <div class="mb-2">
-                      <div class="d-inline-flex align-items-center justify-content-center rounded-0"
-                        style="width: 36px; height: 36px; background: rgba(16,185,129,0.15);"><i
-                          class="fa-solid fa-hourglass-start text-success"></i></div>
-                    </div>
-                    <div class="fw-black text-white mb-1" id="max-stat-oldest"
-                      style="font-size:1.5rem;line-height:1.1;">
-                      <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
-                    </div>
-                    <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-oldest-name"
-                      style="font-size:0.8rem;">...</div>
-                    <div class="text-uppercase mt-2 fw-bold"
-                      style="font-size:0.65rem;letter-spacing:1px;color:var(--rcw-success);">Más Antigua</div>
+                  <div class="sm-rec-card h-100">
+                    <div class="sm-rec-icon"><i class="fa-solid fa-hourglass-start"></i></div>
+                    <div class="sm-rec-val" id="max-stat-oldest"><i
+                        class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i></div>
+                    <div class="sm-rec-name text-truncate" id="max-stat-oldest-name">...</div>
+                    <div class="sm-rec-label">Más Antigua</div>
                   </div>
                 </div>
-                <!-- Más nueva -->
                 <div class="col-6 col-md-4">
-                  <div class="metric-card h-100 text-center p-3">
-                    <div class="mb-2">
-                      <div class="d-inline-flex align-items-center justify-content-center rounded-0"
-                        style="width: 36px; height: 36px; background: rgba(16,185,129,0.15);"><i
-                          class="fa-solid fa-wand-magic-sparkles text-success"></i></div>
-                    </div>
-                    <div class="fw-black text-white mb-1" id="max-stat-newest"
-                      style="font-size:1.5rem;line-height:1.1;">
-                      <i class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i>
-                    </div>
-                    <div class="small text-white-50 fw-semibold text-truncate" id="max-stat-newest-name"
-                      style="font-size:0.8rem;">...</div>
-                    <div class="text-uppercase mt-2 fw-bold"
-                      style="font-size:0.65rem;letter-spacing:1px;color:var(--rcw-success);">Más Nueva</div>
+                  <div class="sm-rec-card h-100">
+                    <div class="sm-rec-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <div class="sm-rec-val" id="max-stat-newest"><i
+                        class="fa-solid fa-spinner fa-spin fs-6 text-muted"></i></div>
+                    <div class="sm-rec-name text-truncate" id="max-stat-newest-name">...</div>
+                    <div class="sm-rec-label">Más Nueva</div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- LISTAS PAÍS / FABRICANTE -->
-            <div class="modal-section mb-2">
-              <h6 class="text-white fw-bold text-uppercase section-title"><i
-                  class="fa-solid fa-list-ul text-success me-2"></i>Desgloses Totales</h6>
-              <div class="row g-3">
-                <!-- Países -->
+            <!-- ④ DESGLOSES -->
+            <div class="sm-section" style="margin-bottom:0;">
+              <div class="sm-section-title">
+                <i class="fa-solid fa-list-ul"></i>Desgloses Totales
+              </div>
+              <div class="row g-2">
                 <div class="col-lg-6">
-                  <div class="stat-card h-100 p-0">
-                    <div class="px-3 pt-3 pb-2 d-flex align-items-center gap-2"
-                      style="background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255,255,255,0.05);">
-                      <i class="fa-solid fa-earth-europe text-success" style="font-size:0.85rem;"></i>
-                      <span class="fw-bold text-white"
-                        style="font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;">Por País</span>
+                  <div class="sm-list-wrap h-100">
+                    <div class="sm-list-head">
+                      <i class="fa-solid fa-earth-europe" style="color:#10b981;"></i>Por País
                     </div>
-                    <div id="modal-list-countries" class="p-2" style="max-height:280px;overflow-y:auto;">
-                      <!-- Dinámico -->
-                    </div>
+                    <div id="modal-list-countries" class="p-2" style="max-height:260px;overflow-y:auto;"></div>
                   </div>
                 </div>
-
-                <!-- Fabricantes -->
                 <div class="col-lg-6">
-                  <div class="stat-card h-100 p-0">
-                    <div class="px-3 pt-3 pb-2 d-flex align-items-center gap-2"
-                      style="background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255,255,255,0.05);">
-                      <i class="fa-solid fa-industry text-success" style="font-size:0.85rem;"></i>
-                      <span class="fw-bold text-white"
-                        style="font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;">Por Fabricante</span>
+                  <div class="sm-list-wrap h-100">
+                    <div class="sm-list-head">
+                      <i class="fa-solid fa-industry" style="color:#10b981;"></i>Por Fabricante
                     </div>
-                    <div id="modal-list-manufacturers" class="p-2" style="max-height:280px;overflow-y:auto;">
-                      <!-- Dinámico -->
-                    </div>
+                    <div id="modal-list-manufacturers" class="p-2" style="max-height:260px;overflow-y:auto;"></div>
                   </div>
                 </div>
               </div>
@@ -1409,7 +1556,7 @@ $user_uid = $_SESSION['firebase_uid'];
           </div><!-- /modal-body -->
         </div>
       </div>
-    </div>
+    </div><!-- /statsExpandedModal -->
 
   </div>
 </main>

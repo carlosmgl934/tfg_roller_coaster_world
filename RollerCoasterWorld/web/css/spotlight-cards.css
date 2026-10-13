@@ -1,0 +1,367 @@
+/* ============================================================
+   spotlight-cards.css — Fichas de "AL AZAR" (coaster / parque)
+   Cargar DESPUÉS de recommendations.css para que gane en cascada.
+   Usa los mismos tokens que home.css: --rcw-green, --rcw-bg,
+   --rcw-border, --rcw-text, --rcw-text-muted
+   ============================================================ */
+
+.rcw-spotlight-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.2rem;
+}
+
+/* ---------- Tarjeta ---------- */
+.rcw-spot {
+  --spot-accent: var(--rcw-green);
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 280px;
+  padding: 1rem 1.2rem 1.2rem;
+  overflow: hidden;
+  background: var(--rcw-bg);
+  border: 1px solid var(--rcw-border);
+  border-radius: 6px;
+  color: var(--rcw-text);
+  text-decoration: none;
+  transition:
+    transform 0.15s,
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.rcw-spot--park {
+  --spot-accent: #38bdf8;
+}
+.rcw-spot:hover,
+.rcw-spot:focus-visible {
+  transform: translateY(-3px);
+  border-color: var(--rcw-green);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  color: var(--rcw-text);
+}
+.rcw-spot:focus-visible {
+  outline: 2px solid var(--spot-accent);
+  outline-offset: 2px;
+}
+
+/* ── Layout split: blur de fondo + foto nítida a la izquierda ── */
+
+/* Fondo: misma foto muy desenfocada — nunca se ve pixelada */
+.rcw-spot__blur {
+  position: absolute;
+  inset: -24px;
+  z-index: -3;
+  width: calc(100% + 48px);
+  height: calc(100% + 48px);
+  object-fit: cover;
+  filter: blur(22px) saturate(1.15) brightness(0.45);
+  pointer-events: none;
+}
+
+/* Foto nítida: columna izquierda, sin zoom ni estiramiento */
+.rcw-spot__img {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: -2;
+  width: 44%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 40%;
+  -webkit-mask-image: linear-gradient(to right, #000 76%, transparent);
+  mask-image: linear-gradient(to right, #000 76%, transparent);
+}
+
+/* Degradado solo sobre la zona del texto (columna derecha) */
+.rcw-spot::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 36%;
+  z-index: -1;
+  background: linear-gradient(
+    to right,
+    rgba(13, 17, 23, 0),
+    rgba(13, 17, 23, 0.45) 30%
+  );
+}
+
+/* Sin foto: mismo recurso que .home-news-card.no-photo */
+.rcw-spot--nophoto {
+  background: linear-gradient(145deg, #0d1117 0%, #161b22 100%);
+}
+.rcw-spot--nophoto::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--spot-accent);
+}
+.rcw-spot--nophoto::after {
+  display: none;
+}
+.rcw-spot__ghost {
+  position: absolute;
+  top: 50%;
+  right: 1.5rem;
+  z-index: -1;
+  transform: translateY(-60%);
+  font-size: 7rem;
+  color: var(--spot-accent);
+  opacity: 0.07;
+  pointer-events: none;
+}
+
+/* ---------- Fila superior: tipo + estado ---------- */
+.rcw-spot__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+.rcw-spot__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: flex-end;
+}
+.rcw-spot__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(13, 17, 23, 0.62);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  white-space: nowrap;
+}
+.rcw-spot__chip--type {
+  border-color: var(--spot-accent);
+  color: var(--spot-accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+/* ── Base del puntito (siempre presente en chips de estado) ── */
+.rcw-spot__chip--status::before {
+  content: "";
+  display: block;
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #64748b;
+}
+/* ── Variantes de color: selectores combinados para mayor especificidad ── */
+.rcw-spot__chip--status.rcw-spot__chip--open {
+  border-color: rgba(63, 185, 80, 0.5);
+}
+.rcw-spot__chip--status.rcw-spot__chip--open::before {
+  content: "";
+  background: #3fb950;
+  box-shadow: 0 0 5px #3fb950, 0 0 10px rgba(63, 185, 80, 0.6);
+}
+.rcw-spot__chip--status.rcw-spot__chip--closed::before {
+  content: "";
+  background: #f85149;
+  box-shadow: 0 0 5px #f85149;
+}
+.rcw-spot__chip--status.rcw-spot__chip--building::before {
+  content: "";
+  background: #f59e0b;
+  box-shadow: 0 0 5px #f59e0b;
+}
+.rcw-spot__chip--done {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: var(--rcw-green);
+  color: #fff;
+}
+
+/* ---------- Cuerpo ---------- */
+.rcw-spot__body {
+  margin-top: 2.5rem;
+}
+.rcw-spot__title {
+  margin: 0 0 0.4rem;
+  font-size: 1.55rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #fff;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.rcw-spot__place {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+.rcw-spot__place i {
+  margin-right: 5px;
+  color: var(--spot-accent);
+}
+
+/* ---------- Datos en una sola línea (sin cajas) ---------- */
+.rcw-spot__foot {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+.rcw-spot__facts {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+.rcw-spot__fact {
+  flex: 1;
+  min-width: 0;
+  padding: 0 1rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.14);
+}
+.rcw-spot__fact:first-child {
+  padding-left: 0;
+  border-left: none;
+}
+.rcw-spot__fact--wide {
+  flex: 1.7;
+}
+.rcw-spot__fact-label {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.58);
+  margin-bottom: 2px;
+}
+.rcw-spot__fact-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* ---------- Carga y cambio de ficha (acciones del usuario) ---------- */
+.rcw-spot--skeleton {
+  pointer-events: none;
+  background: linear-gradient(
+      100deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.05) 50%,
+      transparent 70%
+    )
+    0 0 / 200% 100% no-repeat,
+    var(--rcw-bg);
+  animation: rcw-spot-shimmer 1.3s linear infinite;
+}
+@keyframes rcw-spot-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+.rcw-spot--enter {
+  animation: rcw-spot-in 0.35s ease both;
+}
+.rcw-spot--enter:nth-child(2) {
+  animation-delay: 0.08s;
+}
+@keyframes rcw-spot-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .rcw-spotlight-grid {
+    grid-template-columns: 1fr;
+  }
+  .rcw-spot {
+    min-height: 250px;
+    padding: 0.9rem 1rem 1rem;
+  }
+  .rcw-spot__title {
+    font-size: 1.3rem;
+  }
+  .rcw-spot__fact {
+    padding: 0 0.6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rcw-spot,
+  .rcw-spot__img,
+  .rcw-spot__go {
+    transition: none;
+  }
+  .rcw-spot:hover,
+  .rcw-spot:hover .rcw-spot__img,
+  .rcw-spot:hover .rcw-spot__go {
+    transform: none;
+  }
+  .rcw-spot--skeleton,
+  .rcw-spot--enter {
+    animation: none;
+  }
+}
+
+/* ── Ajustes de layout split ── */
+.rcw-spot {
+  min-height: 240px;
+}
+.rcw-spot__body {
+  margin-top: 1.2rem;
+  margin-left: calc(44% + 16px);
+}
+.rcw-spot__go {
+  display: none;
+}
+/* Sin foto: texto ocupa todo el ancho */
+.rcw-spot--nophoto .rcw-spot__body {
+  margin-left: 0;
+}
+/* Cancelar hover-zoom en la foto (ampliar píxeles no ayuda) */
+.rcw-spot:hover .rcw-spot__img {
+  transform: none;
+}
+
+/* ── Móvil: foto arriba, texto abajo ── */
+@media (max-width: 560px) {
+  .rcw-spot {
+    min-height: 340px;
+  }
+  .rcw-spot__img {
+    inset: 0 0 auto 0;
+    width: 100%;
+    height: 56%;
+    -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent);
+    mask-image: linear-gradient(to bottom, #000 70%, transparent);
+  }
+  .rcw-spot::after {
+    inset: 44% 0 0 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(13, 17, 23, 0),
+      rgba(13, 17, 23, 0.5) 30%
+    );
+  }
+  .rcw-spot__body {
+    margin-left: 0;
+    margin-top: 7rem;
+  }
+}

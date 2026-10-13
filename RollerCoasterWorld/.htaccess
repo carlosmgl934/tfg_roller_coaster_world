@@ -1,7 +1,22 @@
 Options -Indexes
 
+# ── Límites de subida de archivos ─────────────────────────────────────────────
+# El php.ini del servidor de producción tiene por defecto 2MB.
+# Sobrescribimos aquí para permitir imágenes de hasta 20MB.
+<IfModule mod_php.c>
+    php_value upload_max_filesize 20M
+    php_value post_max_size       20M
+</IfModule>
+# Para servidores con PHP-FPM (Ubuntu + Apache mod_proxy_fcgi), usar:
+<IfModule mod_fcgid.c>
+    FcgidMaxRequestLen 20971520
+</IfModule>
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
+
+    # Suprimir el 404 de /favicon.ico (el favicon real es inline en el HTML)
+    RewriteRule ^favicon\.ico$ - [R=204,L]
 
     # Redirigir la raíz del proyecto hacia el index principal
     # Esto soluciona el error 403 Forbidden al entrar sin especificar la ruta
@@ -23,9 +38,37 @@ Options -Indexes
     AddType application/javascript .js
 </IfModule>
 
-# Headers de caché para assets estáticos
+# ── Estrategia de caché ───────────────────────────────────────────────────────
 <IfModule mod_headers.c>
-    <FilesMatch "\.(json|js|css|png|jpg|jpeg|gif|svg|webp|woff2|woff|ttf)$">
-        Header set Cache-Control "public, max-age=3600"
+
+    # 1. Imágenes subidas por usuarios/admin → SIN caché (cambian con frecuencia)
+    #    Afecta a: /web/img/uploads/ (avatares, coasters, parques subidos por admin)
+    <If "%{REQUEST_URI} =~ m|/web/img/uploads/|">
+        Header set Cache-Control "no-store, no-cache, must-revalidate"
+        Header set Pragma "no-cache"
+        Header unset ETag
+        FileETag None
+    </If>
+
+    # 2. Assets de código (JS y CSS) → caché de 1 hora
+    #    Se versionan con ?v=timestamp en el HTML, por lo que el caché no es peligroso
+    <FilesMatch "\.(js|css)$">
+        Header set Cache-Control "public, max-age=3600, stale-while-revalidate=300"
     </FilesMatch>
+
+    # 3. Fuentes → caché de 7 días (nunca cambian)
+    <FilesMatch "\.(woff2|woff|ttf|otf|eot)$">
+        Header set Cache-Control "public, max-age=604800, immutable"
+    </FilesMatch>
+
+    # 4. Imágenes estáticas del proyecto (logos, SVGs, imágenes fijas) → caché de 1 día
+    <FilesMatch "\.(png|jpg|jpeg|gif|webp|svg|ico)$">
+        Header set Cache-Control "public, max-age=86400"
+    </FilesMatch>
+
+    # 5. Respuestas JSON (API) → nunca cachear
+    <FilesMatch "\.json$">
+        Header set Cache-Control "no-store"
+    </FilesMatch>
+
 </IfModule>

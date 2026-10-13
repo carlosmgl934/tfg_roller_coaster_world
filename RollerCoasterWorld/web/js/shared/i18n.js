@@ -102,15 +102,18 @@
   /* ── Aplicar traducciones al DOM ───────────────────────────────── */
 
   function _applyToDOM(translations) {
-    // Traducir todos los elementos con [data-i18n]
-    document.querySelectorAll("[data-i18n]").forEach(function (el) {
-      const key = el.getAttribute("data-i18n");
+    // Traducir todos los elementos con [data-i18n] o [data-i18n-html]
+    document.querySelectorAll("[data-i18n], [data-i18n-html]").forEach(function (el) {
+      const isHtml = el.hasAttribute("data-i18n-html");
+      const key = el.getAttribute("data-i18n") || el.getAttribute("data-i18n-html");
       const val = _get(translations, key);
       if (val !== null) {
         // Si tiene data-i18n-attr, traduce el atributo en vez del textContent
         const attr = el.getAttribute("data-i18n-attr");
         if (attr) {
           el.setAttribute(attr, val);
+        } else if (isHtml) {
+          el.innerHTML = val;
         } else {
           // Preservar elementos hijo (iconos FA, badges, etc.)
           // Solo actualizamos el texto, no destruimos children
@@ -269,13 +272,16 @@
      */
     applyToContainer: function (container) {
       if (!container || !_translations) return;
-      container.querySelectorAll("[data-i18n]").forEach(function (el) {
-        var key = el.getAttribute("data-i18n");
-        var val = _get(_translations, key);
+      container.querySelectorAll("[data-i18n], [data-i18n-html]").forEach(function (el) {
+        const isHtml = el.hasAttribute("data-i18n-html");
+        const key = el.getAttribute("data-i18n") || el.getAttribute("data-i18n-html");
+        const val = _get(_translations, key);
         if (val !== null) {
           var attr = el.getAttribute("data-i18n-attr");
           if (attr) {
             el.setAttribute(attr, val);
+          } else if (isHtml) {
+            el.innerHTML = val;
           } else {
             var tn = _findOrCreateTextNode(el);
             if (tn) tn.textContent = val;

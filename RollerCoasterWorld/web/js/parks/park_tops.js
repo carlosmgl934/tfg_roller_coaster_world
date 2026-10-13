@@ -13,7 +13,7 @@ $(document).ready(function () {
   // ── Constantes ────────────────────────────────────────────────────────────
   const apiBase = (window.BASE_URL || "") + "/api/php/parks.php";
   const defaultImg =
-    "https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png";
+    "https://www.themeparkexperts.com/wp-content/uploads/2019/07/themepark_cedarpoint_montanarusa.jpg";
 
   // ── Referencias al DOM ────────────────────────────────────────────────────
   const $grid = $("#tops-grid");

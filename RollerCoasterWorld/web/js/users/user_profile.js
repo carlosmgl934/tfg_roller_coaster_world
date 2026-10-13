@@ -309,7 +309,7 @@ $(document).ready(function () {
     const selector = $("#tops-type-selector");
 
     const fallbackImage =
-      "https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png";
+      "https://www.themeparkexperts.com/wp-content/uploads/2019/07/themepark_cedarpoint_montanarusa.jpg";
 
     function drawList(items, isCoaster) {
       container.empty();
@@ -713,8 +713,7 @@ $(document).ready(function () {
         const imgUrl =
           r.imagen_url && r.imagen_url.startsWith("/")
             ? BASE_URL + r.imagen_url
-            : r.imagen_url ||
-            "https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png";
+            : r.imagen_url || "https://www.themeparkexperts.com/wp-content/uploads/2019/07/themepark_cedarpoint_montanarusa.jpg";
 
         let starsHtml = "";
         const fullStars = Math.floor(r.note);
@@ -741,7 +740,7 @@ $(document).ready(function () {
              onmouseover="this.style.background='rgba(16,185,129,0.05)';this.style.borderColor='rgba(16,185,129,0.25)'"
              onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,255,255,0.06)'">
             <div class="rcw-review-img">
-              <img src="${imgUrl}" alt="${r.title}" onerror="this.src='https://cdn.hourdetroit.com/wp-content/uploads/sites/20/2019/05/Cedar-Point-Main-4.png'">
+              <img src="${imgUrl}" alt="${r.title}" onerror="this.src='https://www.themeparkexperts.com/wp-content/uploads/2019/07/themepark_cedarpoint_montanarusa.jpg'">
             </div>
             <div class="rcw-review-body">
               <div class="rcw-review-header">

@@ -91,8 +91,8 @@ $(document).ready(function () {
     } else if (sectionId === "section-tops") {
       window.loadUserTops();
     } else if (sectionId === "section-trips-content") {
-      if (window.loadTrips) window.loadTrips();
-      if (window.loadRanking) window.loadRanking();
+      loadTrips();
+      loadRanking();
     }
   }
 
@@ -713,8 +713,76 @@ $(document).ready(function () {
     </div>`;
   }
 
-  // Preview: top-10 compacto
-  function renderCoastersPreview(data) {
+  // Preview: formato idéntico al ranking de user_profile
+  const fallbackTopImage =
+    "https://www.themeparkexperts.com/wp-content/uploads/2019/07/themepark_cedarpoint_montanarusa.jpg";
+
+  function renderTopPreviewCard(item, index, isCoaster) {
+    const rawImg = item.imagen_url;
+    const imgUrl = rawImg
+      ? rawImg.startsWith("/")
+        ? BASE_URL + rawImg
+        : rawImg.startsWith("http")
+          ? rawImg
+          : BASE_URL + "/" + rawImg
+      : fallbackTopImage;
+
+    const link = isCoaster
+      ? `${BASE_URL}/web/views/public/coasters/coasters.php?id=${item.coaster_id || item.id}`
+      : `${BASE_URL}/web/views/public/parks/parks.php?id=${item.park_id || item.id}`;
+
+    const rank = parseInt(item.rank_position) || index + 1;
+    const title = isCoaster ? item.coaster_name : item.park_name;
+
+    // Colores de ranking idénticos a user_profile
+    let badgeBg = "rgba(0,0,0,0.85)";
+    let badgeColor = "#fff";
+    if (rank === 1) {
+      badgeBg = "#FFD700";
+      badgeColor = "#000";
+    } else if (rank === 2) {
+      badgeBg = "#C0C0C0";
+      badgeColor = "#000";
+    } else if (rank === 3) {
+      badgeBg = "#CD7F32";
+      badgeColor = "#000";
+    }
+
+    // PARQUE · PAÍS
+    const parkName = item.park_name || item.location || "";
+    const country = item.country_name || item.park_country || "";
+    const subtitle = isCoaster
+      ? parkName && country
+        ? `${parkName} · ${country}`
+        : parkName || country
+      : country;
+
+    return `
+      <div class="mb-2">
+        <a href="${link}" class="top-card d-flex align-items-stretch text-decoration-none shadow-sm" 
+           style="height:90px; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 0;">
+          <div class="rank-img-container" style="width:90px; height:90px; flex-shrink:0; position:relative;">
+            <img src="${imgUrl}" alt="${title}" class="w-100 h-100 object-fit-cover" onerror="this.src='${fallbackTopImage}'">
+            <div style="position:absolute; top:4px; left:4px; background:${badgeBg}; color:${badgeColor}; font-size: 0.72rem; padding: 2px 7px; font-weight:800; font-family:var(--rcw-font-title); border-radius: 2px;">#${rank}</div>
+          </div>
+          <div class="p-2 px-3 flex-grow-1 d-flex flex-column justify-content-center" style="width: 0; min-width: 0;">
+            <div class="pe-2">
+              <div class="fw-bold text-white text-truncate" style="font-family: var(--rcw-font-title); font-size: 1.05rem; width: 100%; letter-spacing: -0.01em;">${title}</div>
+              <small class="text-muted text-truncate d-block mt-1" style="font-size: 0.8rem; width: 100%; opacity: 0.7;">
+                ${subtitle}
+              </small>
+            </div>
+          </div>
+          <div class="d-flex align-items-center pe-3 opacity-25">
+             <i class="fa-solid fa-chevron-right fs-6"></i>
+          </div>
+        </a>
+      </div>`;
+  }
+
+  /*
+  // [RESPALDO VISTA PREVIA ANTERIOR - Descomentar si se desea revertir]
+  function renderCoastersPreviewOld(data) {
     const el = $("#top-coasters-preview-list").empty();
     if (!data.length) {
       el.html(emptyState('<span data-i18n="profile.empty_coasters">Todavía no tienes montañas rusas en tu top.</span>'));
@@ -739,7 +807,7 @@ $(document).ready(function () {
     }
   }
 
-  function renderParksPreview(data) {
+  function renderParksPreviewOld(data) {
     const el = $("#top-parks-preview-list").empty();
     if (!data.length) {
       el.html(emptyState('<span data-i18n="profile.empty_parks">Todavía no tienes parques en tu top.</span>'));
@@ -760,6 +828,41 @@ $(document).ready(function () {
     if (data.length > 10) {
       el.append(
         `<div class="text-center text-muted small py-2">+${data.length - 10} más en el top completo</div>`,
+      );
+    }
+  }
+  */
+
+  function renderCoastersPreview(data) {
+    const el = $("#top-coasters-preview-list").empty();
+    if (!data.length) {
+      el.html(emptyState('<span data-i18n="profile.empty_coasters">Todavía no tienes montañas rusas en tu top.</span>'));
+      if (window.rcwI18n) window.rcwI18n.applyToContainer(el[0]);
+      return;
+    }
+    data.slice(0, 10).forEach((item, i) => {
+      el.append(renderTopPreviewCard(item, i, true));
+    });
+    if (data.length > 10) {
+      el.append(
+        `<div class="text-center text-muted small py-2 mt-2" style="cursor: pointer;" onclick="window.location.href=$('#btn-tops-full-view').attr('href');">+${data.length - 10} más en el top completo</div>`,
+      );
+    }
+  }
+
+  function renderParksPreview(data) {
+    const el = $("#top-parks-preview-list").empty();
+    if (!data.length) {
+      el.html(emptyState('<span data-i18n="profile.empty_parks">Todavía no tienes parques en tu top.</span>'));
+      if (window.rcwI18n) window.rcwI18n.applyToContainer(el[0]);
+      return;
+    }
+    data.slice(0, 10).forEach((item, i) => {
+      el.append(renderTopPreviewCard(item, i, false));
+    });
+    if (data.length > 10) {
+      el.append(
+        `<div class="text-center text-muted small py-2 mt-2" style="cursor: pointer;" onclick="window.location.href=$('#btn-tops-full-view').attr('href');">+${data.length - 10} más en el top completo</div>`,
       );
     }
   }
@@ -1363,32 +1466,44 @@ $(document).ready(function () {
           <i class="fa-solid fa-grip-lines drag-handle fs-5"></i>
           <span class="tops-rank-badge">#${i + 1}</span>
           <div class="flex-grow-1 min-w-0 pe-3">
-            <div class="fw-bold text-white text-truncate">${item.coaster_name}</div>
-            <small class="text-secondary d-block text-truncate">${item.park_name}</small>
+            <div class="fw-bold text-white text-truncate" style="font-size:0.82rem;">${item.coaster_name}</div>
+            <small class="text-secondary d-block text-truncate" style="font-size:0.72rem;">${item.park_name}</small>
           </div>
-          <div class="d-flex gap-1">
+          <div class="d-flex gap-1 align-items-center">
             <div class="dropdown">
               <button class="btn btn-sm btn-outline-secondary border-0 square-box dropdown-toggle dropdown-toggle-split"
                 data-bs-toggle="dropdown" aria-expanded="false" title="Mover a...">
-                <i class="fa-solid fa-arrows-up-down"></i>
+                <i class="fa-solid fa-arrows-up-down" style="font-size:0.8rem;"></i>
               </button>
-              <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="min-width:200px;">
-                <li><button class="dropdown-item tops-move-first" type="button">
-                  <i class="fa-solid fa-angles-up me-2 text-success"></i>Mover al principio
-                </button></li>
-                <li><button class="dropdown-item tops-move-last" type="button">
-                  <i class="fa-solid fa-angles-down me-2 text-warning"></i>Mover al final
-                </button></li>
-                <li><hr class="dropdown-divider"></li>
-                <li>
-                  <div class="px-3 py-1 d-flex align-items-center gap-2">
-                    <span style="font-size:0.85rem;white-space:nowrap;">Pos.:</span>
-                    <input type="number" min="1" class="form-control form-control-sm bg-dark text-white border-secondary tops-move-pos-input"
-                      style="width:60px;" placeholder="#">
-                    <button class="btn btn-sm btn-success rounded-0 tops-move-pos-btn" type="button">OK</button>
+              <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0" style="min-width:0;">
+                <div class="d-flex align-items-stretch" style="border-radius:4px; overflow:hidden;">
+                  <!-- Izquierda: 4 botones acción -->
+                  <div class="d-flex flex-column" style="min-width:130px;">
+                    <button class="dropdown-item tops-move-first d-flex align-items-center gap-2 py-1 px-3" type="button" style="font-size:0.75rem;">
+                      <i class="fa-solid fa-angles-up text-success" style="font-size:0.78rem;"></i><span>Mover al principio</span>
+                    </button>
+                    <button class="dropdown-item tops-move-up d-flex align-items-center gap-2 py-1 px-3" type="button" style="font-size:0.75rem;">
+                      <i class="fa-solid fa-chevron-up" style="color:#3b9eff;font-size:0.78rem;"></i><span>Subir 1 posición</span>
+                    </button>
+                    <button class="dropdown-item tops-move-down d-flex align-items-center gap-2 py-1 px-3" type="button" style="font-size:0.75rem;">
+                      <i class="fa-solid fa-chevron-down" style="color:#ef4444;font-size:0.78rem;"></i><span>Bajar 1 posición</span>
+                    </button>
+                    <button class="dropdown-item tops-move-last d-flex align-items-center gap-2 py-1 px-3" type="button" style="font-size:0.75rem;">
+                      <i class="fa-solid fa-angles-down text-warning" style="font-size:0.78rem;"></i><span>Mover al final</span>
+                    </button>
                   </div>
-                </li>
-              </ul>
+                  <!-- Separador verde grueso -->
+                  <div style="width:4px; background:#10b981; flex-shrink:0;"></div>
+                  <!-- Derecha: Pos + OK -->
+                  <div class="d-flex flex-column justify-content-center align-items-center gap-1 px-2 py-2" style="min-width:80px;">
+                    <label style="font-size:0.7rem;color:#aaa;text-transform:uppercase;letter-spacing:0.04em;margin:0;">Pos.</label>
+                    <input type="number" min="1" class="form-control form-control-sm bg-dark text-white border-secondary tops-move-pos-input text-center"
+                      style="width:52px;height:26px;font-size:0.78rem;padding:2px 4px;" placeholder="#">
+                    <button class="btn btn-success rounded-0 tops-move-pos-btn" type="button"
+                      style="font-size:0.72rem;padding:2px 10px;font-weight:700;letter-spacing:0.04em;">OK</button>
+                  </div>
+                </div>
+              </div>
             </div>
             <button class="btn btn-sm btn-outline-danger border-0 square-box tops-remove-item"><i class="fa-solid fa-trash"></i></button>
           </div>
@@ -1442,33 +1557,45 @@ $(document).ready(function () {
         <div class="tops-edit-item" data-id="${item.park_id}">
           <i class="fa-solid fa-grip-lines drag-handle fs-5"></i>
           <span class="tops-rank-badge">#${i + 1}</span>
-          <div class="flex-grow-1">
-            <span class="fw-bold text-white">${item.park_name}</span>
-            <small class="text-secondary ms-2">${item.country_name || ""}</small>
+          <div class="flex-grow-1 min-w-0 pe-3">
+            <div class="fw-bold text-white text-truncate" style="font-size:0.82rem;">${item.park_name}</div>
+            <small class="text-secondary d-block text-truncate" style="font-size:0.72rem;">${item.country_name || ""}</small>
           </div>
-          <div class="d-flex gap-1">
+          <div class="d-flex gap-1 align-items-center">
             <div class="dropdown">
               <button class="btn btn-sm btn-outline-secondary border-0 square-box dropdown-toggle dropdown-toggle-split"
                 data-bs-toggle="dropdown" aria-expanded="false" title="Mover a...">
-                <i class="fa-solid fa-arrows-up-down"></i>
+                <i class="fa-solid fa-arrows-up-down" style="font-size:0.8rem;"></i>
               </button>
-              <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="min-width:200px;">
-                <li><button class="dropdown-item tops-move-first" type="button">
-                  <i class="fa-solid fa-angles-up me-2 text-success"></i>Mover al principio
-                </button></li>
-                <li><button class="dropdown-item tops-move-last" type="button">
-                  <i class="fa-solid fa-angles-down me-2 text-warning"></i>Mover al final
-                </button></li>
-                <li><hr class="dropdown-divider"></li>
-                <li>
-                  <div class="px-3 py-1 d-flex align-items-center gap-2">
-                    <span style="font-size:0.85rem;white-space:nowrap;">Pos.:</span>
-                    <input type="number" min="1" class="form-control form-control-sm bg-dark text-white border-secondary tops-move-pos-input"
-                      style="width:60px;" placeholder="#">
-                    <button class="btn btn-sm btn-success rounded-0 tops-move-pos-btn" type="button">OK</button>
+              <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0" style="min-width:0;">
+                <div class="d-flex align-items-stretch" style="border-radius:4px; overflow:hidden;">
+                  <!-- Izquierda: 4 botones acción -->
+                  <div class="d-flex flex-column" style="min-width:130px;">
+                    <button class="dropdown-item tops-move-first d-flex align-items-center gap-2 py-1 px-3" type="button" style="font-size:0.75rem;">
+                      <i class="fa-solid fa-angles-up text-success" style="font-size:0.78rem;"></i><span>Mover al principio</span>
+                    </button>
+                    <button class="dropdown-item tops-move-up d-flex align-items-center gap-2 py-1 px-3" type="button" style="font-size:0.75rem;">
+                      <i class="fa-solid fa-chevron-up" style="color:#3b9eff;font-size:0.78rem;"></i><span>Subir 1 posición</span>
+                    </button>
+                    <button class="dropdown-item tops-move-down d-flex align-items-center gap-2 py-1 px-3" type="button" style="font-size:0.75rem;">
+                      <i class="fa-solid fa-chevron-down" style="color:#ef4444;font-size:0.78rem;"></i><span>Bajar 1 posición</span>
+                    </button>
+                    <button class="dropdown-item tops-move-last d-flex align-items-center gap-2 py-1 px-3" type="button" style="font-size:0.75rem;">
+                      <i class="fa-solid fa-angles-down text-warning" style="font-size:0.78rem;"></i><span>Mover al final</span>
+                    </button>
                   </div>
-                </li>
-              </ul>
+                  <!-- Separador verde grueso -->
+                  <div style="width:4px; background:#10b981; flex-shrink:0;"></div>
+                  <!-- Derecha: Pos + OK -->
+                  <div class="d-flex flex-column justify-content-center align-items-center gap-1 px-2 py-2" style="min-width:80px;">
+                    <label style="font-size:0.7rem;color:#aaa;text-transform:uppercase;letter-spacing:0.04em;margin:0;">Pos.</label>
+                    <input type="number" min="1" class="form-control form-control-sm bg-dark text-white border-secondary tops-move-pos-input text-center"
+                      style="width:52px;height:26px;font-size:0.78rem;padding:2px 4px;" placeholder="#">
+                    <button class="btn btn-success rounded-0 tops-move-pos-btn" type="button"
+                      style="font-size:0.72rem;padding:2px 10px;font-weight:700;letter-spacing:0.04em;">OK</button>
+                  </div>
+                </div>
+              </div>
             </div>
             <button class="btn btn-sm btn-outline-danger border-0 square-box tops-remove-item"><i class="fa-solid fa-trash"></i></button>
           </div>
@@ -1640,7 +1767,6 @@ $(document).ready(function () {
     let totalLength = 0;
     let totalInversions = 0;
     let extinctCount = 0;
-    let gigaCount = 0;
     let withInversions = 0;
 
     let maxHeight = 0, maxHeightCoaster = null;
@@ -1677,8 +1803,6 @@ $(document).ready(function () {
 
       const status = c.coaster_status || "Operating";
       if (!status.includes("Operating")) extinctCount++;
-
-      if (h >= 60) gigaCount++;
 
       // Records
       if (h > maxHeight) { maxHeight = h; maxHeightCoaster = c.coaster_name; }
@@ -1732,8 +1856,6 @@ $(document).ready(function () {
       $("#fav-manufacturer").text("...");
       $("#fav-manufacturer-count").text("0% de tus credits");
     }
-
-    $("#modal-stat-giga").text(gigaCount);
 
     // Populate Records
     $("#max-stat-height").text(maxHeight > 0 ? `${maxHeight} m` : "—");
@@ -1872,8 +1994,8 @@ $(document).ready(function () {
 
   // Botones de navegación
 
-  $("#btn-tops-full-view").on("click", () => setTopsMode("full"));
-  $("#btn-tops-edit").on("click", () => setTopsMode("edit"));
+  // $("#btn-tops-full-view").on("click", () => setTopsMode("full")); // Ahora navega a top_personal.php
+  // $("#btn-tops-edit").on("click", () => setTopsMode("edit")); // Ahora navega a edit_top.php
   $("#btn-tops-back").on("click", () => setTopsMode("preview"));
 
   // Guardar Cambios — guarda AMBOS tops simultáneamente
@@ -1951,8 +2073,26 @@ $(document).ready(function () {
 
   // Sort y Filtros (Vista Completa)
 
+  // Al cambiar el criterio, ajustar dirección automáticamente
+  $("#coasters-sort").on("change", function () {
+    const sort = $(this).val();
+    const $btn = $("#coasters-sort-dir");
+    const $icon = $btn.find("i");
+    // Stats numéricas: mayor primero (desc ▼); rank/name: menor primero (asc ▲)
+    const preferDesc = ["height", "speed", "length", "inversions"].includes(sort);
+    const preferAsc  = ["rank", "name", "year"].includes(sort);
+    if (preferDesc) {
+      $btn.attr("data-dir", "desc");
+      $icon.removeClass().addClass("fa-solid fa-caret-down");
+    } else if (preferAsc) {
+      $btn.attr("data-dir", "asc");
+      $icon.removeClass().addClass("fa-solid fa-caret-up");
+    }
+    renderCoastersFull();
+  });
+
   $(
-    "#coasters-sort, #coasters-filter-park, #coasters-filter-country, #coasters-filter-manufacter, #coasters-filter-model",
+    "#coasters-filter-park, #coasters-filter-country, #coasters-filter-manufacter, #coasters-filter-model",
   ).on("change", renderCoastersFull);
 
   // Botón de dirección (asc/desc) para el sort de coasters
@@ -2216,6 +2356,42 @@ $(document).ready(function () {
     },
   );
 
+  // -- Coasters: subir 1 posición
+  $(document).on(
+    "click",
+    "#top-coasters-list-edit .tops-move-up",
+    function () {
+      const $item = $(this).closest(".tops-edit-item");
+      const currentIndex = $("#top-coasters-list-edit .tops-edit-item").index($item);
+      if (currentIndex <= 0) return;
+      moveTopsItem("top-coasters-list-edit", $item, currentIndex - 1);
+      topsData.coasters = syncTopsDataFromDOM(
+        "top-coasters-list-edit",
+        topsData.coasters,
+        "coaster_id",
+      );
+      renderCoastersPreview(topsData.coasters);
+    },
+  );
+  // -- Coasters: bajar 1 posición
+  $(document).on(
+    "click",
+    "#top-coasters-list-edit .tops-move-down",
+    function () {
+      const $item = $(this).closest(".tops-edit-item");
+      const $all = $("#top-coasters-list-edit .tops-edit-item");
+      const currentIndex = $all.index($item);
+      if (currentIndex >= $all.length - 1) return;
+      moveTopsItem("top-coasters-list-edit", $item, currentIndex + 1);
+      topsData.coasters = syncTopsDataFromDOM(
+        "top-coasters-list-edit",
+        topsData.coasters,
+        "coaster_id",
+      );
+      renderCoastersPreview(topsData.coasters);
+    },
+  );
+
   // -- Parks: mover al principio
   $(document).on("click", "#top-parks-list-edit .tops-move-first", function () {
     const $item = $(this).closest(".tops-edit-item");
@@ -2232,6 +2408,33 @@ $(document).ready(function () {
     const $item = $(this).closest(".tops-edit-item");
     const total = $("#top-parks-list-edit .tops-edit-item").length;
     moveTopsItem("top-parks-list-edit", $item, total);
+    topsData.parks = syncTopsDataFromDOM(
+      "top-parks-list-edit",
+      topsData.parks,
+      "park_id",
+    );
+    renderParksPreview(topsData.parks);
+  });
+  // -- Parks: subir 1 posición
+  $(document).on("click", "#top-parks-list-edit .tops-move-up", function () {
+    const $item = $(this).closest(".tops-edit-item");
+    const currentIndex = $("#top-parks-list-edit .tops-edit-item").index($item);
+    if (currentIndex <= 0) return;
+    moveTopsItem("top-parks-list-edit", $item, currentIndex - 1);
+    topsData.parks = syncTopsDataFromDOM(
+      "top-parks-list-edit",
+      topsData.parks,
+      "park_id",
+    );
+    renderParksPreview(topsData.parks);
+  });
+  // -- Parks: bajar 1 posición
+  $(document).on("click", "#top-parks-list-edit .tops-move-down", function () {
+    const $item = $(this).closest(".tops-edit-item");
+    const $all = $("#top-parks-list-edit .tops-edit-item");
+    const currentIndex = $all.index($item);
+    if (currentIndex >= $all.length - 1) return;
+    moveTopsItem("top-parks-list-edit", $item, currentIndex + 1);
     topsData.parks = syncTopsDataFromDOM(
       "top-parks-list-edit",
       topsData.parks,
@@ -2420,7 +2623,15 @@ $(document).ready(function () {
               '<li class="list-group-item text-muted small bg-dark border-secondary">No se encontraron montañas rusas</li>',
             );
           } else {
+            // IDs ya en el top para excluirlos
+            const alreadyInTop = new Set(
+              topsData.coasters.map((c) => String(c.coaster_id))
+            );
+
             data.forEach(function (coaster) {
+              // Omitir si ya está en el top
+              if (alreadyInTop.has(String(coaster.id))) return;
+
               let statusText = coaster.coaster_status || "Operativa";
               if (statusText === "Operating" || statusText === "Operativa")
                 statusText = "Operativa";
@@ -3568,6 +3779,13 @@ $(document).ready(function () {
 
   // RANKING
   async function loadRanking() {
+    // Evitar doble inicialización de listeners; al reabrir la sección solo actualizamos datos
+    if (loadRanking._initialized) {
+      if (window._rankingRefetch) window._rankingRefetch();
+      return;
+    }
+    loadRanking._initialized = true;
+
     const sType = document.getElementById("rank-type-select");
     const container = document.getElementById("ranking-container");
     const pBtns = document.querySelectorAll(".rank-period-btn");
@@ -3580,9 +3798,9 @@ $(document).ready(function () {
     let baseDate = new Date();
     let cachedData = null;
 
-    // Inicializar Flatpickr para el ranking si no está inicializado
-    const rankingFpConfig = {
-      locale: "es",
+    // Configuración base de Flatpickr para los selectores de estadísticas
+    const statsConfig = {
+      locale: window.APP_LANG || "es",
       dateFormat: "Y-m-d",
       altInput: true,
       altFormat: "d/m/Y",
@@ -3611,16 +3829,39 @@ $(document).ready(function () {
           fp.set("onYearChange", () => {
             yearSelect.value = fp.currentYear;
           });
-          fp.Input.parentNode.replaceChild(yearSelect, yearInput);
+          const parent = yearInput.parentNode;
+          const arrowUp = parent.querySelector(".arrowUp");
+          const arrowDown = parent.querySelector(".arrowDown");
+          if (arrowUp) arrowUp.style.display = "none";
+          if (arrowDown) arrowDown.style.display = "none";
+          parent.replaceChild(yearSelect, yearInput);
         }
       },
     };
 
+    // Inicializar Flatpickr con onChange incluido en la config (patrón correcto)
     if (sDate && !sDate._flatpickr) {
-      flatpickr(sDate, rankingFpConfig);
+      flatpickr(sDate, {
+        ...statsConfig,
+        onChange: function (selectedDates, dateStr) {
+          if (eDate && eDate._flatpickr) {
+            eDate._flatpickr.set("minDate", dateStr);
+          }
+          if (window.rankingOnDateChange) {
+            window.rankingOnDateChange("start", dateStr);
+          }
+        },
+      });
     }
     if (eDate && !eDate._flatpickr) {
-      flatpickr(eDate, rankingFpConfig);
+      flatpickr(eDate, {
+        ...statsConfig,
+        onChange: function (selectedDates, dateStr) {
+          if (window.rankingOnDateChange) {
+            window.rankingOnDateChange("end", dateStr);
+          }
+        },
+      });
     }
 
     function updateLabel() {
@@ -3736,8 +3977,9 @@ $(document).ready(function () {
       } else if (currentPeriod === "custom") {
         const sd = document.getElementById("rank-start-date");
         const ed = document.getElementById("rank-end-date");
-        start = sd ? sd.value : "";
-        end = ed ? ed.value : "";
+        // Leer valor del input hidden de flatpickr (altInput muestra el formato visual)
+        start = sd ? (sd._flatpickr ? sd._flatpickr.input.value : sd.value) : "";
+        end = ed ? (ed._flatpickr ? ed._flatpickr.input.value : ed.value) : "";
       }
       return { start, end };
     }
@@ -3881,36 +4123,22 @@ $(document).ready(function () {
       if (navContainer) navContainer.classList.add("d-none");
     }
 
-    // Flatpickr en profile.php/user_profile.php (iniciado por trips.js initFlatpickr o localmente)
-    // Nos subscribimos via el evento onChange de Flatpickr
-    if (sDate && sDate._flatpickr) {
-      const onStartChange = (val) => {
-        if (!val) return; // limpieza programática — no cambiar periodo
-        if (eDate && eDate._flatpickr) {
-          eDate._flatpickr.set("minDate", val);
-        }
-        if (currentPeriod !== "custom") switchToCustom();
-        const sv = document.getElementById("rank-start-date")?.value;
-        const ev = document.getElementById("rank-end-date")?.value;
-        if (sv && ev && sv <= ev) fetchRanking();
-      };
-      sDate._flatpickr.config.onChange.push((_, dateStr) =>
-        onStartChange(dateStr),
-      );
-    }
+    // Callback global para que el onChange de flatpickr pueda comunicarse con el módulo
+    window.rankingOnDateChange = function (which, dateStr) {
+      if (!dateStr) return; // limpieza programática — no cambiar periodo
+      if (currentPeriod !== "custom") switchToCustom();
+      const sd = document.getElementById("rank-start-date");
+      const ed = document.getElementById("rank-end-date");
+      const sVal = sd ? (sd._flatpickr ? sd._flatpickr.input.value : sd.value) : "";
+      const eVal = ed ? (ed._flatpickr ? ed._flatpickr.input.value : ed.value) : "";
+      if (sVal && eVal && sVal <= eVal) fetchRanking();
+    };
 
-    if (eDate && eDate._flatpickr) {
-      const onEndChange = (val) => {
-        if (!val) return; // limpieza programática — no cambiar periodo
-        if (currentPeriod !== "custom") switchToCustom();
-        const sv = document.getElementById("rank-start-date")?.value;
-        const ev = document.getElementById("rank-end-date")?.value;
-        if (sv && ev && sv <= ev) fetchRanking();
-      };
-      eDate._flatpickr.config.onChange.push((_, dateStr) =>
-        onEndChange(dateStr),
-      );
-    }
+    // Guardar referencia para poder relanzar datos si loadRanking() es llamada de nuevo
+    window._rankingRefetch = function () {
+      updateLabel();
+      fetchRanking();
+    };
 
     updateLabel();
     fetchRanking();

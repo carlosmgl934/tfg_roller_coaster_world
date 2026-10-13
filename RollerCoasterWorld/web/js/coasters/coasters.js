@@ -111,7 +111,7 @@ $(document).ready(function () {
     $("#coaster-search").on("keyup", function () {
       const search = this.value.trim();
       clearTimeout(searchDebounce);
-      if (search.length < 3) {
+      if (search.length < 2) {
         $("#search-results").html("").hide();
         return;
       }
@@ -388,8 +388,13 @@ $(document).ready(function () {
             BASE_URL + (validImgUrl.startsWith("/") ? "" : "/") + validImgUrl;
         }
 
+        // Evitar cargar la URL rota específica que da error 400
+        if (validImgUrl && validImgUrl.includes("aaipdic")) {
+            validImgUrl = null;
+        }
+
         const img = validImgUrl
-          ? `<img src="${validImgUrl}" alt="${coaster.coaster_name}" class="rounded-0 shadow-sm" referrerpolicy="no-referrer" style="width: 110px; height: 110px; object-fit: cover; margin-right: 20px; flex-shrink:0;">`
+          ? `<img src="${validImgUrl}" alt="${coaster.coaster_name}" class="rounded-0 shadow-sm" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='https://www.hussrides.com/fileadmin/_processed_/5/e/csm_giant-frisbee-cedarpoint-01_0697df513a.jpg';" style="width: 110px; height: 110px; object-fit: cover; margin-right: 20px; flex-shrink:0;">`
           : `<img src="https://www.hussrides.com/fileadmin/_processed_/5/e/csm_giant-frisbee-cedarpoint-01_0697df513a.jpg" alt="Sin imagen" class="rounded-0 shadow-sm" style="width: 110px; height: 110px; object-fit: cover; margin-right: 20px; flex-shrink:0;">`;
 
         const _unk = (window.rcwI18n && typeof window.rcwI18n.t === 'function') ? window.rcwI18n.t('coasters.detail.unknown') : 'Desconocido';
@@ -558,7 +563,7 @@ $(document).ready(function () {
     // 3. Mostrar resultados si vuelves a hacer click en el input del buscador
     searchInput.on("focus", function () {
       if (
-        $(this).val().length >= 3 &&
+        $(this).val().length >= 2 &&
         $("#search-results").children().length > 0
       ) {
         $("#search-results").show();
@@ -646,8 +651,13 @@ $(document).ready(function () {
           if (coasterManufacter)
             coasterManufacter.textContent =
               coaster.coaster_manufacter || _unk;
-          if (coasterModel)
-            coasterModel.textContent = coaster.coaster_model || _unk;
+          if (coasterModel) {
+            if (coaster.coaster_model) {
+              coasterModel.innerHTML = `<a href="${BASE_URL}/web/views/public/coasters/models.php?model=${encodeURIComponent(coaster.coaster_model)}" class="text-success text-decoration-none border-bottom border-success border-2 pb-1 hover-fx">${coaster.coaster_model}</a>`;
+            } else {
+              coasterModel.textContent = _unk;
+            }
+          }
           if (coasterYear)
             coasterYear.textContent = coaster.opening_year || "N/A";
 

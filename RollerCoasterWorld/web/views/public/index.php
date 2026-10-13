@@ -1,5 +1,5 @@
 <?php
-$page_css = ['web/css/home.css', 'web/css/recommendations.css'];
+$page_css = ['web/css/home.css', 'web/css/recommendations.css', 'web/css/spotlight-cards.css'];
 require_once __DIR__ . '/../partials/header.php';
 /** @var string $base_url */
 /** @var bool   $is_logged */
@@ -123,29 +123,27 @@ $is_admin = !empty($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
                 </div>
             </div>
 
-            <!-- ========== ESPECIALMENTE PARA TI (IA) ========== -->
+
+            <!-- ========== COASTER Y PARQUE RANDOM ========== -->
             <div class="home-section rcw-recs-section" id="recs-section">
 
                 <div class="rcw-recs-header">
                     <div class="rcw-recs-title-group">
-                        <div class="home-section-title" style="margin-bottom:0;" data-i18n="home.for_you">Especialmente para
-                            ti</div>
+                        <div class="home-section-title" style="margin-bottom:0;" data-i18n="home.for_you">AL AZAR</div>
                     </div>
                     <div class="d-flex align-items-center gap-2">
-                        <span class="text-muted small d-none d-sm-inline" data-i18n="home.based_on_profile">
-                            Basado en tu perfil y actividad
-                        </span>
-                        <button class="rcw-recs-refresh-btn" id="recs-refresh-btn" title="Actualizar recomendaciones">
+                        <button class="rcw-recs-refresh-btn" id="recs-refresh-btn" title="Actualizar">
                             <i class="fa-solid fa-rotate"></i>
                             <span class="d-none d-sm-inline" data-i18n="home.refresh">Actualizar</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Grid de 3 cards — poblado por recommendations.js -->
-                <div class="rcw-recs-grid" id="recs-grid"></div>
+                <!-- Grid 2 columnas responsive -->
+                <div class="rcw-spotlight-grid" id="recs-grid"></div>
 
             </div><!-- /recs-section -->
+
 
             <!-- PERFIL Y NOTICIAS -->
             <div class="home-section" style="padding-top:0;">
@@ -199,7 +197,7 @@ $is_admin = !empty($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
                                         style="max-width:140px;display:inline-block;vertical-align:bottom;">—</strong></span>
                             </div>
                             <div class="home-profile-mini-footer flex-column" style="gap: 0.5rem; padding: 1rem 1.2rem;">
-                                <a href="<?= Router::url('profile') ?>#tops"
+                                <a href="<?= Router::url('top_personal') ?>"
                                     class="btn btn-success rounded-0 w-100 fw-bold d-flex justify-content-center align-items-center mb-1"
                                     style="padding: 0.6rem; letter-spacing:0.5px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);">
                                     <i class="fa-solid fa-ranking-star me-2"></i> <span data-i18n="home.my_tops">Mis
@@ -458,7 +456,8 @@ $is_admin = !empty($_SESSION['user_rol']) && $_SESSION['user_rol'] === 'admin';
 
 
 <script src="<?= Router::asset('web/js/shared/index.js') ?>?v=<?= time() ?>" defer></script>
-<script src="<?= Router::asset('web/js/shared/recommendations.js') ?>?v=<?= time() ?>" defer></script>
+<script src="<?= Router::asset('web/js/shared/spotlight-card.js') ?>?v=<?= time() ?>" defer></script>
+<script src="<?= Router::asset('web/js/shared/spotlight.js') ?>?v=<?= time() ?>" defer></script>
 <?php if ($is_admin): ?>
     <script src="<?= Router::asset('web/js/shared/carousel_admin.js') ?>" defer></script>
 <?php endif; ?>

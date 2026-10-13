@@ -1,0 +1,502 @@
+/* web/css/tops_personal.css */
+
+.tops-personal-container {
+    color: #fff;
+}
+
+/* ── Fondo del área de contenido ─────────────────────────────────────────── */
+#coasters-container,
+#parks-container {
+    background: #0d1117;
+    border: 1px solid #232a31;
+    min-height: 120px;
+    overflow: hidden;
+}
+
+/* ── Grid de 5 columnas ──────────────────────────────────────────────────── */
+.col-tp-5 {
+    flex: 0 0 auto;
+    width: 20%;
+}
+@media (max-width: 991px) { .col-tp-5 { width: 25%; } }
+@media (max-width: 767px) { .col-tp-5 { width: 33.333%; } }
+@media (max-width: 480px) { .col-tp-5 { width: 50%; } }
+
+/* ── Pestañas ────────────────────────────────────────────────────────────── */
+#tab-coasters-count,
+#tab-parks-count {
+    border-radius: 0 !important;
+    background-color: #0a4f2e !important;
+    color: #ffffff !important;
+}
+.rcw-nav-pills .nav-link.active { background-color: var(--rcw-success, #198754) !important; color: #fff !important; }
+#tops-tabs .nav-link.active     { background-color: var(--rcw-success, #198754) !important; color: #fff !important; }
+#tops-tabs .nav-link:hover:not(.active) { background-color: rgba(25, 135, 84, 0.1); }
+
+/* ── Tarjetas de lista ───────────────────────────────────────────────────── */
+.top-card {
+    background: #161c22;
+    border: 1px solid #232a31;
+    border-radius: 0;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+.top-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* Imagen en vista grid — para 5 columnas usa ratio 4:3 */
+.top-card-grid-img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
+}
+.top-card-grid-placeholder {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: #0d1117;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Imagen en vista lista */
+.top-card-list-img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+}
+.top-card-list-placeholder {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #0d1117;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* En móvil (flex-column) las imágenes necesitan más altura */
+@media (max-width: 767.98px) {
+    .top-card .rank-img-container {
+        flex: none !important;
+        min-height: 200px !important;
+        width: 100%;
+    }
+}
+
+/* ── Vista Mini (compacta) ───────────────────────────────────────────────── */
+.tops-mini-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    height: 46px;
+    padding: 5px 8px;
+    border-bottom: 1px solid #232a31;
+    text-decoration: none;
+    transition: background 0.15s ease;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+}
+.tops-mini-item:last-child { border-bottom: none; }
+.tops-mini-item:hover,
+.tops-mini-item:focus {
+    background: rgba(255, 255, 255, 0.04);
+    outline: none;
+}
+
+.tops-mini-rank {
+    font-weight: 800;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    font-size: 9px;
+}
+.tops-mini-rank.rank-1d { font-size: 11px; }
+.tops-mini-rank.rank-2d { font-size: 9px; }
+.tops-mini-rank.rank-3d { font-size: 7px;  }
+.tops-mini-rank.rank-gold   { background: #FFD700; color: #1a1a1a; }
+.tops-mini-rank.rank-silver { background: #C0C0C0; color: #1a1a1a; }
+.tops-mini-rank.rank-bronze { background: #CD7F32; color: #fff; }
+.tops-mini-rank.rank-top5   { background: #065f46; color: #6ee7b7; }
+
+.tops-mini-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+.tops-mini-thumb-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    background: #0d1117;
+    border: 1px solid #232a31;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #444d56;
+    font-size: 0.85rem;
+}
+
+.tops-mini-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+}
+.tops-mini-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #e0e6ed;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+.tops-mini-sub {
+    font-size: 11px;
+    color: #8b949e;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+.tops-mini-chevron {
+    color: #444d56;
+    font-size: 0.65rem;
+    flex-shrink: 0;
+    opacity: 0.6;
+}
+
+/* ── Rank badge sobre imagen ─────────────────────────────────────────────── */
+.rank-img-badge {
+    position: absolute;
+    top: 0; left: 0;
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+    border-bottom-right-radius: 4px;
+    z-index: 2;
+}
+
+/* ── Hover util ──────────────────────────────────────────────────────────── */
+.hover-green:hover { color: #10b981 !important; }
+.hover-bg-white-5:hover { background: rgba(255,255,255,0.05); }
+
+/* ── Filtros y criterio ──────────────────────────────────────────────────── */
+.tops-filters-bar {
+    background: rgba(22, 27, 34, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 0.75rem 1rem;
+    border-radius: 0;
+}
+
+/* ── Botón limpiar filtros ───────────────────────────────────────────────── */
+.tops-filters-clear-row {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 0.5rem 0.7rem 0.3rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.tops-filters-clear-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: #8b4040;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    position: relative;
+    transition: color 0.2s ease;
+}
+
+.tops-filters-clear-btn::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #c0392b;
+    transition: width 0.2s ease;
+}
+
+.tops-filters-clear-btn:hover {
+    color: #e05c5c;
+}
+
+.tops-filters-clear-btn:hover::after {
+    width: 100%;
+}
+
+.tops-filters-clear-btn i {
+    font-size: 0.65rem;
+    opacity: 0.7;
+}
+
+/* ── Sliders / líneas de datos — estilo técnico editorial ────────────────── */
+.tops-filter-item.slider-item {
+    position: relative;
+    padding: 0.55rem 0.7rem 0.65rem;
+    background: rgba(10, 13, 18, 0.5);
+    border: none;
+    border-radius: 0;
+}
+
+/* separador fade entre filas consecutivas — desaparece en los extremos */
+.tops-filter-item.slider-item + .tops-filter-item.slider-item {
+    border-top: 1px solid transparent;
+    background-image: linear-gradient(rgba(10,13,18,0.5), rgba(10,13,18,0.5)),
+                      linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 25%, rgba(255,255,255,0.08) 75%, transparent 100%);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+}
+
+
+
+.tops-filter-item.slider-item .tops-filter-label {
+    margin-bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    padding-left: 0;
+}
+
+/* label text ligeramente más legible */
+.tops-filter-item.slider-item .tops-filter-label > span:first-child {
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: #6e7a85;
+}
+
+/* chip de valor: dato tabular, plano, sin colores */
+.tops-filter-item.slider-item .slider-val-badge {
+    font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: #c9d1d9;
+    background: rgba(255,255,255,0.05);
+    border: none;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.09);
+    padding: 1px 8px 2px;
+    letter-spacing: 0.01em;
+    line-height: 1.8;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.tops-filters-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 0;
+}
+
+.tops-filters-grid > .tops-filter-item:first-child {
+    grid-column: 1 / -1;
+}
+
+.tops-filters-grid--2col {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.tops-filters-grid--2col > .tops-filter-item {
+    grid-column: auto;
+}
+
+.tops-filter-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.tops-filter-label {
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8b949e;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tops-filter-label i {
+    color: var(--rcw-green, #10b981);
+    font-size: 0.75rem;
+    width: 14px;
+    text-align: center;
+}
+
+.tops-filter-select {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    color: #c9d1d9;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 0;
+    width: 100%;
+    outline: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    appearance: auto;
+}
+
+.tops-filter-select:focus {
+    border-color: var(--rcw-green, #10b981);
+    background: transparent;
+}
+
+.tops-filter-select option {
+    background: #161c22;
+    color: #c9d1d9;
+}
+
+.tops-sort-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+}
+
+.tops-sort-select { flex: 1; }
+
+.tops-sort-dir-btn {
+    width: 36px;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    color: var(--rcw-green, #10b981);
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0;
+}
+
+.tops-sort-dir-btn:hover {
+    background: rgba(25, 135, 84, 0.15);
+    border-color: var(--rcw-green, #10b981);
+}
+
+.tops-sort-dir-btn i {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tops-filters-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    margin-top: 8px;
+}
+
+.tops-counter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(0, 200, 83, 0.12);
+    border: 1px solid rgba(0, 200, 83, 0.3);
+    color: var(--rcw-green-neon, #00c853);
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    letter-spacing: 0.03em;
+}
+
+/* Botón toggle móvil — oculto en escritorio */
+.tops-filters-mobile-toggle { display: none; }
+
+@media (max-width: 768px) {
+    .tops-filters-mobile-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        background: rgba(22, 27, 34, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 0;
+        cursor: pointer;
+        margin-bottom: 0;
+        width: 100%;
+        text-align: left;
+        color: #c9d1d9;
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        transition: background 0.2s;
+        user-select: none;
+    }
+
+    .tops-filters-mobile-toggle:hover { background: rgba(22, 27, 34, 0.9); }
+
+    .tops-filters-mobile-toggle .toggle-arrow {
+        transition: transform 0.25s ease;
+        color: var(--rcw-green, #10b981);
+        font-size: 0.75rem;
+    }
+
+    .tops-filters-mobile-toggle.is-open .toggle-arrow { transform: rotate(180deg); }
+
+    .tops-filters-active-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--rcw-green-neon, #00c853);
+        color: #000;
+        font-size: 0.65rem;
+        font-weight: 800;
+        min-width: 18px;
+        height: 18px;
+        border-radius: 9px;
+        padding: 0 5px;
+        margin-left: 6px;
+    }
+
+    .tops-filters-collapsible {
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.3s ease;
+    }
+
+    .tops-filters-collapsible.is-open { max-height: 1200px; }
+
+    /* Espaciado interior del panel colapsable en móvil */
+    .tops-filters-collapsible .tops-filters-grid {
+        padding-top: 0.9rem;
+        border-top: 1px solid rgba(255,255,255,0.06);
+        margin-top: 0.2rem;
+    }
+}
+

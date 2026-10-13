@@ -160,6 +160,8 @@
   color: #fff;
   margin-bottom: 0.75rem;
   text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 .home-hero-sub {
   font-size: 1.05rem;
@@ -295,6 +297,7 @@
   color: var(--rcw-text);
   white-space: nowrap;
   flex-shrink: 0;
+  overflow: hidden;
 }
 .home-section-title::before {
   content: "";
@@ -643,6 +646,13 @@
   .home-hero {
     height: 420px;
   }
+  .home-hero-content {
+    padding: 0 1.5rem;
+    max-width: 100%;
+  }
+  .home-hero-title {
+    font-size: 2.6rem;
+  }
   .home-hero-arrow {
     display: none;
   }
@@ -650,6 +660,22 @@
     padding: 1rem 1rem;
     flex-wrap: wrap;
     gap: 0.8rem;
+  }
+  .home-section-title {
+    white-space: normal;
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-hero-title {
+    font-size: 2rem;
+  }
+  .home-hero-content {
+    padding: 0 1rem;
+  }
+  .home-section-title {
+    font-size: 1.15rem;
   }
 }
 

@@ -17,9 +17,10 @@ $action = $_GET['action'] ?? 'stats';
 $db = new DBConexion();
 
 match ($action) {
-    'stats'     => getGlobalStats($db),
+    'stats' => getGlobalStats($db),
     'dashboard' => getDashboardData($db),
-    default     => Response::error("Acción desconocida: $action", 400),
+    'random' => getRandomSpotlight($db),
+    default => Response::error("Acción desconocida: $action", 400),
 };
 
 // ── Estadísticas globales ──────────────────────────────────────────────────────
@@ -27,18 +28,18 @@ function getGlobalStats(DBConexion $db): void
 {
     try {
         $coasters = (int) $db->query("SELECT COUNT(*) FROM coasters")->fetchColumn();
-        $parks    = (int) $db->query("SELECT COUNT(*) FROM parks")->fetchColumn();
-        $users    = (int) $db->query("SELECT COUNT(*) FROM users")->fetchColumn();
-        $photos   = (int) $db->query("SELECT COUNT(*) FROM coaster_photos")->fetchColumn();
-        $cr       = (int) $db->query("SELECT COUNT(*) FROM coaster_ratings")->fetchColumn();
-        $pr       = (int) $db->query("SELECT COUNT(*) FROM park_ratings")->fetchColumn();
+        $parks = (int) $db->query("SELECT COUNT(*) FROM parks")->fetchColumn();
+        $users = (int) $db->query("SELECT COUNT(*) FROM users")->fetchColumn();
+        $photos = (int) $db->query("SELECT COUNT(*) FROM coaster_photos")->fetchColumn();
+        $cr = (int) $db->query("SELECT COUNT(*) FROM coaster_ratings")->fetchColumn();
+        $pr = (int) $db->query("SELECT COUNT(*) FROM park_ratings")->fetchColumn();
 
         Response::success([
             'coasters' => $coasters,
-            'parks'    => $parks,
-            'users'    => $users,
-            'photos'   => $photos,
-            'reviews'  => $cr + $pr,
+            'parks' => $parks,
+            'users' => $users,
+            'photos' => $photos,
+            'reviews' => $cr + $pr,
         ]);
     } catch (Exception $e) {
         error_log("Error en stats index: " . $e->getMessage());
@@ -107,23 +108,82 @@ function getDashboardData(DBConexion $db): void
 
         Response::success([
             'user' => [
-                'username'         => $user['username'],
-                'profile_image'    => $user['profile_image'],
-                'location'         => $location,
+                'username' => $user['username'],
+                'profile_image' => $user['profile_image'],
+                'location' => $location,
                 'favorite_coaster' => $user['favorite_coaster'] ?: 'Ninguna configurada',
             ],
             'stats' => [
-                'credits'       => (int) $stats['credits'],
-                'reviews'       => (int) $stats['reviews'],
+                'credits' => (int) $stats['credits'],
+                'reviews' => (int) $stats['reviews'],
                 'parks_visited' => (int) $stats['parks_visited'],
-                'trips'         => (int) $stats['trips'],
-                'photos'        => (int) $stats['photos'],
-                'friends'       => (int) $stats['friends'],
+                'trips' => (int) $stats['trips'],
+                'photos' => (int) $stats['photos'],
+                'friends' => (int) $stats['friends'],
             ],
             'news' => $news,
         ]);
     } catch (Exception $e) {
         error_log("Error en dashboard index: " . $e->getMessage());
         Response::error("Error cargando datos del dashboard", 500);
+    }
+}
+
+// ── Spotlight aleatorio: 1 coaster + 1 parque ─────────────────────────────────
+function getRandomSpotlight(DBConexion $db): void
+{
+    try {
+        // Coaster aleatorio — incluye si el usuario logueado ya lo ha montado
+        $userId = $_SESSION['user_id'] ?? null;
+        $coasterStmt = $db->prepare(
+            "SELECT c.id, c.coaster_name, c.imagen_url, c.coaster_manufacter AS manufacter,
+                    c.coaster_model AS model, c.opening_year, c.height, c.speed,
+                    c.coaster_status AS status, c.inversions,
+                    p.park_name, p.park_country AS country, p.id AS park_id,
+                    CASE WHEN uc.coaster_id IS NOT NULL THEN true ELSE false END AS ridden
+             FROM coasters c
+             INNER JOIN parks p ON c.park_id = p.id
+             LEFT JOIN user_credits uc
+               ON uc.coaster_id = c.id AND uc.user_id = :uid
+             WHERE c.imagen_url IS NOT NULL AND c.imagen_url != ''
+               AND p.park_name NOT IN ('Desconocido','Unknown')
+             ORDER BY RANDOM()
+             LIMIT 1"
+        );
+        $coasterStmt->execute([':uid' => $userId]);
+        $coaster = $coasterStmt->fetch(PDO::FETCH_ASSOC);
+
+        // Parque aleatorio — operating_coasters calculado en tiempo real mediante CTE
+        // (PostgreSQL no permite referenciar alias del SELECT en el WHERE, se usa CTE)
+        $parkStmt = $db->query(
+            "WITH park_data AS (
+                SELECT p.id, p.park_name, p.park_country AS country, p.park_location AS location,
+                       p.imagen_url, p.num_coasters, p.opening_year, p.stars, p.precio_entrada,
+                       (SELECT COUNT(*) FROM coasters c2
+                         WHERE c2.park_id = p.id
+                           AND (c2.coaster_status = 'Operating' OR c2.coaster_status = 'Operativa')
+                       ) AS operating_coasters
+                FROM parks p
+                WHERE p.imagen_url IS NOT NULL AND p.imagen_url != ''
+                  AND p.park_name NOT IN ('Desconocido','Unknown')
+             )
+             SELECT * FROM park_data
+             WHERE operating_coasters > 0
+             ORDER BY RANDOM()
+             LIMIT 1"
+        );
+        $park = $parkStmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($coaster) {
+            $coaster['ridden'] = ($coaster['ridden'] === 't' || $coaster['ridden'] === true);
+        }
+
+        Response::success([
+            'coaster' => $coaster ?: null,
+            'park' => $park ?: null,
+        ]);
+    } catch (Exception $e) {
+        error_log("Error en random spotlight: " . $e->getMessage());
+        Response::error("Error cargando spotlight aleatorio", 500);
     }
 }

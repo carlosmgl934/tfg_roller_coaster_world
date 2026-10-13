@@ -145,6 +145,15 @@ $(document).ready(function () {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
+  // Guarda coordenadas en la BD para que todos los usuarios se beneficien
+  function saveParkCoordsToDb(parkId, lat, lng) {
+    fetch(`${BASE_URL}/api/php/profile_config.php?action=save_park_coords`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ park_id: parkId, lat, lng }),
+    }).catch(() => {}); // fire-and-forget, no bloquea
+  }
+
   async function initMap() {
     if (mapInitialized) {
       if (mapInstance) mapInstance.invalidateSize();
@@ -243,15 +252,18 @@ $(document).ready(function () {
     });
     new FullscreenControl().addTo(mapInstance);
 
+    // Autenticación por dominio (configurada en client.stadiamaps.com)
     L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+      "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
       {
         attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
-        subdomains: "abcd",
-        maxZoom: 19,
+          '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
+        maxZoom: 20,
       },
     ).addTo(mapInstance);
+
+    // Ocultar el control de atribución
+    mapInstance.attributionControl.setPrefix(false);
 
     mapMarkerCluster = L.markerClusterGroup({
       showCoverageOnHover: false,
@@ -287,6 +299,17 @@ $(document).ready(function () {
     const bounds = [];
 
     for (const park of parks) {
+      // 1º opción: coordenadas guardadas en la BD (instantáneo, sin geocoding)
+      if (park.latitude && park.longitude) {
+        cached.push({ park, coords: { lat: parseFloat(park.latitude), lng: parseFloat(park.longitude) } });
+        // Refrescamos también el localStorage para usos offline
+        try {
+          const cacheKey = `rcw_geocode_${park.park_id}`;
+          localStorage.setItem(cacheKey, JSON.stringify({ lat: parseFloat(park.latitude), lng: parseFloat(park.longitude), ts: Date.now() }));
+        } catch (_) {}
+        continue;
+      }
+      // 2º opción: cache local de sesiones anteriores
       const coords = getCachedCoords(park.park_id);
       if (coords) {
         cached.push({ park, coords });
@@ -332,6 +355,8 @@ $(document).ready(function () {
         done++;
 
         if (coords) {
+          // Guardar en BD para que future visitas (y otros usuarios) no necesiten geocoding
+          saveParkCoordsToDb(park.park_id, coords.lat, coords.lng);
           bounds.push([coords.lat, coords.lng]);
           const marker = L.marker([coords.lat, coords.lng], {
             icon: createParkIcon(parseInt(park.coaster_count) || 1),
